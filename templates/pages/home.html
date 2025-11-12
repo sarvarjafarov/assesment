@@ -33,6 +33,49 @@
             <div class="hero-orb orb-two"></div>
         </section>
 
+        <section class="assessment-catalog" id="catalog">
+            <div class="section-heading align-left">
+                <p class="eyebrow">Assessment Catalog</p>
+                <h2>Role-ready diagnostics built for hiring teams.</h2>
+                <p class="lede">
+                    Launch targeted assignments across Digital Marketing, HR, and Behavioral competencies.
+                </p>
+            </div>
+            <div class="catalog-grid">
+                {% for category in assessment_categories %}
+                <article class="catalog-card">
+                    <div class="card-top">
+                        <p class="pill subtle">{{ category.name }}</p>
+                        <p class="category-summary">{{ category.summary }}</p>
+                    </div>
+                    <ul class="assessment-list">
+                        {% for assessment in category.assessments.all %}
+                        <li>
+                            <div>
+                                <p class="assessment-title">{{ assessment.title }}</p>
+                                <p class="assessment-meta">
+                                    {{ assessment.get_level_display }} · ~{{ assessment.duration_minutes }} min
+                                </p>
+                            </div>
+                            <div class="skill-pills">
+                                {% for skill in assessment.skills_focus %}
+                                <span>{{ skill }}</span>
+                                {% empty %}
+                                <span>Readiness</span>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="empty-state">Assessments coming soon.</li>
+                        {% endfor %}
+                    </ul>
+                </article>
+                {% empty %}
+                <p class="empty-state">Catalog is being prepared. Check back shortly.</p>
+                {% endfor %}
+            </div>
+        </section>
+
         <section class="feature-suite" id="products">
             <div class="section-heading">
                 <p class="eyebrow">Platform</p>
@@ -201,7 +244,7 @@
             </div>
         </section>
 
-        <section class="cta">
+        <section class="cta" id="cta">
             <div class="cta-copy">
                 <h2>Get started today.</h2>
                 <ul>
@@ -210,10 +253,42 @@
                     <li>Top-notch service</li>
                 </ul>
             </div>
-            <form class="cta-form">
+            <form class="cta-form" method="post" action="{% url 'pages:home' %}#cta">
+                {% csrf_token %}
                 <label>We'd love to hear from you!</label>
-                <input type="email" placeholder="Enter your email" required />
-                <input type="text" placeholder="Company Name" />
+                {% if invite_form.non_field_errors %}
+                <div class="form-error">
+                    {% for error in invite_form.non_field_errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="form-field">
+                    {{ invite_form.full_name.label_tag }}
+                    {{ invite_form.full_name }}
+                    {% for error in invite_form.full_name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-field">
+                    {{ invite_form.email.label_tag }}
+                    {{ invite_form.email }}
+                    {% for error in invite_form.email.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-field">
+                    {{ invite_form.company.label_tag }}
+                    {{ invite_form.company }}
+                </div>
+                <div class="form-field">
+                    {{ invite_form.focus_area.label_tag }}
+                    {{ invite_form.focus_area }}
+                </div>
+                <div class="form-field">
+                    {{ invite_form.notes.label_tag }}
+                    {{ invite_form.notes }}
+                </div>
                 <button type="submit" class="btn btn-pill">Request a Demo</button>
             </form>
         </section>

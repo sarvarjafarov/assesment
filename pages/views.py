@@ -1,4 +1,10 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django import forms
+
+from assessments.forms import AssessmentInviteForm
+from assessments.models import RoleCategory
 
 FEATURES = [
     {
@@ -63,11 +69,35 @@ ARTICLES = [
 
 def home(request):
     """Render the marketing landing page."""
+    assessment_categories = (
+        RoleCategory.objects.filter(is_active=True)
+        .prefetch_related("assessments")
+        .order_by("name")
+    )
+
+    if request.method == "POST":
+        form = AssessmentInviteForm(request.POST)
+        if form.is_valid():
+            try:
+                result = form.save(invited_by="Site CTA")
+                messages.success(
+                    request,
+                    f"Invite created for {result.candidate.first_name} "
+                    f"({result.assessment.title}).",
+                )
+                return redirect(f"{reverse('pages:home')}#cta")
+            except forms.ValidationError as exc:
+                form.add_error(None, exc)
+    else:
+        form = AssessmentInviteForm()
+
     return render(
         request,
         "pages/home.html",
         {
             "features": FEATURES,
             "articles": ARTICLES,
+            "assessment_categories": assessment_categories,
+            "invite_form": form,
         },
     )
