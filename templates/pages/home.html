@@ -1,8 +1,232 @@
 {% extends 'base.html' %}
-{% block title %}Home{% endblock %}
+{% load static %}
+{% block title %}Sira · Workforce OS{% endblock %}
 {% block content %}
-<section class="hero">
-    <h1>Front-end placeholder</h1>
-    <p>Drop your built HTML here by replacing this template.</p>
-</section>
+<div class="page-shell">
+    <header class="site-header">
+        <nav class="nav">
+            <div class="brand">
+                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
+                <span>Sira</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#products">Products</a></li>
+                <li><a href="#industries">Industries</a></li>
+                <li><a href="#blog">Blog</a></li>
+            </ul>
+            <button class="btn btn-pill">Book a Demo</button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-badge">Backed by <span>Y&nbsp;Combinator</span></div>
+                <h1>No more worrying about <span class="highlight">Labor laws</span></h1>
+                <p class="hero-subtitle">Time Tracking, Scheduling &amp; Payroll Automated</p>
+                <div class="hero-cta">
+                    <button class="btn btn-outline">Book a Demo</button>
+                </div>
+            </div>
+            <div class="hero-grid"></div>
+            <div class="hero-orb orb-one"></div>
+            <div class="hero-orb orb-two"></div>
+        </section>
+
+        <section class="feature-suite" id="products">
+            <div class="section-heading">
+                <p class="eyebrow">Platform</p>
+                <h2>Streamline your workforce management</h2>
+            </div>
+            <div class="feature-body">
+                <div class="feature-accordion" id="featureAccordion">
+                    {% for feature in features %}
+                    <button
+                        class="accordion-item {% if forloop.first %}is-active{% endif %}"
+                        data-feature-button
+                        data-feature="{{ feature.slug }}"
+                    >
+                        <span class="item-title">{{ feature.title }}</span>
+                        <span class="chevron"></span>
+                        <small>{{ feature.description }}</small>
+                    </button>
+                    {% endfor %}
+                    <div class="accent-bar"></div>
+                </div>
+                <div class="feature-panel">
+                    <article class="profile-card">
+                        <header>
+                            <div class="window-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <div>
+                                <p class="card-title">Employee Profile</p>
+                                <p class="card-subtitle">HR Management</p>
+                            </div>
+                        </header>
+                        <div class="profile-summary">
+                            <div class="avatar-ring">
+                                <img src="{% static 'img/avatar-lauren.svg' %}" alt="Lauren Chen" />
+                            </div>
+                            <div>
+                                <p class="name">Lauren Chen</p>
+                                <p class="role">Field Manager · Joined Jan 15, 2024</p>
+                            </div>
+                        </div>
+                        <div class="profile-tabs">
+                            <button class="tab is-active">Personal</button>
+                            <button class="tab">Time Off</button>
+                            <button class="tab">Documents</button>
+                            <button class="tab">Settings</button>
+                        </div>
+                        <dl class="profile-fields">
+                            <div>
+                                <dt>Phone</dt>
+                                <dd>(555) 123-4567</dd>
+                            </div>
+                            <div>
+                                <dt>Email</dt>
+                                <dd>lauren.chen@company.com</dd>
+                            </div>
+                            <div>
+                                <dt>Emergency Contact</dt>
+                                <dd>Michael Chen</dd>
+                            </div>
+                            <div>
+                                <dt>Start Date</dt>
+                                <dd>Jan 15, 2024</dd>
+                            </div>
+                            <div>
+                                <dt>Department</dt>
+                                <dd>Field Operations</dd>
+                            </div>
+                            <div>
+                                <dt>Manager</dt>
+                                <dd>Martina Patel</dd>
+                            </div>
+                        </dl>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="mobile-suite">
+            <div class="device-mockup">
+                <div class="device-notch"></div>
+                <div class="device-screen">
+                    <div class="schedule-pill">
+                        <span>Shift starts in 15 minutes</span>
+                        <strong>Nathan's household</strong>
+                    </div>
+                    <div class="lock-time">
+                        <span>9:41</span>
+                        <small>Mon, October 06</small>
+                    </div>
+                </div>
+                <div class="device-shadow"></div>
+            </div>
+            <div class="mobile-copy">
+                <p class="eyebrow">Mobile Companion</p>
+                <h2>Your worker's assistant, right in the pocket.</h2>
+                <p>
+                    Instant notifications keep every shift on track. Clock in with one tap, stay aligned with
+                    managers, and sync time off in seconds—workforce management made simple.
+                </p>
+                <ul class="icon-list">
+                    <li>
+                        <span class="dot-icon"></span>
+                        Smart schedule notifications
+                    </li>
+                    <li>
+                        <span class="dot-icon"></span>
+                        One-tap clock in/out
+                    </li>
+                    <li>
+                        <span class="dot-icon"></span>
+                        Quick time-off submissions
+                    </li>
+                    <li>
+                        <span class="dot-icon"></span>
+                        Real-time team updates
+                    </li>
+                </ul>
+                <div class="store-buttons">
+                    <button class="store-btn app-store">Download on the App Store</button>
+                    <button class="store-btn play-store">Get it on Google Play</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="resources" id="blog">
+            <div class="section-heading">
+                <p class="eyebrow">Resources &amp; Insights</p>
+                <h2>Stay informed with the latest HR trends</h2>
+                <p class="lede">
+                    Compliance updates and best practices from our expert team.
+                </p>
+                <button class="btn btn-pill secondary">View All Articles</button>
+            </div>
+            <div class="resource-grid">
+                {% for article in articles %}
+                <article class="resource-card">
+                    <div class="card-meta">
+                        <span class="pill {{ article.pill_class }}">{{ article.pill }}</span>
+                        <span class="date">{{ article.date }}</span>
+                    </div>
+                    <h3>{{ article.title }}</h3>
+                    <p>{{ article.summary }}</p>
+                    <div class="author">By {{ article.author }}</div>
+                    <a href="#" class="read-more">Read More</a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="testimonial">
+            <div class="testimonial-card">
+                <div class="testimonial-avatar">
+                    <img src="{% static 'img/avatar-savannah.svg' %}" alt="Savannah, Founder of Hailo" />
+                </div>
+                <p class="person">Savannah</p>
+                <p class="role">Founder of Hailo</p>
+                <blockquote>
+                    “This is the first time our scheduler, time tracker, and team communication are all in one place.
+                    It's incredibly simple to use, and I can definitely see us sticking with it for years.”
+                </blockquote>
+                <div class="dots">
+                    <span class="is-active"></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="cta-copy">
+                <h2>Get started today.</h2>
+                <ul>
+                    <li>Powerful for the office</li>
+                    <li>Easy for employees</li>
+                    <li>Top-notch service</li>
+                </ul>
+            </div>
+            <form class="cta-form">
+                <label>We'd love to hear from you!</label>
+                <input type="email" placeholder="Enter your email" required />
+                <input type="text" placeholder="Company Name" />
+                <button type="submit" class="btn btn-pill">Request a Demo</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>© {% now "Y" %} Sira</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Resources</a>
+        </div>
+        <div>Made with <span>♥</span> by Sira</div>
+    </footer>
+</div>
 {% endblock %}
