@@ -36,6 +36,7 @@
             <span>Email</span>
             <span>Assessments</span>
             <span>Status</span>
+            <span>Score</span>
             <span>Decision</span>
         </div>
         {% for candidate in candidates %}
@@ -44,6 +45,13 @@
             <span>{{ candidate.email }}</span>
             <span>{{ candidate.session_total }}</span>
             <span>{{ candidate.latest_status|default:"—"|title }}</span>
+            <span>
+                {% if candidate.latest_score != None %}
+                {{ candidate.latest_score|floatformat:0 }}%
+                {% else %}
+                —
+                {% endif %}
+            </span>
             <span>{{ candidate.latest_decision|default:"—"|title }}</span>
         </a>
         {% empty %}

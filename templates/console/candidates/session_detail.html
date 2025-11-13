@@ -29,7 +29,17 @@
         </div>
         <div>
             <dt>Score</dt>
-            <dd>{% if session_obj.overall_score %}{{ session_obj.overall_score }}{% else %}—{% endif %}</dd>
+            <dd>
+                {% if session_obj.overall_score != None %}
+                {{ session_obj.overall_score|floatformat:0 }}%
+                {% else %}
+                —
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt>Auto decision</dt>
+            <dd>{{ session_obj.score_breakdown.auto_decision|default:"—"|title }}</dd>
         </div>
         <div>
             <dt>Due</dt>
@@ -67,6 +77,26 @@
     <p class="empty-state">Responses will appear once the candidate submits.</p>
     {% endif %}
 </section>
+
+{% if session_obj.score_breakdown.question_scores %}
+<section class="panel">
+    <header>
+        <h2>Question scores</h2>
+    </header>
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Question</span>
+            <span>Score</span>
+        </div>
+        {% for item in session_obj.score_breakdown.question_scores %}
+        <div class="table-row">
+            <span>{{ item.prompt }}</span>
+            <span>{{ item.score }}%</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 
 <section class="panel">
     <header>

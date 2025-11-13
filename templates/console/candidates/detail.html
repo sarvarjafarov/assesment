@@ -44,6 +44,13 @@
     <p class="session-meta">
         Invited {{ session.invited_at|naturaltime }} · Due
         {% if session.due_at %}{{ session.due_at|naturaltime }}{% else %}Not set{% endif %}
+        · Score
+        {% if session.overall_score != None %}
+        {{ session.overall_score|floatformat:0 }}%
+        {% else %}
+        Pending
+        {% endif %}
+        · Decision {{ session.get_decision_display }}
     </p>
     <form method="post" class="form-stack">
         {% csrf_token %}

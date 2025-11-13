@@ -189,6 +189,7 @@ DEFAULT_FROM_EMAIL = os.environ.get(
     "DEFAULT_FROM_EMAIL", "Sira Hiring <talent@sira.com>"
 )
 EMAIL_ENABLED = EMAIL_BACKEND != "django.core.mail.backends.console.EmailBackend"
+ASSESSMENT_PASSING_SCORE = float(os.environ.get("ASSESSMENT_PASSING_SCORE", "70"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

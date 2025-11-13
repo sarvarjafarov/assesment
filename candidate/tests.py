@@ -119,3 +119,4 @@ class CandidateSessionFlowTests(TestCase):
         self.assertEqual(self.session.status, "completed")
         self.assertTrue(self.session.submitted_at)
         self.assertEqual(self.session.responses.count(), 1)
+        self.assertEqual(self.session.decision, "advance")

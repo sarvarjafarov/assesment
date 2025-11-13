@@ -19,6 +19,7 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+PASSING_SCORE = getattr(settings, "ASSESSMENT_PASSING_SCORE", 70.0)
 
 
 @dataclass
@@ -27,6 +28,12 @@ class SessionInvite:
     session: AssessmentSession
     assessment: Assessment
     created: bool
+
+
+@dataclass
+class SessionEvaluation:
+    score: float
+    breakdown: dict
 
 
 def invite_candidate(
@@ -168,18 +175,88 @@ def record_responses(
     if mark_completed:
         session.status = "completed"
         session.submitted_at = timezone.now()
+        evaluation: SessionEvaluation | None = None
+        if overall_score is None or score_breakdown is None:
+            evaluation = evaluate_session_performance(session)
         if overall_score is not None:
             session.overall_score = overall_score
+        elif evaluation:
+            session.overall_score = evaluation.score
         if score_breakdown is not None:
             session.score_breakdown = score_breakdown
+        elif evaluation and evaluation.breakdown:
+            session.score_breakdown = evaluation.breakdown
+        auto_decision_value = None
+        if session.overall_score is not None and session.decision == "undecided":
+            session.decision = determine_decision(session.overall_score)
+            auto_decision_value = session.decision
+        if auto_decision_value:
+            breakdown = session.score_breakdown or {}
+            breakdown.setdefault("auto_decision", auto_decision_value)
+            session.score_breakdown = breakdown
         session.save(
             update_fields=[
                 "status",
                 "submitted_at",
                 "overall_score",
                 "score_breakdown",
+                "decision",
                 "updated_at",
             ]
         )
 
     return session
+
+
+def evaluate_session_performance(
+    session: AssessmentSession,
+) -> SessionEvaluation | None:
+    responses = (
+        session.responses.select_related("question")
+        .prefetch_related("selected_choices", "question__choices")
+        .all()
+    )
+    question_scores: list[float] = []
+    breakdown_entries: list[dict] = []
+    for response in responses:
+        question = response.question
+        if question.question_type not in {Question.TYPE_SINGLE, Question.TYPE_MULTI}:
+            continue
+        max_weight = _question_max_weight(question)
+        if not max_weight:
+            continue
+        selected_weight = sum(
+            float(choice.weight) for choice in response.selected_choices.all()
+        )
+        ratio = max(0.0, min(selected_weight / max_weight, 1.0))
+        question_scores.append(ratio)
+        breakdown_entries.append(
+            {
+                "question_id": question.id,
+                "prompt": question.prompt,
+                "score": round(ratio * 100, 2),
+            }
+        )
+    if not question_scores:
+        return None
+    overall = round(sum(question_scores) / len(question_scores) * 100, 2)
+    return SessionEvaluation(
+        score=overall, breakdown={"question_scores": breakdown_entries}
+    )
+
+
+def _question_max_weight(question: Question) -> float | None:
+    choices = list(question.choices.all())
+    if not choices:
+        return None
+    weights = [float(choice.weight) for choice in choices]
+    if question.question_type == Question.TYPE_SINGLE:
+        return max(weights)
+    positive_weights = [weight for weight in weights if weight > 0]
+    if not positive_weights:
+        return None
+    return sum(positive_weights)
+
+
+def determine_decision(score: float) -> str:
+    return "advance" if score >= PASSING_SCORE else "reject"

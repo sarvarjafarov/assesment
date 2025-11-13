@@ -192,6 +192,7 @@ class CandidateListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
             .annotate(session_total=Count("sessions", distinct=True))
             .annotate(latest_status=Subquery(latest_qs.values("status")[:1]))
             .annotate(latest_decision=Subquery(latest_qs.values("decision")[:1]))
+            .annotate(latest_score=Subquery(latest_qs.values("overall_score")[:1]))
             .order_by("first_name", "last_name")
         )
         query = self.request.GET.get("q")
