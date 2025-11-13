@@ -17,35 +17,37 @@
     </div>
 </section>
 
-<section class="panel meta-panel">
-    <dl>
-        <div>
-            <dt>Status</dt>
-            <dd>{{ session_obj.get_status_display }}</dd>
-        </div>
-        <div>
-            <dt>Decision</dt>
-            <dd>{{ session_obj.get_decision_display }}</dd>
-        </div>
-        <div>
-            <dt>Score</dt>
-            <dd>
+<section class="panel metric-panel">
+    <div class="metric-grid">
+        <article class="metric-card">
+            <p class="metric-label">Status</p>
+            <p class="metric-value">{{ session_obj.get_status_display }}</p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Decision</p>
+            <p class="metric-value decision {{ session_obj.decision }}">{{ session_obj.get_decision_display }}</p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Score</p>
+            <p class="metric-value">
                 {% if session_obj.overall_score != None %}
                 {{ session_obj.overall_score|floatformat:0 }}%
                 {% else %}
                 —
                 {% endif %}
-            </dd>
-        </div>
-        <div>
-            <dt>Auto decision</dt>
-            <dd>{{ session_obj.score_breakdown.auto_decision|default:"—"|title }}</dd>
-        </div>
-        <div>
-            <dt>Due</dt>
-            <dd>{% if session_obj.due_at %}{{ session_obj.due_at|naturaltime }}{% else %}Flexible{% endif %}</dd>
-        </div>
-    </dl>
+            </p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Auto decision</p>
+            <p class="metric-value decision {{ session_obj.score_breakdown.auto_decision|default:'' }}">
+                {{ session_obj.score_breakdown.auto_decision|default:"—"|title }}
+            </p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Due</p>
+            <p class="metric-value">{% if session_obj.due_at %}{{ session_obj.due_at|naturaltime }}{% else %}Flexible{% endif %}</p>
+        </article>
+    </div>
 </section>
 
 <section class="panel response-panel">

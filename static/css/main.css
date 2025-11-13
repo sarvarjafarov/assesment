@@ -1158,6 +1158,46 @@ main {
     align-items: center;
 }
 
+.metric-panel {
+    padding: 1.5rem 2rem;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.metric-card {
+    background: #f6f7fb;
+    border-radius: 18px;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(14, 20, 40, 0.05);
+}
+
+.metric-label {
+    margin: 0;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.metric-value {
+    margin: 0.35rem 0 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.metric-value.decision.advance {
+    color: #0faa7c;
+}
+
+.metric-value.decision.reject {
+    color: #eb5757;
+}
+
 .candidate-shell {
     min-height: 100vh;
     background: var(--bg-muted);
