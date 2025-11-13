@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 class SessionInvite:
     candidate: CandidateProfile
     session: AssessmentSession
+    assessment: Assessment
     created: bool
 
 
@@ -60,7 +61,9 @@ def invite_candidate(
     session.invited_at = timezone.now()
     session.save(update_fields=["status", "invited_by", "invited_at", "updated_at"])
 
-    return SessionInvite(candidate=candidate, session=session, created=created)
+    return SessionInvite(
+        candidate=candidate, session=session, assessment=assessment, created=created
+    )
 
 
 def send_invite_email(
