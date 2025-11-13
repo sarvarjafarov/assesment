@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Iterable, Sequence
 
+from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 from .models import (
@@ -13,6 +17,8 @@ from .models import (
     Question,
     Response,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -55,6 +61,45 @@ def invite_candidate(
     session.save(update_fields=["status", "invited_by", "invited_at", "updated_at"])
 
     return SessionInvite(candidate=candidate, session=session, created=created)
+
+
+def send_invite_email(
+    *,
+    candidate: CandidateProfile,
+    assessment: Assessment,
+    session: AssessmentSession,
+    session_link: str,
+    invited_by: str,
+    due_at=None,
+    notes: str = "",
+):
+    """Send an email invitation with the candidate's unique session link."""
+
+    context = {
+        "candidate": candidate,
+        "assessment": assessment,
+        "session": session,
+        "session_link": session_link,
+        "invited_by": invited_by or "The Sira Team",
+        "due_at": due_at or session.due_at,
+        "notes": notes or session.notes,
+    }
+    subject = f"{assessment.title} assessment invitation"
+    text_body = render_to_string("emails/invite_candidate.txt", context)
+    html_body = render_to_string("emails/invite_candidate.html", context)
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+    try:
+        send_mail(
+            subject,
+            text_body,
+            from_email,
+            [candidate.email],
+            html_message=html_body,
+        )
+    except Exception as exc:  # pragma: no cover - avoid failing invite on email issues
+        logger.warning(
+            "Failed to send invite email for session %s: %s", session.pk, exc
+        )
 
 
 def record_responses(

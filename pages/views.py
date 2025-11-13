@@ -5,6 +5,7 @@ from django import forms
 
 from assessments.forms import AssessmentInviteForm
 from assessments.models import RoleCategory
+from assessments.services import send_invite_email
 
 FEATURES = [
     {
@@ -80,6 +81,17 @@ def home(request):
         if form.is_valid():
             try:
                 result = form.save(invited_by="Site CTA")
+                session_link = request.build_absolute_uri(
+                    reverse("candidate:session-entry", args=[result.session.uuid])
+                )
+                send_invite_email(
+                    candidate=result.candidate,
+                    assessment=result.assessment,
+                    session=result.session,
+                    session_link=session_link,
+                    invited_by="Site CTA",
+                    notes=form.cleaned_data.get("notes", ""),
+                )
                 messages.success(
                     request,
                     f"Invite created for {result.candidate.first_name} "

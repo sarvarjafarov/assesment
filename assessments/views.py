@@ -3,12 +3,15 @@ import json
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Assessment, AssessmentSession, RoleCategory
-from .services import invite_candidate, record_responses
+from .services import invite_candidate, record_responses, send_invite_email
 
 
 class ApiKeyRequiredMixin:
@@ -142,6 +145,41 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
             headline=payload.get("headline", ""),
             metadata=payload.get("metadata") or {},
             invited_by="API",
+        )
+        notes = payload.get("notes", "")
+        due_at_input = payload.get("due_at")
+        due_at = None
+        if due_at_input:
+            due_at = parse_datetime(due_at_input)
+            if not due_at:
+                return JsonResponse(
+                    {"detail": "due_at must be an ISO datetime string."}, status=400
+                )
+            if timezone.is_naive(due_at):
+                due_at = timezone.make_aware(due_at, timezone.get_current_timezone())
+
+        session_updates = []
+        if notes:
+            invite.session.notes = notes
+            session_updates.append("notes")
+        if due_at:
+            invite.session.due_at = due_at
+            session_updates.append("due_at")
+        if session_updates:
+            session_updates.append("updated_at")
+            invite.session.save(update_fields=session_updates)
+
+        session_link = request.build_absolute_uri(
+            reverse("candidate:session-entry", args=[invite.session.uuid])
+        )
+        send_invite_email(
+            candidate=invite.candidate,
+            assessment=assessment,
+            session=invite.session,
+            session_link=session_link,
+            invited_by="API",
+            notes=notes,
+            due_at=due_at,
         )
         response_data = {
             "session_uuid": str(invite.session.uuid),

@@ -21,6 +21,7 @@ from assessments.models import (
     CandidateProfile,
     Question,
 )
+from assessments.services import send_invite_email
 from .forms import (
     AssessmentForm,
     ChoiceForm,
@@ -281,9 +282,22 @@ class InviteCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
         session_link = self.request.build_absolute_uri(
             reverse("candidate:session-entry", args=[result.session.uuid])
         )
+        send_invite_email(
+            candidate=result.candidate,
+            assessment=result.assessment,
+            session=result.session,
+            session_link=session_link,
+            invited_by=invited_by,
+            due_at=form.cleaned_data.get("due_at"),
+            notes=form.cleaned_data.get("notes", ""),
+        )
         messages.success(
             self.request,
             f"Invite ready for {result.candidate.first_name}. Share link: {session_link}",
+        )
+        messages.info(
+            self.request,
+            f"Invitation email sent to {result.candidate.email}.",
         )
         self.success_url = reverse(
             "console:candidate-detail", args=[result.candidate.pk]

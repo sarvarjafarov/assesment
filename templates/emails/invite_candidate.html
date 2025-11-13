@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; color: #0e1428;">
+    <p>Hi {{ candidate.first_name }},</p>
+    <p>
+        {{ invited_by }} invited you to complete the
+        <strong>{{ assessment.title }}</strong> assessment on Sira.
+    </p>
+    {% if due_at %}
+    <p><strong>Deadline:</strong> {{ due_at|date:"M d, Y · h:i A" }}</p>
+    {% endif %}
+    <p>
+        Use your private link to start:
+        <a href="{{ session_link }}">{{ session_link }}</a>
+    </p>
+    {% if notes %}
+    <p>
+        <strong>Notes from the team:</strong><br />
+        {{ notes|linebreaksbr }}
+    </p>
+    {% endif %}
+    <p>
+        Need help? Reply to this email and the team will assist.
+    </p>
+    <p>Thanks,<br />The Sira Team</p>
+</body>
+</html>

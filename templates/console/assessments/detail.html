@@ -46,10 +46,10 @@
                     <p class="question-title">{{ question.prompt }}</p>
                     <small>{{ question.get_question_type_display }} · Weight {{ question.weight }}</small>
                 </div>
-                {% if question.question_type in ('single', 'multi') %}
-                <a class="pill subtle" href="{% url 'console:choice-create' question.pk %}">Add choice</a>
-                {% endif %}
-            </div>
+            {% if question.question_type == 'single' or question.question_type == 'multi' %}
+            <a class="pill subtle" href="{% url 'console:choice-create' question.pk %}">Add choice</a>
+            {% endif %}
+        </div>
             {% if question.choices.all %}
             <ul class="choice-list">
                 {% for choice in question.choices.all %}
