@@ -9,34 +9,52 @@ from assessments.services import send_invite_email
 
 FEATURES = [
     {
-        "slug": "scheduling",
-        "title": "Employee Scheduling",
-        "description": "Visual shift planning with automated compliance guardrails.",
+        "slug": "scope",
+        "title": "Scope & design",
+        "description": "Match roles to catalog assignments or build your own criteria.",
+        "panel_title": "Assessment designer",
+        "panel_subtitle": "Control expertise, competencies, and required artifacts before the invite goes out.",
+        "panel_points": [
+            "Leverage 25+ ready-to-run templates or clone your own.",
+            "Set deadlines, reviewers, and auto-reminders per role.",
+            "Collect structured uploads, videos, or case study answers.",
+        ],
     },
     {
-        "slug": "time",
-        "title": "Time Tracking",
-        "description": "Precise clock-ins with GPS verification and overtime alerts.",
+        "slug": "invite",
+        "title": "Invite & align",
+        "description": "Send branded instructions to candidates and collaborators.",
+        "panel_title": "Branded candidate briefing",
+        "panel_subtitle": "Every invite includes a timeline, recruiter notes, and a mobile-friendly start button.",
+        "panel_points": [
+            "Personalized landing page per candidate.",
+            "Live status signals—opened, started, submitted.",
+            "Secure share links for hiring panels and agencies.",
+        ],
     },
     {
-        "slug": "operations",
-        "title": "Daily Operations",
-        "description": "Dispatch tasks, capture field updates, and keep everyone aligned.",
+        "slug": "score",
+        "title": "Auto score & shortlist",
+        "description": "Capture evidence, auto score responses, and surface the standouts.",
+        "panel_title": "Scoring console",
+        "panel_subtitle": "Structured rubrics transform responses into a ranked slate with bias controls.",
+        "panel_points": [
+            "Per-question scoring with calibration notes.",
+            "Auto advancement rules based on thresholds.",
+            "Export-ready summaries for hiring managers.",
+        ],
     },
     {
-        "slug": "communications",
-        "title": "Internal Communication",
-        "description": "Secure, threaded conversations for every job site.",
-    },
-    {
-        "slug": "payroll",
-        "title": "Payroll",
-        "description": "Push-button payroll exports with automatic deductions.",
-    },
-    {
-        "slug": "hr",
-        "title": "HR Management",
-        "description": "Manage onboarding through offboarding with ease.",
+        "slug": "decide",
+        "title": "Decide & handoff",
+        "description": "Advance shortlisted talent to interviews or offers with context.",
+        "panel_title": "Decision workspace",
+        "panel_subtitle": "Log the rationale, notify candidates, and sync to your ATS without copy-paste.",
+        "panel_points": [
+            "One-click advance/reject with templated communications.",
+            "Shareable highlight reels for interviewers.",
+            "Audit trail covering every reviewer action.",
+        ],
     },
 ]
 
@@ -64,6 +82,27 @@ ARTICLES = [
         "summary": "Learn how Sira's voice AI office manager keeps admins updated and workers empowered in the field.",
         "author": "Business Owner's Guide",
         "date": "October 5, 2025",
+    },
+]
+
+TESTIMONIALS = [
+    {
+        "name": "Savannah",
+        "role": "Founder of Hailo",
+        "quote": "This is the first time our scheduler, time tracker, and team communication are all in one place. It's incredibly simple to use, and I can definitely see us sticking with it for years.",
+        "avatar": "img/avatar-savannah.svg",
+    },
+    {
+        "name": "Marcus",
+        "role": "VP People, Copper Build",
+        "quote": "Sira gave our hiring pods one console to scope assignments, tag reviewers, and advance reliable operators—we ship offers faster than ever.",
+        "avatar": "img/avatar-marcus.svg",
+    },
+    {
+        "name": "Priya",
+        "role": "Head of Talent, Aster Care",
+        "quote": "Auto scoring shaved days off each search. Candidates stay informed while our team sees a clear, auditable shortlist.",
+        "avatar": "img/avatar-priya.svg",
     },
 ]
 
@@ -113,6 +152,7 @@ def home(request):
         {
             "features": FEATURES,
             "articles": ARTICLES,
+            "testimonials": TESTIMONIALS,
             "assessment_categories": assessment_categories,
             "invite_form": form,
         },

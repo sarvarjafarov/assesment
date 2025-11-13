@@ -14,7 +14,10 @@
                 <li><a href="#industries">Industries</a></li>
                 <li><a href="#blog">Blog</a></li>
             </ul>
-            <button class="btn btn-pill">Book a Demo</button>
+            <div class="nav-actions">
+                <a class="btn btn-outline small" href="{% url 'console:dashboard' %}">Customer Login</a>
+                <button class="btn btn-pill">Book a Demo</button>
+            </div>
         </nav>
     </header>
 
@@ -30,6 +33,7 @@
                 <div class="hero-cta">
                     <button class="btn btn-pill">Book a Demo</button>
                     <a class="btn btn-outline" href="#workflow">See how it works</a>
+                    <a class="btn btn-ghost" href="{% url 'console:dashboard' %}">Customer Login</a>
                 </div>
             </div>
             <div class="hero-grid"></div>
@@ -123,18 +127,22 @@
             <div class="catalog-grid">
                 {% for category in assessment_categories %}
                 <article class="catalog-card">
-                    <div class="card-top">
-                        <p class="pill subtle">{{ category.name }}</p>
-                        <p class="category-summary">{{ category.summary }}</p>
-                    </div>
+                    <header class="catalog-header">
+                        <div>
+                            <p class="pill subtle">{{ category.name }}</p>
+                            <h3>{{ category.summary }}</h3>
+                        </div>
+                        <a href="#cta" class="link">Invite talent</a>
+                    </header>
                     <ul class="assessment-list">
                         {% for assessment in category.assessments.all %}
                         <li>
-                            <div>
+                            <div class="assessment-copy">
                                 <p class="assessment-title">{{ assessment.title }}</p>
                                 <p class="assessment-meta">
                                     {{ assessment.get_level_display }} · ~{{ assessment.duration_minutes }} min
                                 </p>
+                                <p class="assessment-summary">{{ assessment.summary }}</p>
                             </div>
                             <div class="skill-pills">
                                 {% for skill in assessment.skills_focus %}
@@ -175,105 +183,89 @@
                     {% endfor %}
                     <div class="accent-bar"></div>
                 </div>
-                <div class="feature-panel">
-                    <article class="profile-card">
-                        <header>
-                            <div class="window-dots">
-                                <span></span><span></span><span></span>
-                            </div>
-                            <div>
-                                <p class="card-title">Employee Profile</p>
-                                <p class="card-subtitle">HR Management</p>
-                            </div>
-                        </header>
-                        <div class="profile-summary">
-                            <div class="avatar-ring">
-                                <img src="{% static 'img/avatar-lauren.svg' %}" alt="Lauren Chen" />
-                            </div>
-                            <div>
-                                <p class="name">Lauren Chen</p>
-                                <p class="role">Field Manager · Joined Jan 15, 2024</p>
-                            </div>
-                        </div>
-                        <div class="profile-tabs">
-                            <button class="tab is-active">Personal</button>
-                            <button class="tab">Time Off</button>
-                            <button class="tab">Documents</button>
-                            <button class="tab">Settings</button>
-                        </div>
-                        <dl class="profile-fields">
-                            <div>
-                                <dt>Phone</dt>
-                                <dd>(555) 123-4567</dd>
-                            </div>
-                            <div>
-                                <dt>Email</dt>
-                                <dd>lauren.chen@company.com</dd>
-                            </div>
-                            <div>
-                                <dt>Emergency Contact</dt>
-                                <dd>Michael Chen</dd>
-                            </div>
-                            <div>
-                                <dt>Start Date</dt>
-                                <dd>Jan 15, 2024</dd>
-                            </div>
-                            <div>
-                                <dt>Department</dt>
-                                <dd>Field Operations</dd>
-                            </div>
-                            <div>
-                                <dt>Manager</dt>
-                                <dd>Martina Patel</dd>
-                            </div>
-                        </dl>
+                <div class="feature-panels">
+                    {% for feature in features %}
+                    <article
+                        class="feature-card {% if forloop.first %}is-active{% endif %}"
+                        data-feature-panel="{{ feature.slug }}"
+                    >
+                        <p class="pill subtle">{{ feature.title }}</p>
+                        <h3>{{ feature.panel_title }}</h3>
+                        <p>{{ feature.panel_subtitle }}</p>
+                        <ul class="feature-points">
+                            {% for point in feature.panel_points %}
+                            <li>{{ point }}</li>
+                            {% endfor %}
+                        </ul>
                     </article>
+                    {% endfor %}
                 </div>
             </div>
         </section>
 
-        <section class="mobile-suite">
-            <div class="device-mockup">
-                <div class="device-notch"></div>
-                <div class="device-screen">
-                    <div class="schedule-pill">
-                        <span>Shift starts in 15 minutes</span>
-                        <strong>Nathan's household</strong>
+        <section class="journey">
+            <div class="journey-copy">
+                <p class="eyebrow">Candidate Journey</p>
+                <h2>Show HR teams and applicants what happens between invite and decision.</h2>
+                <p>Our live animation mirrors the Sira workflow—brief, capture, score, and deliver decisions.</p>
+                <div class="journey-legend">
+                    <span class="tag company">Company console</span>
+                    <span class="tag candidate">Candidate view</span>
+                </div>
+                <ul class="journey-benefits">
+                    <li>Recruiters stay in control with real-time visibility.</li>
+                    <li>Candidates always know what to do next.</li>
+                    <li>Auto scoring shortlists top performers instantly.</li>
+                </ul>
+            </div>
+            <div class="journey-animation">
+                <div class="journey-stage" data-stage="brief">
+                    <div class="journey-card company">
+                        <p class="label">Recruiter sends invite</p>
+                        <p class="title">Briefing sent to Maya</p>
+                        <p class="meta">Due in 3 days · Voice, video, files</p>
                     </div>
-                    <div class="lock-time">
-                        <span>9:41</span>
-                        <small>Mon, October 06</small>
+                    <div class="journey-card candidate">
+                        <p class="label">Candidate sees timeline</p>
+                        <p class="title">“Thanks! Deadline Friday.”</p>
+                        <p class="meta">Maya reviews notes + expectations.</p>
                     </div>
                 </div>
-                <div class="device-shadow"></div>
-            </div>
-            <div class="mobile-copy">
-                <p class="eyebrow">Candidate Companion</p>
-                <h2>Brief, guide, and update every applicant.</h2>
-                <p>
-                    Every assessment invite opens to branded instructions with instant chat, notifications, and status tracking—no logins required.
-                </p>
-                <ul class="icon-list">
-                    <li>
-                        <span class="dot-icon"></span>
-                        Timeline reminders and recruiter notes
-                    </li>
-                    <li>
-                        <span class="dot-icon"></span>
-                        Guided, mobile-first question experience
-                    </li>
-                    <li>
-                        <span class="dot-icon"></span>
-                        Auto saves, confirmations, and receipts
-                    </li>
-                    <li>
-                        <span class="dot-icon"></span>
-                        Real-time status once a decision is made
-                    </li>
-                </ul>
-                <div class="store-buttons">
-                    <button class="store-btn app-store">Download on the App Store</button>
-                    <button class="store-btn play-store">Get it on Google Play</button>
+                <div class="journey-stage" data-stage="capture">
+                    <div class="journey-card company">
+                        <p class="label">Evidence captured</p>
+                        <p class="title">Uploads received</p>
+                        <p class="meta">Case study · Loom video · Doc</p>
+                    </div>
+                    <div class="journey-card candidate">
+                        <p class="label">Progress tracker</p>
+                        <p class="title">“Files uploaded ✔️”</p>
+                        <p class="meta">Auto save + confirmation email.</p>
+                    </div>
+                </div>
+                <div class="journey-stage" data-stage="score">
+                    <div class="journey-card company">
+                        <p class="label">Auto score &amp; shortlist</p>
+                        <p class="title">82% · Ready to advance</p>
+                        <p class="meta">Sira suggests interviews with Eli + Ada.</p>
+                    </div>
+                    <div class="journey-card candidate">
+                        <p class="label">Status update</p>
+                        <p class="title">“Score received. Hang tight.”</p>
+                        <p class="meta">Maya sees that responses are under review.</p>
+                    </div>
+                </div>
+                <div class="journey-stage" data-stage="decision">
+                    <div class="journey-card company">
+                        <p class="label">Decision workspace</p>
+                        <p class="title">Advance to onsite</p>
+                        <p class="meta">Auto email + ATS sync triggered.</p>
+                    </div>
+                    <div class="journey-card candidate">
+                        <p class="label">Outcome delivered</p>
+                        <p class="title">“Great news! Interview confirmed.”</p>
+                        <p class="meta">Candidate receives next steps instantly.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -290,14 +282,15 @@
             <div class="resource-grid">
                 {% for article in articles %}
                 <article class="resource-card">
-                    <div class="card-meta">
+                    <header>
                         <span class="pill {{ article.pill_class }}">{{ article.pill }}</span>
                         <span class="date">{{ article.date }}</span>
-                    </div>
+                    </header>
                     <h3>{{ article.title }}</h3>
                     <p>{{ article.summary }}</p>
                     <div class="author">By {{ article.author }}</div>
-                    <a href="#" class="read-more">Read More</a>
+                    <button class="outline-link">Read article</button>
+                    <div class="card-shade"></div>
                 </article>
                 {% endfor %}
             </div>
@@ -305,70 +298,84 @@
 
         <section class="testimonial">
             <div class="testimonial-card">
-                <div class="testimonial-avatar">
-                    <img src="{% static 'img/avatar-savannah.svg' %}" alt="Savannah, Founder of Hailo" />
+                <div class="testimonial-slider">
+                    {% for testimonial in testimonials %}
+                    <article
+                        class="testimonial-panel {% if forloop.first %}is-active{% endif %}"
+                        data-testimonial-panel="{{ forloop.counter0 }}"
+                    >
+                        <div class="testimonial-avatar">
+                            <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
+                        </div>
+                        <p class="person">{{ testimonial.name }}</p>
+                        <p class="role">{{ testimonial.role }}</p>
+                        <blockquote>“{{ testimonial.quote }}”</blockquote>
+                    </article>
+                    {% endfor %}
                 </div>
-                <p class="person">Savannah</p>
-                <p class="role">Founder of Hailo</p>
-                <blockquote>
-                    “This is the first time our scheduler, time tracker, and team communication are all in one place.
-                    It's incredibly simple to use, and I can definitely see us sticking with it for years.”
-                </blockquote>
                 <div class="dots">
-                    <span class="is-active"></span>
-                    <span></span>
-                    <span></span>
+                    {% for testimonial in testimonials %}
+                    <button
+                        class="{% if forloop.first %}is-active{% endif %}"
+                        data-testimonial-button="{{ forloop.counter0 }}"
+                        aria-label="View testimonial {{ forloop.counter }}"
+                    ></button>
+                    {% endfor %}
                 </div>
             </div>
         </section>
 
         <section class="cta" id="cta">
-            <div class="cta-copy">
+            <div class="cta-card">
+                <p class="eyebrow">Ready to partner?</p>
                 <h2>Get started today.</h2>
+                <p>Full-service support for talent teams rolling out assessments across the org.</p>
                 <ul>
                     <li>Powerful for the office</li>
                     <li>Easy for employees</li>
                     <li>Top-notch service</li>
                 </ul>
             </div>
-            <form class="cta-form" method="post" action="{% url 'pages:home' %}#cta">
-                {% csrf_token %}
-                <label>We'd love to hear from you!</label>
-                {% if invite_form.non_field_errors %}
-                <div class="form-error">
-                    {% for error in invite_form.non_field_errors %}
-                    <p>{{ error }}</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                <div class="form-field">
-                    {{ invite_form.full_name.label_tag }}
-                    {{ invite_form.full_name }}
-                    {% for error in invite_form.full_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-field">
-                    {{ invite_form.email.label_tag }}
-                    {{ invite_form.email }}
-                    {% for error in invite_form.email.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-field">
-                    {{ invite_form.company.label_tag }}
-                    {{ invite_form.company }}
-                </div>
-                <div class="form-field">
-                    {{ invite_form.focus_area.label_tag }}
-                    {{ invite_form.focus_area }}
-                </div>
-                <div class="form-field">
-                    {{ invite_form.notes.label_tag }}
-                    {{ invite_form.notes }}
-                </div>
-                <button type="submit" class="btn btn-pill">Request a Demo</button>
-            </form>
+            <div class="cta-form-card">
+                <form class="cta-form" method="post" action="{% url 'pages:home' %}#cta">
+                    {% csrf_token %}
+                    <label>We'd love to hear from you!</label>
+                    {% if invite_form.non_field_errors %}
+                    <div class="form-error">
+                        {% for error in invite_form.non_field_errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="form-field">
+                        {{ invite_form.full_name.label_tag }}
+                        {{ invite_form.full_name }}
+                        {% for error in invite_form.full_name.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        {{ invite_form.email.label_tag }}
+                        {{ invite_form.email }}
+                        {% for error in invite_form.email.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        {{ invite_form.company.label_tag }}
+                        {{ invite_form.company }}
+                    </div>
+                    <div class="form-field">
+                        {{ invite_form.focus_area.label_tag }}
+                        {{ invite_form.focus_area }}
+                    </div>
+                    <div class="form-field">
+                        {{ invite_form.notes.label_tag }}
+                        {{ invite_form.notes }}
+                    </div>
+                    <button type="submit" class="btn btn-pill">Request a Demo</button>
+                </form>
+            </div>
         </section>
     </main>
 

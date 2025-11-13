@@ -1,5 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     const accordion = document.querySelector('#featureAccordion');
+    const panelsContainer = document.querySelector('.feature-panels');
+    const panels = panelsContainer
+        ? panelsContainer.querySelectorAll('[data-feature-panel]')
+        : [];
+    const setActivePanel = (slug) => {
+        if (!panels.length) {
+            return;
+        }
+        panels.forEach((panel) => {
+            if (panel.dataset.featurePanel === slug) {
+                panel.classList.add('is-active');
+            } else {
+                panel.classList.remove('is-active');
+            }
+        });
+    };
     if (accordion) {
         const buttons = accordion.querySelectorAll('[data-feature-button]');
         const accent = accordion.querySelector('.accent-bar');
@@ -17,11 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 buttons.forEach((b) => b.classList.remove('is-active'));
                 btn.classList.add('is-active');
                 updateAccent(btn);
+                setActivePanel(btn.dataset.feature);
             });
         });
         const active = accordion.querySelector('.accordion-item.is-active');
         if (active) {
             updateAccent(active);
+            setActivePanel(active.dataset.feature);
         }
         window.addEventListener('resize', () => {
             const current = accordion.querySelector('.accordion-item.is-active');
@@ -29,5 +47,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateAccent(current);
             }
         });
+    }
+
+    const journeyStages = document.querySelectorAll('.journey-stage');
+    if (journeyStages.length) {
+        let stageIndex = 0;
+        const rotateStages = () => {
+            journeyStages.forEach((stage, idx) => {
+                stage.classList.toggle('is-active', idx === stageIndex);
+            });
+            stageIndex = (stageIndex + 1) % journeyStages.length;
+        };
+        rotateStages();
+        setInterval(rotateStages, 4000);
+    }
+
+    const testimonialButtons = document.querySelectorAll('[data-testimonial-button]');
+    const testimonialPanels = document.querySelectorAll('[data-testimonial-panel]');
+    if (testimonialButtons.length && testimonialPanels.length) {
+        let activeIndex = 0;
+        const setTestimonial = (index) => {
+            activeIndex = index;
+            testimonialButtons.forEach((btn, idx) => {
+                btn.classList.toggle('is-active', idx === index);
+            });
+            testimonialPanels.forEach((panel, idx) => {
+                panel.classList.toggle('is-active', idx === index);
+            });
+        };
+        testimonialButtons.forEach((button) => {
+            button.addEventListener('click', () =>
+                setTestimonial(Number(button.dataset.testimonialButton))
+            );
+        });
+        setInterval(() => {
+            const next = (activeIndex + 1) % testimonialButtons.length;
+            setTestimonial(next);
+        }, 6000);
     }
 });
