@@ -96,13 +96,13 @@ TESTIMONIALS = [
         "name": "Marcus",
         "role": "VP People, Copper Build",
         "quote": "Sira gave our hiring pods one console to scope assignments, tag reviewers, and advance reliable operators—we ship offers faster than ever.",
-        "avatar": "img/avatar-marcus.svg",
+        "avatar": "img/avatar-lauren.svg",
     },
     {
         "name": "Priya",
         "role": "Head of Talent, Aster Care",
         "quote": "Auto scoring shaved days off each search. Candidates stay informed while our team sees a clear, auditable shortlist.",
-        "avatar": "img/avatar-priya.svg",
+        "avatar": "img/avatar-savannah.svg",
     },
 ]
 
