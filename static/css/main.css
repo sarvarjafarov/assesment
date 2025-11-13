@@ -184,6 +184,13 @@ img {
     margin-bottom: 2rem;
 }
 
+.hero-cta {
+    display: inline-flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .hero-grid {
     position: absolute;
     inset: 0;
@@ -245,6 +252,90 @@ main {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1.5rem 4rem;
+}
+
+.pillars {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+}
+
+.pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.pillar-card {
+    border-radius: 24px;
+    background: #fff;
+    padding: 1.75rem;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    box-shadow: 0 25px 45px rgba(15, 20, 40, 0.05);
+}
+
+.pillar-card h3 {
+    margin: 0.5rem 0 0.5rem;
+    font-size: 1.4rem;
+}
+
+.pillar-card ul {
+    margin: 1rem 0 0;
+    padding-left: 1.2rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.workflow {
+    background: var(--bg-muted);
+    padding: 3.5rem 1.5rem;
+}
+
+.workflow-steps {
+    list-style: none;
+    margin: 2rem auto;
+    padding: 0;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.workflow-steps li {
+    display: flex;
+    gap: 1.5rem;
+    background: #fff;
+    border-radius: 20px;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid rgba(14, 20, 40, 0.06);
+    box-shadow: 0 20px 35px rgba(14, 20, 40, 0.05);
+}
+
+.workflow-steps h3 {
+    margin: 0 0 0.4rem;
+}
+
+.step-number {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(255, 138, 0, 0.15);
+    color: var(--orange);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.workflow-cta {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 .catalog-grid {
