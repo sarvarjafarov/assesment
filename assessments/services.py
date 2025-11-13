@@ -71,7 +71,8 @@ def send_invite_email(
     candidate: CandidateProfile,
     assessment: Assessment,
     session: AssessmentSession,
-    session_link: str,
+    intro_link: str,
+    start_link: str,
     invited_by: str,
     due_at=None,
     notes: str = "",
@@ -82,7 +83,8 @@ def send_invite_email(
         "candidate": candidate,
         "assessment": assessment,
         "session": session,
-        "session_link": session_link,
+        "session_link": intro_link,
+        "start_link": start_link,
         "invited_by": invited_by or "The Sira Team",
         "due_at": due_at or session.due_at,
         "notes": notes or session.notes,
@@ -91,13 +93,26 @@ def send_invite_email(
     text_body = render_to_string("emails/invite_candidate.txt", context)
     html_body = render_to_string("emails/invite_candidate.html", context)
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+    recipients = [candidate.email]
+    if not settings.EMAIL_ENABLED:
+        logger.info(
+            "EMAIL_ENABLED is False; invite for session %s logged but not sent.",
+            session.pk,
+        )
+        logger.info("Invite link for %s: %s", candidate.email, intro_link)
+        return
     try:
         send_mail(
             subject,
             text_body,
             from_email,
-            [candidate.email],
+            recipients,
             html_message=html_body,
+        )
+        logger.info(
+            "Invite email dispatched to %s for assessment %s",
+            candidate.email,
+            assessment.title,
         )
     except Exception as exc:  # pragma: no cover - avoid failing invite on email issues
         logger.warning(

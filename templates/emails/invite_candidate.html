@@ -10,8 +10,12 @@
     <p><strong>Deadline:</strong> {{ due_at|date:"M d, Y · h:i A" }}</p>
     {% endif %}
     <p>
-        Use your private link to start:
+        Review instructions and get ready:
         <a href="{{ session_link }}">{{ session_link }}</a>
+    </p>
+    <p>
+        When you're set, begin the assessment:
+        <a href="{{ start_link }}">{{ start_link }}</a>
     </p>
     {% if notes %}
     <p>

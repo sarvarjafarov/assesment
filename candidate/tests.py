@@ -102,11 +102,16 @@ class CandidateSessionFlowTests(TestCase):
         response = self.client.get(entry_url)
         self.assertEqual(response.status_code, 200)
         self.session.refresh_from_db()
+        self.assertEqual(self.session.status, "invited")
+        start_url = reverse("candidate:session-start", args=[self.session.uuid])
+        response = self.client.get(start_url)
+        self.assertEqual(response.status_code, 200)
+        self.session.refresh_from_db()
         self.assertEqual(self.session.status, "in_progress")
         post_data = {
             f"question_{self.question.id}": str(self.choice.id),
         }
-        response = self.client.post(entry_url, data=post_data)
+        response = self.client.post(start_url, data=post_data)
         self.assertRedirects(
             response, reverse("candidate:session-complete", args=[self.session.uuid])
         )

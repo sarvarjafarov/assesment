@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel intro-panel">
+        <p class="eyebrow">Assessment Invitation</p>
+        <h1>{{ assessment.title }}</h1>
+        <p class="lede">{{ assessment.summary }}</p>
+        <dl class="candidate-meta">
+            <div>
+                <dt>Category</dt>
+                <dd>{{ assessment.category.name }}</dd>
+            </div>
+            <div>
+                <dt>Duration</dt>
+                <dd>~{{ assessment.duration_minutes }} minutes</dd>
+            </div>
+            <div>
+                <dt>Deadline</dt>
+                <dd>
+                    {% if session.due_at %}
+                    {{ session.due_at|date:"M d, Y · h:i A" }}
+                    {% if is_past_due %}<span class="pill danger">Past due</span>{% endif %}
+                    {% else %}
+                    Flexible
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+        <div class="candidate-rules">
+            <h2>Before you begin</h2>
+            <ul>
+                <li>Find a quiet place and set aside the full time above.</li>
+                <li>You can submit once—answers are final.</li>
+                <li>Share examples from your real experience where possible.</li>
+            </ul>
+        </div>
+        {% if instructions %}
+        <div class="candidate-callout">
+            <strong>Notes from the team</strong>
+            <p>{{ instructions|linebreaksbr }}</p>
+        </div>
+        {% endif %}
+        <div class="candidate-actions">
+            {% if has_started %}
+            <a class="btn btn-pill" href="{% url 'candidate:session-start' session.uuid %}">Resume assessment</a>
+            {% else %}
+            <a class="btn btn-pill" href="{{ start_url }}">Start assessment</a>
+            {% endif %}
+            <a class="btn btn-outline" href="mailto:{{ candidate.email }}">Need help?</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

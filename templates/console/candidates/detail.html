@@ -36,7 +36,10 @@
             <p class="eyebrow">{{ session.assessment.category.name }}</p>
             <h2>{{ session.assessment.title }}</h2>
         </div>
-        <span class="pill subtle">{{ session.status|title }}</span>
+        <div class="session-actions">
+            <span class="pill subtle">{{ session.status|title }}</span>
+            <a class="pill subtle" href="{% url 'console:session-detail' session.pk %}">View results</a>
+        </div>
     </header>
     <p class="session-meta">
         Invited {{ session.invited_at|naturaltime }} · Due

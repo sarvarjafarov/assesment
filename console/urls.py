@@ -38,6 +38,10 @@ urlpatterns = [
         views.CandidateDetailView.as_view(),
         name="candidate-detail",
     ),
+    path(
+        "sessions/<int:pk>/",
+        views.SessionDetailView.as_view(),
+        name="session-detail",
+    ),
     path("invites/new/", views.InviteCreateView.as_view(), name="invite-create"),
 ]
-

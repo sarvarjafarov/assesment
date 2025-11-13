@@ -184,13 +184,14 @@ class CandidateListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
     section = "candidates"
 
     def get_queryset(self):
-        latest_status = AssessmentSession.objects.filter(candidate=OuterRef("pk")).order_by(
+        latest_qs = AssessmentSession.objects.filter(candidate=OuterRef("pk")).order_by(
             "-created_at"
         )
         queryset = (
             CandidateProfile.objects.all()
             .annotate(session_total=Count("sessions", distinct=True))
-            .annotate(latest_status=Subquery(latest_status.values("status")[:1]))
+            .annotate(latest_status=Subquery(latest_qs.values("status")[:1]))
+            .annotate(latest_decision=Subquery(latest_qs.values("decision")[:1]))
             .order_by("first_name", "last_name")
         )
         query = self.request.GET.get("q")
@@ -279,21 +280,25 @@ class InviteCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
             or "Console"
         )
         result = form.save(invited_by=invited_by)
-        session_link = self.request.build_absolute_uri(
+        intro_link = self.request.build_absolute_uri(
             reverse("candidate:session-entry", args=[result.session.uuid])
+        )
+        start_link = self.request.build_absolute_uri(
+            reverse("candidate:session-start", args=[result.session.uuid])
         )
         send_invite_email(
             candidate=result.candidate,
             assessment=result.assessment,
             session=result.session,
-            session_link=session_link,
+            intro_link=intro_link,
+            start_link=start_link,
             invited_by=invited_by,
             due_at=form.cleaned_data.get("due_at"),
             notes=form.cleaned_data.get("notes", ""),
         )
         messages.success(
             self.request,
-            f"Invite ready for {result.candidate.first_name}. Share link: {session_link}",
+            f"Invite ready for {result.candidate.first_name}. Share link: {intro_link}",
         )
         messages.info(
             self.request,
@@ -303,3 +308,51 @@ class InviteCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
             "console:candidate-detail", args=[result.candidate.pk]
         )
         return super().form_valid(form)
+
+
+class SessionDetailView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
+    template_name = "console/candidates/session_detail.html"
+    form_class = SessionUpdateForm
+    section = "candidates"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.session = get_object_or_404(
+            AssessmentSession.objects.select_related(
+                "candidate", "assessment", "assessment__category"
+            ).prefetch_related("responses__question", "responses__selected_choices"),
+            pk=kwargs["pk"],
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        return {}
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = self.session
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["session_obj"] = self.session
+        context["candidate"] = self.session.candidate
+        context["assessment"] = self.session.assessment
+        context["responses"] = self.session.responses.select_related("question").all()
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Session updated.")
+        return redirect("console:session-detail", pk=self.session.pk)
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("quick_decision"):
+            decision = request.POST["quick_decision"]
+            self.session.decision = decision
+            self.session.save(update_fields=["decision", "updated_at"])
+            messages.success(
+                request,
+                f"{self.session.candidate.first_name} marked as {decision.title()}.",
+            )
+            return redirect("console:session-detail", pk=self.session.pk)
+        return super().post(request, *args, **kwargs)

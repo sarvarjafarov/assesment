@@ -1,0 +1,96 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Candidate Result</p>
+        <h1>{{ candidate.first_name }} {{ candidate.last_name }}</h1>
+        <p class="lede">{{ assessment.title }} · {{ assessment.category.name }}</p>
+    </div>
+    <div class="header-actions">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="quick_decision" value="advance" />
+            <button class="btn btn-pill" type="submit">Mark as shortlisted</button>
+        </form>
+        <a class="btn btn-outline" href="{% url 'console:candidate-detail' candidate.pk %}">Back to candidate</a>
+    </div>
+</section>
+
+<section class="panel meta-panel">
+    <dl>
+        <div>
+            <dt>Status</dt>
+            <dd>{{ session_obj.get_status_display }}</dd>
+        </div>
+        <div>
+            <dt>Decision</dt>
+            <dd>{{ session_obj.get_decision_display }}</dd>
+        </div>
+        <div>
+            <dt>Score</dt>
+            <dd>{% if session_obj.overall_score %}{{ session_obj.overall_score }}{% else %}—{% endif %}</dd>
+        </div>
+        <div>
+            <dt>Due</dt>
+            <dd>{% if session_obj.due_at %}{{ session_obj.due_at|naturaltime }}{% else %}Flexible{% endif %}</dd>
+        </div>
+    </dl>
+</section>
+
+<section class="panel response-panel">
+    <header>
+        <h2>Responses</h2>
+        <small>Submitted {{ session_obj.submitted_at|naturaltime|default:"Not yet" }}</small>
+    </header>
+    {% if responses %}
+    <ol class="question-list">
+        {% for response in responses %}
+        <li>
+            <p class="question-title">{{ response.question.prompt }}</p>
+            {% if response.selected_choices.all %}
+            <ul class="choice-list">
+                {% for choice in response.selected_choices.all %}
+                <li>{{ choice.label }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>{{ response.answer_text|default:"—" }}</p>
+            {% endif %}
+            {% if response.score %}
+            <small>Score: {{ response.score }}</small>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p class="empty-state">Responses will appear once the candidate submits.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Update status</h2>
+    </header>
+    <form method="post" class="form-stack">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="form-error">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% for field in form %}
+        <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% for error in field.errors %}
+            <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-pill" type="submit">Save updates</button>
+    </form>
+</section>
+{% endblock %}

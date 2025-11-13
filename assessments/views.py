@@ -169,14 +169,18 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
             session_updates.append("updated_at")
             invite.session.save(update_fields=session_updates)
 
-        session_link = request.build_absolute_uri(
+        intro_link = request.build_absolute_uri(
             reverse("candidate:session-entry", args=[invite.session.uuid])
+        )
+        start_link = request.build_absolute_uri(
+            reverse("candidate:session-start", args=[invite.session.uuid])
         )
         send_invite_email(
             candidate=invite.candidate,
             assessment=assessment,
             session=invite.session,
-            session_link=session_link,
+            intro_link=intro_link,
+            start_link=start_link,
             invited_by="API",
             notes=notes,
             due_at=due_at,

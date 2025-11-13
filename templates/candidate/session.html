@@ -1,43 +1,11 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% block content %}
-<div class="candidate-shell">
-    <section class="candidate-panel intro-panel">
-        <p class="eyebrow">Assessment Invitation</p>
-        <h1>{{ assessment.title }}</h1>
-        <p class="lede">{{ assessment.summary }}</p>
-        <dl class="candidate-meta">
-            <div>
-                <dt>Company</dt>
-                <dd>{{ candidate.metadata.company|default:"Your prospective team" }}</dd>
-            </div>
-            <div>
-                <dt>Deadline</dt>
-                <dd>
-                    {% if session.due_at %}
-                    {{ session.due_at|date:"M d, Y · h:i A" }}
-                    {% if is_past_due %}<span class="pill danger">Past due</span>{% endif %}
-                    {% else %}
-                    Flexible
-                    {% endif %}
-                </dd>
-            </div>
-            <div>
-                <dt>Duration</dt>
-                <dd>~{{ assessment.duration_minutes }} minutes</dd>
-            </div>
-        </dl>
-        {% if instructions %}
-        <div class="candidate-callout">
-            <strong>Notes from the team</strong>
-            <p>{{ instructions|linebreaksbr }}</p>
-        </div>
-        {% endif %}
-    </section>
-
+<div class="candidate-shell single-column">
     <section class="candidate-panel response-panel">
-        <h2>Your responses</h2>
-        <p>Answer each prompt in one sitting. Your progress is saved when you submit.</p>
+        <p class="eyebrow">Assessment in progress</p>
+        <h1>{{ assessment.title }}</h1>
+        <p class="lede">Answer each prompt in one sitting. Your progress is saved only when you submit.</p>
         <form method="post" class="form-stack">
             {% csrf_token %}
             {% if form.non_field_errors %}

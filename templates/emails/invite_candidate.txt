@@ -3,8 +3,11 @@ Hi {{ candidate.first_name }},
 {{ invited_by }} invited you to complete the {{ assessment.title }} assessment on Sira.
 
 {% if due_at %}Please submit your responses by {{ due_at|date:"M d, Y · h:i A" }}.{% endif %}
-Use your private link to get started:
+Review instructions and start here:
 {{ session_link }}
+
+When you're ready, begin the assessment directly:
+{{ start_link }}
 
 {% if notes %}
 Notes from the team:

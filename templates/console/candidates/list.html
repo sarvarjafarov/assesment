@@ -36,15 +36,15 @@
             <span>Email</span>
             <span>Assessments</span>
             <span>Status</span>
+            <span>Decision</span>
         </div>
         {% for candidate in candidates %}
         <a class="table-row" href="{% url 'console:candidate-detail' candidate.pk %}">
             <span>{{ candidate.first_name }} {{ candidate.last_name }}</span>
             <span>{{ candidate.email }}</span>
             <span>{{ candidate.session_total }}</span>
-            <span>
-                {{ candidate.latest_status|default:"—"|title }}
-            </span>
+            <span>{{ candidate.latest_status|default:"—"|title }}</span>
+            <span>{{ candidate.latest_decision|default:"—"|title }}</span>
         </a>
         {% empty %}
         <div class="table-row">
