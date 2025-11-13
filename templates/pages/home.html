@@ -144,24 +144,26 @@
                             <p class="pill subtle">{{ category.name }}</p>
                             <h3>{{ category.summary }}</h3>
                         </div>
-                        <a href="#cta" class="link">Invite talent</a>
+                        <a href="#cta" class="ghost-link">Invite talent</a>
                     </header>
                     <ul class="assessment-list">
                         {% for assessment in category.assessments.all %}
                         <li>
-                            <div class="assessment-copy">
-                                <p class="assessment-title">{{ assessment.title }}</p>
-                                <p class="assessment-meta">
-                                    {{ assessment.get_level_display }} · ~{{ assessment.duration_minutes }} min
-                                </p>
-                                <p class="assessment-summary">{{ assessment.summary }}</p>
-                            </div>
-                            <div class="skill-pills">
-                                {% for skill in assessment.skills_focus %}
-                                <span>{{ skill }}</span>
-                                {% empty %}
-                                <span>Readiness</span>
-                                {% endfor %}
+                            <div class="assessment-summary-card">
+                                <div class="assessment-copy">
+                                    <p class="assessment-title">{{ assessment.title }}</p>
+                                    <p class="assessment-meta">
+                                        {{ assessment.get_level_display }} · ~{{ assessment.duration_minutes }} min
+                                    </p>
+                                    <p class="assessment-summary">{{ assessment.summary }}</p>
+                                </div>
+                                <div class="skill-pills">
+                                    {% for skill in assessment.skills_focus %}
+                                    <span>{{ skill }}</span>
+                                    {% empty %}
+                                    <span>Readiness</span>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </li>
                         {% empty %}

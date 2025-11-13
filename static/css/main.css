@@ -534,10 +534,11 @@ main {
     color: var(--navy);
 }
 
-.catalog-card .link {
+.catalog-card .ghost-link {
     font-weight: 600;
-    color: var(--orange);
+    color: var(--navy);
     text-decoration: none;
+    opacity: 0.6;
 }
 
 .assessment-copy {
@@ -558,17 +559,12 @@ main {
     gap: 1rem;
 }
 
-.assessment-list li {
+.assessment-summary-card {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.assessment-list li:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
 }
 
 .assessment-title {
