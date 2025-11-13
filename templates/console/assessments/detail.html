@@ -1,0 +1,69 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Assessment</p>
+        <h1>{{ assessment.title }}</h1>
+        <p class="lede">{{ assessment.summary }}</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-outline" href="{% url 'console:assessment-edit' assessment.slug %}">Edit</a>
+        <a class="btn" href="{% url 'console:question-create' assessment.slug %}">Add question</a>
+    </div>
+</section>
+
+<section class="panel meta-panel">
+    <dl>
+        <div>
+            <dt>Category</dt>
+            <dd>{{ assessment.category.name }}</dd>
+        </div>
+        <div>
+            <dt>Level</dt>
+            <dd>{{ assessment.get_level_display }}</dd>
+        </div>
+        <div>
+            <dt>Duration</dt>
+            <dd>{{ assessment.duration_minutes }} min</dd>
+        </div>
+        <div>
+            <dt>Skills focus</dt>
+            <dd>{{ assessment.skills_focus|join:", " }}</dd>
+        </div>
+    </dl>
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Questions</h2>
+    </header>
+    {% if questions %}
+    <ol class="question-list">
+        {% for question in questions %}
+        <li>
+            <div class="question-header">
+                <div>
+                    <p class="question-title">{{ question.prompt }}</p>
+                    <small>{{ question.get_question_type_display }} · Weight {{ question.weight }}</small>
+                </div>
+                {% if question.question_type in ('single', 'multi') %}
+                <a class="pill subtle" href="{% url 'console:choice-create' question.pk %}">Add choice</a>
+                {% endif %}
+            </div>
+            {% if question.choices.all %}
+            <ul class="choice-list">
+                {% for choice in question.choices.all %}
+                <li>{{ choice.label }} <small>(weight {{ choice.weight }})</small></li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-state">No choices yet.</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p class="empty-state">No questions yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

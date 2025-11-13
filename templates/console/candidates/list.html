@@ -1,0 +1,56 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Talent pool</p>
+        <h1>Candidates</h1>
+        <p class="lede">Monitor invites, completions, and next steps.</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn" href="{% url 'console:invite-create' %}">New invite</a>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="get" class="inline-form">
+        <input type="search" name="q" value="{{ query }}" placeholder="Search by name or email" />
+        <button class="btn btn-pill" type="submit">Search</button>
+    </form>
+    <div class="status-grid">
+        <div>
+            <p>Invited</p>
+            <strong>{{ status_counts.invited|default:0 }}</strong>
+        </div>
+        <div>
+            <p>In progress</p>
+            <strong>{{ status_counts.in_progress|default:0 }}</strong>
+        </div>
+        <div>
+            <p>Completed</p>
+            <strong>{{ status_counts.completed|default:0 }}</strong>
+        </div>
+    </div>
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Name</span>
+            <span>Email</span>
+            <span>Assessments</span>
+            <span>Status</span>
+        </div>
+        {% for candidate in candidates %}
+        <a class="table-row" href="{% url 'console:candidate-detail' candidate.pk %}">
+            <span>{{ candidate.first_name }} {{ candidate.last_name }}</span>
+            <span>{{ candidate.email }}</span>
+            <span>{{ candidate.session_total }}</span>
+            <span>
+                {{ candidate.latest_status|default:"—"|title }}
+            </span>
+        </a>
+        {% empty %}
+        <div class="table-row">
+            <span colspan="4" class="empty-state">No candidates yet.</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

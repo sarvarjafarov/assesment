@@ -1,0 +1,25 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Choices</p>
+        <h1>Add option</h1>
+        <p class="lede">Attach a new option to “{{ question.prompt|truncatewords:12 }}”.</p>
+    </div>
+</section>
+<section class="panel">
+    <form method="post" class="form-stack">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% for error in field.errors %}
+            <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-pill">Add choice</button>
+    </form>
+</section>
+{% endblock %}

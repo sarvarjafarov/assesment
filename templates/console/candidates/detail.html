@@ -1,0 +1,63 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Candidate</p>
+        <h1>{{ candidate.first_name }} {{ candidate.last_name }}</h1>
+        <p class="lede">{{ candidate.email }}</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-outline" href="mailto:{{ candidate.email }}">Email</a>
+    </div>
+</section>
+
+<section class="panel meta-panel">
+    <dl>
+        <div>
+            <dt>Company</dt>
+            <dd>{{ candidate.metadata.company|default:"—" }}</dd>
+        </div>
+        <div>
+            <dt>Headline</dt>
+            <dd>{{ candidate.headline|default:"—" }}</dd>
+        </div>
+        <div>
+            <dt>Joined</dt>
+            <dd>{{ candidate.created_at|date:"M d, Y" }}</dd>
+        </div>
+    </dl>
+</section>
+
+{% for session, form in session_forms %}
+<section class="panel session-panel">
+    <header>
+        <div>
+            <p class="eyebrow">{{ session.assessment.category.name }}</p>
+            <h2>{{ session.assessment.title }}</h2>
+        </div>
+        <span class="pill subtle">{{ session.status|title }}</span>
+    </header>
+    <p class="session-meta">
+        Invited {{ session.invited_at|naturaltime }} · Due
+        {% if session.due_at %}{{ session.due_at|naturaltime }}{% else %}Not set{% endif %}
+    </p>
+    <form method="post" class="form-stack">
+        {% csrf_token %}
+        <input type="hidden" name="session_id" value="{{ session.pk }}">
+        {% for field in form %}
+        <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% for error in field.errors %}
+            <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-pill">Save updates</button>
+    </form>
+</section>
+{% empty %}
+<p class="empty-state">No sessions yet.</p>
+{% endfor %}
+{% endblock %}

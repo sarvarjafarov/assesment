@@ -1,0 +1,36 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Assessment builder</p>
+        <h1>{% if form.instance.pk %}Edit {{ form.instance.title }}{% else %}New assessment{% endif %}</h1>
+        <p class="lede">Define the scope, level, and skills measured.</p>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="post" class="form-stack">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="form-error">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% for field in form %}
+        <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-pill">Save assessment</button>
+    </form>
+</section>
+{% endblock %}

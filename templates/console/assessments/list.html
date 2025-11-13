@@ -1,0 +1,36 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Library</p>
+        <h1>Assessments</h1>
+        <p class="lede">Keep role-specific diagnostics up to date.</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn" href="{% url 'console:assessment-create' %}">New assessment</a>
+    </div>
+</section>
+
+<section class="card-grid">
+    {% for assessment in assessments %}
+    <article class="panel">
+        <header>
+            <h2>{{ assessment.title }}</h2>
+            <span class="pill subtle">{{ assessment.get_level_display }}</span>
+        </header>
+        <p>{{ assessment.summary|truncatewords:30 }}</p>
+        <ul class="detail-list">
+            <li><strong>Category:</strong> {{ assessment.category.name }}</li>
+            <li><strong>Duration:</strong> {{ assessment.duration_minutes }} min</li>
+            <li><strong>Skills:</strong> {{ assessment.skills_focus|join:", " }}</li>
+        </ul>
+        <div class="card-actions">
+            <a href="{% url 'console:assessment-detail' assessment.slug %}">View</a>
+            <a href="{% url 'console:assessment-edit' assessment.slug %}">Edit</a>
+        </div>
+    </article>
+    {% empty %}
+    <p class="empty-state">No assessments yet. Create your first one.</p>
+    {% endfor %}
+</section>
+{% endblock %}

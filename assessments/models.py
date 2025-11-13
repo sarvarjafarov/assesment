@@ -188,6 +188,24 @@ class AssessmentSession(TimeStampedModel):
         blank=True,
         help_text="Store per-skill statistics and confidence intervals.",
     )
+    notes = models.TextField(blank=True)
+    due_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Optional deadline communicated to the candidate.",
+    )
+    DECISION_CHOICES = [
+        ("undecided", "Undecided"),
+        ("advance", "Advance"),
+        ("reject", "Reject"),
+        ("hired", "Hired"),
+    ]
+    decision = models.CharField(
+        max_length=20, choices=DECISION_CHOICES, default="undecided"
+    )
+    decision_notes = models.TextField(
+        blank=True, help_text="Internal notes regarding the decision."
+    )
 
     class Meta:
         unique_together = ("candidate", "assessment")

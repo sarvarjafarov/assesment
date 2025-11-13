@@ -1,0 +1,101 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Command center</p>
+        <h1>Talent pipeline overview</h1>
+        <p class="lede">Track invites, deadlines, and assessment performance in one place.</p>
+    </div>
+    <div class="header-actions">
+        <a href="{% url 'console:invite-create' %}" class="btn btn-pill">Invite candidate</a>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article>
+        <p>Total Invites</p>
+        <strong>{{ stats.total_invites }}</strong>
+    </article>
+    <article>
+        <p>In Progress</p>
+        <strong>{{ stats.in_progress }}</strong>
+    </article>
+    <article>
+        <p>Completed</p>
+        <strong>{{ stats.completed }}</strong>
+    </article>
+    <article>
+        <p>Overdue</p>
+        <strong>{{ stats.overdue }}</strong>
+    </article>
+</section>
+
+<section class="panel-grid">
+    <article class="panel">
+        <header>
+            <h2>Upcoming deadlines</h2>
+            <a href="{% url 'console:candidate-list' %}">View all</a>
+        </header>
+        {% if upcoming_due %}
+        <ul class="deadline-list">
+            {% for session in upcoming_due %}
+            <li>
+                <div>
+                    <p>{{ session.candidate.first_name }} · {{ session.assessment.title }}</p>
+                    <small>Due {{ session.due_at|naturaltime }}</small>
+                </div>
+                <span class="pill subtle">{{ session.status|title }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">No deadlines scheduled.</p>
+        {% endif %}
+    </article>
+    <article class="panel">
+        <header>
+            <h2>Recent activity</h2>
+        </header>
+        {% if recent_activity %}
+        <ul class="activity-list">
+            {% for session in recent_activity %}
+            <li>
+                <div>
+                    <p>{{ session.candidate.first_name }} {{ session.candidate.last_name }}</p>
+                    <small>{{ session.assessment.title }}</small>
+                </div>
+                <span>{{ session.status|title }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">No recent updates.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Top assessments</h2>
+    </header>
+    {% if top_assessments %}
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Assessment</span>
+            <span>Sessions</span>
+            <span>Avg. duration</span>
+        </div>
+        {% for assessment in top_assessments %}
+        <div class="table-row">
+            <span>{{ assessment.title }}</span>
+            <span>{{ assessment.num_sessions }}</span>
+            <span>{{ assessment.duration_minutes }} min</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No assessments yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

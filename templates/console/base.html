@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="console-shell">
+    <aside class="console-sidebar">
+        <div class="console-brand">
+            <span class="glyph">S</span>
+            <div>
+                <p>Sira Console</p>
+                <small>Workforce OS</small>
+            </div>
+        </div>
+        <nav>
+            <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' %}is-active{% endif %}">
+                Dashboard
+            </a>
+            <a href="{% url 'console:assessment-list' %}" class="{% if section == 'assessments' %}is-active{% endif %}">
+                Assessments
+            </a>
+            <a href="{% url 'console:candidate-list' %}" class="{% if section == 'candidates' %}is-active{% endif %}">
+                Candidates
+            </a>
+            <a href="{% url 'console:invite-create' %}" class="{% if section == 'invites' %}is-active{% endif %}">
+                Invite Candidate
+            </a>
+        </nav>
+        <div class="console-sidebar-foot">
+            <div>
+                <p>{{ request.user.get_full_name|default:request.user.username }}</p>
+                <small>{{ request.user.email }}</small>
+            </div>
+            <a class="console-logout" href="{% url 'admin:logout' %}">Sign out</a>
+        </div>
+    </aside>
+    <main class="console-main">
+        {% block console_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

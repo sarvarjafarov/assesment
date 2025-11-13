@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="candidate-shell completed-panel">
+    <div class="candidate-panel">
+        <p class="eyebrow">Thank you</p>
+        <h1>Assessment submitted</h1>
+        <p class="lede">
+            {{ candidate.metadata.company|default:"The team" }} has received your responses for
+            <strong>{{ assessment.title }}</strong>. They will be in touch soon.
+        </p>
+        <ul class="candidate-next-steps">
+            <li>Watch your inbox for next steps.</li>
+            <li>Reach out to your recruiter if you have questions.</li>
+        </ul>
+        <a class="btn btn-pill" href="mailto:{{ candidate.email }}">Update your info</a>
+    </div>
+</div>
+{% endblock %}
