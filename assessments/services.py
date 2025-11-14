@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from .behavioral import build_behavioral_profile, parse_behavioral_value
 from .models import (
     Assessment,
     AssessmentSession,
@@ -143,6 +144,7 @@ def record_responses(
             assessment=session.assessment, id__in=[a["question_id"] for a in answers]
         )
     }
+    behavioral_selections: list[dict] = []
 
     for answer in answers:
         question = question_map.get(answer["question_id"])
@@ -157,11 +159,15 @@ def record_responses(
         response.answer_text = answer.get("answer_text", "")
         if question.question_type in {Question.TYPE_SINGLE, Question.TYPE_MULTI}:
             choice_ids = answer.get("choice_ids") or []
-            valid_choices = Choice.objects.filter(
-                question=question, id__in=choice_ids
+            valid_choices = list(
+                Choice.objects.filter(question=question, id__in=choice_ids)
             )
             response.save()
             response.selected_choices.set(valid_choices)
+            for choice in valid_choices:
+                payload = parse_behavioral_value(choice.value)
+                if payload:
+                    behavioral_selections.append(payload)
         else:
             response.selected_choices.clear()
             response.save()
@@ -171,6 +177,11 @@ def record_responses(
             response.save(update_fields=["answer_text", "score", "updated_at"])
         else:
             response.save(update_fields=["answer_text", "updated_at"])
+
+    weight_profile = _resolve_behavioral_weight_profile(session.assessment)
+    behavioral_profile = build_behavioral_profile(
+        behavioral_selections, weight_profile=weight_profile
+    )
 
     if mark_completed:
         session.status = "completed"
@@ -182,10 +193,16 @@ def record_responses(
             session.overall_score = overall_score
         elif evaluation:
             session.overall_score = evaluation.score
+        breakdown_payload = None
         if score_breakdown is not None:
-            session.score_breakdown = score_breakdown
+            breakdown_payload = dict(score_breakdown)
         elif evaluation and evaluation.breakdown:
-            session.score_breakdown = evaluation.breakdown
+            breakdown_payload = dict(evaluation.breakdown)
+        if behavioral_profile:
+            breakdown_payload = breakdown_payload or {}
+            breakdown_payload["behavioral_profile"] = behavioral_profile
+        if breakdown_payload is not None:
+            session.score_breakdown = breakdown_payload
         auto_decision_value = None
         if session.overall_score is not None and session.decision == "undecided":
             session.decision = determine_decision(session.overall_score)
@@ -260,3 +277,17 @@ def _question_max_weight(question: Question) -> float | None:
 
 def determine_decision(score: float) -> str:
     return "advance" if score >= PASSING_SCORE else "reject"
+
+
+def _resolve_behavioral_weight_profile(assessment: Assessment | None) -> str | None:
+    if not assessment or not assessment.scoring_rubric:
+        return None
+    rubric = assessment.scoring_rubric or {}
+    profile = (
+        rubric.get("behavioral_weight_profile")
+        or rubric.get("behavioral_profile")
+        or rubric.get("weight_profile")
+    )
+    if not profile:
+        return None
+    return str(profile).lower()

@@ -52,6 +52,52 @@
         {% endif %}
         · Decision {{ session.get_decision_display }}
     </p>
+    {% with behavior=session.score_breakdown.behavioral_profile %}
+    {% if behavior %}
+    <div class="behavior-preview">
+        <div class="behavior-row">
+            <div>
+                <p class="eyebrow">Dominant traits</p>
+                <p class="lede small">
+                    {% if behavior.dominant_traits %}
+                        {{ behavior.dominant_traits|join:", " }}
+                    {% else %}
+                        Emerging
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="eyebrow">Behavioral eligibility</p>
+                <p class="lede small">
+                    {{ behavior.eligibility.decision|default:"Not evaluated"|title }}
+                    {% if behavior.eligibility.score != None %}
+                    · {{ behavior.eligibility.score|floatformat:0 }}%
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                {% with report=behavior.red_flag_report %}
+                <p class="eyebrow">Risk level</p>
+                <p class="lede small {{ report.overall_risk_level|default:"" }}">
+                    {{ report.overall_risk_level|default:"Low"|title|default:"Low" }}
+                    {% if report.red_flags %}
+                    · {{ report.red_flags|length }} flag{% if report.red_flags|length > 1 %}s{% endif %}
+                    {% else %}
+                    · No flags
+                    {% endif %}
+                </p>
+                {% endwith %}
+            </div>
+        </div>
+        <div class="behavior-row">
+            <p class="behavior-note">
+                {{ behavior.candidate_summary.eligibility_message|default:"Behavioral summary available in session view." }}
+            </p>
+            <a class="pill subtle" href="{% url 'console:session-detail' session.pk %}">View behavioral summary</a>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
     <form method="post" class="form-stack">
         {% csrf_token %}
         <input type="hidden" name="session_id" value="{{ session.pk }}">

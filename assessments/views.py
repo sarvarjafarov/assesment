@@ -203,6 +203,39 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
 class SessionResponseApiView(ApiKeyRequiredMixin, View):
     """Attach candidate responses to a session."""
 
+    def get(self, request, session_uuid):
+        session = get_object_or_404(
+            AssessmentSession.objects.select_related(
+                "candidate", "assessment", "assessment__category"
+            ),
+            uuid=session_uuid,
+        )
+        submitted = session.submitted_at.isoformat() if session.submitted_at else None
+        score_breakdown = session.score_breakdown or {}
+        return JsonResponse(
+            {
+                "session_uuid": str(session.uuid),
+                "status": session.status,
+                "submitted_at": submitted,
+                "overall_score": float(session.overall_score)
+                if session.overall_score is not None
+                else None,
+                "candidate": {
+                    "id": session.candidate.pk,
+                    "first_name": session.candidate.first_name,
+                    "last_name": session.candidate.last_name,
+                    "email": session.candidate.email,
+                },
+                "assessment": {
+                    "id": session.assessment.pk,
+                    "title": session.assessment.title,
+                    "category": session.assessment.category.name,
+                },
+                "score_breakdown": score_breakdown,
+                "behavioral_profile": score_breakdown.get("behavioral_profile"),
+            }
+        )
+
     def post(self, request, session_uuid):
         session = get_object_or_404(AssessmentSession, uuid=session_uuid)
         try:

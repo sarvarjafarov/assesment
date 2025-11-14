@@ -50,6 +50,132 @@
     </div>
 </section>
 
+{% with behavior=session_obj.score_breakdown.behavioral_profile %}
+{% if behavior %}
+<section class="panel behavior-panel">
+    <header>
+        <div>
+            <p class="eyebrow">Behavioral profile</p>
+            <h2>Behavioral readiness snapshot</h2>
+            <p class="lede small">{{ behavior.candidate_summary.intro }}</p>
+        </div>
+        <div class="behavior-stat">
+            {% with report=behavior.red_flag_report %}
+            <span class="pill subtle {{ report.overall_risk_level|default:'' }}">
+                Risk: {{ report.overall_risk_level|default:"low"|title }}
+            </span>
+            {% endwith %}
+        </div>
+    </header>
+    <div class="behavior-grid">
+        <article>
+            <p class="eyebrow">Eligibility</p>
+            <h3>{{ behavior.eligibility.decision|title }}</h3>
+            <p class="lede small">
+                Weighted score {{ behavior.eligibility.score|floatformat:0 }}%
+            </p>
+            <p>{{ behavior.candidate_summary.eligibility_message }}</p>
+        </article>
+        <article>
+            <p class="eyebrow">Dominant traits</p>
+            <p class="lede small">
+                {% if behavior.dominant_traits %}
+                    {{ behavior.dominant_traits|join:", " }}
+                {% else %}
+                    Emerging
+                {% endif %}
+            </p>
+            <p>Development focus:
+                {% if behavior.development_traits %}
+                    {{ behavior.development_traits|join:", " }}
+                {% else %}
+                    None flagged
+                {% endif %}
+            </p>
+        </article>
+        <article>
+            <p class="eyebrow">Coverage</p>
+            <p class="lede small">{{ behavior.coverage_score|floatformat:0 }} coverage</p>
+            <p>Balance gap: {{ behavior.balance_gap|floatformat:0 }} pts</p>
+        </article>
+    </div>
+    <div class="table trait-table">
+        <div class="table-row table-head">
+            <span>Trait</span>
+            <span>Score</span>
+            <span>Label</span>
+        </div>
+        {% for item in behavior.trait_rankings %}
+        <div class="table-row">
+            <span>{{ item.trait|title }}</span>
+            <span>
+                {% if item.normalized_score != None %}
+                    {{ item.normalized_score|floatformat:0 }}%
+                {% else %}
+                    —
+                {% endif %}
+            </span>
+            <span>{{ behavior.behavior_labels[item.trait]|default:"—" }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% with summary=behavior.candidate_summary %}
+    <div class="behavior-traits">
+        {% for trait, data in summary.traits.items %}
+        <article>
+            <p class="eyebrow">{{ trait|title }} · {{ data.label }}</p>
+            <p>{{ data.description }}</p>
+        </article>
+        {% endfor %}
+    </div>
+    {% endwith %}
+    {% with report=behavior.red_flag_report %}
+    <div class="behavior-risks">
+        <h3>Risk alerts</h3>
+        {% if report.red_flags %}
+        <ul class="flag-list">
+            {% for flag in report.red_flags %}
+            <li>
+                <strong>{{ flag.code|replace:"_"," "|title }}</strong> · {{ flag.level|title }}
+                <p>{{ flag.explanation|default:flag.reason }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">No red flags detected.</p>
+        {% endif %}
+        {% if report.follow_up_questions %}
+        <div class="follow-up">
+            <h4>Suggested follow-up</h4>
+            {% for bundle in report.follow_up_questions %}
+            <article>
+                <p class="eyebrow">{{ bundle.title }}</p>
+                <ul class="bullet">
+                    {% for question in bundle.questions %}
+                    <li>{{ question }}</li>
+                    {% endfor %}
+                </ul>
+                {% if bundle.probing_questions %}
+                <p><strong>Probing:</strong></p>
+                <ul class="bullet">
+                    {% for question in bundle.probing_questions %}
+                    <li>{{ question }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% if bundle.red_flag_indicators %}
+                <p><strong>Watch for:</strong> {{ bundle.red_flag_indicators|join:", " }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endwith %}
+</section>
+{% endif %}
+{% endwith %}
+
 <section class="panel response-panel">
     <header>
         <h2>Responses</h2>
