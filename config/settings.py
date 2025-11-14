@@ -81,7 +81,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'cms',
     'console',
     'candidate',
     'pages',
@@ -176,9 +175,6 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 if "test" in sys.argv:
     WHITENOISE_USE_FINDERS = True
-
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Email
 DEFAULT_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
