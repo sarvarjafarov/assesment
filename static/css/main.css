@@ -547,10 +547,6 @@ main {
     opacity: 1;
 }
 
-.assessment-copy {
-    margin-bottom: 0.5rem;
-}
-
 .category-summary {
     margin: 0.35rem 0 0;
     color: var(--text-muted);
@@ -625,7 +621,6 @@ main {
     font-size: 0.75rem;
     padding: 0.25rem 0.75rem;
     font-weight: 600;
-}
 }
 
 .empty-state {
@@ -1012,6 +1007,20 @@ main {
 .testimonial-avatar {
     width: 80px;
     margin: 0 auto 1rem;
+}
+
+.testimonial-avatar img,
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 999px;
+    object-fit: cover;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 138, 0, 0.15);
+    color: var(--navy);
+    font-weight: 700;
 }
 
 .testimonial blockquote {

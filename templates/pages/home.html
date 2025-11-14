@@ -24,15 +24,14 @@
     <main>
         <section class="hero">
             <div class="hero-inner">
-                <div class="hero-badge">Backed by <span>Y&nbsp;Combinator</span></div>
-                <h1>Run <span class="highlight">assessments</span> and hiring decisions from one console</h1>
+                <div class="hero-badge">{{ marketing.hero_badge|default:"Backed by Y&nbsp;Combinator" }}</div>
+                <h1>{{ marketing.hero_heading|default:"Run assessments and hiring decisions from one console" }}</h1>
                 <p class="hero-subtitle">
-                    Sira unifies company workflows and the candidate experience—invite talent, capture evidence,
-                    auto score, and advance top performers in minutes.
+                    {{ marketing.hero_subheading|default:"Sira unifies company workflows and the candidate experience—invite talent, capture evidence, auto score, and advance top performers in minutes." }}
                 </p>
                 <div class="hero-cta">
-                    <button class="btn btn-pill">Book a Demo</button>
-                    <a class="btn btn-outline" href="#workflow">See how it works</a>
+                    <button class="btn btn-pill">{{ marketing.hero_primary_cta|default:"Book a Demo" }}</button>
+                    <a class="btn btn-outline" href="#workflow">{{ marketing.hero_secondary_cta|default:"See how it works" }}</a>
                 </div>
             </div>
             <div class="hero-grid"></div>
@@ -123,55 +122,7 @@
             </ol>
             <div class="workflow-cta">
                 <p>Need a ready-to-go assignment?</p>
-                <a class="btn btn-pill" href="#catalog">Explore the catalog</a>
-            </div>
-        </section>
-
-        <section class="assessment-catalog" id="catalog">
-            <div class="section-heading">
-                <p class="eyebrow">Assessment Catalog</p>
-                <h2>Ready-to-run assignments for every frontline hire.</h2>
-                <p class="lede">
-                    Launch targeted diagnostics across Digital Marketing, HR, behavioral, and operations roles with consistent scoring.
-                </p>
-            </div>
-            <div class="catalog-grid">
-                {% for category in assessment_categories %}
-                <article class="catalog-card">
-                    <header class="catalog-header">
-                        <div>
-                            <p class="pill subtle">{{ category.name }}</p>
-                            <h3>{{ category.summary }}</h3>
-                        </div>
-                        <a href="#cta" class="ghost-link">Invite talent</a>
-                    </header>
-                    <ul class="assessment-list">
-                        {% for assessment in category.assessments.all %}
-                        <li>
-                            <article class="assessment-summary-card">
-                                <div class="assessment-copy">
-                                    <span class="assessment-pill">{{ assessment.get_level_display }}</span>
-                                    <p class="assessment-title">{{ assessment.title }}</p>
-                                    <p class="assessment-meta">~{{ assessment.duration_minutes }} min</p>
-                                    <p class="assessment-summary">{{ assessment.summary }}</p>
-                                </div>
-                                <div class="skill-pill-grid">
-                                    {% for skill in assessment.skills_focus %}
-                                    <span>{{ skill }}</span>
-                                    {% empty %}
-                                    <span>Readiness</span>
-                                    {% endfor %}
-                                </div>
-                            </article>
-                        </li>
-                        {% empty %}
-                        <li class="empty-state">Assessments coming soon.</li>
-                        {% endfor %}
-                    </ul>
-                </article>
-                {% empty %}
-                <p class="empty-state">Catalog is being prepared. Check back shortly.</p>
-                {% endfor %}
+                <a class="btn btn-pill" href="#cta">Talk to us</a>
             </div>
         </section>
 
@@ -205,7 +156,7 @@
                         <h3>{{ feature.panel_title }}</h3>
                         <p>{{ feature.panel_subtitle }}</p>
                         <ul class="feature-points">
-                            {% for point in feature.panel_points %}
+                            {% for point in feature.panel_points_list %}
                             <li>{{ point }}</li>
                             {% endfor %}
                         </ul>
@@ -297,8 +248,8 @@
                 {% for article in articles %}
                 <article class="resource-card">
                     <header>
-                        <span class="pill {{ article.pill_class }}">{{ article.pill }}</span>
-                        <span class="date">{{ article.date }}</span>
+                        <span class="pill {{ article.pill_class }}">{{ article.pill_label }}</span>
+                        <span class="date">{{ article.date_display }}</span>
                     </header>
                     <h3>{{ article.title }}</h3>
                     <p>{{ article.summary }}</p>
@@ -319,7 +270,11 @@
                         data-testimonial-panel="{{ forloop.counter0 }}"
                     >
                         <div class="testimonial-avatar">
-                            <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
+                            {% if testimonial.avatar_url %}
+                            <img src="{{ testimonial.avatar_url }}" alt="{{ testimonial.name }}">
+                            {% else %}
+                            <span class="avatar-placeholder">{{ testimonial.name|first }}</span>
+                            {% endif %}
                         </div>
                         <p class="person">{{ testimonial.name }}</p>
                         <p class="role">{{ testimonial.role }}</p>
@@ -342,8 +297,8 @@
         <section class="cta" id="cta">
             <div class="cta-card">
                 <p class="eyebrow">Ready to partner?</p>
-                <h2>Get started today.</h2>
-                <p>Full-service support for talent teams rolling out assessments across the org.</p>
+                <h2>{{ marketing.cta_title|default:"Get started today." }}</h2>
+                <p>{{ marketing.cta_body|default:"Full-service support for talent teams rolling out assessments across the org." }}</p>
                 <div class="cta-grid">
                     <ul>
                         <li>Powerful for the office</li>
