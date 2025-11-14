@@ -11,3 +11,10 @@ def dict_get(mapping, key):
     if not mapping:
         return None
     return mapping.get(key)
+
+
+@register.filter
+def humanize_flag(code: str) -> str:
+    if not code:
+        return ""
+    return code.replace("_", " ").title()

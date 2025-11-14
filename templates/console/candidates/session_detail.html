@@ -136,9 +136,7 @@
         <ul class="flag-list">
             {% for flag in report.red_flags %}
             <li>
-                {% with flag.code|split:"_" as parts %}
-                <strong>{{ parts|join:" "|title }}</strong>
-                {% endwith %}
+                <strong>{{ flag.code|humanize_flag }}</strong>
                 · {{ flag.level|title }}
                 <p>{{ flag.explanation|default:flag.reason }}</p>
             </li>
