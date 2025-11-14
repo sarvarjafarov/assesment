@@ -131,6 +131,32 @@ DATABASES = {
 }
 
 
+def _configure_test_database():
+    """Ensure tests use a writable database even on hosted Postgres (e.g. Heroku)."""
+
+    if "test" not in sys.argv:
+        return
+
+    # Allow overriding via TEST_DATABASE_URL if a disposable database exists.
+    test_database_url = os.environ.get("TEST_DATABASE_URL")
+    if test_database_url:
+        DATABASES["default"] = dj_database_url.parse(
+            test_database_url, conn_max_age=0, ssl_require=False
+        )
+        return
+
+    if os.environ.get("TEST_USE_SQLITE", "1") == "1":
+        DATABASES["default"] = {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "test.sqlite3",
+        }
+        # Django skips creating/dropping databases for SQLite if TEST NAME matches NAME.
+        DATABASES["default"]["TEST"] = {"NAME": BASE_DIR / "test.sqlite3"}
+
+
+_configure_test_database()
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

@@ -14,6 +14,28 @@ python manage.py seed_assessments
 python manage.py runserver
 ```
 
+## Running Tests
+
+By default tests run against SQLite so they can execute anywhere (CI, Heroku review apps) without needing database privileges. No extra setup is required locally:
+
+```bash
+python manage.py test
+```
+
+If you need to point tests at a specific database, set `TEST_DATABASE_URL`. To force SQLite explicitly (useful on platforms where the default Postgres user cannot create databases), set:
+
+```bash
+export TEST_USE_SQLITE=1  # default
+```
+
+or
+
+```bash
+export TEST_DATABASE_URL=postgres://user:pass@host:5432/disposable_test_db
+```
+
+When `TEST_DATABASE_URL` is provided it takes precedence; otherwise SQLite (`test.sqlite3`) is used automatically.
+
 ## Email Configuration
 
 The app reads standard Django `EMAIL_*` settings from the environment. For local/dev:
