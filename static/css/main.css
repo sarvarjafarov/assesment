@@ -540,6 +540,11 @@ main {
     color: var(--navy);
     text-decoration: none;
     opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.catalog-card .ghost-link:hover {
+    opacity: 1;
 }
 
 .assessment-copy {
@@ -581,18 +586,22 @@ main {
 
 .skill-pills {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-end;
 }
 
 .skill-pills span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 999px;
     background: rgba(255, 138, 0, 0.12);
     color: var(--orange);
     font-size: 0.75rem;
-    padding: 0.2rem 0.75rem;
+    padding: 0.2rem 0.9rem;
     font-weight: 600;
+}
 }
 
 .empty-state {
