@@ -16,6 +16,44 @@
             </div>
             {% endif %}
             {% for field in form %}
+            {% if field.field.question.question_type == 'behavioral' %}
+            <div class="form-field candidate-question behavioral-question">
+                <label>{{ field.label }}</label>
+                <p class="help-text">For each row, select the statement that is most like you and the one that is least like you. Every block must have two different statements selected.</p>
+                <div class="behavioral-blocks">
+                    {% for block in field.field.behavioral_blocks %}
+                    <article class="behavioral-block">
+                        <p class="eyebrow">Set {{ block.id }}</p>
+                        <ul class="statement-list">
+                            {% for statement in block.statements %}
+                            <li><strong>{{ statement.id }}</strong> {{ statement.text }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="behavioral-inputs">
+                            <label for="{{ block.most_name }}">Most like me</label>
+                            <select name="{{ block.most_name }}" id="{{ block.most_name }}" required>
+                                <option value="">Select</option>
+                                {% for statement in block.statements %}
+                                <option value="{{ statement.id }}" {% if block.most_value == statement.id %}selected{% endif %}>{{ statement.id }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="{{ block.least_name }}">Least like me</label>
+                            <select name="{{ block.least_name }}" id="{{ block.least_name }}" required>
+                                <option value="">Select</option>
+                                {% for statement in block.statements %}
+                                <option value="{{ statement.id }}" {% if block.least_value == statement.id %}selected{% endif %}>{{ statement.id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {{ field }}
+                {% for error in field.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
             <div class="form-field candidate-question">
                 <label>{{ field.label }}</label>
                 {{ field }}
@@ -23,6 +61,7 @@
                 <span class="field-error">{{ error }}</span>
                 {% endfor %}
             </div>
+            {% endif %}
             {% empty %}
             <p class="empty-state">No questions configured yet.</p>
             {% endfor %}

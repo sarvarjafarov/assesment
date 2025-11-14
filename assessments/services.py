@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass
 from typing import Iterable, Sequence
@@ -157,6 +158,13 @@ def record_responses(
             defaults={"answer_text": ""},
         )
         response.answer_text = answer.get("answer_text", "")
+        if question.question_type == Question.TYPE_BEHAVIORAL:
+            behavioral_payload = answer.get("behavioral_responses") or []
+            response.selected_choices.clear()
+            response.answer_text = json.dumps(behavioral_payload)
+            response.save(update_fields=["answer_text", "updated_at"])
+            behavioral_selections.extend(behavioral_payload)
+            continue
         if question.question_type in {Question.TYPE_SINGLE, Question.TYPE_MULTI}:
             choice_ids = answer.get("choice_ids") or []
             valid_choices = list(

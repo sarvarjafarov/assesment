@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from pathlib import Path
 from typing import Iterable, Sequence
 
 # Behavioural dataset contains 200 blocks with statements A, B, C.
@@ -590,6 +591,31 @@ FOLLOW_UP_QUESTIONS = RED_FLAG_DETECTOR_META.get("follow_up_questions", {})
 # Optional map that can be hydrated with the verbose statement dataset so we can
 # surface the exact prompts a candidate selected.
 STATEMENT_LIBRARY: dict[str, dict[str, str]] = {}
+
+
+def _load_behavioral_blocks() -> list[dict]:
+    data_path = Path(__file__).resolve().parent / "data" / "behavioral_blocks.json"
+    if not data_path.exists():
+        return []
+    with data_path.open() as fh:
+        return json.load(fh)
+
+
+BEHAVIORAL_BLOCKS = _load_behavioral_blocks()
+for block in BEHAVIORAL_BLOCKS:
+    for statement in block.get("statements", []):
+        STATEMENT_LIBRARY[statement["id"]] = {
+            "text": statement.get("text", ""),
+            "trait": statement.get("trait"),
+            "block_id": block.get("id"),
+        }
+
+
+def get_behavioral_blocks(block_ids: list[int] | None = None) -> list[dict]:
+    if not block_ids:
+        return BEHAVIORAL_BLOCKS
+    block_map = {block["id"]: block for block in BEHAVIORAL_BLOCKS}
+    return [block_map[_id] for _id in block_ids if _id in block_map]
 
 
 def parse_behavioral_value(value: str | None, default_response: str = "most_like_me") -> dict | None:

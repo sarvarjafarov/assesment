@@ -1,0 +1,1002 @@
+[
+  {
+    "id": 1,
+    "statements": [
+      {
+        "id": "1A",
+        "text": "I explain ideas in a way that gets people fully on board with me.",
+        "trait": "communication"
+      },
+      {
+        "id": "1B",
+        "text": "I adjust quickly even when plans collapse unexpectedly.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "1C",
+        "text": "I stay calm enough to find the hidden logic in messy situations.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "statements": [
+      {
+        "id": "2A",
+        "text": "I step in when teamwork starts falling apart.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "2B",
+        "text": "I avoid doing anything that could question my honesty.",
+        "trait": "integrity"
+      },
+      {
+        "id": "2C",
+        "text": "I can adapt quickly even when the environment feels chaotic.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "statements": [
+      {
+        "id": "3A",
+        "text": "I phrase things so misunderstandings almost never happen.",
+        "trait": "communication"
+      },
+      {
+        "id": "3B",
+        "text": "I break problems into simple, solvable parts.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "3C",
+        "text": "I offer help even when the team doesn’t ask for it.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "statements": [
+      {
+        "id": "4A",
+        "text": "I stay truthful even if the truth is uncomfortable.",
+        "trait": "integrity"
+      },
+      {
+        "id": "4B",
+        "text": "I stay functional when others panic.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "4C",
+        "text": "I ask questions until I’m 100% clear on what’s needed.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "statements": [
+      {
+        "id": "5A",
+        "text": "I weigh different solutions before choosing the smartest one.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "5B",
+        "text": "I make sure everyone in the team feels involved.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "5C",
+        "text": "I follow rules even when shortcuts look tempting.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "statements": [
+      {
+        "id": "6A",
+        "text": "I explain things in a way almost anyone can follow.",
+        "trait": "communication"
+      },
+      {
+        "id": "6B",
+        "text": "I enjoy solving problems that require creativity.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "6C",
+        "text": "I shift my approach when plans need to change instantly.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "statements": [
+      {
+        "id": "7A",
+        "text": "I speak up when I see something unethical.",
+        "trait": "integrity"
+      },
+      {
+        "id": "7B",
+        "text": "I help groups find common ground.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "7C",
+        "text": "I approach difficult tasks with a structured mindset.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "statements": [
+      {
+        "id": "8A",
+        "text": "I adapt immediately when something unexpected hits.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "8B",
+        "text": "I can present my ideas confidently even under pressure.",
+        "trait": "communication"
+      },
+      {
+        "id": "8C",
+        "text": "I admit mistakes without trying to hide them.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "statements": [
+      {
+        "id": "9A",
+        "text": "I collaborate easily with people who think differently.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "9B",
+        "text": "I double-check information so I don’t rely on assumptions.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "9C",
+        "text": "I adjust my communication style depending on who I speak to.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "statements": [
+      {
+        "id": "10A",
+        "text": "I stay true to my values regardless of pressure.",
+        "trait": "integrity"
+      },
+      {
+        "id": "10B",
+        "text": "I support teammates so we can move together.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "10C",
+        "text": "I reorganize myself quickly when plans fall apart.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "statements": [
+      {
+        "id": "11A",
+        "text": "I express my ideas without overcomplicating them.",
+        "trait": "communication"
+      },
+      {
+        "id": "11B",
+        "text": "I can keep my cool when everyone else gets frustrated.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "11C",
+        "text": "I look for root causes instead of quick fixes.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "statements": [
+      {
+        "id": "12A",
+        "text": "I prefer cooperation over competition.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "12B",
+        "text": "I do what's right even when it slows me down.",
+        "trait": "integrity"
+      },
+      {
+        "id": "12C",
+        "text": "I shift direction easily when circumstances demand it.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "statements": [
+      {
+        "id": "13A",
+        "text": "I communicate in a way that avoids unnecessary tension.",
+        "trait": "communication"
+      },
+      {
+        "id": "13B",
+        "text": "I break down challenges into steps that make sense.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "13C",
+        "text": "I make sure no one on the team feels left out.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "statements": [
+      {
+        "id": "14A",
+        "text": "I don’t bend rules even when it’s harmless.",
+        "trait": "integrity"
+      },
+      {
+        "id": "14B",
+        "text": "I stay productive when the environment is unstable.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "14C",
+        "text": "I double-check instructions to avoid mistakes.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "statements": [
+      {
+        "id": "15A",
+        "text": "I compare several approaches before choosing one.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "15B",
+        "text": "I try to ensure my team functions smoothly.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "15C",
+        "text": "I stay ethical even when shortcuts look rewarding.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "statements": [
+      {
+        "id": "16A",
+        "text": "I communicate in a way that prevents confusion before it happens.",
+        "trait": "communication"
+      },
+      {
+        "id": "16B",
+        "text": "I stay flexible even when everything around me feels rigid.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "16C",
+        "text": "I look for patterns that others overlook.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "statements": [
+      {
+        "id": "17A",
+        "text": "I bring teammates together when tension rises.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "17B",
+        "text": "I avoid choices that might compromise my integrity.",
+        "trait": "integrity"
+      },
+      {
+        "id": "17C",
+        "text": "I quickly adapt when unexpected tasks arrive.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "statements": [
+      {
+        "id": "18A",
+        "text": "I communicate with clarity especially in stressful moments.",
+        "trait": "communication"
+      },
+      {
+        "id": "18B",
+        "text": "I break down tough problems with a calm, logical approach.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "18C",
+        "text": "I include others even if their opinions differ from mine.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "statements": [
+      {
+        "id": "19A",
+        "text": "I stay honest even when honesty is inconvenient.",
+        "trait": "integrity"
+      },
+      {
+        "id": "19B",
+        "text": "I adjust rapidly when faced with new demands.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "19C",
+        "text": "I rephrase messages to prevent misunderstandings.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "statements": [
+      {
+        "id": "20A",
+        "text": "I evaluate every angle before committing to a solution.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "20B",
+        "text": "I step in to support teammates when workload increases.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "20C",
+        "text": "I resist any action that violates ethical principles.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "statements": [
+      {
+        "id": "21A",
+        "text": "I adapt my wording depending on who I’m speaking to.",
+        "trait": "communication"
+      },
+      {
+        "id": "21B",
+        "text": "I remain composed when plans fall apart suddenly.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "21C",
+        "text": "I question assumptions before using them.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "statements": [
+      {
+        "id": "22A",
+        "text": "I look for ways to strengthen group cooperation.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "22B",
+        "text": "I do what is right even when it feels uncomfortable.",
+        "trait": "integrity"
+      },
+      {
+        "id": "22C",
+        "text": "I adapt quickly when priorities shift.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "statements": [
+      {
+        "id": "23A",
+        "text": "I express ideas in a way that builds trust.",
+        "trait": "communication"
+      },
+      {
+        "id": "23B",
+        "text": "I organize difficult tasks into manageable steps.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "23C",
+        "text": "I help teammates feel valued and included.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "statements": [
+      {
+        "id": "24A",
+        "text": "I avoid actions that would make people question my character.",
+        "trait": "integrity"
+      },
+      {
+        "id": "24B",
+        "text": "I stay efficient during unexpected changes.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "24C",
+        "text": "I clarify instructions before starting.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "statements": [
+      {
+        "id": "25A",
+        "text": "I explore multiple solutions before selecting the best one.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "25B",
+        "text": "I contribute positively to the group’s dynamic.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "25C",
+        "text": "I stay ethical even under pressure to perform.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "statements": [
+      {
+        "id": "26A",
+        "text": "I communicate in a way that keeps discussions grounded.",
+        "trait": "communication"
+      },
+      {
+        "id": "26B",
+        "text": "I adjust smoothly when things become unpredictable.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "26C",
+        "text": "I see connections others usually miss.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "statements": [
+      {
+        "id": "27A",
+        "text": "I encourage teammates to work collaboratively.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "27B",
+        "text": "I avoid decisions that feel morally questionable.",
+        "trait": "integrity"
+      },
+      {
+        "id": "27C",
+        "text": "I quickly adapt to changing expectations.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "statements": [
+      {
+        "id": "28A",
+        "text": "I phrase ideas so others feel comfortable engaging.",
+        "trait": "communication"
+      },
+      {
+        "id": "28B",
+        "text": "I lean toward logical, structured thinking when challenged.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "28C",
+        "text": "I try to make cooperation easier for everyone.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "statements": [
+      {
+        "id": "29A",
+        "text": "I stick to honesty even when dishonesty seems easier.",
+        "trait": "integrity"
+      },
+      {
+        "id": "29B",
+        "text": "I adapt my methods quickly when conditions change.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "29C",
+        "text": "I ensure clarity so others don’t misinterpret me.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "statements": [
+      {
+        "id": "30A",
+        "text": "I compare outcomes before committing to a strategy.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "30B",
+        "text": "I help my team function smoothly despite differences.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "30C",
+        "text": "I follow ethical rules even when no one is checking.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "statements": [
+      {
+        "id": "31A",
+        "text": "I communicate in a way that avoids unnecessary conflict.",
+        "trait": "communication"
+      },
+      {
+        "id": "31B",
+        "text": "I stay adaptable when plans shift at the last moment.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "31C",
+        "text": "I search for underlying issues rather than surface problems.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "statements": [
+      {
+        "id": "32A",
+        "text": "I mediate when teammates struggle to collaborate.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "32B",
+        "text": "I avoid choices that compromise ethical standards.",
+        "trait": "integrity"
+      },
+      {
+        "id": "32C",
+        "text": "I adjust gracefully to unplanned changes.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "statements": [
+      {
+        "id": "33A",
+        "text": "I deliver messages in a clear and organized way.",
+        "trait": "communication"
+      },
+      {
+        "id": "33B",
+        "text": "I break confusing tasks into clear, actionable steps.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "33C",
+        "text": "I create an atmosphere where teammates feel respected.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "statements": [
+      {
+        "id": "34A",
+        "text": "I maintain integrity even when mistakes could be hidden.",
+        "trait": "integrity"
+      },
+      {
+        "id": "34B",
+        "text": "I stay focused when sudden changes occur.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "34C",
+        "text": "I ask questions to avoid unclear instructions.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "statements": [
+      {
+        "id": "35A",
+        "text": "I evaluate multiple methods to solve problems efficiently.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "35B",
+        "text": "I support teammates when they experience setbacks.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "35C",
+        "text": "I avoid bending rules regardless of the situation.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "statements": [
+      {
+        "id": "36A",
+        "text": "I adjust my communication when others seem confused.",
+        "trait": "communication"
+      },
+      {
+        "id": "36B",
+        "text": "I stay calm when sudden challenges appear.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "36C",
+        "text": "I seek clarity by questioning assumptions.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "statements": [
+      {
+        "id": "37A",
+        "text": "I encourage unity when the group gets divided.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "37B",
+        "text": "I avoid anything that conflicts with my values.",
+        "trait": "integrity"
+      },
+      {
+        "id": "37C",
+        "text": "I adapt fluidly when plans get disrupted.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "statements": [
+      {
+        "id": "38A",
+        "text": "I communicate with confidence and clarity.",
+        "trait": "communication"
+      },
+      {
+        "id": "38B",
+        "text": "I identify the logical order hidden inside complex tasks.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "38C",
+        "text": "I help teammates feel motivated to contribute.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "statements": [
+      {
+        "id": "39A",
+        "text": "I choose honesty even when dishonest paths look easier.",
+        "trait": "integrity"
+      },
+      {
+        "id": "39B",
+        "text": "I adjust approaches instantly when conditions evolve.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "39C",
+        "text": "I give explanations that leave no room for confusion.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "statements": [
+      {
+        "id": "40A",
+        "text": "I examine details to determine the best solution.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "40B",
+        "text": "I work to keep the team cooperative and positive.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "40C",
+        "text": "I stay true to ethical rules even under stress.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "statements": [
+      {
+        "id": "41A",
+        "text": "I express ideas without causing unnecessary friction.",
+        "trait": "communication"
+      },
+      {
+        "id": "41B",
+        "text": "I stay adaptable when plans change suddenly.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "41C",
+        "text": "I analyze situations deeply before reacting.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "statements": [
+      {
+        "id": "42A",
+        "text": "I support the group when disagreements arise.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "42B",
+        "text": "I avoid decisions that violate moral standards.",
+        "trait": "integrity"
+      },
+      {
+        "id": "42C",
+        "text": "I shift gears quickly when priorities flip.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "statements": [
+      {
+        "id": "43A",
+        "text": "I ensure clarity even when delivering bad news.",
+        "trait": "communication"
+      },
+      {
+        "id": "43B",
+        "text": "I break down overwhelming tasks into manageable chunks.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "43C",
+        "text": "I create an environment where team members trust each other.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "statements": [
+      {
+        "id": "44A",
+        "text": "I stick to integrity even if it slows my progress.",
+        "trait": "integrity"
+      },
+      {
+        "id": "44B",
+        "text": "I remain efficient when everything shifts unexpectedly.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "44C",
+        "text": "I ask clarifying questions instead of guessing.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "statements": [
+      {
+        "id": "45A",
+        "text": "I explore various approaches before selecting one.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "45B",
+        "text": "I mediate when team tension escalates.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "45C",
+        "text": "I maintain high ethical standards in all decisions.",
+        "trait": "integrity"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "statements": [
+      {
+        "id": "46A",
+        "text": "I change my communication style depending on the situation.",
+        "trait": "communication"
+      },
+      {
+        "id": "46B",
+        "text": "I adjust rapidly when circumstances shift.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "46C",
+        "text": "I challenge assumptions before accepting them.",
+        "trait": "problem_solving"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "statements": [
+      {
+        "id": "47A",
+        "text": "I unify teams when collaboration becomes difficult.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "47B",
+        "text": "I avoid choices that conflict with my moral compass.",
+        "trait": "integrity"
+      },
+      {
+        "id": "47C",
+        "text": "I stay flexible even when plans change halfway.",
+        "trait": "adaptability"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "statements": [
+      {
+        "id": "48A",
+        "text": "I summarize ideas so others immediately understand.",
+        "trait": "communication"
+      },
+      {
+        "id": "48B",
+        "text": "I identify the structure inside chaotic problems.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "48C",
+        "text": "I motivate others by creating a positive team spirit.",
+        "trait": "teamwork"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "statements": [
+      {
+        "id": "49A",
+        "text": "I stay honest even if the outcome is risky for me.",
+        "trait": "integrity"
+      },
+      {
+        "id": "49B",
+        "text": "I adapt my plans as soon as new information appears.",
+        "trait": "adaptability"
+      },
+      {
+        "id": "49C",
+        "text": "I avoid unclear communication by being direct and precise.",
+        "trait": "communication"
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "statements": [
+      {
+        "id": "50A",
+        "text": "I analyze information carefully before choosing a direction.",
+        "trait": "problem_solving"
+      },
+      {
+        "id": "50B",
+        "text": "I help teams overcome obstacles together.",
+        "trait": "teamwork"
+      },
+      {
+        "id": "50C",
+        "text": "I uphold ethical rules regardless of pressure.",
+        "trait": "integrity"
+      }
+    ]
+  }
+]

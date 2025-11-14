@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 from typing import Iterable
 
 from django import forms
 
+from assessments.behavioral import get_behavioral_blocks
 from assessments.models import Question
 
 
@@ -16,6 +18,7 @@ class AssessmentResponseForm(forms.Form):
             assessment.questions.prefetch_related("choices").order_by("order")
         )
         super().__init__(*args, **kwargs)
+        self.behavioral_fields: dict[str, dict] = {}
         for question in self.questions:
             field_name = self._field_name(question)
             if question.question_type == Question.TYPE_SINGLE:
@@ -32,6 +35,18 @@ class AssessmentResponseForm(forms.Form):
                     widget=forms.CheckboxSelectMultiple,
                     required=False,
                 )
+            elif question.question_type == Question.TYPE_BEHAVIORAL:
+                blocks = self._prepare_behavioral_blocks(field_name, question)
+                self.fields[field_name] = forms.CharField(
+                    label=question.prompt,
+                    widget=forms.HiddenInput,
+                    required=False,
+                )
+                self.fields[field_name].behavioral_blocks = blocks
+                self.behavioral_fields[field_name] = {
+                    "question": question,
+                    "blocks": blocks,
+                }
             elif question.question_type == Question.TYPE_SCALE:
                 labels = question.metadata.get("scale_labels") or [
                     "1",
@@ -52,6 +67,27 @@ class AssessmentResponseForm(forms.Form):
                     widget=forms.Textarea(attrs={"rows": 4}),
                     required=True,
                 )
+            self.fields[field_name].question = question
+
+    def _prepare_behavioral_blocks(self, field_name: str, question: Question) -> list[dict]:
+        config = question.metadata.get("behavioral_bank", {})
+        block_ids = config.get("blocks")
+        blocks = get_behavioral_blocks(block_ids)
+        prepared: list[dict] = []
+        for block in blocks:
+            most_name = self._behavioral_input_name(field_name, block["id"], "most")
+            least_name = self._behavioral_input_name(field_name, block["id"], "least")
+            prepared.append(
+                {
+                    "id": block["id"],
+                    "statements": block.get("statements", []),
+                    "most_name": most_name,
+                    "least_name": least_name,
+                    "most_value": self.data.get(most_name, "") if self.is_bound else "",
+                    "least_value": self.data.get(least_name, "") if self.is_bound else "",
+                }
+            )
+        return prepared
 
     def to_answers(self) -> list[dict]:
         """Transform cleaned_data into the payload expected by record_responses."""
@@ -65,10 +101,48 @@ class AssessmentResponseForm(forms.Form):
                 payload["choice_ids"] = [int(value)] if value else []
             elif question.question_type == Question.TYPE_MULTI:
                 payload["choice_ids"] = [int(val) for val in value]
+            elif question.question_type == Question.TYPE_BEHAVIORAL:
+                payload["behavioral_responses"] = value or []
+                payload["answer_text"] = json.dumps(value or [])
             else:
                 payload["answer_text"] = value or ""
             answers.append(payload)
         return answers
+
+    def clean(self):
+        cleaned = super().clean()
+        for field_name, config in self.behavioral_fields.items():
+            selections: list[dict] = []
+            errors: list[str] = []
+            for block in config["blocks"]:
+                most_name = block["most_name"]
+                least_name = block["least_name"]
+                most_value = self.data.get(most_name)
+                least_value = self.data.get(least_name)
+                valid_ids = {stmt["id"] for stmt in block["statements"]}
+                if not most_value or not least_value:
+                    errors.append(
+                        f"Select both 'Most like me' and 'Least like me' for block {block['id']}."
+                    )
+                    continue
+                if most_value == least_value:
+                    errors.append(
+                        f"Block {block['id']}: choose different statements for most and least."
+                    )
+                    continue
+                if most_value not in valid_ids or least_value not in valid_ids:
+                    errors.append(f"Block {block['id']}: invalid selection.")
+                    continue
+                selections.append(
+                    {"statement_id": most_value, "response_type": "most_like_me"}
+                )
+                selections.append(
+                    {"statement_id": least_value, "response_type": "least_like_me"}
+                )
+            if errors:
+                self.add_error(field_name, " ".join(errors))
+            cleaned[field_name] = selections
+        return cleaned
 
     @staticmethod
     def _field_name(question: Question) -> str:
@@ -78,3 +152,6 @@ class AssessmentResponseForm(forms.Form):
     def _choice_pairs(question: Question) -> list[tuple[int, str]]:
         return [(choice.id, choice.label) for choice in question.choices.all()]
 
+    @staticmethod
+    def _behavioral_input_name(field_name: str, block_id: int, kind: str) -> str:
+        return f"{field_name}-{block_id}-{kind}"

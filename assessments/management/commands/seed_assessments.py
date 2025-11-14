@@ -8,99 +8,6 @@ from assessments.models import Assessment, Choice, Question, RoleCategory
 SEED_DATA = [
     {
         "category": {
-            "name": "Digital Marketing",
-            "slug": "digital-marketing",
-            "summary": "Evaluate paid media, lifecycle automation, and analytics readiness.",
-            "icon": "sparkles",
-        },
-        "assessments": [
-            {
-                "title": "Digital Marketing Fundamentals",
-                "slug": "digital-marketing-fundamentals",
-                "summary": "Measures campaign planning, channel mastery, and data fluency.",
-                "level": "intermediate",
-                "duration_minutes": 30,
-                "skills_focus": ["Paid Ads", "Lifecycle", "Analytics"],
-                "scoring_rubric": {"tiers": ["Emerging", "Ready", "Expert"]},
-                "questions": [
-                    {
-                        "order": 1,
-                        "prompt": "Which KPI best demonstrates paid social efficiency when budgets fluctuate weekly?",
-                        "question_type": "single",
-                        "choices": [
-                            {"label": "Click-through rate", "weight": 0.5},
-                            {"label": "Cost per incremental lift", "weight": 1.0},
-                            {"label": "Reach", "weight": 0.3},
-                        ],
-                    },
-                    {
-                        "order": 2,
-                        "prompt": "Select the automations you would deploy for a new product onboarding journey.",
-                        "question_type": "multi",
-                        "choices": [
-                            {"label": "Behavior-triggered nurture", "weight": 0.6},
-                            {"label": "Time-based announcement", "weight": 0.3},
-                            {"label": "Win-back for disengaged cohort", "weight": 0.6},
-                        ],
-                    },
-                    {
-                        "order": 3,
-                        "prompt": "Rate your confidence in building a multi-touch attribution dashboard.",
-                        "question_type": "scale",
-                        "metadata": {"scale_labels": ["Low", "Medium", "High"]},
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        "category": {
-            "name": "Human Resources",
-            "slug": "human-resources",
-            "summary": "Understand people-ops strategy, compliance rigor, and change enablement.",
-            "icon": "briefcase",
-        },
-        "assessments": [
-            {
-                "title": "HR Compliance Pulse",
-                "slug": "hr-compliance-pulse",
-                "summary": "Checks knowledge of regional regulations and escalation playbooks.",
-                "level": "advanced",
-                "duration_minutes": 25,
-                "skills_focus": ["Employment Law", "Policy Design", "Risk"],
-                "scoring_rubric": {"weights": {"law": 0.4, "policy": 0.35, "risk": 0.25}},
-                "questions": [
-                    {
-                        "order": 1,
-                        "prompt": "When rolling out a global leave policy, which step ensures enforceability?",
-                        "question_type": "single",
-                        "choices": [
-                            {"label": "Provide FAQ in Slack", "weight": 0.2},
-                            {"label": "Audit labor codes per region", "weight": 1.0},
-                            {"label": "Conduct manager office hours", "weight": 0.5},
-                        ],
-                    },
-                    {
-                        "order": 2,
-                        "prompt": "Which signals indicate it is time to refresh an employee handbook?",
-                        "question_type": "multi",
-                        "choices": [
-                            {"label": "Recent acquisition", "weight": 0.6},
-                            {"label": "Regulatory change", "weight": 0.6},
-                            {"label": "High NPS", "weight": 0.2},
-                        ],
-                    },
-                    {
-                        "order": 3,
-                        "prompt": "Outline how you would partner with legal on a sensitive investigation.",
-                        "question_type": "text",
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        "category": {
             "name": "General Behaviors",
             "slug": "general-behaviors",
             "summary": "Measure collaboration habits, decision making, and adaptability.",
@@ -108,39 +15,44 @@ SEED_DATA = [
         },
         "assessments": [
             {
-                "title": "Collaboration DNA",
-                "slug": "collaboration-dna",
-                "summary": "Highlights communication preferences and conflict navigation.",
+                "title": "Behavioral Readiness Index",
+                "slug": "behavioral-readiness",
+                "summary": "Scenario-neutral behavioral inventory covering communication, adaptability, and integrity.",
                 "level": "intro",
-                "duration_minutes": 15,
-                "skills_focus": ["Communication", "Conflict", "Ownership"],
-                "scoring_rubric": {"dimensions": ["Clarity", "Empathy", "Bias for Action"]},
+                "duration_minutes": 18,
+                "skills_focus": [
+                    "Communication",
+                    "Adaptability",
+                    "Problem Solving",
+                    "Teamwork",
+                    "Integrity",
+                ],
+                "scoring_rubric": {
+                    "behavioral_weight_profile": "general_behaviors",
+                    "dimensions": [
+                        "Communication",
+                        "Adaptability",
+                        "Problem Solving",
+                        "Teamwork",
+                        "Integrity",
+                    ],
+                },
                 "questions": [
                     {
                         "order": 1,
-                        "prompt": "How do you keep distributed teammates aligned on objectives?",
-                        "question_type": "text",
-                    },
-                    {
-                        "order": 2,
-                        "prompt": "Choose the behaviors that best describe your response to urgent blockers.",
-                        "question_type": "multi",
-                        "choices": [
-                            {"label": "Mobilize available partners quickly", "weight": 0.6},
-                            {"label": "Document workaround and share", "weight": 0.6},
-                            {"label": "Pause other priorities indefinitely", "weight": 0.1},
-                        ],
-                    },
-                    {
-                        "order": 3,
-                        "prompt": "Rate your comfort facilitating feedback conversations.",
-                        "question_type": "scale",
-                        "metadata": {"scale_labels": ["Still learning", "Confident", "Expert"]},
-                    },
+                        "prompt": "Select the statements that are most and least like you for each set.",
+                        "question_type": "behavioral",
+                        "metadata": {
+                            "behavioral_bank": {
+                                "dataset": "default",
+                                "blocks": list(range(1, 51)),
+                            }
+                        },
+                    }
                 ],
-            },
+            }
         ],
-    },
+    }
 ]
 
 
@@ -149,6 +61,14 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
+        desired_category_slugs = [entry["category"]["slug"] for entry in SEED_DATA]
+        desired_assessment_slugs = [
+            assessment["slug"]
+            for entry in SEED_DATA
+            for assessment in entry["assessments"]
+        ]
+        Assessment.objects.exclude(slug__in=desired_assessment_slugs).delete()
+        RoleCategory.objects.exclude(slug__in=desired_category_slugs).delete()
         for entry in SEED_DATA:
             category_payload = entry["category"]
             category, created = RoleCategory.objects.update_or_create(

@@ -80,11 +80,13 @@ class Question(TimeStampedModel):
     TYPE_MULTI = "multi"
     TYPE_SCALE = "scale"
     TYPE_TEXT = "text"
+    TYPE_BEHAVIORAL = "behavioral"
     QUESTION_TYPES = [
         (TYPE_SINGLE, "Single Select"),
         (TYPE_MULTI, "Multi Select"),
         (TYPE_SCALE, "Likert Scale"),
         (TYPE_TEXT, "Free Text"),
+        (TYPE_BEHAVIORAL, "Behavioral Matrix"),
     ]
 
     assessment = models.ForeignKey(
