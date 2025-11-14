@@ -1072,13 +1072,40 @@ main {
     gap: 1rem;
 }
 
-.cta-grid {
+.cta-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.85rem;
+}
+
+.cta-highlights article {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 18px;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    box-shadow: inset 0 0 20px rgba(255, 138, 0, 0.08);
+}
+
+.highlight-value {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.highlight-label {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.cta-checks {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
 }
 
-.cta-card ul {
+.cta-checks ul {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -1087,14 +1114,14 @@ main {
     gap: 0.6rem;
 }
 
-.cta-card li {
+.cta-checks li {
     display: flex;
     gap: 0.5rem;
     align-items: center;
     font-weight: 600;
 }
 
-.cta-card li::before {
+.cta-checks li::before {
     content: "✓";
     color: var(--orange);
     font-weight: 700;
@@ -1239,13 +1266,13 @@ main {
 
 .site-footer {
     border-top: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 1.5rem;
+    padding: 2.5rem 1.5rem;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .site-footer span {
@@ -1254,8 +1281,7 @@ main {
 
 .footer-links {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .footer-links a {
