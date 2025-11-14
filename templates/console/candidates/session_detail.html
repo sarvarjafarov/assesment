@@ -1,5 +1,5 @@
 {% extends 'console/base.html' %}
-{% load humanize %}
+{% load humanize dict_extras %}
 {% block console_content %}
 <section class="console-page-header">
     <div>
@@ -115,7 +115,7 @@
                     —
                 {% endif %}
             </span>
-            <span>{{ behavior.behavior_labels[item.trait]|default:"—" }}</span>
+            <span>{{ behavior.behavior_labels|dict_get:item.trait|default:"—" }}</span>
         </div>
         {% endfor %}
     </div>
