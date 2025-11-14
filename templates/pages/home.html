@@ -15,7 +15,7 @@
                 <li><a href="#blog">Blog</a></li>
             </ul>
             <div class="nav-actions">
-                <a class="btn btn-outline small" href="{% url 'console:dashboard' %}">Customer Login</a>
+                <a class="btn btn-outline small" href="{% url 'console:login' %}">Customer Login</a>
                 <button class="btn btn-pill">Book a Demo</button>
             </div>
         </nav>
@@ -148,22 +148,21 @@
                     <ul class="assessment-list">
                         {% for assessment in category.assessments.all %}
                         <li>
-                            <div class="assessment-summary-card">
+                            <article class="assessment-summary-card">
                                 <div class="assessment-copy">
+                                    <span class="assessment-pill">{{ assessment.get_level_display }}</span>
                                     <p class="assessment-title">{{ assessment.title }}</p>
-                                    <p class="assessment-meta">
-                                        {{ assessment.get_level_display }} · ~{{ assessment.duration_minutes }} min
-                                    </p>
+                                    <p class="assessment-meta">~{{ assessment.duration_minutes }} min</p>
                                     <p class="assessment-summary">{{ assessment.summary }}</p>
                                 </div>
-                                <div class="skill-pills">
+                                <div class="skill-pill-grid">
                                     {% for skill in assessment.skills_focus %}
                                     <span>{{ skill }}</span>
                                     {% empty %}
                                     <span>Readiness</span>
                                     {% endfor %}
                                 </div>
-                            </div>
+                            </article>
                         </li>
                         {% empty %}
                         <li class="empty-state">Assessments coming soon.</li>
@@ -345,11 +344,18 @@
                 <p class="eyebrow">Ready to partner?</p>
                 <h2>Get started today.</h2>
                 <p>Full-service support for talent teams rolling out assessments across the org.</p>
-                <ul>
-                    <li>Powerful for the office</li>
-                    <li>Easy for employees</li>
-                    <li>Top-notch service</li>
-                </ul>
+                <div class="cta-grid">
+                    <ul>
+                        <li>Powerful for the office</li>
+                        <li>Easy for employees</li>
+                        <li>Top-notch service</li>
+                    </ul>
+                    <ul>
+                        <li>Guided onboarding</li>
+                        <li>Dedicated support</li>
+                        <li>Clear pricing</li>
+                    </ul>
+                </div>
             </div>
             <div class="cta-form-card">
                 <form class="cta-form" method="post" action="{% url 'pages:home' %}#cta">
@@ -362,27 +368,31 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    <div class="form-field">
-                        {{ invite_form.full_name.label_tag }}
-                        {{ invite_form.full_name }}
-                        {% for error in invite_form.full_name.errors %}
-                        <span class="field-error">{{ error }}</span>
-                        {% endfor %}
+                    <div class="form-row">
+                        <div class="form-field">
+                            {{ invite_form.full_name.label_tag }}
+                            {{ invite_form.full_name }}
+                            {% for error in invite_form.full_name.errors %}
+                            <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="form-field">
+                            {{ invite_form.email.label_tag }}
+                            {{ invite_form.email }}
+                            {% for error in invite_form.email.errors %}
+                            <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="form-field">
-                        {{ invite_form.email.label_tag }}
-                        {{ invite_form.email }}
-                        {% for error in invite_form.email.errors %}
-                        <span class="field-error">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    <div class="form-field">
-                        {{ invite_form.company.label_tag }}
-                        {{ invite_form.company }}
-                    </div>
-                    <div class="form-field">
-                        {{ invite_form.focus_area.label_tag }}
-                        {{ invite_form.focus_area }}
+                    <div class="form-row">
+                        <div class="form-field">
+                            {{ invite_form.company.label_tag }}
+                            {{ invite_form.company }}
+                        </div>
+                        <div class="form-field">
+                            {{ invite_form.focus_area.label_tag }}
+                            {{ invite_form.focus_area }}
+                        </div>
                     </div>
                     <div class="form-field">
                         {{ invite_form.notes.label_tag }}

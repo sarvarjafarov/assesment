@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-copy">
+            <p class="eyebrow">Customer login</p>
+            <h1>Access your hiring console</h1>
+            <p>Review invites, scoring, and candidate journeys inside the secure workspace.</p>
+        </div>
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="form-error">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-field">
+                {{ form.username.label_tag }}
+                {{ form.username }}
+                {% for error in form.username.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="form-field">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+                {% for error in form.password.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-pill">Sign in</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count, OuterRef, Q, Subquery
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -311,6 +314,21 @@ class InviteCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
 
+class ConsoleLoginView(SuccessMessageMixin, FormView):
+    template_name = "console/login.html"
+    success_url = reverse_lazy("console:dashboard")
+    form_class = AuthenticationForm
+    success_message = "Welcome back!"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("console:dashboard")
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.get_user()
+        login(self.request, user)
+        return super().form_valid(form)
 class SessionDetailView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
     template_name = "console/candidates/session_detail.html"
     form_class = SessionUpdateForm
