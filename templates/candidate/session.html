@@ -4,12 +4,21 @@
 <div class="candidate-shell single-column">
     <section class="candidate-panel response-panel question-step">
         <div class="question-progress">
-            <div>
-                <p class="eyebrow">Assessment in progress</p>
-                <p class="progress-text">Step {{ step_number }} of {{ total_steps }}</p>
+            <div class="progress-meta">
+                <span class="status-chip">
+                    <span class="chip-dot"></span>
+                    Assessment in progress
+                </span>
+                <div class="progress-count">
+                    <span class="progress-step">Step {{ step_number }}</span>
+                    <span class="progress-total">of {{ total_steps }}</span>
+                </div>
             </div>
-            <div class="progress-bar">
-                <span style="width: {{ progress_percent }}%"></span>
+            <div class="progress-meter">
+                <div class="progress-bar">
+                    <span style="width: {{ progress_percent }}%"></span>
+                </div>
+                <p class="progress-percent">{{ progress_percent }}% complete</p>
             </div>
         </div>
         {% if instructions %}

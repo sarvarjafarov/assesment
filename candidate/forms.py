@@ -67,13 +67,21 @@ class QuestionStepForm(forms.Form):
             self.fields["most_like"] = forms.ChoiceField(
                 label="Most like me",
                 choices=choices,
-                widget=forms.Select,
+                widget=forms.Select(
+                    attrs={
+                        "class": "behavioral-select",
+                    }
+                ),
                 required=True,
             )
             self.fields["least_like"] = forms.ChoiceField(
                 label="Least like me",
                 choices=choices,
-                widget=forms.Select,
+                widget=forms.Select(
+                    attrs={
+                        "class": "behavioral-select",
+                    }
+                ),
                 required=True,
             )
         else:
