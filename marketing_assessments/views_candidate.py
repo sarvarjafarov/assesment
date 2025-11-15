@@ -93,6 +93,9 @@ class MarketingAssessmentCompleteView(TemplateView):
         )
         context = super().get_context_data(**kwargs)
         context["session"] = session
+        if session.started_at and session.submitted_at:
+            duration = (session.submitted_at - session.started_at).total_seconds() / 60
+            context["elapsed_minutes"] = round(duration, 1)
         return context
 
 

@@ -6,6 +6,9 @@
             <p class="eyebrow">Assessment submitted</p>
             <h2>Thanks for completing the digital marketing assessment.</h2>
         </div>
+        {% if elapsed_minutes %}
+        <p>You completed the assessment in {{ elapsed_minutes }} minutes.</p>
+        {% endif %}
         <p>Your responses were recorded. The talent team will review your scores shortly.</p>
     </section>
 </div>

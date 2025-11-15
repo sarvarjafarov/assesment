@@ -2064,6 +2064,12 @@ main {
     font-weight: 600;
     color: var(--orange);
 }
+.share-meta p {
+    margin: 0;
+}
+.share-meta {
+    text-align: right;
+}
 
 .score-highlight .share-row {
     display: flex;
