@@ -40,6 +40,12 @@ class SessionEvaluation:
     breakdown: dict
 
 
+@dataclass
+class EmailDeliveryResult:
+    sent: bool
+    reason: str | None = None
+
+
 def invite_candidate(
     *,
     assessment: Assessment,
@@ -137,12 +143,13 @@ def send_invite_email(
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
     recipients = [candidate.email]
     if not settings.EMAIL_ENABLED:
+        reason = "EMAIL_ENABLED is False; configure SMTP or set EMAIL_BACKEND."
         logger.info(
-            "EMAIL_ENABLED is False; invite for session %s logged but not sent.",
+            reason + " Session %s invite link available at %s",
             session.pk,
+            intro_link,
         )
-        logger.info("Invite link for %s: %s", candidate.email, intro_link)
-        return
+        return EmailDeliveryResult(sent=False, reason=reason)
     try:
         send_mail(
             subject,
@@ -156,10 +163,12 @@ def send_invite_email(
             candidate.email,
             assessment.title,
         )
+        return EmailDeliveryResult(sent=True)
     except Exception as exc:  # pragma: no cover - avoid failing invite on email issues
         logger.warning(
             "Failed to send invite email for session %s: %s", session.pk, exc
         )
+        return EmailDeliveryResult(sent=False, reason=str(exc))
 
 
 def record_responses(

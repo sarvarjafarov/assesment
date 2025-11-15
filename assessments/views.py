@@ -182,7 +182,7 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
         start_link = request.build_absolute_uri(
             reverse("candidate:session-start", args=[invite.session.uuid])
         )
-        send_invite_email(
+        email_result = send_invite_email(
             candidate=invite.candidate,
             assessment=assessment,
             session=invite.session,
@@ -203,7 +203,10 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
             },
             "status": invite.session.status,
             "behavioral_focus": focus_selection,
+            "email_sent": email_result.sent if email_result else False,
         }
+        if email_result and not email_result.sent:
+            response_data["email_error"] = email_result.reason
         return JsonResponse(response_data, status=201)
 
 

@@ -455,7 +455,7 @@ class InviteCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
         start_link = self.request.build_absolute_uri(
             reverse("candidate:session-start", args=[result.session.uuid])
         )
-        send_invite_email(
+        email_result = send_invite_email(
             candidate=result.candidate,
             assessment=result.assessment,
             session=result.session,
@@ -469,10 +469,17 @@ class InviteCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
             self.request,
             f"Invite ready for {result.candidate.first_name}. Share link: {intro_link}",
         )
-        messages.info(
-            self.request,
-            f"Invitation email sent to {result.candidate.email}.",
-        )
+        if email_result and email_result.sent:
+            messages.info(
+                self.request,
+                f"Invitation email sent to {result.candidate.email}.",
+            )
+        else:
+            reason = email_result.reason if email_result else "Email backend unavailable."
+            messages.warning(
+                self.request,
+                f"Email could not be sent (reason: {reason}). Share the invite link manually.",
+            )
         self.success_url = reverse(
             "console:candidate-detail", args=[result.candidate.pk]
         )
