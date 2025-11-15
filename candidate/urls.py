@@ -1,5 +1,7 @@
 from django.urls import path
 
+from marketing_assessments import views_candidate as marketing_views
+
 from . import views
 
 app_name = "candidate"
@@ -19,5 +21,15 @@ urlpatterns = [
         "<uuid:session_uuid>/complete/",
         views.SessionCompleteView.as_view(),
         name="session-complete",
+    ),
+    path(
+        "marketing/<uuid:session_uuid>/",
+        marketing_views.MarketingAssessmentView.as_view(),
+        name="marketing-session",
+    ),
+    path(
+        "marketing/<uuid:session_uuid>/complete/",
+        marketing_views.MarketingAssessmentCompleteView.as_view(),
+        name="marketing-complete",
     ),
 ]

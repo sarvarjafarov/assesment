@@ -14,6 +14,8 @@ from assessments.models import (
 )
 from assessments.services import invite_candidate
 from blog.models import BlogPost
+from marketing_assessments.models import DigitalMarketingAssessmentSession
+from marketing_assessments.services import generate_question_set
 
 
 def _comma_separated(value: str) -> list[str]:
@@ -406,3 +408,24 @@ class BlogPostForm(forms.ModelForm):
         if value and timezone.is_naive(value):
             value = timezone.make_aware(value, timezone.get_current_timezone())
         return value
+
+
+class MarketingAssessmentInviteForm(forms.Form):
+    candidate_identifier = forms.CharField(
+        label="Candidate identifier (email or ID)",
+        help_text="Used to generate the assessment link.",
+    )
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
+    def save(self) -> DigitalMarketingAssessmentSession:
+        candidate_id = self.cleaned_data["candidate_identifier"]
+        session, _ = DigitalMarketingAssessmentSession.objects.get_or_create(
+            candidate_id=candidate_id, defaults={"status": "draft"}
+        )
+        session.question_set = generate_question_set()
+        session.status = "in_progress"
+        session.save(update_fields=["question_set", "status"])
+        return session

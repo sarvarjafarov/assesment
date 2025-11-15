@@ -33,9 +33,12 @@ from assessments.models import (
 )
 from assessments.services import send_invite_email
 from blog.models import BlogPost
+from marketing_assessments.models import DigitalMarketingAssessmentSession
+from marketing_assessments.services import generate_question_set
 from .forms import (
     AssessmentForm,
     BlogPostForm,
+    MarketingAssessmentInviteForm,
     ChoiceForm,
     CompanyForm,
     ConsoleInviteForm,
@@ -255,6 +258,49 @@ class BlogPostUpdateView(ConsoleSectionMixin, LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse("console:blog-list")
+
+
+class MarketingAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+    model = DigitalMarketingAssessmentSession
+    template_name = "console/marketing/list.html"
+    context_object_name = "sessions"
+    section = "marketing"
+    paginate_by = 25
+
+    def get_queryset(self):
+        return DigitalMarketingAssessmentSession.objects.order_by("-created_at")
+
+
+class MarketingAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
+    template_name = "console/marketing/form.html"
+    form_class = MarketingAssessmentInviteForm
+    section = "marketing"
+
+    def form_valid(self, form):
+        session = form.save()
+        messages.success(
+            self.request,
+            "Assessment ready. Share the candidate link below.",
+        )
+        self.success_url = reverse("console:marketing-detail", args=[session.uuid])
+        return super().form_valid(form)
+
+
+class MarketingAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
+    model = DigitalMarketingAssessmentSession
+    template_name = "console/marketing/detail.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    context_object_name = "session_obj"
+    section = "marketing"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        share_link = self.request.build_absolute_uri(
+            reverse("candidate:marketing-session", args=[self.object.uuid])
+        )
+        context["share_link"] = share_link
+        return context
 
 
 class PositionTaskCreateView(ConsoleSectionMixin, LoginRequiredMixin, CreateView):

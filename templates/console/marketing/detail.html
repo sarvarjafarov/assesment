@@ -1,0 +1,46 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Digital marketing</p>
+        <h1>{{ session_obj.candidate_id }}</h1>
+        <p class="lede">Assessment status: {{ session_obj.get_status_display }}</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-outline" href="{% url 'console:marketing-list' %}">Back to sessions</a>
+    </div>
+</section>
+
+<section class="panel">
+    <p><strong>Share link:</strong> <a href="{{ share_link }}">{{ share_link }}</a></p>
+    {% if session_obj.status == "submitted" %}
+    <dl class="metric-grid">
+        <div>
+            <dt>Hard skills</dt>
+            <dd>{{ session_obj.hard_skill_score|default:"—" }}</dd>
+        </div>
+        <div>
+            <dt>Soft skills</dt>
+            <dd>{{ session_obj.soft_skill_score|default:"—" }}</dd>
+        </div>
+        <div>
+            <dt>Overall score</dt>
+            <dd>{{ session_obj.overall_score|default:"—" }}</dd>
+        </div>
+    </dl>
+    <h3>Fit scores</h3>
+    <ul>
+        {% for key, value in session_obj.recommendations.fit_scores.items %}
+        <li>{{ key|title }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+    <h3>Strengths</h3>
+    <p>{{ session_obj.recommendations.strengths|join:", " }}</p>
+    <h3>Development areas</h3>
+    <p>{{ session_obj.recommendations.development|join:", " }}</p>
+    {% else %}
+    <p>Awaiting submission.</p>
+    {% endif %}
+</section>
+{% endblock %}

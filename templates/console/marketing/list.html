@@ -1,0 +1,38 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Assessments</p>
+        <h1>Digital marketing sessions</h1>
+        <p class="lede">Launch and monitor digital marketing assessments.</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-pill" href="{% url 'console:marketing-create' %}">New session</a>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Candidate</span>
+            <span>Status</span>
+            <span>Overall score</span>
+            <span>Created</span>
+            <span></span>
+        </div>
+        {% for session in sessions %}
+        <div class="table-row">
+            <span>{{ session.candidate_id }}</span>
+            <span>{{ session.get_status_display }}</span>
+            <span>{% if session.overall_score %}{{ session.overall_score }}{% else %}—{% endif %}</span>
+            <span>{{ session.created_at|naturaltime }}</span>
+            <span><a class="pill subtle" href="{% url 'console:marketing-detail' session.uuid %}">View</a></span>
+        </div>
+        {% empty %}
+        <div class="table-row">
+            <span class="empty-state">No sessions yet.</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

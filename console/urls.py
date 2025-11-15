@@ -75,4 +75,7 @@ urlpatterns = [
     path("blog/", views.BlogPostListView.as_view(), name="blog-list"),
     path("blog/new/", views.BlogPostCreateView.as_view(), name="blog-create"),
     path("blog/<slug:slug>/edit/", views.BlogPostUpdateView.as_view(), name="blog-edit"),
+    path("marketing/", views.MarketingAssessmentListView.as_view(), name="marketing-list"),
+    path("marketing/new/", views.MarketingAssessmentCreateView.as_view(), name="marketing-create"),
+    path("marketing/<uuid:uuid>/", views.MarketingAssessmentDetailView.as_view(), name="marketing-detail"),
 ]

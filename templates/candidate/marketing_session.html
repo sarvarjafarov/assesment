@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel response-panel question-step">
+        <div class="question-progress">
+            <div class="progress-meta">
+                <span class="status-chip"><span class="chip-dot"></span>Digital marketing assessment</span>
+                <div class="progress-count">
+                    <span class="progress-step">Step {{ step_number }}</span>
+                    <span class="progress-total">of {{ total_steps }}</span>
+                </div>
+            </div>
+            <div class="progress-meter">
+                <div class="progress-bar">
+                    <span style="width: {{ progress_percent }}%"></span>
+                </div>
+                <p class="progress-percent">{{ progress_percent }}% complete</p>
+            </div>
+        </div>
+        <form method="post" class="question-form">
+            {% csrf_token %}
+            <div class="question-card">
+                <p class="eyebrow">{{ question.get_category_display }}</p>
+                <h2>{{ question.question_text }}</h2>
+                <div class="question-input">
+                    {% for field in form %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% for error in field.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-pill">
+                {% if step_number == total_steps %}Submit assessment{% else %}Save & Continue{% endif %}
+            </button>
+        </form>
+    </section>
+</div>
+{% endblock %}
