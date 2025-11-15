@@ -20,7 +20,13 @@
         </div>
         <div class="share-meta">
             <p class="meta">Duration: {{ session_obj.duration_minutes }} min</p>
-            <p class="meta">Created {{ session_obj.created_at|naturaltime }}</p>
+            <p class="meta">
+                {% if session_obj.started_at and session_obj.submitted_at %}
+                    Completed in {{ session_obj.submitted_at|timesince:session_obj.started_at }}
+                {% else %}
+                    Created {{ session_obj.created_at|naturaltime }}
+                {% endif %}
+            </p>
         </div>
     </div>
     {% if session_obj.status == "submitted" %}
