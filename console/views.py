@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
@@ -18,6 +20,7 @@ from django.views.generic import (
     UpdateView,
 )
 
+from assessments.behavioral import STATEMENT_LIBRARY
 from assessments.models import (
     Assessment,
     AssessmentSession,
@@ -356,7 +359,29 @@ class SessionDetailView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
         context["session_obj"] = self.session
         context["candidate"] = self.session.candidate
         context["assessment"] = self.session.assessment
-        context["responses"] = self.session.responses.select_related("question").all()
+        responses = list(
+            self.session.responses.select_related("question").all()
+        )
+        for response in responses:
+            if response.question.question_type == Question.TYPE_BEHAVIORAL:
+                entries = []
+                try:
+                    data = json.loads(response.answer_text or "[]")
+                except json.JSONDecodeError:
+                    data = []
+                for entry in data:
+                    statement_id = entry.get("statement_id")
+                    meta = STATEMENT_LIBRARY.get(statement_id, {})
+                    entries.append(
+                        {
+                            "statement_id": statement_id,
+                            "response_type": entry.get("response_type"),
+                            "text": meta.get("text", ""),
+                            "trait": (meta.get("trait") or "").replace("_", " ").title(),
+                        }
+                    )
+                response.behavioral_entries = entries
+        context["responses"] = responses
         return context
 
     def form_valid(self, form):

@@ -17,6 +17,7 @@
     </div>
 </section>
 
+{% with behavior=session_obj.score_breakdown.behavioral_profile %}
 <section class="panel metric-panel">
     <div class="metric-grid">
         <article class="metric-card">
@@ -32,6 +33,8 @@
             <p class="metric-value">
                 {% if session_obj.overall_score != None %}
                 {{ session_obj.overall_score|floatformat:0 }}%
+                {% elif behavior %}
+                {{ behavior.eligibility.score|floatformat:0 }}%
                 {% else %}
                 —
                 {% endif %}
@@ -39,9 +42,17 @@
         </article>
         <article class="metric-card">
             <p class="metric-label">Auto decision</p>
-            <p class="metric-value decision {{ session_obj.score_breakdown.auto_decision|default:'' }}">
-                {{ session_obj.score_breakdown.auto_decision|default:"—"|title }}
+            {% with auto=session_obj.score_breakdown.auto_decision %}
+            <p class="metric-value decision {{ auto|default:'' }}">
+                {% if auto %}
+                {{ auto|title }}
+                {% elif behavior %}
+                {{ behavior.eligibility.decision|title }}
+                {% else %}
+                —
+                {% endif %}
             </p>
+            {% endwith %}
         </article>
         <article class="metric-card">
             <p class="metric-label">Due</p>
@@ -49,6 +60,7 @@
         </article>
     </div>
 </section>
+{% endwith %}
 
 {% with behavior=session_obj.score_breakdown.behavioral_profile %}
 {% if behavior %}
@@ -68,24 +80,27 @@
         </div>
     </header>
     <div class="behavior-grid">
-        <article>
-            <p class="eyebrow">Eligibility</p>
-            <h3>{{ behavior.eligibility.decision|title }}</h3>
-            <p class="lede small">
-                Weighted score {{ behavior.eligibility.score|floatformat:0 }}%
+        <article class="behavior-card">
+            <p class="card-label">Eligibility</p>
+            <h3 class="card-value">{{ behavior.eligibility.decision|title }}</h3>
+            <p class="card-metric">
+                <span>{{ behavior.eligibility.score|floatformat:0 }}%</span>
+                <small>weighted score</small>
             </p>
             <p>{{ behavior.candidate_summary.eligibility_message }}</p>
         </article>
-        <article>
-            <p class="eyebrow">Dominant traits</p>
-            <p class="lede small">
+        <article class="behavior-card">
+            <p class="card-label">Dominant traits</p>
+            <ul class="chip-list">
                 {% if behavior.dominant_traits %}
-                    {{ behavior.dominant_traits|join:", " }}
+                    {% for trait in behavior.dominant_traits %}
+                        <li class="chip">{{ trait|title }}</li>
+                    {% endfor %}
                 {% else %}
-                    Emerging
+                    <li class="chip">Emerging</li>
                 {% endif %}
-            </p>
-            <p>Development focus:
+            </ul>
+            <p class="muted">Development focus:
                 {% if behavior.development_traits %}
                     {{ behavior.development_traits|join:", " }}
                 {% else %}
@@ -93,42 +108,46 @@
                 {% endif %}
             </p>
         </article>
-        <article>
-            <p class="eyebrow">Coverage</p>
-            <p class="lede small">{{ behavior.coverage_score|floatformat:0 }} coverage</p>
-            <p>Balance gap: {{ behavior.balance_gap|floatformat:0 }} pts</p>
+        <article class="behavior-card">
+            <p class="card-label">Coverage</p>
+            <p class="card-value">{{ behavior.coverage_score|floatformat:0 }}</p>
+            <p class="muted">Traits covered of {{ behavior.trait_counts|length }}</p>
+            <p class="muted">Balance gap: {{ behavior.balance_gap|floatformat:0 }} pts</p>
         </article>
     </div>
-    <div class="table trait-table">
-        <div class="table-row table-head">
-            <span>Trait</span>
-            <span>Score</span>
-            <span>Label</span>
+    <div class="behavior-split">
+        {% with summary=behavior.candidate_summary %}
+        <div class="behavior-summary">
+            {% for trait, data in summary.traits.items %}
+            <article>
+                <p class="eyebrow">{{ trait|title }}</p>
+                <p class="trait-label">{{ data.label }}</p>
+                <p class="muted">{{ data.description }}</p>
+            </article>
+            {% endfor %}
         </div>
-        {% for item in behavior.trait_rankings %}
-        <div class="table-row">
-            <span>{{ item.trait|title }}</span>
-            <span>
-                {% if item.normalized_score != None %}
-                    {{ item.normalized_score|floatformat:0 }}%
-                {% else %}
-                    —
-                {% endif %}
-            </span>
-            <span>{{ behavior.behavior_labels|dict_get:item.trait|default:"—" }}</span>
+        {% endwith %}
+        <div class="table trait-table">
+            <div class="table-row table-head">
+                <span>Trait</span>
+                <span>Score</span>
+                <span>Label</span>
+            </div>
+            {% for item in behavior.trait_rankings %}
+            <div class="table-row">
+                <span>{{ item.trait|title }}</span>
+                <span>
+                    {% if item.normalized_score != None %}
+                        {{ item.normalized_score|floatformat:0 }}%
+                    {% else %}
+                        —
+                    {% endif %}
+                </span>
+                <span>{{ behavior.behavior_labels|dict_get:item.trait|default:"—" }}</span>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-    {% with summary=behavior.candidate_summary %}
-    <div class="behavior-traits">
-        {% for trait, data in summary.traits.items %}
-        <article>
-            <p class="eyebrow">{{ trait|title }} · {{ data.label }}</p>
-            <p>{{ data.description }}</p>
-        </article>
-        {% endfor %}
-    </div>
-    {% endwith %}
     {% with report=behavior.red_flag_report %}
     <div class="behavior-risks">
         <h3>Risk alerts</h3>
@@ -187,7 +206,26 @@
         {% for response in responses %}
         <li>
             <p class="question-title">{{ response.question.prompt }}</p>
-            {% if response.selected_choices.all %}
+            {% if response.question.question_type == 'behavioral' and response.behavioral_entries %}
+            <table class="behavioral-response-table">
+                <thead>
+                    <tr>
+                        <th>Statement</th>
+                        <th>Trait</th>
+                        <th>Selection</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in response.behavioral_entries %}
+                    <tr>
+                        <td><strong>{{ entry.statement_id }}</strong> {{ entry.text }}</td>
+                        <td>{{ entry.trait|default:"—" }}</td>
+                        <td>{{ entry.response_type|replace:"_"," "|title }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% elif response.selected_choices.all %}
             <ul class="choice-list">
                 {% for choice in response.selected_choices.all %}
                 <li>{{ choice.label }}</li>
