@@ -220,7 +220,7 @@
                     <tr>
                         <td><strong>{{ entry.statement_id }}</strong> {{ entry.text }}</td>
                         <td>{{ entry.trait|default:"—" }}</td>
-                        <td>{{ entry.response_type|replace:"_"," "|title }}</td>
+                        <td>{{ entry.response_type|humanize_selection }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -18,3 +18,10 @@ def humanize_flag(code: str) -> str:
     if not code:
         return ""
     return code.replace("_", " ").title()
+
+
+@register.filter
+def humanize_selection(value: str) -> str:
+    if not value:
+        return ""
+    return value.replace("_", " ").title()
