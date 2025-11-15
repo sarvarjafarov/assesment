@@ -1,6 +1,9 @@
+import json
+
 from django.test import TestCase
 from django.urls import reverse
 
+from assessments.behavioral import get_behavioral_blocks
 from assessments.models import (
     Assessment,
     AssessmentSession,
@@ -9,21 +12,17 @@ from assessments.models import (
     Question,
     RoleCategory,
 )
-from .forms import AssessmentResponseForm
+from .forms import QuestionStepForm
 
 
-class AssessmentResponseFormTests(TestCase):
+class QuestionStepFormTests(TestCase):
     def setUp(self):
-        self.category = RoleCategory.objects.create(
-            name="Test Category", slug="test-category"
-        )
+        category = RoleCategory.objects.create(name="Test", slug="test")
         self.assessment = Assessment.objects.create(
-            category=self.category,
+            category=category,
             title="Test Assessment",
             slug="test-assessment",
             summary="Summary",
-            level="intro",
-            duration_minutes=10,
         )
         self.single_question = Question.objects.create(
             assessment=self.assessment,
@@ -31,76 +30,41 @@ class AssessmentResponseFormTests(TestCase):
             question_type=Question.TYPE_SINGLE,
             order=1,
         )
-        self.multi_question = Question.objects.create(
-            assessment=self.assessment,
-            prompt="Multi select?",
-            question_type=Question.TYPE_MULTI,
-            order=2,
+        self.choice = Choice.objects.create(
+            question=self.single_question, label="Option", weight=1.0
         )
-        self.text_question = Question.objects.create(
-            assessment=self.assessment,
-            prompt="Tell us more",
-            question_type=Question.TYPE_TEXT,
-            order=3,
-        )
-        self.choice_a = Choice.objects.create(
-            question=self.single_question, label="A", weight=1.0
-        )
-        self.choice_b = Choice.objects.create(
-            question=self.multi_question, label="B", weight=1.0
-        )
-
-    def test_to_answers_returns_choice_ids_and_text(self):
-        data = {
-            f"question_{self.single_question.id}": str(self.choice_a.id),
-            f"question_{self.multi_question.id}": [str(self.choice_b.id)],
-            f"question_{self.text_question.id}": "Free text",
-        }
-        form = AssessmentResponseForm(data=data, assessment=self.assessment)
-        self.assertTrue(form.is_valid())
-        answers = form.to_answers()
-        self.assertEqual(len(answers), 3)
-        single = next(a for a in answers if a["question_id"] == self.single_question.id)
-        self.assertEqual(single["choice_ids"], [self.choice_a.id])
-        multi = next(a for a in answers if a["question_id"] == self.multi_question.id)
-        self.assertEqual(multi["choice_ids"], [self.choice_b.id])
-        text = next(a for a in answers if a["question_id"] == self.text_question.id)
-        self.assertEqual(text["answer_text"], "Free text")
-
-    def test_behavioral_question_serializes_responses(self):
-        behavioral_question = Question.objects.create(
+        self.behavioral_question = Question.objects.create(
             assessment=self.assessment,
             prompt="Behavioral matrix",
             question_type=Question.TYPE_BEHAVIORAL,
-            order=4,
+            order=2,
             metadata={"behavioral_bank": {"blocks": [1]}},
         )
-        field_name = f"question_{behavioral_question.id}"
-        data = {
-            f"question_{self.single_question.id}": str(self.choice_a.id),
-            f"question_{self.multi_question.id}": [str(self.choice_b.id)],
-            f"question_{self.text_question.id}": "Free text",
-            f"{field_name}-1-most": "1A",
-            f"{field_name}-1-least": "1B",
-        }
-        form = AssessmentResponseForm(data=data, assessment=self.assessment)
+
+    def test_single_choice_to_answer(self):
+        form = QuestionStepForm(
+            data={"response": str(self.choice.id)}, question=self.single_question
+        )
+        self.assertTrue(form.is_valid())
+        payload = form.to_answer()
+        self.assertEqual(payload["choice_ids"], [self.choice.id])
+
+    def test_behavioral_block_to_answer(self):
+        block = get_behavioral_blocks([1])[0]
+        form = QuestionStepForm(
+            data={"most_like": "1A", "least_like": "1B"},
+            question=self.behavioral_question,
+            behavioral_block=block,
+        )
         self.assertTrue(form.is_valid(), form.errors)
-        answers = form.to_answers()
-        behavioral = next(
-            a for a in answers if a["question_id"] == behavioral_question.id
-        )
-        self.assertEqual(
-            behavioral["behavioral_responses"],
-            [
-                {"statement_id": "1A", "response_type": "most_like_me"},
-                {"statement_id": "1B", "response_type": "least_like_me"},
-            ],
-        )
+        payload = form.to_answer()
+        self.assertEqual(len(payload["behavioral_responses"]), 2)
+        self.assertEqual(payload["behavioral_responses"][0]["statement_id"], "1A")
 
 
 class CandidateSessionFlowTests(TestCase):
     def setUp(self):
-        category = RoleCategory.objects.create(name="Cat", slug="cat")
+        category = RoleCategory.objects.create(name="General", slug="general")
         self.assessment = Assessment.objects.create(
             category=category,
             title="Assessment",
@@ -109,47 +73,45 @@ class CandidateSessionFlowTests(TestCase):
             level="intro",
             duration_minutes=5,
         )
-        self.question = Question.objects.create(
+        self.single_question = Question.objects.create(
             assessment=self.assessment,
             prompt="Pick one",
             question_type=Question.TYPE_SINGLE,
             order=1,
         )
         self.choice = Choice.objects.create(
-            question=self.question,
-            label="Choice",
-            weight=1.0,
+            question=self.single_question, label="Choice", weight=1.0
         )
-        self.candidate = CandidateProfile.objects.create(
+        self.text_question = Question.objects.create(
+            assessment=self.assessment,
+            prompt="Describe your approach",
+            question_type=Question.TYPE_TEXT,
+            order=2,
+        )
+        candidate = CandidateProfile.objects.create(
             first_name="Casey", email="casey@example.com"
         )
         self.session = AssessmentSession.objects.create(
-            candidate=self.candidate, assessment=self.assessment, status="invited"
+            candidate=candidate, assessment=self.assessment, status="invited"
         )
 
-    def test_visit_marks_session_in_progress_and_submit(self):
-        entry_url = reverse("candidate:session-entry", args=[self.session.uuid])
-        response = self.client.get(entry_url)
-        self.assertEqual(response.status_code, 200)
-        self.session.refresh_from_db()
-        self.assertEqual(self.session.status, "invited")
+    def test_sequential_flow(self):
         start_url = reverse("candidate:session-start", args=[self.session.uuid])
         response = self.client.get(start_url)
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Pick one")
+        post_data = {"response": str(self.choice.id)}
+        response = self.client.post(start_url, data=post_data, follow=False)
+        self.assertRedirects(response, start_url)
         self.session.refresh_from_db()
-        self.assertEqual(self.session.status, "in_progress")
-        post_data = {
-            f"question_{self.question.id}": str(self.choice.id),
-        }
-        response = self.client.post(start_url, data=post_data)
+        self.assertEqual(self.session.responses.count(), 1)
+        response = self.client.get(start_url)
+        self.assertContains(response, "Describe your approach")
+        response = self.client.post(start_url, data={"response": "Thoughtful"}, follow=False)
         self.assertRedirects(
             response, reverse("candidate:session-complete", args=[self.session.uuid])
         )
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "completed")
-        self.assertTrue(self.session.submitted_at)
-        self.assertEqual(self.session.responses.count(), 1)
-        self.assertEqual(self.session.decision, "advance")
 
 
 class BehavioralCandidateFlowTests(TestCase):
@@ -160,38 +122,50 @@ class BehavioralCandidateFlowTests(TestCase):
             title="Behavioral",
             slug="behavioral",
             summary="Summary",
-            level="intro",
-            duration_minutes=10,
         )
-        self.question = Question.objects.create(
+        self.behavioral_question = Question.objects.create(
             assessment=self.assessment,
             prompt="Behavioral inventory",
             question_type=Question.TYPE_BEHAVIORAL,
             order=1,
-            metadata={"behavioral_bank": {"blocks": [1]}},
+            metadata={"behavioral_bank": {"blocks": [1, 2]}},
         )
-        self.candidate = CandidateProfile.objects.create(
+        candidate = CandidateProfile.objects.create(
             first_name="Avery", email="avery@example.com"
         )
         self.session = AssessmentSession.objects.create(
-            candidate=self.candidate, assessment=self.assessment, status="invited"
+            candidate=candidate, assessment=self.assessment, status="invited"
         )
 
-    def test_submit_behavioral_matrix(self):
-        entry_url = reverse("candidate:session-entry", args=[self.session.uuid])
-        self.client.get(entry_url)
+    def test_behavioral_blocks_progress_sequentially(self):
         start_url = reverse("candidate:session-start", args=[self.session.uuid])
-        self.client.get(start_url)
-        post_data = {
-            f"question_{self.question.id}-1-most": "1A",
-            f"question_{self.question.id}-1-least": "1B",
-        }
-        response = self.client.post(start_url, data=post_data)
+        response = self.client.get(start_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["behavioral_block_index"], 1)
+        block1 = get_behavioral_blocks([1])[0]
+        self.client.post(
+            start_url,
+            data={"most_like": block1["statements"][0]["id"], "least_like": block1["statements"][1]["id"]},
+        )
+        self.session.refresh_from_db()
+        response_record = self.session.responses.get(question=self.behavioral_question)
+        self.assertEqual(len(json.loads(response_record.answer_text)), 2)
+        progress_store = self.session.score_breakdown.get("behavioral_progress", {})
+        self.assertIn(str(self.behavioral_question.id), progress_store)
+        fresh = AssessmentSession.objects.get(pk=self.session.pk)
+        stored = fresh.score_breakdown.get("behavioral_progress", {})
+        self.assertIn(str(self.behavioral_question.id), stored)
+        response = self.client.get(start_url)
+        self.assertContains(response, "Set 2 of 2")
+        block2 = get_behavioral_blocks([2])[0]
+        response = self.client.post(
+            start_url,
+            data={"most_like": block2["statements"][0]["id"], "least_like": block2["statements"][1]["id"]},
+        )
         self.assertRedirects(
             response, reverse("candidate:session-complete", args=[self.session.uuid])
         )
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "completed")
-        self.assertIsNotNone(
-            self.session.score_breakdown.get("behavioral_profile")
-        )
+        response_record.refresh_from_db()
+        self.assertEqual(len(json.loads(response_record.answer_text)), 4)

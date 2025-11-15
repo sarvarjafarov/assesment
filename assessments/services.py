@@ -162,7 +162,10 @@ def record_responses(
             behavioral_payload = answer.get("behavioral_responses") or []
             response.selected_choices.clear()
             response.answer_text = json.dumps(behavioral_payload)
-            response.save(update_fields=["answer_text", "updated_at"])
+            metadata = response.metadata or {}
+            metadata["behavioral_partial"] = behavioral_payload
+            response.metadata = metadata
+            response.save(update_fields=["answer_text", "metadata", "updated_at"])
             behavioral_selections.extend(behavioral_payload)
             continue
         if question.question_type in {Question.TYPE_SINGLE, Question.TYPE_MULTI}:

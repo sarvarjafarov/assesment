@@ -2,11 +2,22 @@
 {% load humanize %}
 {% block content %}
 <div class="candidate-shell single-column">
-    <section class="candidate-panel response-panel">
-        <p class="eyebrow">Assessment in progress</p>
-        <h1>{{ assessment.title }}</h1>
-        <p class="lede">Answer each prompt in one sitting. Your progress is saved only when you submit.</p>
-        <form method="post" class="form-stack">
+    <section class="candidate-panel response-panel question-step">
+        <div class="question-progress">
+            <div>
+                <p class="eyebrow">Assessment in progress</p>
+                <p class="progress-text">Step {{ step_number }} of {{ total_steps }}</p>
+            </div>
+            <div class="progress-bar">
+                <span style="width: {{ progress_percent }}%"></span>
+            </div>
+        </div>
+        {% if instructions %}
+        <div class="question-instructions">
+            <p>{{ instructions }}</p>
+        </div>
+        {% endif %}
+        <form method="post" class="question-form">
             {% csrf_token %}
             {% if form.non_field_errors %}
             <div class="form-error">
@@ -15,57 +26,71 @@
                 {% endfor %}
             </div>
             {% endif %}
-            {% for field in form %}
-            {% if field.field.question.question_type == 'behavioral' %}
-            <div class="form-field candidate-question behavioral-question">
-                <label>{{ field.label }}</label>
-                <p class="help-text">For each row, select the statement that is most like you and the one that is least like you. Every block must have two different statements selected.</p>
-                <div class="behavioral-blocks">
-                    {% for block in field.field.behavioral_blocks %}
-                    <article class="behavioral-block">
-                        <p class="eyebrow">Set {{ block.id }}</p>
-                        <ul class="statement-list">
-                            {% for statement in block.statements %}
-                            <li><strong>{{ statement.id }}</strong> {{ statement.text }}</li>
-                            {% endfor %}
-                        </ul>
-                        <div class="behavioral-inputs">
-                            <label for="{{ block.most_name }}">Most like me</label>
-                            <select name="{{ block.most_name }}" id="{{ block.most_name }}" required>
-                                <option value="">Select</option>
-                                {% for statement in block.statements %}
-                                <option value="{{ statement.id }}" {% if block.most_value == statement.id %}selected{% endif %}>{{ statement.id }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="{{ block.least_name }}">Least like me</label>
-                            <select name="{{ block.least_name }}" id="{{ block.least_name }}" required>
-                                <option value="">Select</option>
-                                {% for statement in block.statements %}
-                                <option value="{{ statement.id }}" {% if block.least_value == statement.id %}selected{% endif %}>{{ statement.id }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </article>
-                    {% endfor %}
+
+            {% if question.question_type == 'behavioral' %}
+            <div class="behavioral-set-card">
+                <div class="behavioral-set-header">
+                    <div>
+                        <p class="eyebrow">Set {{ behavioral_block_index }} of {{ behavioral_total_blocks }}</p>
+                        <h2>Select the statements that are most and least like you.</h2>
+                        <p class="help-text">Choose one statement that best describes you and another that is least like you. Each choice must be different.</p>
+                    </div>
                 </div>
-                {{ field }}
-                {% for error in field.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
+                <ul class="statement-list large">
+                    {% for statement in behavioral_block.statements %}
+                    <li>
+                        <strong>{{ statement.id }}</strong>
+                        <span>{{ statement.text }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="behavioral-inputs">
+                    <div>
+                        <label>{{ form.most_like.label }}</label>
+                        {{ form.most_like }}
+                        {% for error in form.most_like.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label>{{ form.least_like.label }}</label>
+                        {{ form.least_like }}
+                        {% for error in form.least_like.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             {% else %}
-            <div class="form-field candidate-question">
-                <label>{{ field.label }}</label>
-                {{ field }}
-                {% for error in field.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
+            <div class="question-card">
+                <p class="eyebrow">Question {{ question.order }}</p>
+                <h2>{{ question.prompt }}</h2>
+                <div class="question-input">
+                    {% if question.question_type == 'text' %}
+                        {{ form.response }}
+                    {% elif question.question_type == 'multi' %}
+                        <div class="option-list checkbox">
+                            {% for option in form.response %}
+                            <label class="option-item">{{ option.tag }} {{ option.choice_label }}</label>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="option-list">
+                            {% for option in form.response %}
+                            <label class="option-item">{{ option.tag }} {{ option.choice_label }}</label>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% for error in form.response.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
             </div>
             {% endif %}
-            {% empty %}
-            <p class="empty-state">No questions configured yet.</p>
-            {% endfor %}
-            <button type="submit" class="btn btn-pill">Submit assessment</button>
+
+            <button type="submit" class="btn btn-pill">
+                {% if step_number == total_steps %}Submit assessment{% else %}Save & Continue{% endif %}
+            </button>
         </form>
     </section>
 </div>
