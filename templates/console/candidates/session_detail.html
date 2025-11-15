@@ -65,19 +65,26 @@
 {% with behavior=session_obj.score_breakdown.behavioral_profile %}
 {% if behavior %}
 <section class="panel behavior-panel">
-    <header>
-        <div>
+    <header class="behavior-header">
+        <div class="behavior-title">
             <p class="eyebrow">Behavioral profile</p>
             <h2>Behavioral readiness snapshot</h2>
             <p class="lede small">{{ behavior.candidate_summary.intro }}</p>
         </div>
-        <div class="behavior-stat">
-            {% with report=behavior.red_flag_report %}
-            <span class="pill subtle {{ report.overall_risk_level|default:'' }}">
-                Risk: {{ report.overall_risk_level|default:"low"|title }}
-            </span>
-            {% endwith %}
+        {% with report=behavior.red_flag_report %}
+        <div class="behavior-meta">
+            <div class="meta-card">
+                <p>Risk level</p>
+                <span class="risk-badge risk-{{ report.overall_risk_level|default:'low' }}">
+                    {{ report.overall_risk_level|default:"low"|title }}
+                </span>
+            </div>
+            <div class="meta-card">
+                <p>Signals captured</p>
+                <span class="meta-value">{{ behavior.total_responses|default:0 }}</span>
+            </div>
         </div>
+        {% endwith %}
     </header>
     <div class="behavior-grid">
         <article class="behavior-card">
