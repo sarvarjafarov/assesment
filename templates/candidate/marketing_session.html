@@ -22,9 +22,23 @@
             <div class="question-card">
                 <p class="eyebrow">{{ question.get_category_display }}</p>
                 <h2>{{ question.question_text }}</h2>
+                {% if question.explanation %}
+                <p class="help-text">{{ question.explanation }}</p>
+                {% endif %}
                 <div class="question-input">
+                    {% if question.question_type == 'ranking' %}
+                    <p class="help-text">Arrange the following items before submitting your final order:</p>
+                    <ol class="ranking-items">
+                        {% for item in form.ranking_items %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ol>
+                    {% elif question.question_type == 'behavioral_most' %}
+                    <p class="help-text">Select the statement that is most like you.</p>
+                    {% elif question.question_type == 'behavioral_least' %}
+                    <p class="help-text">Select the statement that is least like you.</p>
+                    {% endif %}
                     {% for field in form %}
-                        {{ field.label_tag }}
                         {{ field }}
                         {% for error in field.errors %}
                         <span class="field-error">{{ error }}</span>

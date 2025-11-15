@@ -12,35 +12,60 @@
     </div>
 </section>
 
-<section class="panel">
-    <p><strong>Share link:</strong> <a href="{{ share_link }}">{{ share_link }}</a></p>
+<section class="panel score-highlight">
+    <div class="share-row">
+        <div>
+            <p class="eyebrow">Share link</p>
+            <a href="{{ share_link }}">{{ share_link }}</a>
+        </div>
+        <p class="meta">Created {{ session_obj.created_at|naturaltime }}</p>
+    </div>
     {% if session_obj.status == "submitted" %}
-    <dl class="metric-grid">
+    <div class="metric-grid">
+        <article class="metric-card">
+            <p class="metric-label">Hard skills</p>
+            <p class="metric-value">{{ session_obj.hard_skill_score|default:"—" }}</p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Soft skills</p>
+            <p class="metric-value">{{ session_obj.soft_skill_score|default:"—" }}</p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Overall score</p>
+            <p class="metric-value">{{ session_obj.overall_score|default:"—" }}</p>
+        </article>
+    </div>
+    <div class="fit-grid">
         <div>
-            <dt>Hard skills</dt>
-            <dd>{{ session_obj.hard_skill_score|default:"—" }}</dd>
+            <p class="label">Fit scores</p>
+            <ul>
+                {% for key, value in session_obj.recommendations.fit_scores.items %}
+                <li>
+                    <span>{{ key|title|replace:"_"," " }}</span>
+                    <strong>{{ value }}</strong>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
         <div>
-            <dt>Soft skills</dt>
-            <dd>{{ session_obj.soft_skill_score|default:"—" }}</dd>
+            <p class="label">Strengths</p>
+            <div class="chip-row">
+                {% for trait in session_obj.recommendations.strengths %}
+                <span class="chip">{{ trait|title }}</span>
+                {% endfor %}
+            </div>
+            <p class="label">Development areas</p>
+            <div class="chip-row warning">
+                {% for trait in session_obj.recommendations.development %}
+                <span class="chip">{{ trait|title }}</span>
+                {% endfor %}
+            </div>
         </div>
-        <div>
-            <dt>Overall score</dt>
-            <dd>{{ session_obj.overall_score|default:"—" }}</dd>
-        </div>
-    </dl>
-    <h3>Fit scores</h3>
-    <ul>
-        {% for key, value in session_obj.recommendations.fit_scores.items %}
-        <li>{{ key|title }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
-    <h3>Strengths</h3>
-    <p>{{ session_obj.recommendations.strengths|join:", " }}</p>
-    <h3>Development areas</h3>
-    <p>{{ session_obj.recommendations.development|join:", " }}</p>
+    </div>
     {% else %}
-    <p>Awaiting submission.</p>
+    <div class="empty-state">
+        Awaiting candidate submission. Share the link above to invite them.
+    </div>
     {% endif %}
 </section>
 {% endblock %}

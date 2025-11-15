@@ -13,13 +13,14 @@ class MarketingQuestionForm(forms.Form):
         super().__init__(*args, **kwargs)
         q_type = question.question_type
         options = question.options or {}
+        self.ranking_items = []
         if q_type in {"multiple_choice", "scenario"}:
             choices = [
                 (choice["id"], choice["text"])
                 for choice in options.get("choices", [])
             ]
             self.fields["answer"] = forms.ChoiceField(
-                label=question.question_text,
+                label="",
                 choices=choices,
                 widget=forms.RadioSelect,
             )
@@ -27,25 +28,26 @@ class MarketingQuestionForm(forms.Form):
             items = options.get("items", [])
             placeholder = ", ".join(items)
             self.fields["answer"] = forms.CharField(
-                label=question.question_text,
+                label="Enter the final order (comma separated)",
                 widget=forms.Textarea(
                     attrs={
                         "rows": 3,
-                        "placeholder": f"Enter order separated by commas (e.g. {placeholder})",
+                        "placeholder": f"E.g. {placeholder}",
                     }
                 ),
             )
+            self.ranking_items = items
         elif q_type in {"behavioral_most", "behavioral_least"}:
             statements = options.get("statements", [])
             choices = [(str(idx), text) for idx, text in enumerate(statements)]
             self.fields["selected"] = forms.ChoiceField(
-                label="Select the statement that best fits",
+                label="",
                 choices=choices,
                 widget=forms.RadioSelect,
             )
         else:
             self.fields["answer"] = forms.CharField(
-                label=question.question_text,
+                label="",
                 widget=forms.Textarea(attrs={"rows": 3}),
             )
 
