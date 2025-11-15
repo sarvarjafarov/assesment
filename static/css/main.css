@@ -2059,12 +2059,21 @@ main {
     margin-bottom: 0.35rem;
 }
 
+.timer {
+    margin: 0;
+    font-weight: 600;
+    color: var(--orange);
+}
+
 .score-highlight .share-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+.share-meta {
+    text-align: right;
 }
 .score-highlight .meta {
     margin: 0;

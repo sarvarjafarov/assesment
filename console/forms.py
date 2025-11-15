@@ -419,6 +419,11 @@ class MarketingAssessmentInviteForm(forms.Form):
         required=False,
         widget=forms.Textarea(attrs={"rows": 3}),
     )
+    duration_minutes = forms.IntegerField(
+        label="Duration (minutes)",
+        initial=30,
+        min_value=5,
+    )
 
     def save(self) -> DigitalMarketingAssessmentSession:
         candidate_id = self.cleaned_data["candidate_identifier"]
@@ -427,5 +432,7 @@ class MarketingAssessmentInviteForm(forms.Form):
         )
         session.question_set = generate_question_set()
         session.status = "in_progress"
-        session.save(update_fields=["question_set", "status"])
+        session.duration_minutes = self.cleaned_data["duration_minutes"]
+        session.started_at = None
+        session.save(update_fields=["question_set", "status", "duration_minutes", "started_at"])
         return session

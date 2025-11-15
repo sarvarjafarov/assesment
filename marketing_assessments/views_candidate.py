@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from datetime import timedelta
+
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 
 from .forms import MarketingQuestionForm
@@ -21,6 +24,20 @@ class MarketingAssessmentView(FormView):
             return redirect(
                 "candidate:marketing-complete", session_uuid=self.session.uuid
             )
+        if not self.session.started_at:
+            self.session.started_at = timezone.now()
+            self.session.save(update_fields=["started_at"])
+        deadline = self.session.started_at + timedelta(
+            minutes=self.session.duration_minutes or 0
+        )
+        now = timezone.now()
+        if self.session.duration_minutes and now > deadline:
+            return redirect(
+                "candidate:marketing-expired", session_uuid=self.session.uuid
+            )
+        self.remaining_minutes = max(
+            0, int((deadline - now).total_seconds() // 60)
+        )
         self.current_index = len(self.session.responses)
         if self.current_index >= len(self.session.question_set):
             evaluate_session(self.session)
@@ -47,6 +64,7 @@ class MarketingAssessmentView(FormView):
                 "step_number": self.current_index + 1,
                 "total_steps": total,
                 "progress_percent": int((self.current_index / total) * 100),
+                "remaining_minutes": self.remaining_minutes,
             }
         )
         return context
@@ -68,6 +86,18 @@ class MarketingAssessmentView(FormView):
 
 class MarketingAssessmentCompleteView(TemplateView):
     template_name = "candidate/marketing_complete.html"
+
+    def get_context_data(self, **kwargs):
+        session = get_object_or_404(
+            DigitalMarketingAssessmentSession, uuid=kwargs["session_uuid"]
+        )
+        context = super().get_context_data(**kwargs)
+        context["session"] = session
+        return context
+
+
+class MarketingAssessmentExpiredView(TemplateView):
+    template_name = "candidate/marketing_expired.html"
 
     def get_context_data(self, **kwargs):
         session = get_object_or_404(

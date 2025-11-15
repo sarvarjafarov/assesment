@@ -18,7 +18,10 @@
             <p class="eyebrow">Share link</p>
             <a href="{{ share_link }}">{{ share_link }}</a>
         </div>
-        <p class="meta">Created {{ session_obj.created_at|naturaltime }}</p>
+        <div class="share-meta">
+            <p class="meta">Duration: {{ session_obj.duration_minutes }} min</p>
+            <p class="meta">Created {{ session_obj.created_at|naturaltime }}</p>
+        </div>
     </div>
     {% if session_obj.status == "submitted" %}
     <div class="metric-grid">

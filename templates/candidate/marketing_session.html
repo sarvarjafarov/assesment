@@ -15,6 +15,9 @@
                     <span style="width: {{ progress_percent }}%"></span>
                 </div>
                 <p class="progress-percent">{{ progress_percent }}% complete</p>
+                {% if remaining_minutes %}
+                <p class="timer">Time left: {{ remaining_minutes }} min</p>
+                {% endif %}
             </div>
         </div>
         <form method="post" class="question-form">

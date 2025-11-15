@@ -32,4 +32,9 @@ urlpatterns = [
         marketing_views.MarketingAssessmentCompleteView.as_view(),
         name="marketing-complete",
     ),
+    path(
+        "marketing/<uuid:session_uuid>/expired/",
+        marketing_views.MarketingAssessmentExpiredView.as_view(),
+        name="marketing-expired",
+    ),
 ]

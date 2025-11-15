@@ -514,4 +514,37 @@ SAMPLE_QUESTIONS = [
         "scoring_weight": 1.0,
         "explanation": "Outline high-level allocations and how you would test/justify the mix.",
     },
+    {
+        "question_text": "Scenario: A Google Ads account spends $48,000/mo. Search CTR is 4.3%, CVR is 6.2%, and AOV is $320 with 65% gross margin. Calculate the current ROAS and determine the CPA needed to hit a 4x payback. Provide the number closest to correct.",
+        "question_type": "scenario",
+        "difficulty_level": 5,
+        "category": "ppc",
+        "options": {
+            "choices": [
+                {"id": "A", "text": "ROAS 4.16, target CPA $52"},
+                {"id": "B", "text": "ROAS 3.21, target CPA $83"},
+                {"id": "C", "text": "ROAS 2.59, target CPA $51"},
+                {"id": "D", "text": "ROAS 1.94, target CPA $120"},
+            ]
+        },
+        "correct_answer": "B",
+        "scoring_weight": 1.4,
+        "explanation": "Use revenue per conversion and margin to derive efficiency.",
+    },
+    {
+        "question_text": "Scenario: Paid social funnel has CPM $28, CTR 1.6%, landing page CVR 18%, and SQL rate 25%. Client targets $450 CAC with $2,500 ARR and 80% gross margin. What budget multiple is required (vs. current state) to hit CAC if nothing else changes?",
+        "question_type": "scenario",
+        "difficulty_level": 5,
+        "category": "social",
+        "options": {
+            "choices": [
+                {"id": "A", "text": "Increase budget 1.3x"},
+                {"id": "B", "text": "Reduce budget to 0.6x"},
+                {"id": "C", "text": "Increase budget 2.1x"},
+                {"id": "D", "text": "No change needed"},
+            ]
+        },
+        "correct_answer": "A",
+        "scoring_weight": 1.4,
+    },
 ]

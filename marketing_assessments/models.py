@@ -94,6 +94,8 @@ class DigitalMarketingAssessmentSession(TimeStampedModel):
     category_breakdown = models.JSONField(default=dict, blank=True)
     recommendations = models.JSONField(default=dict, blank=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    duration_minutes = models.PositiveIntegerField(default=30)
 
     class Meta:
         ordering = ("-created_at",)
