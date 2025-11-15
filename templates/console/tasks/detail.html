@@ -1,0 +1,70 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Position task</p>
+        <h1>{{ object.title }}</h1>
+        <p class="lede">{{ object.description|default:"Role-specific assessment track." }}</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-outline" href="{% url 'console:position-task-edit' object.slug %}">Edit</a>
+        <a class="btn btn-pill" href="{% url 'console:company-detail' object.company.slug %}">Back to {{ object.company.name }}</a>
+    </div>
+</section>
+
+<section class="panel meta-panel">
+    <dl>
+        <div>
+            <dt>Company</dt>
+            <dd>{{ object.company.name }}</dd>
+        </div>
+        <div>
+            <dt>Assessment</dt>
+            <dd>{{ object.assessment.title|default:"Not linked" }}</dd>
+        </div>
+        <div>
+            <dt>Assessment type</dt>
+            <dd>{{ object.assessment_type|title }}</dd>
+        </div>
+        <div>
+            <dt>Status</dt>
+            <dd>{{ object.get_status_display }}</dd>
+        </div>
+    </dl>
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Sessions</h2>
+    </header>
+    {% if sessions %}
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Candidate</span>
+            <span>Status</span>
+            <span>Score</span>
+            <span>Decision</span>
+            <span>Invited</span>
+        </div>
+        {% for session in sessions %}
+        <a class="table-row" href="{% url 'console:session-detail' session.pk %}">
+            <span>{{ session.candidate.first_name }} {{ session.candidate.last_name }}</span>
+            <span>{{ session.status|title }}</span>
+            <span>
+                {% if session.overall_score != None %}
+                {{ session.overall_score|floatformat:0 }}%
+                {% else %}
+                —
+                {% endif %}
+            </span>
+            <span>{{ session.get_decision_display }}</span>
+            <span>{{ session.invited_at|naturaltime }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No invites have been sent for this task yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

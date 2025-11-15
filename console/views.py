@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+from django import forms
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
@@ -25,13 +27,17 @@ from assessments.models import (
     Assessment,
     AssessmentSession,
     CandidateProfile,
+    CompanyProfile,
+    PositionTask,
     Question,
 )
 from assessments.services import send_invite_email
 from .forms import (
     AssessmentForm,
     ChoiceForm,
+    CompanyForm,
     ConsoleInviteForm,
+    PositionTaskForm,
     QuestionForm,
     SessionUpdateForm,
 )
@@ -63,6 +69,8 @@ class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
             ).exclude(status="completed").count(),
         }
         context["assessment_count"] = Assessment.objects.count()
+        context["company_count"] = CompanyProfile.objects.count()
+        context["active_tasks"] = PositionTask.objects.filter(status="active").count()
         context["candidate_count"] = CandidateProfile.objects.count()
         context["upcoming_due"] = (
             sessions.filter(
@@ -74,6 +82,12 @@ class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
         context["top_assessments"] = (
             Assessment.objects.annotate(num_sessions=Count("sessions"))
             .order_by("-num_sessions")[:5]
+        )
+        context["active_tasks_list"] = (
+            PositionTask.objects.filter(status="active")
+            .select_related("company", "assessment")
+            .annotate(session_total=Count("sessions"))
+            .order_by("-session_total", "title")[:5]
         )
         return context
 
@@ -129,6 +143,148 @@ class AssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
             self.object.questions.prefetch_related("choices").order_by("order")
         )
         return context
+
+
+class CompanyListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+    model = CompanyProfile
+    template_name = "console/companies/list.html"
+    context_object_name = "companies"
+    section = "companies"
+
+    def get_queryset(self):
+        return (
+            CompanyProfile.objects.all()
+            .annotate(task_total=Count("position_tasks", distinct=True))
+            .annotate(session_total=Count("sessions", distinct=True))
+            .order_by("name")
+        )
+
+
+class CompanyCreateView(ConsoleSectionMixin, LoginRequiredMixin, CreateView):
+    model = CompanyProfile
+    form_class = CompanyForm
+    template_name = "console/companies/form.html"
+    section = "companies"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Company profile created.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("console:company-detail", args=[self.object.slug])
+
+
+class CompanyUpdateView(ConsoleSectionMixin, LoginRequiredMixin, UpdateView):
+    model = CompanyProfile
+    form_class = CompanyForm
+    template_name = "console/companies/form.html"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    section = "companies"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Company profile updated.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("console:company-detail", args=[self.object.slug])
+
+
+class CompanyDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
+    model = CompanyProfile
+    template_name = "console/companies/detail.html"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    context_object_name = "company"
+    section = "companies"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tasks = (
+            self.object.position_tasks.select_related("assessment")
+            .annotate(session_total=Count("sessions"))
+            .order_by("-status", "title")
+        )
+        context["tasks"] = tasks
+        context["recent_sessions"] = (
+            self.object.sessions.select_related("candidate", "assessment")
+            .order_by("-updated_at")[:5]
+        )
+        context["allowed_types"] = self.object.assessment_type_labels()
+        return context
+
+
+class PositionTaskCreateView(ConsoleSectionMixin, LoginRequiredMixin, CreateView):
+    model = PositionTask
+    form_class = PositionTaskForm
+    template_name = "console/tasks/form.html"
+    section = "companies"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.company = get_object_or_404(CompanyProfile, slug=kwargs["company_slug"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["company"] = self.company
+        initial["assessment_type"] = (
+            (self.company.allowed_assessment_types or ["behavioral"])[0]
+        )
+        return initial
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["company"].initial = self.company
+        form.fields["company"].widget = forms.HiddenInput()
+        return form
+
+    def form_valid(self, form):
+        messages.success(self.request, "Position task created.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("console:company-detail", args=[self.company.slug])
+
+
+class PositionTaskDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
+    model = PositionTask
+    template_name = "console/tasks/detail.html"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    section = "companies"
+
+    def get_queryset(self):
+        return PositionTask.objects.select_related("company", "assessment")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["sessions"] = (
+            self.object.sessions.select_related("candidate", "assessment")
+            .order_by("-created_at")
+        )
+        return context
+
+
+class PositionTaskUpdateView(ConsoleSectionMixin, LoginRequiredMixin, UpdateView):
+    model = PositionTask
+    form_class = PositionTaskForm
+    template_name = "console/tasks/form.html"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    section = "companies"
+
+    def get_queryset(self):
+        return PositionTask.objects.select_related("company")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Position task updated.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "console:position-task-detail",
+            args=[self.object.slug],
+        )
 
 
 class QuestionCreateView(ConsoleSectionMixin, LoginRequiredMixin, CreateView):
@@ -199,6 +355,10 @@ class CandidateListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
             .annotate(latest_status=Subquery(latest_qs.values("status")[:1]))
             .annotate(latest_decision=Subquery(latest_qs.values("decision")[:1]))
             .annotate(latest_score=Subquery(latest_qs.values("overall_score")[:1]))
+            .annotate(
+                latest_company=Subquery(latest_qs.values("company__name")[:1]),
+                latest_task=Subquery(latest_qs.values("position_task__title")[:1]),
+            )
             .order_by("first_name", "last_name")
         )
         query = self.request.GET.get("q")
@@ -231,7 +391,9 @@ class CandidateDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         sessions = list(
-            self.object.sessions.select_related("assessment").order_by("-created_at")
+            self.object.sessions.select_related(
+                "assessment", "position_task", "company"
+            ).order_by("-created_at")
         )
         forms = []
         for session in sessions:
@@ -340,7 +502,11 @@ class SessionDetailView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
     def dispatch(self, request, *args, **kwargs):
         self.session = get_object_or_404(
             AssessmentSession.objects.select_related(
-                "candidate", "assessment", "assessment__category"
+                "candidate",
+                "assessment",
+                "assessment__category",
+                "position_task",
+                "company",
             ).prefetch_related("responses__question", "responses__selected_choices"),
             pk=kwargs["pk"],
         )

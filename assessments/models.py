@@ -32,6 +32,34 @@ class RoleCategory(TimeStampedModel):
     def __str__(self):
         return self.name
 
+class CompanyProfile(TimeStampedModel):
+    """Organization-level profile that receives assessment access."""
+
+    name = models.CharField(max_length=160)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+    contact_name = models.CharField(max_length=120, blank=True)
+    contact_email = models.EmailField(blank=True)
+    website = models.URLField(blank=True)
+    allowed_assessment_types = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of assessment type keys the company can access.",
+    )
+    metadata = models.JSONField(default=dict, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self):
+        return self.name
+
+    def assessment_type_labels(self) -> list[str]:
+        labels = dict(Assessment.ASSESSMENT_TYPE_CHOICES)
+        types = self.allowed_assessment_types or ["behavioral"]
+        return [labels.get(key, str(key).replace("_", " ").title()) for key in types]
+
 
 class Assessment(TimeStampedModel):
     """Individual assessment for a role category."""
@@ -42,12 +70,22 @@ class Assessment(TimeStampedModel):
         ("advanced", "Advanced"),
     ]
 
+    ASSESSMENT_TYPE_CHOICES = [
+        ("behavioral", "Behavioral"),
+        ("skills", "Skills"),
+        ("technical", "Technical"),
+        ("case_study", "Case Study"),
+    ]
+
     category = models.ForeignKey(
         RoleCategory, related_name="assessments", on_delete=models.CASCADE
     )
     title = models.CharField(max_length=160)
     slug = models.SlugField(unique=True)
     summary = models.TextField()
+    assessment_type = models.CharField(
+        max_length=40, choices=ASSESSMENT_TYPE_CHOICES, default="behavioral"
+    )
     level = models.CharField(
         max_length=20,
         choices=LEVEL_CHOICES,
@@ -117,6 +155,44 @@ class Question(TimeStampedModel):
         return f"{self.assessment.title} · Q{self.order}"
 
 
+class PositionTask(TimeStampedModel):
+    """Position-based hiring task a company can use to group assessment sessions."""
+
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("active", "Active"),
+        ("archived", "Archived"),
+    ]
+
+    company = models.ForeignKey(
+        CompanyProfile, related_name="position_tasks", on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=160)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+    assessment_type = models.CharField(
+        max_length=40, choices=Assessment.ASSESSMENT_TYPE_CHOICES, default="behavioral"
+    )
+    assessment = models.ForeignKey(
+        Assessment,
+        related_name="position_tasks",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default="draft"
+    )
+    notes = models.TextField(blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ("company", "title")
+
+    def __str__(self):
+        return f"{self.company.name} · {self.title}"
+
+
 class Choice(TimeStampedModel):
     """Possible answer for questions that require options."""
 
@@ -169,6 +245,20 @@ class AssessmentSession(TimeStampedModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     candidate = models.ForeignKey(
         CandidateProfile, related_name="sessions", on_delete=models.CASCADE
+    )
+    company = models.ForeignKey(
+        "CompanyProfile",
+        related_name="sessions",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    position_task = models.ForeignKey(
+        "PositionTask",
+        related_name="sessions",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     assessment = models.ForeignKey(
         Assessment, related_name="sessions", on_delete=models.CASCADE

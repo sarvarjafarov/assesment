@@ -42,7 +42,15 @@
         </div>
     </header>
     <p class="session-meta">
-        Invited {{ session.invited_at|naturaltime }} · Due
+        {% if session.position_task %}
+            Task · {{ session.position_task.title }}
+        {% else %}
+            Task · Not assigned
+        {% endif %}
+        {% if session.company %}
+            · Company · {{ session.company.name }}
+        {% endif %}
+        · Invited {{ session.invited_at|naturaltime }} · Due
         {% if session.due_at %}{{ session.due_at|naturaltime }}{% else %}Not set{% endif %}
         · Score
         {% if session.overall_score != None %}

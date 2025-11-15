@@ -16,6 +16,8 @@ from .models import (
     AssessmentSession,
     CandidateProfile,
     Choice,
+    CompanyProfile,
+    PositionTask,
     Question,
     Response,
 )
@@ -47,8 +49,10 @@ def invite_candidate(
     headline: str = "",
     metadata: dict | None = None,
     invited_by: str = "API",
+    company: CompanyProfile | None = None,
+    position_task: PositionTask | None = None,
 ) -> SessionInvite:
-    """Create or update a candidate + associated assessment session."""
+    """Create a candidate profile and an associated assessment session."""
 
     candidate, _ = CandidateProfile.objects.update_or_create(
         email=email.lower(),
@@ -60,18 +64,21 @@ def invite_candidate(
         },
     )
 
-    session, created = AssessmentSession.objects.get_or_create(
+    if position_task and not company:
+        company = position_task.company
+
+    session = AssessmentSession.objects.create(
         candidate=candidate,
         assessment=assessment,
-        defaults={"status": "invited"},
+        status="invited",
+        invited_by=invited_by,
+        invited_at=timezone.now(),
+        company=company,
+        position_task=position_task,
     )
-    session.status = "invited"
-    session.invited_by = invited_by
-    session.invited_at = timezone.now()
-    session.save(update_fields=["status", "invited_by", "invited_at", "updated_at"])
 
     return SessionInvite(
-        candidate=candidate, session=session, assessment=assessment, created=created
+        candidate=candidate, session=session, assessment=assessment, created=True
     )
 
 

@@ -45,4 +45,31 @@ urlpatterns = [
         name="session-detail",
     ),
     path("invites/new/", views.InviteCreateView.as_view(), name="invite-create"),
+    path("companies/", views.CompanyListView.as_view(), name="company-list"),
+    path("companies/new/", views.CompanyCreateView.as_view(), name="company-create"),
+    path(
+        "companies/<slug:slug>/",
+        views.CompanyDetailView.as_view(),
+        name="company-detail",
+    ),
+    path(
+        "companies/<slug:slug>/edit/",
+        views.CompanyUpdateView.as_view(),
+        name="company-edit",
+    ),
+    path(
+        "companies/<slug:company_slug>/tasks/new/",
+        views.PositionTaskCreateView.as_view(),
+        name="position-task-create",
+    ),
+    path(
+        "tasks/<slug:slug>/",
+        views.PositionTaskDetailView.as_view(),
+        name="position-task-detail",
+    ),
+    path(
+        "tasks/<slug:slug>/edit/",
+        views.PositionTaskUpdateView.as_view(),
+        name="position-task-edit",
+    ),
 ]

@@ -9,10 +9,12 @@ from assessments.models import (
     AssessmentSession,
     CandidateProfile,
     Choice,
+    CompanyProfile,
+    PositionTask,
     Question,
     RoleCategory,
 )
-from assessments.services import record_responses
+from assessments.services import invite_candidate, record_responses
 
 
 class RecordResponsesEvaluationTests(TestCase):
@@ -157,6 +159,46 @@ class BehavioralProfileBuilderTests(TestCase):
         self.assertIsNotNone(report)
         self.assertIn("overall_risk_level", report)
         self.assertIn("follow_up_questions", report)
+
+
+class InviteCandidateWorkflowTests(TestCase):
+    def setUp(self):
+        category = RoleCategory.objects.create(name="Behavioral", slug="behavioral")
+        self.assessment = Assessment.objects.create(
+            category=category,
+            title="Behavioral Core",
+            slug="behavioral-core",
+            summary="Behavioral",
+        )
+        self.company = CompanyProfile.objects.create(
+            name="Atlas Labs",
+            slug="atlas-labs",
+            allowed_assessment_types=["behavioral"],
+        )
+        self.task = PositionTask.objects.create(
+            company=self.company,
+            title="Product Manager · Growth",
+            slug="pm-growth",
+            assessment_type="behavioral",
+            assessment=self.assessment,
+            status="active",
+        )
+
+    def test_invite_links_company_and_task(self):
+        result = invite_candidate(
+            assessment=self.assessment,
+            first_name="June",
+            last_name="Rowe",
+            email="june@example.com",
+            invited_by="Tests",
+            company=self.company,
+            position_task=self.task,
+        )
+        session = result.session
+        self.assertEqual(session.company, self.company)
+        self.assertEqual(session.position_task, self.task)
+        self.assertEqual(session.assessment, self.assessment)
+        self.assertEqual(session.status, "invited")
 
     def test_follow_up_questions_attached_for_flags(self):
         profile = build_behavioral_profile(

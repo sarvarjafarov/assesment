@@ -1,0 +1,98 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Company</p>
+        <h1>{{ company.name }}</h1>
+        <p class="lede">{{ company.description|default:"Manage assessments for this organization." }}</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-outline" href="{% url 'console:company-edit' company.slug %}">Edit</a>
+        <a class="btn btn-pill" href="{% url 'console:position-task-create' company.slug %}">New position task</a>
+    </div>
+</section>
+
+<section class="panel meta-panel">
+    <dl>
+        <div>
+            <dt>Access</dt>
+            <dd>{{ allowed_types|join:", " }}</dd>
+        </div>
+        <div>
+            <dt>Contact</dt>
+            <dd>
+                {% if company.contact_name %}
+                {{ company.contact_name }} · <a href="mailto:{{ company.contact_email }}">{{ company.contact_email }}</a>
+                {% else %}
+                —
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt>Website</dt>
+            <dd>
+                {% if company.website %}
+                    <a href="{{ company.website }}" target="_blank" rel="noreferrer">{{ company.website }}</a>
+                {% else %}
+                    —
+                {% endif %}
+            </dd>
+        </div>
+        <div>
+            <dt>Status</dt>
+            <dd>{{ company.is_active|yesno:"Active,Inactive" }}</dd>
+        </div>
+    </dl>
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Position tasks</h2>
+        <a href="{% url 'console:position-task-create' company.slug %}">Create task</a>
+    </header>
+    {% if tasks %}
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Task</span>
+            <span>Assessment</span>
+            <span>Type</span>
+            <span>Status</span>
+            <span>Sessions</span>
+        </div>
+        {% for task in tasks %}
+        <a class="table-row" href="{% url 'console:position-task-detail' task.slug %}">
+            <span>{{ task.title }}</span>
+            <span>{{ task.assessment.title|default:"—" }}</span>
+            <span>{{ task.assessment_type|title }}</span>
+            <span>{{ task.get_status_display }}</span>
+            <span>{{ task.session_total }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No tasks yet. Create one to group invites for a role.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Recent activity</h2>
+    </header>
+    {% if recent_sessions %}
+    <ul class="activity-list">
+        {% for session in recent_sessions %}
+        <li>
+            <div>
+                <p>{{ session.candidate.first_name }} {{ session.candidate.last_name }}</p>
+                <small>{{ session.assessment.title }}</small>
+            </div>
+            <span>{{ session.status|title }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty-state">No invites yet for this company.</p>
+    {% endif %}
+</section>
+{% endblock %}

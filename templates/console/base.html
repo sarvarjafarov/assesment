@@ -13,6 +13,9 @@
             <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' %}is-active{% endif %}">
                 Dashboard
             </a>
+            <a href="{% url 'console:company-list' %}" class="{% if section == 'companies' %}is-active{% endif %}">
+                Companies
+            </a>
             <a href="{% url 'console:assessment-list' %}" class="{% if section == 'assessments' %}is-active{% endif %}">
                 Assessments
             </a>

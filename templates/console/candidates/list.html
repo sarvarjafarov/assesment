@@ -34,6 +34,8 @@
         <div class="table-row table-head">
             <span>Name</span>
             <span>Email</span>
+            <span>Company</span>
+            <span>Position task</span>
             <span>Assessments</span>
             <span>Status</span>
             <span>Score</span>
@@ -43,6 +45,8 @@
         <a class="table-row" href="{% url 'console:candidate-detail' candidate.pk %}">
             <span>{{ candidate.first_name }} {{ candidate.last_name }}</span>
             <span>{{ candidate.email }}</span>
+            <span>{{ candidate.latest_company|default:"—" }}</span>
+            <span>{{ candidate.latest_task|default:"—" }}</span>
             <span>{{ candidate.session_total }}</span>
             <span>{{ candidate.latest_status|default:"—"|title }}</span>
             <span>

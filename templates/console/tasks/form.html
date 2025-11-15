@@ -1,0 +1,38 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Position task</p>
+        <h1>{% if form.instance.pk %}Update {{ form.instance.title }}{% else %}Create task{% endif %}</h1>
+        <p class="lede">Link a role to a specific assessment so invites stay organized.</p>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="post" class="form-stack">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="form-error">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% for field in form %}
+        <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-pill" type="submit">
+            {% if form.instance.pk %}Save changes{% else %}Create task{% endif %}
+        </button>
+    </form>
+</section>
+{% endblock %}

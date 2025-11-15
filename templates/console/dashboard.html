@@ -29,6 +29,14 @@
         <p>Overdue</p>
         <strong>{{ stats.overdue }}</strong>
     </article>
+    <article>
+        <p>Companies</p>
+        <strong>{{ company_count }}</strong>
+    </article>
+    <article>
+        <p>Active tasks</p>
+        <strong>{{ active_tasks }}</strong>
+    </article>
 </section>
 
 <section class="panel-grid">
@@ -96,6 +104,32 @@
     </div>
     {% else %}
     <p class="empty-state">No assessments yet.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Active position tasks</h2>
+    </header>
+    {% if active_tasks_list %}
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Task</span>
+            <span>Company</span>
+            <span>Assessment</span>
+            <span>Sessions</span>
+        </div>
+        {% for task in active_tasks_list %}
+        <a class="table-row" href="{% url 'console:position-task-detail' task.slug %}">
+            <span>{{ task.title }}</span>
+            <span>{{ task.company.name }}</span>
+            <span>{{ task.assessment.title|default:"—" }}</span>
+            <span>{{ task.session_total }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No active tasks available.</p>
     {% endif %}
 </section>
 {% endblock %}

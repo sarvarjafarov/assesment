@@ -1,0 +1,44 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Organizations</p>
+        <h1>Company access</h1>
+        <p class="lede">Manage which partners can run assessments and which roles they track.</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-pill" href="{% url 'console:company-create' %}">New company</a>
+    </div>
+</section>
+
+<section class="panel">
+    {% if companies %}
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Name</span>
+            <span>Assessment access</span>
+            <span>Position tasks</span>
+            <span>Sessions</span>
+            <span>Status</span>
+        </div>
+        {% for company in companies %}
+        <a class="table-row" href="{% url 'console:company-detail' company.slug %}">
+            <span>{{ company.name }}</span>
+            <span>{{ company.assessment_type_labels|join:", " }}</span>
+            <span>{{ company.task_total }}</span>
+            <span>{{ company.session_total }}</span>
+            <span>
+                {% if company.is_active %}
+                    Active
+                {% else %}
+                    Paused
+                {% endif %}
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No companies yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

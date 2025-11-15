@@ -6,6 +6,16 @@
         <p class="eyebrow">Candidate Result</p>
         <h1>{{ candidate.first_name }} {{ candidate.last_name }}</h1>
         <p class="lede">{{ assessment.title }} · {{ assessment.category.name }}</p>
+        <p class="lede small">
+            {% if session_obj.company %}
+                {{ session_obj.company.name }}
+            {% else %}
+                Direct invite
+            {% endif %}
+            {% if session_obj.position_task %}
+                · Task · {{ session_obj.position_task.title }}
+            {% endif %}
+        </p>
     </div>
     <div class="header-actions">
         <form method="post">
@@ -39,6 +49,19 @@
                 —
                 {% endif %}
             </p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Position task</p>
+            <p class="metric-value">
+                {% if session_obj.position_task %}
+                    {{ session_obj.position_task.title }}
+                {% else %}
+                    Not assigned
+                {% endif %}
+            </p>
+            {% if session_obj.company %}
+            <p class="muted small">Company · {{ session_obj.company.name }}</p>
+            {% endif %}
         </article>
         <article class="metric-card">
             <p class="metric-label">Auto decision</p>

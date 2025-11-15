@@ -27,12 +27,13 @@ class AssessmentAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "category",
+        "assessment_type",
         "level",
         "duration_minutes",
         "is_active",
         "updated_at",
     )
-    list_filter = ("category", "level", "is_active")
+    list_filter = ("category", "assessment_type", "level", "is_active")
     search_fields = ("title", "summary")
     prepopulated_fields = {"slug": ("title",)}
     inlines = [QuestionInline]
@@ -52,6 +53,28 @@ class CandidateProfileAdmin(admin.ModelAdmin):
     search_fields = ("first_name", "last_name", "email")
 
 
+@admin.register(models.CompanyProfile)
+class CompanyProfileAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug", "contact_name", "contact_email", "is_active")
+    search_fields = ("name", "contact_name", "contact_email")
+    list_filter = ("is_active",)
+    prepopulated_fields = {"slug": ("name",)}
+
+
+@admin.register(models.PositionTask)
+class PositionTaskAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "company",
+        "assessment_type",
+        "status",
+        "updated_at",
+    )
+    list_filter = ("assessment_type", "status", "company")
+    search_fields = ("title", "company__name")
+    prepopulated_fields = {"slug": ("title",)}
+
+
 class ResponseInline(admin.TabularInline):
     model = models.Response
     extra = 0
@@ -64,13 +87,21 @@ class AssessmentSessionAdmin(admin.ModelAdmin):
         "uuid",
         "candidate",
         "assessment",
+        "company",
+        "position_task",
         "status",
         "overall_score",
         "invited_at",
         "submitted_at",
     )
-    list_filter = ("status", "assessment__category")
-    search_fields = ("candidate__first_name", "candidate__last_name", "assessment__title")
+    list_filter = ("status", "assessment__category", "company")
+    search_fields = (
+        "candidate__first_name",
+        "candidate__last_name",
+        "assessment__title",
+        "company__name",
+        "position_task__title",
+    )
     inlines = [ResponseInline]
 
 

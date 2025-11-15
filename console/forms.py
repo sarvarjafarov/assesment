@@ -3,7 +3,14 @@ from __future__ import annotations
 from django import forms
 from django.utils import timezone
 
-from assessments.models import Assessment, AssessmentSession, Choice, Question
+from assessments.models import (
+    Assessment,
+    AssessmentSession,
+    Choice,
+    CompanyProfile,
+    PositionTask,
+    Question,
+)
 from assessments.services import invite_candidate
 
 
@@ -26,6 +33,7 @@ class AssessmentForm(forms.ModelForm):
             "title",
             "slug",
             "summary",
+            "assessment_type",
             "level",
             "duration_minutes",
             "skills_focus",
@@ -96,14 +104,106 @@ class ChoiceForm(forms.ModelForm):
         }
 
 
+class CompanyForm(forms.ModelForm):
+    """Capture profile details for partner companies."""
+
+    allowed_assessment_types = forms.MultipleChoiceField(
+        required=False,
+        choices=Assessment.ASSESSMENT_TYPE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Select the assessment types this company can access.",
+    )
+
+    class Meta:
+        model = CompanyProfile
+        fields = [
+            "name",
+            "slug",
+            "description",
+            "website",
+            "contact_name",
+            "contact_email",
+            "allowed_assessment_types",
+            "is_active",
+        ]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields["allowed_assessment_types"].initial = (
+                self.instance.allowed_assessment_types or []
+            )
+
+    def clean_allowed_assessment_types(self):
+        return self.cleaned_data.get("allowed_assessment_types") or []
+
+
+class PositionTaskForm(forms.ModelForm):
+    """Define role-based tasks for routing assessment sessions."""
+
+    class Meta:
+        model = PositionTask
+        fields = [
+            "company",
+            "title",
+            "slug",
+            "assessment_type",
+            "assessment",
+            "status",
+            "description",
+            "notes",
+        ]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 4}),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["assessment"].queryset = Assessment.objects.filter(
+            is_active=True
+        ).order_by("title")
+        if self.instance and self.instance.pk:
+            self.fields["company"].disabled = True
+
+    def clean(self):
+        cleaned = super().clean()
+        company: CompanyProfile | None = cleaned.get("company")
+        assessment_type = cleaned.get("assessment_type")
+        assessment: Assessment | None = cleaned.get("assessment")
+        if company:
+            allowed = company.allowed_assessment_types or []
+            if allowed and assessment_type not in allowed:
+                self.add_error(
+                    "assessment_type",
+                    "This company does not have access to the selected assessment type.",
+                )
+        if assessment and assessment.assessment_type != assessment_type:
+            self.add_error(
+                "assessment",
+                "Assessment must match the task's assessment type.",
+            )
+        return cleaned
+
+
 class ConsoleInviteForm(forms.Form):
     """Invite a candidate to an assessment with an optional due date."""
 
     full_name = forms.CharField(label="Candidate name")
     email = forms.EmailField()
-    company = forms.CharField(
+    company = forms.ModelChoiceField(
         required=False,
-        widget=forms.TextInput(attrs={"placeholder": "Company or team"}),
+        queryset=CompanyProfile.objects.filter(is_active=True).order_by("name"),
+        empty_label="Select company (optional)",
+    )
+    position_task = forms.ModelChoiceField(
+        required=False,
+        queryset=PositionTask.objects.filter(status="active").select_related("company"),
+        empty_label="Select position task (optional)",
+        help_text="Assign to a role-specific task to track progress.",
     )
     assessment = forms.ModelChoiceField(
         queryset=Assessment.objects.filter(is_active=True).order_by("title"),
@@ -127,21 +227,59 @@ class ConsoleInviteForm(forms.Form):
             due_at = timezone.make_aware(due_at, timezone.get_current_timezone())
         return due_at
 
+    def clean(self):
+        cleaned = super().clean()
+        company: CompanyProfile | None = cleaned.get("company")
+        task: PositionTask | None = cleaned.get("position_task")
+        assessment: Assessment | None = cleaned.get("assessment")
+        if task:
+            if company and task.company_id != company.id:
+                self.add_error(
+                    "position_task", "This task belongs to a different company."
+                )
+            cleaned["company"] = task.company
+            company = task.company
+            if task.assessment:
+                cleaned["assessment"] = task.assessment
+                assessment = task.assessment
+            if assessment and task.assessment and assessment != task.assessment:
+                self.add_error(
+                    "assessment",
+                    "Assessment is fixed for the selected task.",
+                )
+            if assessment and assessment.assessment_type != task.assessment_type:
+                self.add_error(
+                    "position_task",
+                    "Task type does not match selected assessment.",
+                )
+        if company and assessment:
+            allowed = company.allowed_assessment_types or []
+            if allowed and assessment.assessment_type not in allowed:
+                self.add_error(
+                    "assessment",
+                    f"{company.name} does not have access to {assessment.assessment_type} assessments.",
+                )
+        return cleaned
+
     def save(self, invited_by: str):
         full_name = self.cleaned_data["full_name"].strip()
         first_name, last_name = _split_name(full_name)
         assessment: Assessment = self.cleaned_data["assessment"]
+        company: CompanyProfile | None = self.cleaned_data.get("company")
+        position_task: PositionTask | None = self.cleaned_data.get("position_task")
         result = invite_candidate(
             assessment=assessment,
             first_name=first_name,
             last_name=last_name,
             email=self.cleaned_data["email"],
-            headline=self.cleaned_data.get("company", ""),
+            headline=company.name if company else "",
             metadata={
-                "company": self.cleaned_data.get("company", ""),
+                "company": company.name if company else "",
                 "notes": self.cleaned_data.get("notes", ""),
             },
             invited_by=invited_by,
+            company=company,
+            position_task=position_task,
         )
         session = result.session
         session.notes = self.cleaned_data.get("notes", "")
