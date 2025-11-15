@@ -2128,7 +2128,7 @@ main {
     color: #eb5757;
 }
 
-.api-page {
+.api-shell {
     max-width: 1200px;
     margin: 0 auto;
     padding: 4rem 1.5rem 5rem;
@@ -2136,10 +2136,16 @@ main {
     flex-direction: column;
     gap: 2rem;
 }
-.api-page .hero {
+.api-shell main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+.api-shell .hero {
     text-align: center;
 }
-.api-page .hero h1 {
+.api-shell .hero h1 {
     margin-bottom: 0.5rem;
 }
 .api-endpoints {
@@ -2168,7 +2174,18 @@ main {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
 }
-.code-grid pre,
+.code-card {
+    background: #0e1428;
+    color: #f8f8ff;
+    border-radius: 18px;
+    padding: 1rem;
+    font-size: 0.85rem;
+    overflow-x: auto;
+}
+.code-card pre {
+    margin: 0;
+}
+.integration-grid .code-card,
 .integration-grid pre {
     background: #0e1428;
     color: #f8f8ff;
@@ -2192,6 +2209,10 @@ main {
     border-bottom: 1px solid rgba(14, 20, 40, 0.08);
     font-weight: 600;
     color: var(--navy);
+}
+.nav-links a.is-active {
+    color: var(--navy);
+    font-weight: 700;
 }
 
 .blog-shell {

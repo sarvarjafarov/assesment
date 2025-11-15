@@ -1,82 +1,127 @@
 {% extends 'base.html' %}
-{% block title %}Assessments API · Sira{% endblock %}
+{% load static %}
+{% block title %}Sira · Assessments API{% endblock %}
 {% block content %}
-<div class="page-shell api-page">
-    <section class="panel hero">
-        <p class="eyebrow">API INTEGRATION</p>
-        <h1>Connect every Sira assessment to your stack.</h1>
-        <p class="lede">Behavioral, digital marketing, and future role modules are available through one REST API.</p>
-    </section>
-
-    <section class="panel">
-        <h2>REST endpoints</h2>
-        <p class="lede">Call these endpoints from any language with your API token in the <code>X-API-Key</code> header.</p>
-        <div class="api-endpoints">
-            {% for endpoint in rest_endpoints %}
-            <article>
-                <span class="method">{{ endpoint.method }}</span>
-                <code>{{ endpoint.path }}</code>
-                <p>{{ endpoint.description }}</p>
-            </article>
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="panel">
-        <h2>Language examples</h2>
-        <div class="code-grid">
-            {% for sample in language_examples %}
-            <article>
-                <p class="label">{{ sample.title }}</p>
-                <pre><code>{{ sample.code }}</code></pre>
-            </article>
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="panel integration-grid">
-        <div>
-            <h2>Stacks we support</h2>
-            <ul>
-                <li>Python (requests, Django, FastAPI)</li>
-                <li>Node.js (fetch, Axios, Nest)</li>
-                <li>Ruby, Go, Java</li>
-                <li>Zapier, Make.com, Workato</li>
-                <li>ATS partners: Lever, Greenhouse, Ashby</li>
+<div class="page-shell api-shell">
+    <header class="site-header">
+        <nav class="nav">
+            <div class="brand">
+                <a href="{% url 'pages:home' %}">
+                    <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
+                </a>
+                <span>Sira</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'pages:home' %}#products">Products</a></li>
+                <li><a href="{% url 'pages:home' %}#industries">Industries</a></li>
+                <li><a href="{% url 'pages:home' %}#blog">Blog</a></li>
+                <li><a class="is-active" href="{% url 'marketing-assessment:api' %}">API</a></li>
             </ul>
-        </div>
-        <div>
-            <h2>Sample requests & responses</h2>
+            <div class="nav-actions">
+                <a class="btn btn-outline small" href="{% url 'console:login' %}">Customer Login</a>
+                <a class="btn btn-pill" href="{% url 'pages:home' %}#cta">Book a Demo</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="panel hero">
+            <p class="eyebrow">API integration</p>
+            <h1>Connect every Sira assessment to your stack.</h1>
+            <p class="lede">Behavioral, digital marketing, and future role modules run through one secure REST API.</p>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading align-left">
+                <h2>REST endpoints</h2>
+                <p class="lede">Call these endpoints with your <code>X-API-Key</code> header.</p>
+            </div>
+            <div class="api-endpoints">
+                {% for endpoint in rest_endpoints %}
+                <article class="endpoint-card">
+                    <span class="method">{{ endpoint.method }}</span>
+                    <code>{{ endpoint.path }}</code>
+                    <p>{{ endpoint.description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading align-left">
+                <h2>Language examples</h2>
+                <p class="lede">Drop these snippets into your favorite language or workflow.</p>
+            </div>
+            <div class="code-grid">
+                {% for sample in language_examples %}
+                <article class="code-card">
+                    <p class="label">{{ sample.title }}</p>
+                    <pre><code>{{ sample.code }}</code></pre>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="panel integration-grid">
+            <div>
+                <h2>Stacks we support</h2>
+                <ul>
+                    <li>Python (requests, Django, FastAPI)</li>
+                    <li>Node.js (fetch, Axios, Nest)</li>
+                    <li>Ruby, Go, Java</li>
+                    <li>Zapier, Make.com, Workato</li>
+                    <li>ATS partners: Lever, Greenhouse, Ashby</li>
+                </ul>
+            </div>
+            <div>
+                <h2>Sample requests & responses</h2>
+                <div class="code-card">
 <pre><code>POST /api/marketing-assessment/start/
 {
   "candidate_id": "cand-123"
 }
 → { "session_uuid": "uuid" }</code></pre>
+                </div>
+                <div class="code-card">
 <pre><code>GET /api/marketing-assessment/cand-123/results/
 {
   "overall_score": 82.5,
   "category_breakdown": {...},
   "recommendations": {...}
 }</code></pre>
-        </div>
-    </section>
-
-    <section class="panel">
-        <h2>Request access</h2>
-        <p class="lede">Need credentials? Share a brief summary of your use case.</p>
-        <form method="post" class="form-stack">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="form-field">
-                {{ field.label_tag }}
-                {{ field }}
-                {% for error in field.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
+                </div>
             </div>
-            {% endfor %}
-            <button class="btn btn-pill">Submit request</button>
-        </form>
-    </section>
+        </section>
+
+        <section class="panel request-panel">
+            <div class="section-heading align-left">
+                <h2>Request access</h2>
+                <p class="lede">Need credentials? Tell us how you plan to use the API and we’ll send a token.</p>
+            </div>
+            <form method="post" class="form-stack">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% for error in field.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                <button class="btn btn-pill" type="submit">Submit request</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>© {% now "Y" %} Sira</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Resources</a>
+        </div>
+        <div>Made with <span>♥</span> by Sira</div>
+    </footer>
 </div>
 {% endblock %}
