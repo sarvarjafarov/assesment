@@ -25,12 +25,14 @@ class DigitalMarketingQuestion(TimeStampedModel):
     TYPE_RANKING = "ranking"
     TYPE_BEHAVIORAL_MOST = "behavioral_most"
     TYPE_BEHAVIORAL_LEAST = "behavioral_least"
+    TYPE_REASONING = "reasoning"
     QUESTION_TYPES = [
         (TYPE_MULTIPLE, "Multiple choice"),
         (TYPE_SCENARIO, "Scenario based"),
         (TYPE_RANKING, "Ranking / Ordering"),
         (TYPE_BEHAVIORAL_MOST, "Behavioral - most like me"),
         (TYPE_BEHAVIORAL_LEAST, "Behavioral - least like me"),
+        (TYPE_REASONING, "Reasoning / open response"),
     ]
 
     CATEGORY_PPC = "ppc"

@@ -505,4 +505,13 @@ SAMPLE_QUESTIONS = [
         "correct_answer": "A",
         "scoring_weight": 1.1,
     },
+    {
+        "question_text": "Reason through how you would split a $60k/mo digital budget across PPC, paid social, and lifecycle channels for a B2B SaaS with a 90-day sales cycle.",
+        "question_type": "reasoning",
+        "difficulty_level": 4,
+        "category": "strategy",
+        "options": {},
+        "scoring_weight": 1.0,
+        "explanation": "Outline high-level allocations and how you would test/justify the mix.",
+    },
 ]

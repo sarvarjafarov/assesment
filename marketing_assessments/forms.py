@@ -45,6 +45,16 @@ class MarketingQuestionForm(forms.Form):
                 choices=choices,
                 widget=forms.RadioSelect,
             )
+        elif q_type == "reasoning":
+            self.fields["answer"] = forms.CharField(
+                label="",
+                widget=forms.Textarea(
+                    attrs={
+                        "rows": 5,
+                        "placeholder": "Briefly explain your reasoning or approach.",
+                    }
+                ),
+            )
         else:
             self.fields["answer"] = forms.CharField(
                 label="",
