@@ -5,6 +5,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Iterable, Sequence
 
+from .constants import BEHAVIORAL_TRAITS, normalize_behavioral_focus
+
 # Behavioural dataset contains 200 blocks with statements A, B, C.
 # Trait alignment repeats every 10 question blocks.
 TRAIT_PATTERN = {
@@ -88,13 +90,7 @@ RED_FLAG_RULES_CONFIG = {
 }
 
 SCORING_SYSTEM = {
-    "traits": [
-        "communication",
-        "adaptability",
-        "problem_solving",
-        "teamwork",
-        "integrity",
-    ],
+    "traits": BEHAVIORAL_TRAITS,
     "scoring_rules": {
         "most_like_me": 1,
         "least_like_me": -1,
@@ -674,6 +670,7 @@ def build_behavioral_profile(
     selections: Iterable[dict | str],
     *,
     weight_profile: str | None = None,
+    focus_traits: Sequence[str] | None = None,
 ) -> dict:
     """
     Aggregate behavioural signals for the statements a candidate selected.
@@ -685,6 +682,8 @@ def build_behavioral_profile(
     normalized_selections = _normalize_selections(selections)
     if not normalized_selections:
         return {}
+
+    focus_traits = normalize_behavioral_focus(focus_traits)
 
     trait_counts: Counter[str] = Counter()
     raw_scores = {trait: 0 for trait in KNOWN_TRAITS}
@@ -724,18 +723,28 @@ def build_behavioral_profile(
         for trait in KNOWN_TRAITS
     }
     normalized_scores = _normalize_scores(raw_scores, counts_dict)
-    rankings = _build_rankings(counts_dict, percentages, raw_scores, normalized_scores)
-    dominant_traits = _dominant_traits(rankings)
-    development_traits = _development_traits(rankings)
+    rankings_all = _build_rankings(counts_dict, percentages, raw_scores, normalized_scores)
+
+    focus_counts = {trait: counts_dict.get(trait, 0) for trait in focus_traits}
+    focus_percentages = {trait: percentages.get(trait, 0.0) for trait in focus_traits}
+    focus_raw_scores = {trait: raw_scores.get(trait, 0) for trait in focus_traits}
+    focus_normalized_scores = {
+        trait: normalized_scores.get(trait) for trait in focus_traits
+    }
+    focus_rankings = [entry for entry in rankings_all if entry["trait"] in focus_traits]
+    dominant_traits = _dominant_traits(focus_rankings)
+    development_traits = _development_traits(focus_rankings)
     coverage_score = round(
-        len([trait for trait, count in counts_dict.items() if count]) / len(KNOWN_TRAITS),
+        len([trait for trait in focus_traits if focus_counts.get(trait)]) / len(focus_traits),
         2,
     )
-    balance_gap = _balance_gap(normalized_scores)
-    insights = _build_insights(rankings, coverage_score, development_traits)
+    balance_gap = _balance_gap(
+        {trait: focus_normalized_scores.get(trait) for trait in focus_traits}
+    )
+    insights = _build_insights(focus_rankings, coverage_score, development_traits)
 
     behavior_labels = {
-        trait: _label_for_score(normalized_scores[trait]) for trait in KNOWN_TRAITS
+        trait: _label_for_score(focus_normalized_scores[trait]) for trait in focus_traits
     }
     behavior_messages = {
         trait: PROFILE_MESSAGES[trait].get(label)
@@ -745,44 +754,51 @@ def build_behavioral_profile(
     }
 
     profile_key, weights = _resolve_weight_map(weight_profile)
-    eligibility_score = _weighted_score(normalized_scores, weights)
+    filtered_weights = _filter_weights(weights, focus_traits)
+    eligibility_score = _weighted_score(focus_normalized_scores, filtered_weights)
     eligibility_band = _eligibility_decision(eligibility_score)
-    candidate_summary = _build_candidate_summary(normalized_scores, eligibility_band)
+    candidate_summary = _build_candidate_summary(
+        focus_normalized_scores, eligibility_band, focus_traits
+    )
+
+    focus_distributions = {
+        trait: dict(response_distribution[trait]) for trait in focus_traits
+    }
 
     red_flags, risk_level = _evaluate_red_flags(
-        normalized_scores,
+        focus_normalized_scores,
         balance_gap=balance_gap,
-        response_distribution=response_distribution,
+        response_distribution=focus_distributions,
         total_responses=total_responses,
+        focus_traits=focus_traits,
     )
 
     return {
         "total_responses": total_responses,
         "statement_ids": [entry["id"] for entry in statements_detail],
         "statements": statements_detail,
-        "trait_counts": counts_dict,
-        "trait_percentages": percentages,
-        "trait_rankings": rankings,
+        "focus_traits": focus_traits,
+        "trait_counts": focus_counts,
+        "trait_percentages": focus_percentages,
+        "trait_rankings": focus_rankings,
         "dominant_traits": dominant_traits,
         "development_traits": development_traits,
         "coverage_score": coverage_score,
         "balance_gap": balance_gap,
-        "raw_scores": raw_scores,
-        "normalized_scores": normalized_scores,
+        "raw_scores": focus_raw_scores,
+        "normalized_scores": focus_normalized_scores,
         "behavior_labels": behavior_labels,
         "behavior_messages": behavior_messages,
-        "response_distribution": {
-            trait: dict(counter) for trait, counter in response_distribution.items()
-        },
+        "response_distribution": focus_distributions,
         "eligibility": {
             "weight_profile": profile_key,
-            "weights": weights,
+            "weights": filtered_weights,
             "score": eligibility_score,
             "decision": eligibility_band,
         },
         "red_flags": red_flags,
         "red_flag_report": {
-            "normalized_scores": normalized_scores,
+            "normalized_scores": focus_normalized_scores,
             "red_flags": red_flags,
             "overall_risk_level": risk_level,
             "follow_up_questions": _build_follow_up_questions(red_flags),
@@ -1030,13 +1046,15 @@ def _label_for_score(score: float | None) -> str | None:
 
 
 def _build_candidate_summary(
-    normalized_scores: dict[str, float | None], decision: str
+    normalized_scores: dict[str, float | None],
+    decision: str,
+    focus_traits: Sequence[str],
 ) -> dict:
     summary_cfg = CANDIDATE_SUMMARY_TEXT
     trait_cfg = summary_cfg.get("trait_descriptions", {})
     trait_messages: dict[str, dict] = {}
 
-    for trait in KNOWN_TRAITS:
+    for trait in focus_traits:
         score = normalized_scores.get(trait)
         label = _label_for_score(score)
         resolved_label = label or "Moderate"
@@ -1074,6 +1092,20 @@ def _resolve_weight_map(weight_profile: str | None) -> tuple[str, dict[str, floa
     return profile_key, weights
 
 
+def _filter_weights(weights: dict[str, float], focus_traits: Sequence[str]) -> dict[str, float]:
+    filtered = {trait: weights.get(trait, 0.0) for trait in focus_traits if weights.get(trait, 0) > 0}
+    if not filtered:
+        if not focus_traits:
+            return {}
+        uniform = round(1 / len(focus_traits), 4)
+        return {trait: uniform for trait in focus_traits}
+    total = sum(filtered.values())
+    if total <= 0:
+        uniform = round(1 / len(focus_traits), 4)
+        return {trait: uniform for trait in focus_traits}
+    return {trait: round(value / total, 4) for trait, value in filtered.items()}
+
+
 def _weighted_score(normalized_scores: dict[str, float | None], weights: dict[str, float]) -> float:
     score = 0.0
     for trait, weight in weights.items():
@@ -1102,12 +1134,16 @@ def _evaluate_red_flags(
     balance_gap: float,
     response_distribution: dict[str, Counter],
     total_responses: int,
+    focus_traits: Sequence[str],
 ) -> tuple[list[dict], str]:
     flags: list[dict] = []
+    focus_set = set(focus_traits)
 
     for code, rule in RED_FLAG_RULES.items():
         trait = rule.get("trait")
         if trait:
+            if trait not in focus_set:
+                continue
             trait_score = normalized_scores.get(trait)
             if trait_score is None:
                 continue
@@ -1140,6 +1176,8 @@ def _evaluate_red_flags(
             continue
 
         if code == "imbalance_risk" or rule.get("type") == "multi_trait":
+            if len(focus_set) < 2:
+                continue
             params = rule.get("params", {})
             high = params.get("high_threshold", 75)
             low = params.get("low_threshold", 40)

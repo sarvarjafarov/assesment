@@ -2027,6 +2027,22 @@ main {
     margin-bottom: 1.5rem;
     color: var(--text-muted);
 }
+.focus-banner {
+    background: rgba(255, 138, 0, 0.08);
+    border: 1px solid rgba(255, 138, 0, 0.2);
+    border-radius: 16px;
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 1.25rem;
+    font-weight: 600;
+    color: var(--navy);
+}
+.focus-banner span {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--orange);
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+}
 .question-card {
     background: #f5f6fc;
     border-radius: 20px;

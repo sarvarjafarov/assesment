@@ -51,6 +51,7 @@ def invite_candidate(
     invited_by: str = "API",
     company: CompanyProfile | None = None,
     position_task: PositionTask | None = None,
+    behavioral_focus: list[str] | None = None,
 ) -> SessionInvite:
     """Create a candidate profile and an associated assessment session."""
 
@@ -67,18 +68,43 @@ def invite_candidate(
     if position_task and not company:
         company = position_task.company
 
-    session = AssessmentSession.objects.create(
+    focus_values = list(behavioral_focus or [])
+    if position_task and not focus_values:
+        focus_values = list(position_task.behavioral_focus or [])
+
+    session, created = AssessmentSession.objects.get_or_create(
         candidate=candidate,
         assessment=assessment,
-        status="invited",
-        invited_by=invited_by,
-        invited_at=timezone.now(),
-        company=company,
-        position_task=position_task,
+        defaults={
+            "status": "invited",
+            "invited_by": invited_by,
+            "invited_at": timezone.now(),
+            "company": company,
+            "position_task": position_task,
+            "behavioral_focus": focus_values,
+        },
     )
+    if not created:
+        session.status = "invited"
+        session.invited_by = invited_by
+        session.invited_at = timezone.now()
+        session.company = company
+        session.position_task = position_task
+        session.behavioral_focus = focus_values
+        session.save(
+            update_fields=[
+                "status",
+                "invited_by",
+                "invited_at",
+                "company",
+                "position_task",
+                "behavioral_focus",
+                "updated_at",
+            ]
+        )
 
     return SessionInvite(
-        candidate=candidate, session=session, assessment=assessment, created=True
+        candidate=candidate, session=session, assessment=assessment, created=created
     )
 
 
@@ -197,8 +223,11 @@ def record_responses(
             response.save(update_fields=["answer_text", "updated_at"])
 
     weight_profile = _resolve_behavioral_weight_profile(session.assessment)
+    focus_traits = session.behavioral_focus_traits
     behavioral_profile = build_behavioral_profile(
-        behavioral_selections, weight_profile=weight_profile
+        behavioral_selections,
+        weight_profile=weight_profile,
+        focus_traits=focus_traits,
     )
 
     if mark_completed:
@@ -219,6 +248,9 @@ def record_responses(
         if behavioral_profile:
             breakdown_payload = breakdown_payload or {}
             breakdown_payload["behavioral_profile"] = behavioral_profile
+        if focus_traits:
+            breakdown_payload = breakdown_payload or {}
+            breakdown_payload["behavioral_focus"] = focus_traits
         if breakdown_payload is not None:
             session.score_breakdown = breakdown_payload
         auto_decision_value = None

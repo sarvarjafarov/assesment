@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 
+from .constants import BEHAVIORAL_TRAITS, normalize_behavioral_focus
+
 
 class TimeStampedModel(models.Model):
     """Base class to track creation and modification times."""
@@ -185,12 +187,28 @@ class PositionTask(TimeStampedModel):
     )
     notes = models.TextField(blank=True)
     metadata = models.JSONField(default=dict, blank=True)
+    behavioral_focus = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Subset of behavioural traits emphasized for this task.",
+    )
 
     class Meta:
         ordering = ("company", "title")
 
     def __str__(self):
         return f"{self.company.name} · {self.title}"
+
+    @property
+    def behavioral_focus_traits(self) -> list[str]:
+        return normalize_behavioral_focus(self.behavioral_focus)
+
+    @property
+    def behavioral_focus_display(self) -> str:
+        focus = self.behavioral_focus_traits
+        if set(focus) == set(BEHAVIORAL_TRAITS):
+            return "General behavioral profile"
+        return ", ".join(trait.replace("_", " ").title() for trait in focus)
 
 
 class Choice(TimeStampedModel):
@@ -260,6 +278,11 @@ class AssessmentSession(TimeStampedModel):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    behavioral_focus = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Subset of behavioural traits targeted for this session.",
+    )
     assessment = models.ForeignKey(
         Assessment, related_name="sessions", on_delete=models.CASCADE
     )
@@ -305,6 +328,17 @@ class AssessmentSession(TimeStampedModel):
 
     def __str__(self):
         return f"{self.candidate} · {self.assessment.title}"
+
+    @property
+    def behavioral_focus_traits(self) -> list[str]:
+        return normalize_behavioral_focus(self.behavioral_focus)
+
+    @property
+    def behavioral_focus_display(self) -> str:
+        focus = self.behavioral_focus_traits
+        if set(focus) == set(BEHAVIORAL_TRAITS):
+            return "General behavioral profile"
+        return ", ".join(trait.replace("_", " ").title() for trait in focus)
 
 
 class Response(TimeStampedModel):

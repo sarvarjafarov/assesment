@@ -117,6 +117,7 @@
             <span>Task</span>
             <span>Company</span>
             <span>Assessment</span>
+            <span>Focus</span>
             <span>Sessions</span>
         </div>
         {% for task in active_tasks_list %}
@@ -124,6 +125,7 @@
             <span>{{ task.title }}</span>
             <span>{{ task.company.name }}</span>
             <span>{{ task.assessment.title|default:"—" }}</span>
+            <span>{{ task.behavioral_focus_display }}</span>
             <span>{{ task.session_total }}</span>
         </a>
         {% endfor %}

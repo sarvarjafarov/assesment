@@ -50,6 +50,7 @@
         {% if session.company %}
             · Company · {{ session.company.name }}
         {% endif %}
+        · Focus · {{ session.behavioral_focus_display }}
         · Invited {{ session.invited_at|naturaltime }} · Due
         {% if session.due_at %}{{ session.due_at|naturaltime }}{% else %}Not set{% endif %}
         · Score

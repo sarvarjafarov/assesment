@@ -4,6 +4,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from assessments.behavioral import build_behavioral_profile
+from assessments.constants import BEHAVIORAL_TRAITS
 from assessments.models import (
     Assessment,
     AssessmentSession,
@@ -113,6 +114,8 @@ class RecordResponsesEvaluationTests(TestCase):
         self.session.refresh_from_db()
         profile = self.session.score_breakdown.get("behavioral_profile")
         self.assertIsNotNone(profile)
+        self.assertIn("focus_traits", profile)
+        self.assertEqual(set(profile["focus_traits"]), set(BEHAVIORAL_TRAITS))
         self.assertEqual(profile["total_responses"], 2)
         self.assertIn("communication", profile["dominant_traits"])
         self.assertIn("eligibility", profile)
@@ -132,6 +135,20 @@ class RecordResponsesEvaluationTests(TestCase):
         self.assertIn("follow_up_questions", report)
         if report["red_flags"]:
             self.assertIn("trait", report["red_flags"][0])
+
+    def test_behavioral_focus_limits_traits(self):
+        self.session.behavioral_focus = ["communication"]
+        self.session.save(update_fields=["behavioral_focus"])
+        answers = [
+            {"question_id": self.single_question.id, "choice_ids": [self.good_choice.id]},
+            {"question_id": self.multi_question.id, "choice_ids": [self.multi_secondary.id]},
+        ]
+        record_responses(session=self.session, answers=answers)
+        self.session.refresh_from_db()
+        profile = self.session.score_breakdown.get("behavioral_profile")
+        self.assertEqual(profile["focus_traits"], ["communication"])
+        self.assertEqual(set(profile["trait_counts"].keys()), {"communication"})
+        self.assertEqual(set(profile["behavior_labels"].keys()), {"communication"})
 
 
 class BehavioralProfileBuilderTests(TestCase):
@@ -182,6 +199,7 @@ class InviteCandidateWorkflowTests(TestCase):
             assessment_type="behavioral",
             assessment=self.assessment,
             status="active",
+            behavioral_focus=["communication", "teamwork"],
         )
 
     def test_invite_links_company_and_task(self):
@@ -199,6 +217,7 @@ class InviteCandidateWorkflowTests(TestCase):
         self.assertEqual(session.position_task, self.task)
         self.assertEqual(session.assessment, self.assessment)
         self.assertEqual(session.status, "invited")
+        self.assertEqual(session.behavioral_focus, ["communication", "teamwork"])
 
     def test_follow_up_questions_attached_for_flags(self):
         profile = build_behavioral_profile(
@@ -213,6 +232,19 @@ class InviteCandidateWorkflowTests(TestCase):
         self.assertTrue(follow_ups)
         self.assertEqual(follow_ups[0]["code"], report["red_flags"][0]["code"])
         self.assertTrue(follow_ups[0]["questions"])
+
+    def test_focus_selection_limits_traits(self):
+        profile = build_behavioral_profile(
+            [
+                {"statement_id": "1A", "response_type": "most_like_me"},
+                {"statement_id": "2A", "response_type": "least_like_me"},
+                {"statement_id": "3C", "response_type": "most_like_me"},
+            ],
+            focus_traits=["communication", "teamwork"],
+        )
+        self.assertEqual(profile["focus_traits"], ["communication", "teamwork"])
+        self.assertEqual(set(profile["trait_counts"].keys()), {"communication", "teamwork"})
+        self.assertNotIn("adaptability", profile["behavior_labels"])
 
 
 @override_settings(API_ACCESS_TOKEN="apitoken")
@@ -262,3 +294,4 @@ class SessionResponseApiViewTests(TestCase):
         self.assertIn("behavioral_profile", payload)
         self.assertIsNotNone(payload["behavioral_profile"])
         self.assertIn("score_breakdown", payload)
+        self.assertIn("behavioral_focus", payload)

@@ -26,6 +26,11 @@
             <p>{{ instructions }}</p>
         </div>
         {% endif %}
+        {% if behavioral_focus_label %}
+        <div class="focus-banner">
+            <p><span>Behavioral focus:</span> {{ behavioral_focus_label }}</p>
+        </div>
+        {% endif %}
         <form method="post" class="question-form">
             {% csrf_token %}
             {% if form.non_field_errors %}

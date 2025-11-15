@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
+from .constants import sanitize_behavioral_focus
 from .models import Assessment, AssessmentSession, RoleCategory
 from .services import invite_candidate, record_responses, send_invite_email
 
@@ -137,6 +138,11 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
             )
 
         first_name, last_name = _split_name(full_name)
+        focus_payload = payload.get("behavioral_focus")
+        if isinstance(focus_payload, str):
+            focus_payload = [focus_payload]
+        focus_selection = sanitize_behavioral_focus(focus_payload)
+
         invite = invite_candidate(
             assessment=assessment,
             first_name=first_name,
@@ -145,6 +151,7 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
             headline=payload.get("headline", ""),
             metadata=payload.get("metadata") or {},
             invited_by="API",
+            behavioral_focus=focus_selection,
         )
         notes = payload.get("notes", "")
         due_at_input = payload.get("due_at")
@@ -195,6 +202,7 @@ class InvitationCreateApiView(ApiKeyRequiredMixin, View):
                 "email": invite.candidate.email,
             },
             "status": invite.session.status,
+            "behavioral_focus": focus_selection,
         }
         return JsonResponse(response_data, status=201)
 
@@ -233,6 +241,7 @@ class SessionResponseApiView(ApiKeyRequiredMixin, View):
                 },
                 "score_breakdown": score_breakdown,
                 "behavioral_profile": score_breakdown.get("behavioral_profile"),
+                "behavioral_focus": session.behavioral_focus_traits,
             }
         )
 

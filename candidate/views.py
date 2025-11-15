@@ -39,6 +39,8 @@ class SessionMixin:
             "candidate": self.session.candidate,
             "instructions": self.session.notes,
             "due_at": self.session.due_at,
+            "behavioral_focus_traits": self.session.behavioral_focus_traits,
+            "behavioral_focus_label": self.session.behavioral_focus_display,
         }
 
 

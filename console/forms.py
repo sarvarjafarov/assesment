@@ -3,6 +3,7 @@ from __future__ import annotations
 from django import forms
 from django.utils import timezone
 
+from assessments.constants import BEHAVIORAL_TRAITS, sanitize_behavioral_focus
 from assessments.models import (
     Assessment,
     AssessmentSession,
@@ -16,6 +17,15 @@ from assessments.services import invite_candidate
 
 def _comma_separated(value: str) -> list[str]:
     return [item.strip() for item in (value or "").split(",") if item.strip()]
+
+
+FOCUS_CHOICES = [
+    ("general", "General behavioral profile"),
+    *[
+        (trait, trait.replace("_", " ").title())
+        for trait in BEHAVIORAL_TRAITS
+    ],
+]
 
 
 class AssessmentForm(forms.ModelForm):
@@ -144,6 +154,13 @@ class CompanyForm(forms.ModelForm):
 class PositionTaskForm(forms.ModelForm):
     """Define role-based tasks for routing assessment sessions."""
 
+    behavioral_focus = forms.MultipleChoiceField(
+        required=False,
+        choices=FOCUS_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Choose specific traits to emphasize or keep the assessment general.",
+    )
+
     class Meta:
         model = PositionTask
         fields = [
@@ -152,6 +169,7 @@ class PositionTaskForm(forms.ModelForm):
             "slug",
             "assessment_type",
             "assessment",
+            "behavioral_focus",
             "status",
             "description",
             "notes",
@@ -168,6 +186,9 @@ class PositionTaskForm(forms.ModelForm):
         ).order_by("title")
         if self.instance and self.instance.pk:
             self.fields["company"].disabled = True
+            self.fields["behavioral_focus"].initial = (
+                self.instance.behavioral_focus or []
+            )
 
     def clean(self):
         cleaned = super().clean()
@@ -187,6 +208,10 @@ class PositionTaskForm(forms.ModelForm):
                 "Assessment must match the task's assessment type.",
             )
         return cleaned
+
+    def clean_behavioral_focus(self):
+        values = self.cleaned_data.get("behavioral_focus")
+        return sanitize_behavioral_focus(values)
 
 
 class ConsoleInviteForm(forms.Form):
@@ -220,6 +245,12 @@ class ConsoleInviteForm(forms.Form):
             attrs={"rows": 3, "placeholder": "Expectation, context, etc."}
         ),
     )
+    behavioral_focus = forms.MultipleChoiceField(
+        required=False,
+        choices=FOCUS_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Pick the behavioural skills to emphasize or keep it general.",
+    )
 
     def clean_due_at(self):
         due_at = self.cleaned_data.get("due_at")
@@ -252,6 +283,9 @@ class ConsoleInviteForm(forms.Form):
                     "position_task",
                     "Task type does not match selected assessment.",
                 )
+            cleaned["behavioral_focus"] = task.behavioral_focus or []
+            if cleaned["behavioral_focus"]:
+                cleaned["behavioral_focus"] = list(cleaned["behavioral_focus"])
         if company and assessment:
             allowed = company.allowed_assessment_types or []
             if allowed and assessment.assessment_type not in allowed:
@@ -260,6 +294,10 @@ class ConsoleInviteForm(forms.Form):
                     f"{company.name} does not have access to {assessment.assessment_type} assessments.",
                 )
         return cleaned
+
+    def clean_behavioral_focus(self):
+        values = self.cleaned_data.get("behavioral_focus")
+        return sanitize_behavioral_focus(values)
 
     def save(self, invited_by: str):
         full_name = self.cleaned_data["full_name"].strip()
@@ -280,6 +318,7 @@ class ConsoleInviteForm(forms.Form):
             invited_by=invited_by,
             company=company,
             position_task=position_task,
+            behavioral_focus=self.cleaned_data.get("behavioral_focus"),
         )
         session = result.session
         session.notes = self.cleaned_data.get("notes", "")

@@ -15,6 +15,7 @@
             {% if session_obj.position_task %}
                 · Task · {{ session_obj.position_task.title }}
             {% endif %}
+            · Focus · {{ session_obj.behavioral_focus_display }}
         </p>
     </div>
     <div class="header-actions">
@@ -76,6 +77,10 @@
                 {% endif %}
             </p>
             {% endwith %}
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Behavioral focus</p>
+            <p class="metric-value">{{ session_obj.behavioral_focus_display }}</p>
         </article>
         <article class="metric-card">
             <p class="metric-label">Due</p>
