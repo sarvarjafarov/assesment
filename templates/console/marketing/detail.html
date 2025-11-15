@@ -41,7 +41,7 @@
             <ul>
                 {% for key, value in session_obj.recommendations.fit_scores.items %}
                 <li>
-                    <span>{{ key|title|replace:"_"," " }}</span>
+                    <span>{{ key|cut:"_"|title }}</span>
                     <strong>{{ value }}</strong>
                 </li>
                 {% endfor %}
