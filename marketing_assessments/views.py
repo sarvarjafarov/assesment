@@ -1,0 +1,81 @@
+import json
+
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+
+from .models import DigitalMarketingAssessmentSession, DigitalMarketingQuestion
+from .services import evaluate_session, generate_question_set
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class StartAssessmentView(View):
+    def post(self, request):
+        try:
+            payload = json.loads(request.body or "{}")
+        except json.JSONDecodeError:
+            return JsonResponse({"detail": "Invalid JSON"}, status=400)
+        candidate_id = payload.get("candidate_id")
+        if not candidate_id:
+            return JsonResponse({"detail": "candidate_id required"}, status=400)
+        session, _ = DigitalMarketingAssessmentSession.objects.get_or_create(
+            candidate_id=candidate_id, defaults={"status": "draft"}
+        )
+        session.question_set = generate_question_set()
+        session.status = "in_progress"
+        session.save(update_fields=["question_set", "status"])
+        return JsonResponse({"session_uuid": str(session.uuid)}, status=201)
+
+
+class QuestionListView(View):
+    def get(self, request, candidate_id):
+        session = DigitalMarketingAssessmentSession.objects.get(candidate_id=candidate_id)
+        qs = DigitalMarketingQuestion.objects.filter(id__in=session.question_set)
+        questions = [
+            {
+                "id": q.id,
+                "question_text": q.question_text,
+                "question_type": q.question_type,
+                "difficulty_level": q.difficulty_level,
+                "category": q.category,
+                "options": q.options,
+                "scoring_weight": float(q.scoring_weight),
+            }
+            for q in qs
+        ]
+        return JsonResponse({"session_uuid": str(session.uuid), "questions": questions})
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class SubmitAssessmentView(View):
+    def post(self, request, candidate_id):
+        session = DigitalMarketingAssessmentSession.objects.get(candidate_id=candidate_id)
+        try:
+            responses = json.loads(request.body or "[]")
+        except json.JSONDecodeError:
+            return JsonResponse({"detail": "Invalid JSON"}, status=400)
+        if not isinstance(responses, list):
+            return JsonResponse({"detail": "Responses must be a list"}, status=400)
+        session.responses = responses
+        session.save(update_fields=["responses"])
+        evaluate_session(session)
+        return JsonResponse(
+            {"detail": "Assessment submitted", "session_uuid": str(session.uuid)}
+        )
+
+
+class AssessmentResultView(View):
+    def get(self, request, candidate_id):
+        session = DigitalMarketingAssessmentSession.objects.get(
+            candidate_id=candidate_id, status="submitted"
+        )
+        payload = {
+            "candidate_id": session.candidate_id,
+            "hard_skill_score": session.hard_skill_score,
+            "soft_skill_score": session.soft_skill_score,
+            "overall_score": session.overall_score,
+            "category_breakdown": session.category_breakdown,
+            "recommendations": session.recommendations,
+        }
+        return JsonResponse(payload)
