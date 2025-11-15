@@ -2128,6 +2128,36 @@ main {
     color: #eb5757;
 }
 
+.page-shell {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+.api-endpoints {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.api-endpoints article {
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 18px;
+    padding: 1rem 1.25rem;
+    background: #f8f9ff;
+}
+.api-endpoints .method {
+    font-weight: 700;
+    color: var(--orange);
+}
+.api-endpoints code {
+    display: block;
+    margin: 0.4rem 0;
+    font-family: "SFMono-Regular", Menlo, monospace;
+}
+
 .blog-shell {
     max-width: 960px;
     margin: 0 auto;

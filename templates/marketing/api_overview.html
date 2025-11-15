@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Digital Marketing API · Sira{% endblock %}
+{% block content %}
+<div class="page-shell">
+    <section class="panel">
+        <p class="eyebrow">API INTEGRATION</p>
+        <h1>Digital marketing assessment API</h1>
+        <p class="lede">Integrate the assessment into your ATS or hiring workflow using the endpoints below.</p>
+        <div class="api-endpoints">
+            {% for endpoint in endpoints %}
+            <article>
+                <span class="method">{{ endpoint.method }}</span>
+                <code>{{ endpoint.path }}</code>
+                <p>{{ endpoint.description }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Request access</h2>
+        <p class="lede">Need API credentials? Share a brief summary of your use case.</p>
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button class="btn btn-pill">Submit request</button>
+        </form>
+    </section>
+</div>
+{% endblock %}
