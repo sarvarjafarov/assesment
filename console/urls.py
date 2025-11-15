@@ -72,4 +72,7 @@ urlpatterns = [
         views.PositionTaskUpdateView.as_view(),
         name="position-task-edit",
     ),
+    path("blog/", views.BlogPostListView.as_view(), name="blog-list"),
+    path("blog/new/", views.BlogPostCreateView.as_view(), name="blog-create"),
+    path("blog/<slug:slug>/edit/", views.BlogPostUpdateView.as_view(), name="blog-edit"),
 ]

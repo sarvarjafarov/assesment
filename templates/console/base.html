@@ -22,6 +22,9 @@
             <a href="{% url 'console:candidate-list' %}" class="{% if section == 'candidates' %}is-active{% endif %}">
                 Candidates
             </a>
+            <a href="{% url 'console:blog-list' %}" class="{% if section == 'blog' %}is-active{% endif %}">
+                Blog
+            </a>
             <a href="{% url 'console:invite-create' %}" class="{% if section == 'invites' %}is-active{% endif %}">
                 Invite Candidate
             </a>

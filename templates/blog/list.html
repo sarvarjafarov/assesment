@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Insights & Resources · Sira{% endblock %}
+{% block meta_description %}Browse the latest Sira product updates, hiring playbooks, and behavioral interviewing tips.{% endblock %}
+{% block content %}
+<div class="page-shell blog-shell">
+    <section class="blog-hero">
+        <p class="eyebrow">Insights</p>
+        <h1>Hiring ideas, playbooks, and product news.</h1>
+        <p class="lede">Practical guides for recruiters modernizing behavioral assessments.</p>
+    </section>
+
+    {% if featured_post %}
+    <section class="blog-featured">
+        <article class="featured-card">
+            <div>
+                <span class="pill {{ featured_post.pill_style }}">{{ featured_post.pill_label }}</span>
+                <p class="date">{{ featured_post.published_at|date:"F j, Y" }}</p>
+            </div>
+            <h2><a href="{{ featured_post.get_absolute_url }}">{{ featured_post.title }}</a></h2>
+            <p>{{ featured_post.excerpt }}</p>
+            <p class="author">By {{ featured_post.display_author }}</p>
+            <a class="outline-link" href="{{ featured_post.get_absolute_url }}">Read article</a>
+        </article>
+    </section>
+    {% endif %}
+
+    <section class="blog-grid">
+        {% for post in posts %}
+        <article class="resource-card">
+            <header>
+                <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
+                <span class="date">{{ post.published_at|date:"M j, Y" }}</span>
+            </header>
+            <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+            <p>{{ post.excerpt }}</p>
+            <div class="author">By {{ post.display_author }}</div>
+            <a class="outline-link" href="{{ post.get_absolute_url }}">Read article</a>
+            <div class="card-shade"></div>
+        </article>
+        {% empty %}
+        <p class="empty-state">Fresh content is on the way.</p>
+        {% endfor %}
+    </section>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

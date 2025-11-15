@@ -2043,6 +2043,49 @@ main {
     font-size: 0.75rem;
     margin-right: 0.5rem;
 }
+
+.blog-shell {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+}
+.blog-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+.blog-featured .featured-card {
+    background: #101632;
+    color: #fff;
+    padding: 2rem;
+    border-radius: 24px;
+    margin-bottom: 2rem;
+}
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+.blog-article h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 0.5rem;
+}
+.blog-article .article-body {
+    margin-top: 2rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+.blog-related {
+    margin-top: 3rem;
+}
+.blog-related .resource-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.pagination {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
 .question-card {
     background: #f5f6fc;
     border-radius: 20px;

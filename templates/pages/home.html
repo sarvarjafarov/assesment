@@ -243,21 +243,23 @@
                 <p class="lede">
                     Compliance updates and best practices from our expert team.
                 </p>
-                <button class="btn btn-pill secondary">View All Articles</button>
+                <a class="btn btn-pill secondary" href="{% url 'blog:list' %}">View All Articles</a>
             </div>
             <div class="resource-grid">
                 {% for article in articles %}
                 <article class="resource-card">
                     <header>
-                        <span class="pill {{ article.pill_class }}">{{ article.pill }}</span>
-                        <span class="date">{{ article.date }}</span>
+                        <span class="pill {{ article.pill_style }}">{{ article.pill_label }}</span>
+                        <span class="date">{{ article.published_at|date:"M j, Y" }}</span>
                     </header>
                     <h3>{{ article.title }}</h3>
-                    <p>{{ article.summary }}</p>
-                    <div class="author">By {{ article.author }}</div>
-                    <button class="outline-link">Read article</button>
+                    <p>{{ article.excerpt }}</p>
+                    <div class="author">By {{ article.display_author }}</div>
+                    <a class="outline-link" href="{{ article.get_absolute_url }}">Read article</a>
                     <div class="card-shade"></div>
                 </article>
+                {% empty %}
+                <p class="empty-state">Fresh resources are coming soon.</p>
                 {% endfor %}
             </div>
         </section>

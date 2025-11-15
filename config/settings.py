@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'console',
     'candidate',
     'pages',
+    'blog',
     'assessments',
 ]
 

@@ -5,6 +5,7 @@ from django import forms
 
 from assessments.forms import AssessmentInviteForm
 from assessments.services import send_invite_email
+from blog.models import BlogPost
 
 def home(request):
     """Render the marketing landing page."""
@@ -59,32 +60,9 @@ def home(request):
         },
     ]
 
-    articles = [
-        {
-            "pill": "HR Insights",
-            "pill_class": "accent",
-            "title": "The 5 Best HR Software Solutions for Construction Companies in 2025",
-            "summary": "Discover the top HR software platforms built for construction, from automation to enterprise-grade compliance.",
-            "author": "Nathan Belaye",
-            "date": "October 13, 2025",
-        },
-        {
-            "pill": "Best Practices",
-            "pill_class": "success",
-            "title": "Time Tracking Software for Landscaping: Streamline Your Field Teams",
-            "summary": "Landscaping crews waste hours juggling disconnected tools. See how Sira unifies tracking and payroll.",
-            "author": "Nathan Belay",
-            "date": "October 6, 2025",
-        },
-        {
-            "pill": "Product News",
-            "pill_class": "neutral",
-            "title": "Connecteam vs. Sira: The Age of Voice AI",
-            "summary": "Learn how Sira's voice AI office manager keeps admins updated and workers empowered in the field.",
-            "author": "Business Owner's Guide",
-            "date": "October 5, 2025",
-        },
-    ]
+    articles = list(
+        BlogPost.objects.published().order_by("-is_featured", "-published_at")[:3]
+    )
 
     testimonials = [
         {

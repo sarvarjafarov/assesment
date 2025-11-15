@@ -13,6 +13,7 @@ from assessments.models import (
     Question,
 )
 from assessments.services import invite_candidate
+from blog.models import BlogPost
 
 
 def _comma_separated(value: str) -> list[str]:
@@ -366,3 +367,42 @@ def _split_name(full_name: str) -> tuple[str, str]:
     first = parts[0] if parts else "Candidate"
     last = parts[1] if len(parts) > 1 else ""
     return first, last
+
+
+class BlogPostForm(forms.ModelForm):
+    published_at = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+    )
+
+    class Meta:
+        model = BlogPost
+        fields = [
+            "title",
+            "slug",
+            "hero_image",
+            "pill_label",
+            "pill_style",
+            "excerpt",
+            "body",
+            "author_name",
+            "author_title",
+            "status",
+            "published_at",
+            "is_featured",
+            "meta_title",
+            "meta_description",
+            "meta_keywords",
+            "meta_image",
+        ]
+        widgets = {
+            "excerpt": forms.Textarea(attrs={"rows": 3}),
+            "body": forms.Textarea(attrs={"rows": 10}),
+            "meta_description": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def clean_published_at(self):
+        value = self.cleaned_data.get("published_at")
+        if value and timezone.is_naive(value):
+            value = timezone.make_aware(value, timezone.get_current_timezone())
+        return value

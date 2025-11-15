@@ -32,8 +32,10 @@ from assessments.models import (
     Question,
 )
 from assessments.services import send_invite_email
+from blog.models import BlogPost
 from .forms import (
     AssessmentForm,
+    BlogPostForm,
     ChoiceForm,
     CompanyForm,
     ConsoleInviteForm,
@@ -212,6 +214,47 @@ class CompanyDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
         )
         context["allowed_types"] = self.object.assessment_type_labels()
         return context
+
+
+class BlogPostListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+    model = BlogPost
+    template_name = "console/blog/list.html"
+    context_object_name = "posts"
+    paginate_by = 20
+    section = "blog"
+
+    def get_queryset(self):
+        return BlogPost.objects.order_by("-published_at", "-created_at")
+
+
+class BlogPostCreateView(ConsoleSectionMixin, LoginRequiredMixin, CreateView):
+    model = BlogPost
+    template_name = "console/blog/form.html"
+    form_class = BlogPostForm
+    section = "blog"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Article drafted.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("console:blog-list")
+
+
+class BlogPostUpdateView(ConsoleSectionMixin, LoginRequiredMixin, UpdateView):
+    model = BlogPost
+    template_name = "console/blog/form.html"
+    form_class = BlogPostForm
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    section = "blog"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Article updated.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("console:blog-list")
 
 
 class PositionTaskCreateView(ConsoleSectionMixin, LoginRequiredMixin, CreateView):
