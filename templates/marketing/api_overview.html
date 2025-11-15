@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
-{% block title %}Digital Marketing API · Sira{% endblock %}
+{% block title %}Assessments API · Sira{% endblock %}
 {% block content %}
-<div class="page-shell">
-    <section class="panel">
+<div class="page-shell api-page">
+    <section class="panel hero">
         <p class="eyebrow">API INTEGRATION</p>
-        <h1>Digital marketing assessment API</h1>
-        <p class="lede">Integrate the assessment into your ATS or hiring workflow using the endpoints below.</p>
+        <h1>Connect every Sira assessment to your stack.</h1>
+        <p class="lede">Behavioral, digital marketing, and future role modules are available through one REST API.</p>
+    </section>
+
+    <section class="panel">
+        <h2>REST endpoints</h2>
+        <p class="lede">Call these endpoints from any language with your API token in the <code>X-API-Key</code> header.</p>
         <div class="api-endpoints">
-            {% for endpoint in endpoints %}
+            {% for endpoint in rest_endpoints %}
             <article>
                 <span class="method">{{ endpoint.method }}</span>
                 <code>{{ endpoint.path }}</code>
@@ -18,8 +23,47 @@
     </section>
 
     <section class="panel">
+        <h2>Language examples</h2>
+        <div class="code-grid">
+            {% for sample in language_examples %}
+            <article>
+                <p class="label">{{ sample.title }}</p>
+                <pre><code>{{ sample.code }}</code></pre>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="panel integration-grid">
+        <div>
+            <h2>Stacks we support</h2>
+            <ul>
+                <li>Python (requests, Django, FastAPI)</li>
+                <li>Node.js (fetch, Axios, Nest)</li>
+                <li>Ruby, Go, Java</li>
+                <li>Zapier, Make.com, Workato</li>
+                <li>ATS partners: Lever, Greenhouse, Ashby</li>
+            </ul>
+        </div>
+        <div>
+            <h2>Sample requests & responses</h2>
+<pre><code>POST /api/marketing-assessment/start/
+{
+  "candidate_id": "cand-123"
+}
+→ { "session_uuid": "uuid" }</code></pre>
+<pre><code>GET /api/marketing-assessment/cand-123/results/
+{
+  "overall_score": 82.5,
+  "category_breakdown": {...},
+  "recommendations": {...}
+}</code></pre>
+        </div>
+    </section>
+
+    <section class="panel">
         <h2>Request access</h2>
-        <p class="lede">Need API credentials? Share a brief summary of your use case.</p>
+        <p class="lede">Need credentials? Share a brief summary of your use case.</p>
         <form method="post" class="form-stack">
             {% csrf_token %}
             {% for field in form %}

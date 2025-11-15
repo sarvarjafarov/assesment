@@ -6,9 +6,12 @@ from django.shortcuts import redirect, render
 
 
 class ApiTokenRequestForm(forms.Form):
-    company_name = forms.CharField(max_length=180)
-    contact_email = forms.EmailField()
-    use_case = forms.CharField(widget=forms.Textarea(attrs={"rows": 4}))
+    company_name = forms.CharField(max_length=180, label="Company name")
+    contact_email = forms.EmailField(label="Contact email")
+    use_case = forms.CharField(
+        label="Use case",
+        widget=forms.Textarea(attrs={"rows": 4, "placeholder": "Describe your integration goals."}),
+    )
 
 
 def api_overview(request):
@@ -21,13 +24,12 @@ def api_overview(request):
             f"Email: {payload['contact_email']}\n"
             f"Use case:\n{payload['use_case']}"
         )
-        recipients = [admin_email] if admin_email else []
-        if recipients:
+        if admin_email:
             send_mail(
                 subject="API Token Request",
                 message=body,
                 from_email=payload["contact_email"],
-                recipient_list=recipients,
+                recipient_list=[admin_email],
                 fail_silently=True,
             )
         messages.success(
@@ -39,11 +41,26 @@ def api_overview(request):
         request,
         "marketing/api_overview.html",
         {
-            "endpoints": [
-                {"method": "POST", "path": "/api/marketing-assessment/start/", "description": "Create a session"},
-                {"method": "GET", "path": "/api/marketing-assessment/<candidate_id>/questions/", "description": "Retrieve questions"},
+            "rest_endpoints": [
+                {"method": "POST", "path": "/api/marketing-assessment/start/", "description": "Create digital marketing session"},
+                {"method": "GET", "path": "/api/marketing-assessment/<candidate_id>/questions/", "description": "Retrieve question bundle"},
                 {"method": "POST", "path": "/api/marketing-assessment/<candidate_id>/submit/", "description": "Submit responses"},
-                {"method": "GET", "path": "/api/marketing-assessment/<candidate_id>/results/", "description": "Fetch scores"},
+                {"method": "GET", "path": "/api/marketing-assessment/<candidate_id>/results/", "description": "Fetch scores + fit summary"},
+                {"method": "GET", "path": "/api/assessments/sessions/<uuid>/responses/", "description": "Behavioral profile + score breakdown"},
+            ],
+            "language_examples": [
+                {
+                    "title": "Python requests",
+                    "code": "import requests\\nrequests.post('https://your-domain/api/marketing-assessment/start/', json={'candidate_id': 'cand-123'}, headers={'X-API-Key': '<token>'})",
+                },
+                {
+                    "title": "Node.js fetch",
+                    "code": "await fetch('/api/marketing-assessment/<id>/submit/', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': token }, body: JSON.stringify(responses) });",
+                },
+                {
+                    "title": "cURL",
+                    "code": "curl -H 'X-API-Key: <token>' https://your-domain/api/assessments/sessions/<uuid>/responses/",
+                },
             ],
             "form": form,
         },

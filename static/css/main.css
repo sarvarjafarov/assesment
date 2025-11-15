@@ -2128,13 +2128,19 @@ main {
     color: #eb5757;
 }
 
-.page-shell {
-    max-width: 960px;
+.api-page {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 3rem 1.5rem 5rem;
+    padding: 4rem 1.5rem 5rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
+}
+.api-page .hero {
+    text-align: center;
+}
+.api-page .hero h1 {
+    margin-bottom: 0.5rem;
 }
 .api-endpoints {
     display: grid;
@@ -2156,6 +2162,36 @@ main {
     display: block;
     margin: 0.4rem 0;
     font-family: "SFMono-Regular", Menlo, monospace;
+}
+.code-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+.code-grid pre,
+.integration-grid pre {
+    background: #0e1428;
+    color: #f8f8ff;
+    border-radius: 18px;
+    padding: 1rem;
+    font-size: 0.85rem;
+    overflow-x: auto;
+}
+.integration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+.integration-grid ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.integration-grid li {
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(14, 20, 40, 0.08);
+    font-weight: 600;
+    color: var(--navy);
 }
 
 .blog-shell {
