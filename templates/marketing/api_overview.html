@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Sira · Assessments API{% endblock %}
 {% block content %}
-<div class="page-shell api-shell">
+<div class="page-shell">
     <header class="site-header">
         <nav class="nav">
             <div class="brand">
@@ -24,7 +24,7 @@
         </nav>
     </header>
 
-    <main>
+    <main class="api-shell">
         <section class="panel hero">
             <p class="eyebrow">API integration</p>
             <h1>Connect every Sira assessment to your stack.</h1>
@@ -32,10 +32,13 @@
         </section>
 
         <section class="panel endpoint-panel">
-            <div class="section-heading align-left">
-                <h2>REST endpoints</h2>
+            <header class="panel-heading">
+                <div>
+                    <p class="eyebrow">Endpoints</p>
+                    <h2>REST endpoints</h2>
+                </div>
                 <p class="lede">Call these endpoints with your <code>X-API-Key</code> header.</p>
-            </div>
+            </header>
             <div class="api-endpoints">
                 {% for endpoint in rest_endpoints %}
                 <article class="endpoint-card">
@@ -65,10 +68,13 @@
         </section>
 
         <section class="panel language-panel">
-            <div class="section-heading align-left">
-                <h2>Language examples</h2>
+            <header class="panel-heading">
+                <div>
+                    <p class="eyebrow">Language examples</p>
+                    <h2>Language examples</h2>
+                </div>
                 <p class="lede">Drop these snippets into your favorite language or workflow.</p>
-            </div>
+            </header>
             <div class="code-grid">
                 {% for sample in language_examples %}
                 <article class="code-card">
@@ -79,7 +85,15 @@
             </div>
         </section>
 
-        <section class="panel integration-grid">
+        <section class="panel integration-panel">
+            <header class="panel-heading">
+                <div>
+                    <p class="eyebrow">Integrations</p>
+                    <h2>Stacks & sample payloads</h2>
+                </div>
+                <p class="lede">Use our REST interface across any stack, or drop these request/response samples to speed up QA.</p>
+            </header>
+            <div class="integration-grid">
             <div class="stack-card">
                 <h2>Stacks we support</h2>
                 <p class="lede">Embed Sira into any workflow or automation platform.</p>
@@ -117,13 +131,17 @@
 → { "detail": "Assessment submitted", "session_uuid": "uuid" }</code></pre>
                 </div>
             </div>
+            </div>
         </section>
 
         <section class="panel request-panel">
-            <div class="section-heading align-left">
-                <h2>Request access</h2>
+            <header class="panel-heading">
+                <div>
+                    <p class="eyebrow">Access request</p>
+                    <h2>Request access</h2>
+                </div>
                 <p class="lede">Need credentials? Tell us how you plan to use the API and we’ll send a token.</p>
-            </div>
+            </header>
             <form method="post" class="form-stack request-form">
                 {% csrf_token %}
                 <div class="form-row">

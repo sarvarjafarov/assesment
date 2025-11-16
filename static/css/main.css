@@ -260,6 +260,8 @@ main {
 
 .section-heading.align-left {
     text-align: left;
+    margin: 0 0 2rem;
+    max-width: none;
 }
 
 .eyebrow {
@@ -461,13 +463,13 @@ main {
 }
 
 .journey-animation {
-    background: #fff;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), #fff6ef);
     border-radius: 36px;
     padding: 2.5rem;
     border: 1px solid rgba(14, 20, 40, 0.05);
     box-shadow: 0 45px 80px rgba(12, 18, 40, 0.08);
     position: relative;
-    overflow: hidden;
+    min-height: 520px;
 }
 
 .journey-stage {
@@ -475,8 +477,8 @@ main {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.25rem;
     margin-bottom: 1.75rem;
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 0.35;
+    transform: translateY(10px);
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -1293,6 +1295,7 @@ main {
     max-width: 1200px;
     margin: 0 auto;
     gap: 1.5rem;
+    text-align: center;
 }
 
 .site-footer span {
@@ -1303,6 +1306,7 @@ main {
     display: flex;
     gap: 1.25rem;
     flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .footer-links a {
@@ -2141,23 +2145,30 @@ main {
 
 .api-shell {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 4rem 1.5rem 5rem;
+    margin: 2rem auto 4rem;
+    padding: 0 1.5rem 4rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-}
-.api-shell main {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    margin-top: 2rem;
 }
 .api-shell .hero {
     text-align: center;
 }
 .api-shell .hero h1 {
     margin-bottom: 0.5rem;
+}
+.panel-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+}
+.panel-heading .lede {
+    max-width: 360px;
+    margin: 0;
+    color: var(--text-muted);
 }
 .api-endpoints {
     display: grid;
@@ -2189,10 +2200,15 @@ main {
 }
 .endpoint-card .path {
     display: block;
-    margin: 0.6rem 0;
+    margin: 0.25rem 0 0.75rem;
     font-family: "SFMono-Regular", Menlo, monospace;
     font-size: 0.95rem;
     color: var(--navy);
+    word-break: break-all;
+}
+.endpoint-card p {
+    margin: 0;
+    color: var(--text-muted);
 }
 .language-panel {
     background: #f7f8fc;
@@ -2200,47 +2216,70 @@ main {
 .code-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
+    gap: 1.25rem;
 }
 .code-card {
-    background: #0e1428;
+    position: relative;
+    background: linear-gradient(120deg, #0e1428 0%, #111c3f 50%, #0e1428 100%);
+    background-size: 220% 220%;
+    animation: codeGlow 12s ease-in-out infinite;
     color: #f8f8ff;
     border-radius: 18px;
     padding: 1.25rem;
     font-size: 0.85rem;
-    overflow-x: auto;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 30px rgba(13, 18, 34, 0.35);
 }
 .code-card pre {
     margin: 0;
-}
-.integration-grid .code-card,
-.integration-grid pre {
-    background: #0e1428;
-    color: #f8f8ff;
-    border-radius: 18px;
-    padding: 1rem;
-    font-size: 0.85rem;
     overflow-x: auto;
+}
+.code-card .label {
+    text-transform: none;
+    letter-spacing: 0.04em;
+    color: rgba(248, 248, 255, 0.8);
+    font-weight: 600;
+}
+.code-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 24px 45px rgba(13, 18, 34, 0.45);
+}
+@keyframes codeGlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+.integration-panel {
+    background: #fff9f2;
 }
 .integration-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 1.5rem;
+    align-items: stretch;
 }
-.stack-card {
+.integration-panel .stack-card {
     background: #f7f8fc;
     border-radius: 18px;
     padding: 1.5rem;
+    height: 100%;
 }
-.stack-card ul {
+.integration-panel .stack-card ul {
     list-style: none;
     padding: 0;
     margin: 1rem 0 0;
 }
-.stack-card li {
+.integration-panel .stack-card li {
     padding: 0.55rem 0;
     border-bottom: 1px solid rgba(14, 20, 40, 0.06);
     font-weight: 600;
@@ -2248,7 +2287,7 @@ main {
     display: flex;
     gap: 0.5rem;
 }
-.stack-card li span {
+.integration-panel .stack-card li span {
     min-width: 120px;
     color: var(--text-muted);
     font-weight: 500;
@@ -2257,6 +2296,16 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    height: 100%;
+}
+.sample-code h2 {
+    margin-bottom: 0.5rem;
+}
+.sample-code .code-card {
+    min-height: 120px;
+}
+.sample-code .code-card pre {
+    padding: 0;
 }
 .token-panel .token-card {
     background: #0e1428;
@@ -2265,16 +2314,33 @@ main {
     color: #f8f8ff;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.2rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 .token-card pre {
     margin: 0;
     font-size: 1.1rem;
 }
+.token-card .label {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.8rem;
+    color: rgba(248, 248, 255, 0.7);
+    margin-bottom: 0.35rem;
+    display: block;
+}
+.token-card code {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+}
 .token-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
+    justify-content: flex-start;
+    margin-top: 0.25rem;
 }
 .copy-trigger {
     background: rgba(255, 255, 255, 0.1);
@@ -2480,6 +2546,20 @@ main {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1rem;
 }
+.request-panel {
+    background: #fffefd;
+}
+.request-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+.request-panel .form-field label {
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
 .request-panel .form-field input,
 .request-panel .form-field textarea {
     border: 1px solid rgba(14, 20, 40, 0.15);
@@ -2489,6 +2569,10 @@ main {
     width: 100%;
     background: #fff;
     transition: border 0.15s ease, box-shadow 0.15s ease;
+}
+.request-panel .form-field textarea {
+    min-height: 160px;
+    resize: vertical;
 }
 .request-panel .form-field input:focus,
 .request-panel .form-field textarea:focus {
@@ -2500,4 +2584,5 @@ main {
     width: auto;
     align-self: flex-start;
     padding: 0.9rem 2.5rem;
+    margin-top: 0.5rem;
 }
