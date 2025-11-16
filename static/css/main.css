@@ -2287,12 +2287,11 @@ main {
     font-size: 0.95rem;
 }
 .language-snippet {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 1rem;
 }
 .snippet-card,
-.mini-snippet,
 .sample-card,
 .code-card {
     position: relative;
@@ -2326,7 +2325,6 @@ main {
     gap: 1rem;
 }
 .snippet-card .label,
-.mini-snippet .label,
 .code-card .label {
     text-transform: uppercase;
     letter-spacing: 0.15em;
@@ -2338,14 +2336,12 @@ main {
     transform: translateY(-3px);
     box-shadow: 0 24px 45px rgba(13, 18, 34, 0.45);
 }
-.snippet-tiles {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0.75rem;
+.snippet-card.is-primary {
+    padding: 1.5rem;
+    min-height: 220px;
 }
-.mini-snippet {
-    padding: 1rem;
-    font-size: 0.8rem;
+.snippet-card:not(.is-primary) {
+    background: linear-gradient(120deg, #101b3a 0%, #0e1428 100%);
 }
 .sample-card-stack {
     display: flex;

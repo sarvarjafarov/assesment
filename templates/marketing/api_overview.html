@@ -67,7 +67,7 @@
             </div>
         </section>
 
-        {% with primary=language_examples|first %}
+        {% with samples=language_examples %}
         <section class="panel language-panel">
             <div class="language-flex">
                 <div class="language-copy">
@@ -99,30 +99,20 @@
                         <li>Webhook callbacks notify you when candidates finish.</li>
                     </ul>
                 </div>
-                {% if primary %}
                 <div class="language-snippet">
-                    <div class="snippet-card">
+                    {% for sample in samples %}
+                    <article class="snippet-card {% if forloop.first %}is-primary{% endif %}">
                         <div class="snippet-header">
                             <div>
-                                <p class="label">Example</p>
-                                <strong>{{ primary.title }}</strong>
+                                <p class="label">{% if forloop.first %}Featured{% else %}Snippet{% endif %}</p>
+                                <strong>{{ sample.title }}</strong>
                             </div>
-                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#primarySnippet">Copy</button>
+                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#languageSnippet{{ forloop.counter }}">Copy</button>
                         </div>
-                        <pre><code id="primarySnippet">{{ primary.code }}</code></pre>
-                    </div>
-                    {% if language_examples|length > 1 %}
-                    <div class="snippet-tiles">
-                        {% for sample in language_examples|slice:"1:4" %}
-                        <article class="mini-snippet">
-                            <p class="label">{{ sample.title }}</p>
-                            <pre><code>{{ sample.code }}</code></pre>
-                        </article>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
+                        <pre><code id="languageSnippet{{ forloop.counter }}">{{ sample.code }}</code></pre>
+                    </article>
+                    {% endfor %}
                 </div>
-                {% endif %}
             </div>
         </section>
         {% endwith %}
