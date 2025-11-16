@@ -2387,11 +2387,6 @@ main {
     transform: translateY(-3px);
     box-shadow: 0 24px 45px rgba(13, 18, 34, 0.45);
 }
-.sample-card-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
 .sample-card-header {
     display: flex;
     justify-content: space-between;
@@ -2401,9 +2396,6 @@ main {
 .sample-card-header strong {
     display: block;
     font-size: 0.9rem;
-}
-.sample-card pre {
-    padding-top: 0;
 }
 .copy-trigger.dark {
     background: rgba(255, 255, 255, 0.15);
@@ -2452,11 +2444,8 @@ main {
 .integration-panel {
     background: #fff9f2;
 }
-.integration-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
-    align-items: stretch;
+.stacks-panel .stack-card {
+    max-width: 520px;
 }
 .integration-panel .stack-card {
     background: #f7f8fc;
@@ -2482,20 +2471,21 @@ main {
     color: var(--text-muted);
     font-weight: 500;
 }
-.sample-code {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    height: 100%;
+.sample-panel {
+    background: #fff5ec;
+    position: relative;
+    overflow: hidden;
 }
-.sample-code h2 {
-    margin-bottom: 0.5rem;
+.sample-flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
 }
-.sample-code .code-card {
-    min-height: 120px;
+.sample-card {
+    position: relative;
 }
-.sample-code .code-card pre {
-    padding: 0;
+.sample-card pre {
+    padding-top: 0;
 }
 .token-panel .token-card {
     background: #0e1428;

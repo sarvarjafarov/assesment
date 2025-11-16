@@ -134,7 +134,7 @@
         </section>
 {% endwith %}
 
-        <section class="panel integration-panel">
+        <section class="panel integration-panel stacks-panel">
             <header class="panel-heading">
                 <div>
                     <p class="eyebrow">Integrations</p>
@@ -142,7 +142,6 @@
                 </div>
                 <p class="lede">Use our REST interface across any stack, or drop these request/response samples to speed up QA.</p>
             </header>
-            <div class="integration-grid">
             <div class="stack-card">
                 <h2>Stacks we support</h2>
                 <p class="lede">Embed Sira into any workflow or automation platform.</p>
@@ -154,58 +153,58 @@
                     <li><span>ATS partners</span> Lever, Greenhouse, Ashby</li>
                 </ul>
             </div>
-            <div class="sample-code">
-                <header class="panel-heading">
-                    <div>
-                        <p class="eyebrow">Sample requests & responses</p>
-                        <h2>Drop-in payloads for your QA team.</h2>
-                    </div>
-                    <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
-                </header>
-                <div class="sample-card-stack">
-                    <article class="sample-card">
-                        <div class="sample-card-header">
-                            <div>
-                                <p class="label">Start a session</p>
-                                <strong>POST /api/marketing-assessment/start/</strong>
-                            </div>
-                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode1" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+        </section>
+
+        <section class="panel sample-panel">
+            <header class="panel-heading">
+                <div>
+                    <p class="eyebrow">Sample requests & responses</p>
+                    <h2>Drop-in payloads for your QA team.</h2>
+                </div>
+                <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
+            </header>
+            <div class="sample-flow">
+                <article class="sample-card is-start">
+                    <div class="sample-card-header">
+                        <div>
+                            <p class="label">Start a session</p>
+                            <strong>POST /api/marketing-assessment/start/</strong>
                         </div>
+                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode1" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                    </div>
 <pre><code id="sampleCode1">{
   "candidate_id": "cand-123"
 }
 → { "session_uuid": "uuid" }</code></pre>
-                    </article>
-                    <article class="sample-card">
-                        <div class="sample-card-header">
-                            <div>
-                                <p class="label">Fetch results</p>
-                                <strong>GET /api/marketing-assessment/cand-123/results/</strong>
-                            </div>
-                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode2" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                </article>
+                <article class="sample-card is-process">
+                    <div class="sample-card-header">
+                        <div>
+                            <p class="label">Fetch results</p>
+                            <strong>GET /api/marketing-assessment/cand-123/results/</strong>
                         </div>
+                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode2" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                    </div>
 <pre><code id="sampleCode2">{
   "overall_score": 82.5,
   "category_breakdown": {...},
   "recommendations": {...}
 }</code></pre>
-                    </article>
-                    <article class="sample-card">
-                        <div class="sample-card-header">
-                            <div>
-                                <p class="label">Submit responses</p>
-                                <strong>POST /api/marketing-assessment/cand-123/submit/</strong>
-                            </div>
-                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode3" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                </article>
+                <article class="sample-card is-complete">
+                    <div class="sample-card-header">
+                        <div>
+                            <p class="label">Submit responses</p>
+                            <strong>POST /api/marketing-assessment/cand-123/submit/</strong>
                         </div>
+                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode3" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                    </div>
 <pre><code id="sampleCode3">[
   {"question_id": 45, "answer": "B"},
   {"question_id": 52, "selected": "most"}
 ]
 → { "detail": "Assessment submitted", "session_uuid": "uuid" }</code></pre>
-                    </article>
-                </div>
-            </div>
+                </article>
             </div>
         </section>
 
