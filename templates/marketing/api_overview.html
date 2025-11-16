@@ -67,8 +67,8 @@
             </div>
         </section>
 
-        {% with samples=language_examples %}
-        <section class="panel language-panel">
+{% with samples=language_examples %}
+        <section class="panel language-info-panel">
             <div class="language-flex">
                 <div class="language-copy">
                     <p class="eyebrow">Language examples</p>
@@ -99,33 +99,40 @@
                         <li>Webhook callbacks notify you when candidates finish.</li>
                     </ul>
                 </div>
-                <div class="language-snippet" data-language-switcher>
-                    <div class="language-tabs" role="tablist">
-                        {% for sample in samples %}
-                        <button class="language-tab {% if forloop.first %}is-active{% endif %}" type="button" data-language-tab="{{ forloop.counter0 }}">
-                            <span class="language-token">{{ sample.title|slice:":1"|upper }}</span>
-                            <span>{{ sample.title }}</span>
-                        </button>
-                        {% endfor %}
-                    </div>
-                    <div class="language-card-stack">
-                        {% for sample in samples %}
-                        <article class="snippet-card language-card {% if forloop.first %}is-active{% endif %}" data-language-panel="{{ forloop.counter0 }}">
-                            <div class="snippet-header">
-                                <div>
-                                    <p class="label">Client library</p>
-                                    <strong>{{ sample.title }}</strong>
-                                </div>
-                                <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#languageSnippet{{ forloop.counter }}" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
-                            </div>
-                            <pre><code id="languageSnippet{{ forloop.counter }}">{{ sample.code }}</code></pre>
-                        </article>
-                        {% endfor %}
-                    </div>
-                </div>
             </div>
         </section>
-        {% endwith %}
+        <section class="panel language-code-panel" data-language-switcher>
+            <header class="panel-heading">
+                <div>
+                    <p class="eyebrow">Client libraries</p>
+                    <h2>Plug Sira into any stack.</h2>
+                </div>
+                <p class="lede">Pick your language to see a ready-to-copy snippet.</p>
+            </header>
+            <div class="language-tabs" role="tablist">
+                {% for sample in samples %}
+                <button class="language-tab {% if forloop.first %}is-active{% endif %}" type="button" data-language-tab="{{ forloop.counter0 }}">
+                    <span class="language-token">{{ sample.title|slice:":1"|upper }}</span>
+                    <span>{{ sample.title }}</span>
+                </button>
+                {% endfor %}
+            </div>
+            <div class="language-card-stack">
+                {% for sample in samples %}
+                <article class="snippet-card language-card {% if forloop.first %}is-active{% endif %}" data-language-panel="{{ forloop.counter0 }}">
+                    <div class="snippet-header">
+                        <div>
+                            <p class="label">Client library</p>
+                            <strong>{{ sample.title }}</strong>
+                        </div>
+                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#languageSnippet{{ forloop.counter }}" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                    </div>
+                    <pre><code id="languageSnippet{{ forloop.counter }}">{{ sample.code }}</code></pre>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+{% endwith %}
 
         <section class="panel integration-panel">
             <header class="panel-heading">
