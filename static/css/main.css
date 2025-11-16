@@ -2298,7 +2298,9 @@ main {
 .sample-card pre,
 .code-card pre {
     margin: 0;
-    overflow-x: auto;
+    overflow: visible;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 .snippet-header {
     display: flex;
