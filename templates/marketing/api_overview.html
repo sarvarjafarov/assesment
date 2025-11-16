@@ -175,15 +175,15 @@
         </section>
 
         <section class="panel sample-panel">
-            <header class="panel-heading">
-                <div>
+            <div class="sample-intro">
+                <div class="sample-copy">
                     <p class="eyebrow">Sample requests & responses</p>
                     <h2>Drop-in payloads for your QA team.</h2>
+                    <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
                 </div>
-                <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
-            </header>
-            <div class="sample-note">
-                <p>Pair these with our webhooks to keep ATS, CRM, and analytics tools in sync.</p>
+                <div class="sample-note">
+                    <p>Pair these with our webhooks to keep ATS, CRM, and analytics tools in sync.</p>
+                </div>
             </div>
             <div class="sample-flow">
                 <article class="sample-card is-start">
@@ -234,13 +234,21 @@
         </section>
 
         <section class="panel request-panel">
-            <header class="panel-heading">
-                <div>
+            <div class="request-intro">
+                <div class="request-copy">
                     <p class="eyebrow">Access request</p>
                     <h2>Request access</h2>
+                    <p class="lede">Need credentials? Tell us how you plan to use the API and we’ll send a token within one business day.</p>
                 </div>
-                <p class="lede">Need credentials? Tell us how you plan to use the API and we’ll send a token.</p>
-            </header>
+                <div class="request-note">
+                    <p class="label">What to include</p>
+                    <ul>
+                        <li>Describe your integration target (ATS, CRM, internal tooling).</li>
+                        <li>Share required assessment types or expected volume.</li>
+                        <li>List teammates who need read/write keys.</li>
+                    </ul>
+                </div>
+            </div>
             <form method="post" class="form-stack request-form">
                 {% csrf_token %}
                 <div class="form-row">
