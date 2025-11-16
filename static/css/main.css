@@ -907,7 +907,7 @@ main {
 .resource-card {
     border: 1px solid rgba(14, 20, 40, 0.08);
     border-radius: 28px;
-    padding: 1.5rem;
+    padding: 1.65rem;
     background: #fff;
     box-shadow: 0 30px 45px rgba(15, 26, 58, 0.08);
     position: relative;
@@ -915,6 +915,18 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.resource-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 35px 50px rgba(15, 26, 58, 0.12);
+}
+.resource-card header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
 }
 
 .card-meta {
@@ -948,8 +960,15 @@ main {
 }
 
 .resource-card h3 {
-    margin-top: 0;
+    margin: 0.25rem 0 0.25rem;
     font-size: 1.1rem;
+}
+.resource-card h3 a {
+    text-decoration: none;
+    color: var(--navy);
+}
+.resource-card h3 a:hover {
+    text-decoration: underline;
 }
 
 .resource-card p {
@@ -969,6 +988,7 @@ main {
     font-weight: 600;
     cursor: pointer;
     align-self: flex-start;
+    margin-top: 0.5rem;
 }
 
 .resource-card .card-shade {
@@ -1039,7 +1059,7 @@ main {
 }
 .testimonial-slider {
     position: relative;
-    min-height: 280px;
+    min-height: 260px;
 }
 .testimonial-panel {
     opacity: 0;
@@ -1054,22 +1074,24 @@ main {
     transform: translateY(0);
 }
 .testimonial-panel .person {
-    margin: 0.5rem 0 0.1rem;
+    margin: 0.65rem 0 0.1rem;
     font-weight: 600;
+    font-size: 1.05rem;
 }
 .testimonial-panel .role {
-    margin: 0;
+    margin: 0 0 0.8rem;
     color: var(--text-muted);
     font-size: 0.95rem;
 }
 .testimonial-avatar {
-    width: 80px;
-    margin: 0 auto 1rem;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 1.25rem;
 }
 .testimonial-avatar img,
 .avatar-placeholder {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    height: 100%;
     border-radius: 999px;
     object-fit: cover;
     display: inline-flex;
