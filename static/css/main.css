@@ -1427,6 +1427,12 @@ main {
     border: 1px solid rgba(14, 20, 40, 0.06);
     box-shadow: 0 20px 40px rgba(13, 18, 34, 0.05);
 }
+.panel-contained {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
 
 .panel header {
     display: flex;
