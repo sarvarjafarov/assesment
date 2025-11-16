@@ -83,7 +83,11 @@ class Migration(migrations.Migration):
             ],
             options={
                 "ordering": ("-created_at",),
-                "indexes": [models.Index(fields=["candidate_id"], name="pm_assessm_candida_idx")],
+                "indexes": [
+                    models.Index(
+                        fields=["candidate_id"], name="pm_assessme_candida_f66539_idx"
+                    )
+                ],
             },
         ),
     ]
