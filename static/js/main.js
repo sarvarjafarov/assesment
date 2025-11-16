@@ -85,4 +85,42 @@ document.addEventListener('DOMContentLoaded', () => {
             setTestimonial(next);
         }, 6000);
     }
+
+    const generateToken = () =>
+        `sk_live_${Math.random().toString(36).slice(2, 8)}${Math.random()
+            .toString(36)
+            .slice(2, 10)}`;
+
+    const tokenButtons = document.querySelectorAll(".token-generate");
+    tokenButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const targetSelector = button.dataset.tokenTarget;
+            const target = document.querySelector(targetSelector);
+            if (!target) {
+                return;
+            }
+            const token = generateToken();
+            target.textContent = `X-API-Key: ${token}`;
+            button.textContent = "New token generated";
+            setTimeout(() => (button.textContent = "Generate mock token"), 2000);
+        });
+    });
+
+    const copyButtons = document.querySelectorAll(".copy-trigger");
+    copyButtons.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const target = document.querySelector(btn.dataset.copyTarget);
+            if (!target) {
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(target.textContent.trim());
+                btn.textContent = "Copied!";
+                setTimeout(() => (btn.textContent = "Copy header"), 1500);
+            } catch (err) {
+                btn.textContent = "Press ⌘C / Ctrl+C";
+                setTimeout(() => (btn.textContent = "Copy header"), 2000);
+            }
+        });
+    });
 });

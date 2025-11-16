@@ -31,7 +31,7 @@
             <p class="lede">Behavioral, digital marketing, and future role modules run through one secure REST API.</p>
         </section>
 
-        <section class="panel">
+        <section class="panel endpoint-panel">
             <div class="section-heading align-left">
                 <h2>REST endpoints</h2>
                 <p class="lede">Call these endpoints with your <code>X-API-Key</code> header.</p>
@@ -39,15 +39,32 @@
             <div class="api-endpoints">
                 {% for endpoint in rest_endpoints %}
                 <article class="endpoint-card">
-                    <span class="method">{{ endpoint.method }}</span>
-                    <code>{{ endpoint.path }}</code>
+                    <div class="method">{{ endpoint.method }}</div>
+                    <div class="path">{{ endpoint.path }}</div>
                     <p>{{ endpoint.description }}</p>
                 </article>
                 {% endfor %}
             </div>
         </section>
 
-        <section class="panel">
+        <section class="panel token-panel">
+            <div class="section-heading align-left">
+                <h2>Authentication & tokens</h2>
+                <p class="lede">Use the API key we issue per workspace. Rotate tokens anytime.</p>
+            </div>
+            <div class="token-card">
+                <div>
+                    <p class="label">Example header</p>
+                    <pre><code id="tokenSample">X-API-Key: sk_live_a1b2c3d4e5f6</code></pre>
+                </div>
+                <div class="token-actions">
+                    <button class="btn btn-pill secondary token-generate" type="button" data-token-target="#tokenSample">Generate mock token</button>
+                    <button class="btn btn-pill copy-trigger" type="button" data-copy-target="#tokenSample">Copy header</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel language-panel">
             <div class="section-heading align-left">
                 <h2>Language examples</h2>
                 <p class="lede">Drop these snippets into your favorite language or workflow.</p>
@@ -63,17 +80,18 @@
         </section>
 
         <section class="panel integration-grid">
-            <div>
+            <div class="stack-card">
                 <h2>Stacks we support</h2>
+                <p class="lede">Embed Sira into any workflow or automation platform.</p>
                 <ul>
-                    <li>Python (requests, Django, FastAPI)</li>
-                    <li>Node.js (fetch, Axios, Nest)</li>
-                    <li>Ruby, Go, Java</li>
-                    <li>Zapier, Make.com, Workato</li>
-                    <li>ATS partners: Lever, Greenhouse, Ashby</li>
+                    <li><span>Python</span> (requests, Django, FastAPI)</li>
+                    <li><span>Node.js</span> (fetch, Axios, Nest)</li>
+                    <li><span>Ruby, Go, Java</span> and more</li>
+                    <li><span>Automation</span> Zapier, Make, Workato</li>
+                    <li><span>ATS partners</span> Lever, Greenhouse, Ashby</li>
                 </ul>
             </div>
-            <div>
+            <div class="sample-code">
                 <h2>Sample requests & responses</h2>
                 <div class="code-card">
 <pre><code>POST /api/marketing-assessment/start/
@@ -90,6 +108,14 @@
   "recommendations": {...}
 }</code></pre>
                 </div>
+                <div class="code-card">
+<pre><code>POST /api/marketing-assessment/cand-123/submit/
+[
+  {"question_id": 45, "answer": "B"},
+  {"question_id": 52, "selected": "most"}
+]
+→ { "detail": "Assessment submitted", "session_uuid": "uuid" }</code></pre>
+                </div>
             </div>
         </section>
 
@@ -98,17 +124,31 @@
                 <h2>Request access</h2>
                 <p class="lede">Need credentials? Tell us how you plan to use the API and we’ll send a token.</p>
             </div>
-            <form method="post" class="form-stack">
+            <form method="post" class="form-stack request-form">
                 {% csrf_token %}
-                {% for field in form %}
+                <div class="form-row">
+                    <div class="form-field">
+                        {{ form.company_name.label_tag }}
+                        {{ form.company_name }}
+                        {% for error in form.company_name.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        {{ form.contact_email.label_tag }}
+                        {{ form.contact_email }}
+                        {% for error in form.contact_email.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
                 <div class="form-field">
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% for error in field.errors %}
+                    {{ form.use_case.label_tag }}
+                    {{ form.use_case }}
+                    {% for error in form.use_case.errors %}
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                {% endfor %}
                 <button class="btn btn-pill" type="submit">Submit request</button>
             </form>
         </section>

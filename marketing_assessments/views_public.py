@@ -61,6 +61,10 @@ def api_overview(request):
                     "title": "cURL",
                     "code": "curl -H 'X-API-Key: <token>' https://your-domain/api/assessments/sessions/<uuid>/responses/",
                 },
+                {
+                    "title": "Ruby Net::HTTP",
+                    "code": "require 'net/http'\\nuri = URI('https://your-domain/api/marketing-assessment/cand-123/results/')\\nreq = Net::HTTP::Get.new(uri)\\nreq['X-API-Key'] = token\\nres = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }",
+                },
             ],
             "form": form,
         },
