@@ -2584,8 +2584,7 @@ main {
     background: #fff5ec;
     position: relative;
     overflow: hidden;
-    padding: 2rem;
-    padding-bottom: 2.5rem;
+    padding: 2rem 2.25rem 2.5rem;
 }
 .sample-panel::after {
     content: "";
@@ -2607,7 +2606,7 @@ main {
     align-items: flex-start;
     gap: 2rem;
     flex-wrap: wrap;
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.25rem;
 }
 .sample-copy {
     max-width: 560px;
@@ -2631,6 +2630,7 @@ main {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.25rem;
     width: 100%;
+    margin-top: 1rem;
 }
 .sample-card {
     position: relative;
@@ -2947,7 +2947,7 @@ main {
 }
 .request-panel {
     background: #f5f7ff;
-    padding: 2rem;
+    padding: 2rem 2.25rem;
 }
 .request-form {
     display: flex;
