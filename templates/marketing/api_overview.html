@@ -79,25 +79,35 @@
                         <span class="language-pill">{{ sample.title }}</span>
                         {% endfor %}
                     </div>
-                    <div class="language-stats">
-                        <article>
-                            <strong>{{ language_examples|length }}</strong>
-                            <span>Ready-made snippets</span>
-                        </article>
-                        <article>
-                            <strong>120&nbsp;ms</strong>
-                            <span>Avg API latency</span>
-                        </article>
-                        <article>
-                            <strong>99.9%</strong>
-                            <span>Uptime SLA</span>
-                        </article>
-                    </div>
                     <ul class="language-highlights">
                         <li>Single API key powers behavioral & digital marketing modules.</li>
                         <li>Safe retries + idempotency tokens keep submissions intact.</li>
                         <li>Webhook callbacks notify you when candidates finish.</li>
                     </ul>
+                </div>
+                <div class="language-aside">
+                    <div class="language-aside-card">
+                        <p class="label">Reliability snapshot</p>
+                        <div class="language-stats">
+                            <article>
+                                <strong>{{ language_examples|length }}</strong>
+                                <span>Ready-made snippets</span>
+                            </article>
+                            <article>
+                                <strong>120&nbsp;ms</strong>
+                                <span>Avg API latency</span>
+                            </article>
+                            <article>
+                                <strong>99.9%</strong>
+                                <span>Uptime SLA</span>
+                            </article>
+                        </div>
+                        <ul class="language-aside-list">
+                            <li>Webhook retry strategy with exponential backoff.</li>
+                            <li>Idempotency safeguards prevent duplicate sessions.</li>
+                            <li>Role-scoped keys so each workspace stays isolated.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
@@ -135,14 +145,15 @@
 {% endwith %}
 
         <section class="panel integration-panel stacks-panel">
-            <header class="panel-heading">
+            <div class="stacks-grid">
                 <div>
-                    <p class="eyebrow">Integrations</p>
-                    <h2>Stacks & sample payloads</h2>
+                    <header>
+                        <p class="eyebrow">Integrations</p>
+                        <h2>Stacks & sample payloads</h2>
+                        <p class="lede">Use our REST interface across any stack, or drop these request/response samples to speed up QA.</p>
+                    </header>
                 </div>
-                <p class="lede">Use our REST interface across any stack, or drop these request/response samples to speed up QA.</p>
-            </header>
-            <div class="stack-card">
+                <div class="stack-card">
                 <h2>Stacks we support</h2>
                 <p class="lede">Embed Sira into any workflow or automation platform.</p>
                 <ul>
@@ -153,18 +164,31 @@
                     <li><span>ATS partners</span> Lever, Greenhouse, Ashby</li>
                 </ul>
             </div>
+            <div class="stacks-note">
+                <p class="label">How teams use this</p>
+                <ul>
+                    <li>ATS sync: auto-create candidate entries when a new session starts.</li>
+                    <li>Workflow automations: route high-scorers into Calendly/HubSpot.</li>
+                    <li>Custom dashboards: pull JSON payloads into BI tools for reporting.</li>
+                </ul>
+            </div>
+            </div>
         </section>
 
         <section class="panel sample-panel">
-            <header class="panel-heading">
+            <div class="sample-header">
                 <div>
                     <p class="eyebrow">Sample requests & responses</p>
                     <h2>Drop-in payloads for your QA team.</h2>
+                    <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
                 </div>
-                <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
-            </header>
+                <div class="sample-note">
+                    <p>Pair these with our webhooks to keep ATS, CRM, and analytics tools in sync.</p>
+                </div>
+            </div>
             <div class="sample-flow">
                 <article class="sample-card is-start">
+                    <span class="step-badge">01</span>
                     <div class="sample-card-header">
                         <div>
                             <p class="label">Start a session</p>
@@ -174,10 +198,11 @@
                     </div>
 <pre><code id="sampleCode1">{
   "candidate_id": "cand-123"
-}
+} 
 → { "session_uuid": "uuid" }</code></pre>
                 </article>
                 <article class="sample-card is-process">
+                    <span class="step-badge">02</span>
                     <div class="sample-card-header">
                         <div>
                             <p class="label">Fetch results</p>
@@ -192,6 +217,7 @@
 }</code></pre>
                 </article>
                 <article class="sample-card is-complete">
+                    <span class="step-badge">03</span>
                     <div class="sample-card-header">
                         <div>
                             <p class="label">Submit responses</p>
