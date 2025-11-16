@@ -2331,16 +2331,6 @@ main {
 .language-code-panel .panel-heading .lede {
     color: rgba(248, 248, 255, 0.7);
 }
-.language-card-stack {
-    position: relative;
-    min-height: 220px;
-}
-.language-card {
-    display: none;
-}
-.language-card.is-active {
-    display: block;
-}
 .language-code-panel .language-tab {
     background: rgba(248, 248, 255, 0.08);
     color: #f8f8ff;
@@ -2423,6 +2413,16 @@ main {
 .sample-card code {
     display: block;
     animation: codePulse 6s ease-in-out infinite;
+}
+.language-card-stack {
+    position: relative;
+    min-height: 220px;
+}
+.language-code-panel .language-card {
+    display: none;
+}
+.language-code-panel .language-card.is-active {
+    display: flex;
 }
 @keyframes codeGlow {
     0% {
