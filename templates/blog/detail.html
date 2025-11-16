@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load humanize %}
+{% load humanize static %}
 {% block title %}{{ post.meta_title|default:post.title }} · Sira{% endblock %}
 {% block meta_description %}{{ post.meta_description|default:post.excerpt }}{% endblock %}
 {% block extra_meta %}
@@ -7,6 +7,27 @@
     {% if post.meta_image %}<meta property="og:image" content="{{ post.meta_image }}">{% endif %}
 {% endblock %}
 {% block content %}
+<div class="page-shell">
+    <header class="site-header">
+        <nav class="nav">
+            <div class="brand">
+                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
+                <span>Sira</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'pages:home' %}#products">Products</a></li>
+                <li><a href="{% url 'pages:home' %}#industries">Industries</a></li>
+                <li><a class="is-active" href="{% url 'blog:list' %}">Blog</a></li>
+                <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a class="btn btn-outline small" href="{% url 'console:login' %}">Customer Login</a>
+                <a class="btn btn-pill" href="{% url 'pages:home' %}#cta">Book a Demo</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
 <div class="blog-shell blog-shell-detail">
     <header class="hero-card detail-hero">
         <div class="hero-copy">
@@ -36,13 +57,13 @@
             <h2>Keep reading</h2>
             <p class="lede">More ideas from teams building with Sira.</p>
         </div>
-        <div class="blog-grid">
+        <div class="blog-grid compact-grid">
             {% for related in recent_posts %}
-            <article class="blog-card">
-                <header>
+            <article class="blog-card compact">
+                <div class="meta-row">
                     <span class="pill {{ related.pill_style }}">{{ related.pill_label }}</span>
                     <span class="date">{{ related.published_at|date:"M j, Y" }}</span>
-                </header>
+                </div>
                 <h3><a href="{{ related.get_absolute_url }}">{{ related.title }}</a></h3>
                 <p>{{ related.excerpt }}</p>
                 <div class="author">By {{ related.display_author }}</div>
@@ -52,5 +73,17 @@
         </div>
     </section>
     {% endif %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div>© {% now "Y" %} Sira</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Resources</a>
+        </div>
+        <div>Made with <span>♥</span> by Sira</div>
+    </footer>
 </div>
 {% endblock %}

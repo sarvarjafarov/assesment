@@ -1,9 +1,30 @@
 {% extends 'base.html' %}
-{% load humanize %}
+{% load humanize static %}
 {% block title %}Insights & Resources · Sira{% endblock %}
 {% block meta_description %}Browse the latest Sira product updates, hiring playbooks, and behavioral interviewing tips.{% endblock %}
 {% block content %}
-<div class="blog-shell">
+<div class="page-shell">
+    <header class="site-header">
+        <nav class="nav">
+            <div class="brand">
+                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
+                <span>Sira</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'pages:home' %}#products">Products</a></li>
+                <li><a href="{% url 'pages:home' %}#industries">Industries</a></li>
+                <li><a class="is-active" href="{% url 'blog:list' %}">Blog</a></li>
+                <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a class="btn btn-outline small" href="{% url 'console:login' %}">Customer Login</a>
+                <a class="btn btn-pill" href="{% url 'pages:home' %}#cta">Book a Demo</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="blog-shell">
     <section class="hero-card">
         <div class="hero-copy">
             <p class="eyebrow">Insights</p>
@@ -53,5 +74,17 @@
         <a class="btn btn-pill secondary" href="?page={{ page_obj.next_page_number }}">Load more</a>
     </div>
     {% endif %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div>© {% now "Y" %} Sira</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Resources</a>
+        </div>
+        <div>Made with <span>♥</span> by Sira</div>
+    </footer>
 </div>
 {% endblock %}
