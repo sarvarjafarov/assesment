@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel response-panel question-step">
+        <div class="question-progress">
+            <div class="progress-meta">
+                <span class="status-chip"><span class="chip-dot"></span>Product management assessment</span>
+                <div class="progress-count">
+                    <span class="progress-step">Step {{ step_number }}</span>
+                    <span class="progress-total">of {{ total_steps }}</span>
+                </div>
+            </div>
+            <div class="progress-meter">
+                <div class="progress-bar">
+                    <span style="width: {{ progress_percent }}%"></span>
+                </div>
+                <p class="progress-percent">{{ progress_percent }}% complete</p>
+                {% if remaining_minutes %}
+                <p class="timer">Time left: {{ remaining_minutes }} min</p>
+                {% endif %}
+            </div>
+        </div>
+        <form method="post" class="question-form">
+            {% csrf_token %}
+            <div class="question-card">
+                <p class="eyebrow">{{ question.get_category_display }}</p>
+                <h2>{{ question.question_text }}</h2>
+                {% if question.explanation %}
+                <p class="help-text">{{ question.explanation }}</p>
+                {% endif %}
+                <div class="question-input">
+                    {% if question.question_type == 'ranking' %}
+                    <p class="help-text">Arrange the following items before submitting your final order:</p>
+                    <ol class="ranking-items">
+                        {% for item in form.ranking_items %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ol>
+                    {% elif question.question_type == 'behavioral_most' %}
+                    <p class="help-text">Select the statement that is most like you.</p>
+                    {% elif question.question_type == 'behavioral_least' %}
+                    <p class="help-text">Select the statement that is least like you.</p>
+                    {% endif %}
+                    {% for field in form %}
+                        {{ field }}
+                        {% for error in field.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-pill">
+                {% if step_number == total_steps %}Submit assessment{% else %}Save & Continue{% endif %}
+            </button>
+        </form>
+    </section>
+</div>
+{% endblock %}

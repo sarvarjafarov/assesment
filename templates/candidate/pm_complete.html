@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel response-panel">
+        <div class="complete-state">
+            <p class="eyebrow">Product management assessment</p>
+            <h1>Thanks for completing the task.</h1>
+            <p>The recruiting team now has everything they need to review your responses.</p>
+            {% if elapsed_minutes %}
+            <p class="meta">Submitted in {{ elapsed_minutes }} minutes.</p>
+            {% endif %}
+            <a class="btn btn-pill" href="{{ request.GET.return or '/' }}">Return to Sira</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

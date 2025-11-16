@@ -1,6 +1,7 @@
 from django.urls import path
 
 from marketing_assessments import views_candidate as marketing_views
+from pm_assessments import views_candidate as pm_views
 
 from . import views
 
@@ -36,5 +37,20 @@ urlpatterns = [
         "marketing/<uuid:session_uuid>/expired/",
         marketing_views.MarketingAssessmentExpiredView.as_view(),
         name="marketing-expired",
+    ),
+    path(
+        "pm/<uuid:session_uuid>/",
+        pm_views.ProductAssessmentView.as_view(),
+        name="pm-session",
+    ),
+    path(
+        "pm/<uuid:session_uuid>/complete/",
+        pm_views.ProductAssessmentCompleteView.as_view(),
+        name="pm-complete",
+    ),
+    path(
+        "pm/<uuid:session_uuid>/expired/",
+        pm_views.ProductAssessmentExpiredView.as_view(),
+        name="pm-expired",
     ),
 ]
