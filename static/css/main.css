@@ -2214,7 +2214,24 @@ main {
     color: var(--text-muted);
 }
 .language-panel {
-    background: #f5f7ff;
+    background: linear-gradient(135deg, #f5f7ff 0%, #eef2ff 40%, #fff 100%);
+    position: relative;
+    overflow: hidden;
+}
+.language-panel::after {
+    content: "";
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 138, 0, 0.35), rgba(255, 138, 0, 0));
+    top: -120px;
+    right: -60px;
+    filter: blur(10px);
+    pointer-events: none;
+}
+.language-panel > * {
+    position: relative;
 }
 .language-flex {
     display: grid;
@@ -2352,6 +2369,12 @@ main {
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
 }
+.snippet-card code,
+.mini-snippet code,
+.sample-card code {
+    display: block;
+    animation: codePulse 6s ease-in-out infinite;
+}
 @keyframes codeGlow {
     0% {
         background-position: 0% 50%;
@@ -2361,6 +2384,20 @@ main {
     }
     100% {
         background-position: 0% 50%;
+    }
+}
+@keyframes codePulse {
+    0% {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.12);
+        opacity: 0.95;
+    }
+    50% {
+        text-shadow: 0 0 28px rgba(255, 138, 0, 0.35);
+        opacity: 1;
+    }
+    100% {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.12);
+        opacity: 0.95;
     }
 }
 .integration-panel {
