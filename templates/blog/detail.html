@@ -7,21 +7,24 @@
     {% if post.meta_image %}<meta property="og:image" content="{{ post.meta_image }}">{% endif %}
 {% endblock %}
 {% block content %}
-<div class="page-shell blog-shell">
-    <article class="blog-article">
-        <div class="breadcrumb">
-            <a href="{% url 'blog:list' %}">← All articles</a>
+<div class="blog-shell blog-shell-detail">
+    <header class="hero-card detail-hero">
+        <div class="hero-copy">
+            <div class="breadcrumb">
+                <a href="{% url 'blog:list' %}">← All articles</a>
+            </div>
+            <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
+            <h1>{{ post.title }}</h1>
+            <p class="meta">Published {{ post.published_at|date:"F j, Y" }} · {{ post.display_author }}</p>
         </div>
-        <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
-        <h1>{{ post.title }}</h1>
-        <p class="meta">
-            Published {{ post.published_at|date:"F j, Y" }} · {{ post.display_author }}
-        </p>
         {% if post.hero_image %}
         <figure class="article-hero">
             <img src="{{ post.hero_image }}" alt="{{ post.title }}">
         </figure>
         {% endif %}
+    </header>
+
+    <article class="blog-article">
         <div class="article-body">
             {{ post.body|linebreaks }}
         </div>
@@ -29,18 +32,21 @@
 
     {% if recent_posts %}
     <section class="blog-related">
-        <h2>Keep reading</h2>
-        <div class="resource-grid">
+        <div class="section-heading align-left">
+            <h2>Keep reading</h2>
+            <p class="lede">More ideas from teams building with Sira.</p>
+        </div>
+        <div class="blog-grid">
             {% for related in recent_posts %}
-            <article class="resource-card compact">
+            <article class="blog-card">
                 <header>
                     <span class="pill {{ related.pill_style }}">{{ related.pill_label }}</span>
                     <span class="date">{{ related.published_at|date:"M j, Y" }}</span>
                 </header>
                 <h3><a href="{{ related.get_absolute_url }}">{{ related.title }}</a></h3>
                 <p>{{ related.excerpt }}</p>
+                <div class="author">By {{ related.display_author }}</div>
                 <a class="outline-link" href="{{ related.get_absolute_url }}">Read</a>
-                <div class="card-shade"></div>
             </article>
             {% endfor %}
         </div>

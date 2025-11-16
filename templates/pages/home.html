@@ -261,30 +261,42 @@
         </section>
 
         <section class="testimonial">
-            <div class="testimonial-card">
-                <div class="testimonial-slider">
-                    {% for testimonial in testimonials %}
-                    <article
-                        class="testimonial-panel {% if forloop.first %}is-active{% endif %}"
-                        data-testimonial-panel="{{ forloop.counter0 }}"
-                    >
-                        <div class="testimonial-avatar">
-                            <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
-                        </div>
-                        <p class="person">{{ testimonial.name }}</p>
-                        <p class="role">{{ testimonial.role }}</p>
-                        <blockquote>“{{ testimonial.quote }}”</blockquote>
-                    </article>
-                    {% endfor %}
+            <div class="testimonial-grid">
+                <div class="testimonial-copy">
+                    <p class="eyebrow">Customer stories</p>
+                    <h2>Makings teams faster from kickoff to offer.</h2>
+                    <p class="lede">Talent leaders use Sira to coordinate reviewers, surface the right candidates, and keep candidates confident at every step.</p>
+                    <ul class="testimonial-points">
+                        <li>Shared console for recruiters, hiring managers, and interviewers.</li>
+                        <li>Automated nudges keep candidates and reviewers aligned.</li>
+                        <li>Behavioral insights make debriefs decisive.</li>
+                    </ul>
                 </div>
-                <div class="dots">
-                    {% for testimonial in testimonials %}
-                    <button
-                        class="{% if forloop.first %}is-active{% endif %}"
-                        data-testimonial-button="{{ forloop.counter0 }}"
-                        aria-label="View testimonial {{ forloop.counter }}"
-                    ></button>
-                    {% endfor %}
+                <div class="testimonial-card">
+                    <div class="testimonial-slider">
+                        {% for testimonial in testimonials %}
+                        <article
+                            class="testimonial-panel {% if forloop.first %}is-active{% endif %}"
+                            data-testimonial-panel="{{ forloop.counter0 }}"
+                        >
+                            <div class="testimonial-avatar">
+                                <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
+                            </div>
+                            <p class="person">{{ testimonial.name }}</p>
+                            <p class="role">{{ testimonial.role }}</p>
+                            <blockquote>“{{ testimonial.quote }}”</blockquote>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    <div class="dots">
+                        {% for testimonial in testimonials %}
+                        <button
+                            class="{% if forloop.first %}is-active{% endif %}"
+                            data-testimonial-button="{{ forloop.counter0 }}"
+                            aria-label="View testimonial {{ forloop.counter }}"
+                        ></button>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </section>
