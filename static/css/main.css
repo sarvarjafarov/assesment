@@ -1109,7 +1109,7 @@ main {
     font-size: 1.15rem;
     color: #2c2f44;
     font-weight: 500;
-    margin: 0 auto 1.5rem;
+    margin: -14px auto 1.5rem;
     max-width: 520px;
     line-height: 1.2;
 }
