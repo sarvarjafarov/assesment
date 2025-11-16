@@ -233,13 +233,12 @@
         </section>
 
         <section class="resources" id="blog">
-            <div class="section-heading">
+            <div class="section-heading section-heading-tight">
                 <p class="eyebrow">Resources &amp; Insights</p>
                 <h2>Stay informed with the latest HR trends</h2>
                 <p class="lede">
                     Compliance updates and best practices from our expert team.
                 </p>
-                <a class="btn btn-pill secondary" href="{% url 'blog:list' %}">View All Articles</a>
             </div>
             <div class="resource-grid">
                 {% for article in articles %}
@@ -257,6 +256,9 @@
                 {% empty %}
                 <p class="empty-state">Fresh resources are coming soon.</p>
                 {% endfor %}
+            </div>
+            <div class="blog-load-more">
+                <a class="btn btn-pill secondary" href="{% url 'blog:list' %}">View All Articles</a>
             </div>
         </section>
 
