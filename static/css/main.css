@@ -1434,6 +1434,9 @@ main {
     width: 100%;
     margin-bottom: 1.75rem;
 }
+.section-tight {
+    margin-bottom: 1.25rem;
+}
 
 .panel header {
     display: flex;
