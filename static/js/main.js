@@ -108,6 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const copyButtons = document.querySelectorAll(".copy-trigger");
     copyButtons.forEach((btn) => {
+        const defaultLabel = btn.dataset.copyLabel || btn.textContent.trim();
+        const successLabel = btn.dataset.copySuccess || "Copied!";
+        const fallbackLabel = btn.dataset.copyFallback || "Press ⌘C / Ctrl+C";
+        btn.dataset.copyLabel = defaultLabel;
+        btn.dataset.copySuccess = successLabel;
+        btn.dataset.copyFallback = fallbackLabel;
         btn.addEventListener("click", async () => {
             const target = document.querySelector(btn.dataset.copyTarget);
             if (!target) {
@@ -115,12 +121,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             try {
                 await navigator.clipboard.writeText(target.textContent.trim());
-                btn.textContent = "Copied!";
-                setTimeout(() => (btn.textContent = "Copy header"), 1500);
+                btn.textContent = successLabel;
+                setTimeout(() => (btn.textContent = defaultLabel), 1500);
             } catch (err) {
-                btn.textContent = "Press ⌘C / Ctrl+C";
-                setTimeout(() => (btn.textContent = "Copy header"), 2000);
+                btn.textContent = fallbackLabel;
+                setTimeout(() => (btn.textContent = defaultLabel), 2000);
             }
+        });
+    });
+
+    const languageSwitchers = document.querySelectorAll("[data-language-switcher]");
+    languageSwitchers.forEach((switcher) => {
+        const tabs = switcher.querySelectorAll("[data-language-tab]");
+        const panels = switcher.querySelectorAll("[data-language-panel]");
+        if (!tabs.length || !panels.length) {
+            return;
+        }
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const targetKey = tab.dataset.languageTab;
+                tabs.forEach((btn) => btn.classList.toggle("is-active", btn === tab));
+                panels.forEach((panel) => {
+                    panel.classList.toggle(
+                        "is-active",
+                        panel.dataset.languagePanel === targetKey
+                    );
+                });
+            });
         });
     });
 });
