@@ -2578,7 +2578,22 @@ main {
     background: #fff5ec;
     position: relative;
     overflow: hidden;
+    padding: 2rem;
     padding-bottom: 2.5rem;
+}
+.sample-panel::after {
+    content: "";
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(255, 138, 0, 0.25), rgba(255, 138, 0, 0));
+    border-radius: 50%;
+    top: -120px;
+    right: -80px;
+    pointer-events: none;
+}
+.sample-panel > * {
+    position: relative;
 }
 .sample-intro {
     display: flex;
@@ -2586,31 +2601,37 @@ main {
     align-items: flex-start;
     gap: 2rem;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
 }
 .sample-copy {
-    max-width: 580px;
+    max-width: 560px;
 }
 .sample-note {
     flex: 1;
     min-width: 240px;
-    color: rgba(15, 23, 42, 0.75);
+    color: rgba(15, 23, 42, 0.85);
     font-size: 0.95rem;
-    background: rgba(255, 255, 255, 0.8);
+    background: #fff;
     padding: 1.1rem 1.4rem;
     border-radius: 18px;
-    box-shadow: 0 20px 40px rgba(14, 20, 40, 0.08);
+    box-shadow: 0 30px 55px rgba(14, 20, 40, 0.15);
+    border: 1px solid rgba(14, 20, 40, 0.05);
+}
+.sample-note p {
+    margin: 0;
 }
 .sample-flow {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.25rem;
+    width: 100%;
 }
 .sample-card {
     position: relative;
     min-height: 280px;
     padding-top: 1.75rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .sample-card:hover {
     transform: translateY(-6px);
@@ -2919,7 +2940,8 @@ main {
     gap: 1rem;
 }
 .request-panel {
-    background: #fffefd;
+    background: #f5f7ff;
+    padding: 2rem;
 }
 .request-form {
     display: flex;
