@@ -67,23 +67,65 @@
             </div>
         </section>
 
+        {% with primary=language_examples|first %}
         <section class="panel language-panel">
-            <header class="panel-heading">
-                <div>
+            <div class="language-flex">
+                <div class="language-copy">
                     <p class="eyebrow">Language examples</p>
-                    <h2>Language examples</h2>
+                    <h2>Built for any stack and ready in minutes.</h2>
+                    <p class="lede">Use the snippets below to launch assessments directly from your product, workflow tools, or ATS.</p>
+                    <div class="language-pill-row">
+                        {% for sample in language_examples %}
+                        <span class="language-pill">{{ sample.title }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="language-stats">
+                        <article>
+                            <strong>{{ language_examples|length }}</strong>
+                            <span>Ready-made snippets</span>
+                        </article>
+                        <article>
+                            <strong>120&nbsp;ms</strong>
+                            <span>Avg API latency</span>
+                        </article>
+                        <article>
+                            <strong>99.9%</strong>
+                            <span>Uptime SLA</span>
+                        </article>
+                    </div>
+                    <ul class="language-highlights">
+                        <li>Single API key powers behavioral & digital marketing modules.</li>
+                        <li>Safe retries + idempotency tokens keep submissions intact.</li>
+                        <li>Webhook callbacks notify you when candidates finish.</li>
+                    </ul>
                 </div>
-                <p class="lede">Drop these snippets into your favorite language or workflow.</p>
-            </header>
-            <div class="code-grid">
-                {% for sample in language_examples %}
-                <article class="code-card">
-                    <p class="label">{{ sample.title }}</p>
-                    <pre><code>{{ sample.code }}</code></pre>
-                </article>
-                {% endfor %}
+                {% if primary %}
+                <div class="language-snippet">
+                    <div class="snippet-card">
+                        <div class="snippet-header">
+                            <div>
+                                <p class="label">Example</p>
+                                <strong>{{ primary.title }}</strong>
+                            </div>
+                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#primarySnippet">Copy</button>
+                        </div>
+                        <pre><code id="primarySnippet">{{ primary.code }}</code></pre>
+                    </div>
+                    {% if language_examples|length > 1 %}
+                    <div class="snippet-tiles">
+                        {% for sample in language_examples|slice:"1:4" %}
+                        <article class="mini-snippet">
+                            <p class="label">{{ sample.title }}</p>
+                            <pre><code>{{ sample.code }}</code></pre>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
         </section>
+        {% endwith %}
 
         <section class="panel integration-panel">
             <header class="panel-heading">
@@ -106,29 +148,55 @@
                 </ul>
             </div>
             <div class="sample-code">
-                <h2>Sample requests & responses</h2>
-                <div class="code-card">
-<pre><code>POST /api/marketing-assessment/start/
-{
+                <header class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Sample requests & responses</p>
+                        <h2>Drop-in payloads for your QA team.</h2>
+                    </div>
+                    <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
+                </header>
+                <div class="sample-card-stack">
+                    <article class="sample-card">
+                        <div class="sample-card-header">
+                            <div>
+                                <p class="label">Start a session</p>
+                                <strong>POST /api/marketing-assessment/start/</strong>
+                            </div>
+                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode1">Copy</button>
+                        </div>
+<pre><code id="sampleCode1">{
   "candidate_id": "cand-123"
 }
 → { "session_uuid": "uuid" }</code></pre>
-                </div>
-                <div class="code-card">
-<pre><code>GET /api/marketing-assessment/cand-123/results/
-{
+                    </article>
+                    <article class="sample-card">
+                        <div class="sample-card-header">
+                            <div>
+                                <p class="label">Fetch results</p>
+                                <strong>GET /api/marketing-assessment/cand-123/results/</strong>
+                            </div>
+                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode2">Copy</button>
+                        </div>
+<pre><code id="sampleCode2">{
   "overall_score": 82.5,
   "category_breakdown": {...},
   "recommendations": {...}
 }</code></pre>
-                </div>
-                <div class="code-card">
-<pre><code>POST /api/marketing-assessment/cand-123/submit/
-[
+                    </article>
+                    <article class="sample-card">
+                        <div class="sample-card-header">
+                            <div>
+                                <p class="label">Submit responses</p>
+                                <strong>POST /api/marketing-assessment/cand-123/submit/</strong>
+                            </div>
+                            <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode3">Copy</button>
+                        </div>
+<pre><code id="sampleCode3">[
   {"question_id": 45, "answer": "B"},
   {"question_id": 52, "selected": "most"}
 ]
 → { "detail": "Assessment submitted", "session_uuid": "uuid" }</code></pre>
+                    </article>
                 </div>
             </div>
             </div>
