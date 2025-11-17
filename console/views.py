@@ -35,6 +35,8 @@ from assessments.services import send_invite_email
 from blog.models import BlogPost
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from marketing_assessments.services import generate_question_set
+from pm_assessments.models import ProductAssessmentSession
+from .forms import ProductAssessmentInviteForm
 from .forms import (
     AssessmentForm,
     BlogPostForm,
@@ -298,6 +300,49 @@ class MarketingAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, Det
         context = super().get_context_data(**kwargs)
         share_link = self.request.build_absolute_uri(
             reverse("candidate:marketing-session", args=[self.object.uuid])
+        )
+        context["share_link"] = share_link
+        return context
+
+
+class ProductAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+    model = ProductAssessmentSession
+    template_name = "console/pm/list.html"
+    context_object_name = "sessions"
+    section = "pm"
+    paginate_by = 25
+
+    def get_queryset(self):
+        return ProductAssessmentSession.objects.order_by("-created_at")
+
+
+class ProductAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
+    template_name = "console/pm/form.html"
+    form_class = ProductAssessmentInviteForm
+    section = "pm"
+
+    def form_valid(self, form):
+        session = form.save()
+        messages.success(
+            self.request,
+            "Assessment ready. Share the candidate link below.",
+        )
+        self.success_url = reverse("console:pm-detail", args=[session.uuid])
+        return super().form_valid(form)
+
+
+class ProductAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
+    model = ProductAssessmentSession
+    template_name = "console/pm/detail.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    context_object_name = "session_obj"
+    section = "pm"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        share_link = self.request.build_absolute_uri(
+            reverse("candidate:pm-session", args=[self.object.uuid])
         )
         context["share_link"] = share_link
         return context

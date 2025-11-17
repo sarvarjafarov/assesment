@@ -16,6 +16,8 @@ from assessments.services import invite_candidate
 from blog.models import BlogPost
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from marketing_assessments.services import generate_question_set
+from pm_assessments.models import ProductAssessmentSession
+from pm_assessments.services import generate_question_set as generate_pm_question_set
 
 
 def _comma_separated(value: str) -> list[str]:
@@ -435,4 +437,27 @@ class MarketingAssessmentInviteForm(forms.Form):
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.save(update_fields=["question_set", "status", "duration_minutes", "started_at"])
+        return session
+
+
+class ProductAssessmentInviteForm(forms.Form):
+    candidate_identifier = forms.CharField(
+        label="Candidate identifier (email or ID)",
+        help_text="Used to generate the PM assessment link.",
+    )
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 3}))
+    duration_minutes = forms.IntegerField(label="Duration (minutes)", initial=30, min_value=5)
+
+    def save(self) -> ProductAssessmentSession:
+        candidate_id = self.cleaned_data["candidate_identifier"]
+        session, _ = ProductAssessmentSession.objects.get_or_create(
+            candidate_id=candidate_id, defaults={"status": "draft"}
+        )
+        session.question_set = generate_pm_question_set()
+        session.status = "in_progress"
+        session.duration_minutes = self.cleaned_data["duration_minutes"]
+        session.started_at = None
+        session.save(
+            update_fields=["question_set", "status", "duration_minutes", "started_at"]
+        )
         return session

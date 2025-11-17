@@ -1,0 +1,80 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Product management</p>
+        <h1>{{ session_obj.candidate_id }}</h1>
+        <p class="lede">Assessment status: {{ session_obj.get_status_display }}</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn btn-outline" href="{% url 'console:pm-list' %}">Back to sessions</a>
+    </div>
+</section>
+
+<section class="panel score-highlight">
+    <div class="share-row">
+        <div>
+            <p class="eyebrow">Share link</p>
+            <a href="{{ share_link }}">{{ share_link }}</a>
+        </div>
+        <div class="share-meta">
+            <p class="meta">Duration: {{ session_obj.duration_minutes }} min</p>
+            <p class="meta">
+                {% if session_obj.started_at and session_obj.submitted_at %}
+                    Completed in {{ session_obj.submitted_at|timesince:session_obj.started_at }}
+                {% else %}
+                    Created {{ session_obj.created_at|naturaltime }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    {% if session_obj.status == "submitted" %}
+    <div class="metric-grid">
+        <article class="metric-card">
+            <p class="metric-label">Hard skills</p>
+            <p class="metric-value">{{ session_obj.hard_skill_score|default:"—" }}</p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Soft skills</p>
+            <p class="metric-value">{{ session_obj.soft_skill_score|default:"—" }}</p>
+        </article>
+        <article class="metric-card">
+            <p class="metric-label">Overall score</p>
+            <p class="metric-value">{{ session_obj.overall_score|default:"—" }}</p>
+        </article>
+    </div>
+    <div class="fit-grid">
+        <div>
+            <p class="label">Fit scores</p>
+            <ul>
+                {% for key, value in session_obj.recommendations.fit_scores.items %}
+                <li>
+                    <span>{{ key|cut:"_"|title }}</span>
+                    <strong>{{ value }}</strong>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <p class="label">Strengths</p>
+            <div class="chip-row">
+                {% for trait in session_obj.recommendations.strengths %}
+                <span class="chip">{{ trait|title }}</span>
+                {% endfor %}
+            </div>
+            <p class="label">Development areas</p>
+            <div class="chip-row warning">
+                {% for trait in session_obj.recommendations.development %}
+                <span class="chip">{{ trait|title }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        Awaiting candidate submission. Share the link above to invite them.
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
