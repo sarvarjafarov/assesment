@@ -1,22 +1,96 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="page narrow">
-    <section class="panel">
-        <p class="eyebrow">Become a hiring partner</p>
-        <h1>Create your client workspace</h1>
-        <p class="lede">Tell us about your company and which assessments you want to access. We'll review your request within one business day.</p>
-        <form method="post" class="form-stack">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="form-field">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-                {% for error in field.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
+<div class="page">
+    <section class="panel request-panel panel-contained">
+        <div class="request-intro">
+            <div class="request-copy">
+                <p class="eyebrow">Become a hiring partner</p>
+                <h1>Create your client workspace</h1>
+                <p class="lede">Tell us about your company, how large your talent team is, and which assessments you need. We’ll review within one business day.</p>
             </div>
-            {% endfor %}
+            <div class="request-note">
+                <p class="label">What happens next?</p>
+                <ul>
+                    <li>We verify that you’re using a company domain.</li>
+                    <li>Our team approves the assessments you requested.</li>
+                    <li>You’ll receive an approval email with dashboard access.</li>
+                </ul>
+            </div>
+        </div>
+        <form method="post" class="request-form">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-field">
+                    {{ form.full_name.label_tag }}
+                    {{ form.full_name }}
+                    {% for error in form.full_name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-field">
+                    {{ form.company_name.label_tag }}
+                    {{ form.company_name }}
+                    {% for error in form.company_name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    <small>Use your work email so we can verify your organization.</small>
+                    {% for error in form.email.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-field">
+                    {{ form.phone_number.label_tag }}
+                    {{ form.phone_number }}
+                    {% for error in form.phone_number.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    {{ form.employee_size.label_tag }}
+                    {{ form.employee_size }}
+                    {% for error in form.employee_size.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-field">
+                    <label>Requested assessment</label>
+                    <div class="option-list">
+                        {% for radio in form.requested_assessment %}
+                        <label class="option-item">
+                            {{ radio.tag }}
+                            <span>{{ radio.choice_label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% for error in form.requested_assessment.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    {{ form.password1.label_tag }}
+                    {{ form.password1 }}
+                    {% for error in form.password1.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-field">
+                    {{ form.password2.label_tag }}
+                    {{ form.password2 }}
+                    {% for error in form.password2.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
             <button class="btn btn-pill" type="submit">Submit application</button>
         </form>
     </section>
