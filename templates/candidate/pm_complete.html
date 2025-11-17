@@ -9,7 +9,7 @@
             {% if elapsed_minutes %}
             <p class="meta">Submitted in {{ elapsed_minutes }} minutes.</p>
             {% endif %}
-            <a class="btn btn-pill" href="{{ request.GET.return or '/' }}">Return to Sira</a>
+            <a class="btn btn-pill" href="{{ request.GET.return|default:'/' }}">Return to Sira</a>
         </div>
     </section>
 </div>
