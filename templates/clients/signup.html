@@ -1,26 +1,26 @@
 {% extends 'base.html' %}
-{% load client_tags %}
+{% load static client_tags %}
 {% block content %}
 <div class="page-shell apply-page">
     <header class="site-header">
-        <div class="nav">
+        <nav class="nav">
             <div class="brand">
-                <span class="glyph">S</span>
+                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
                 <span>Sira Assessments</span>
             </div>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/#products">Products</a></li>
-                <li><a href="/marketing/api/">API</a></li>
+                <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
             </ul>
             <div class="nav-actions">
                 <a class="btn-outline small" href="{% url 'clients:login' %}">Login</a>
                 <a class="btn small" href="{% url 'clients:signup' %}">Apply</a>
             </div>
-        </div>
+        </nav>
     </header>
 
-    <main>
+    <main class="apply-main">
     <section class="panel request-panel request-panel--glass panel-contained">
         <div class="request-intro">
             <div class="request-copy">
@@ -123,6 +123,8 @@
         </form>
     </section>
     </section>
+    </main>
+
     </main>
 
     <footer class="site-footer">
