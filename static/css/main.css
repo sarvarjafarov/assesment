@@ -3127,6 +3127,20 @@ main {
     margin: 0 auto;
     padding: 3rem 1.5rem 4rem;
 }
+.auth-main {
+    max-width: 560px;
+}
+.auth-panel {
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: left;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(246, 248, 255, 0.95));
+}
+.auth-panel .lede {
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    margin-bottom: 1.5rem;
+}
 .request-panel {
     background: #f5f7ff;
     padding: 2rem 2.25rem;

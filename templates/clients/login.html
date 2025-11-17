@@ -1,24 +1,61 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div class="page narrow">
-    <section class="panel">
-        <p class="eyebrow">Client portal</p>
-        <h1>Sign in</h1>
-        <form method="post" class="form-stack">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            {% for field in form %}
-            <div class="form-field">
-                {{ field.label_tag }}
-                {{ field }}
-                {% for error in field.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
+<div class="page-shell apply-page">
+    <header class="site-header">
+        <nav class="nav">
+            <div class="brand">
+                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
+                <span>Sira Assessments</span>
             </div>
-            {% endfor %}
-            <button class="btn btn-pill" type="submit">Access dashboard</button>
-        </form>
-        <p class="muted">Need an account? <a href="{% url 'clients:signup' %}">Apply for access</a>.</p>
-    </section>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#products">Products</a></li>
+                <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a class="btn-outline small" href="{% url 'clients:signup' %}">Apply</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="apply-main auth-main">
+        <section class="panel auth-panel">
+            <p class="eyebrow">Client portal</p>
+            <h1>Sign in to your workspace</h1>
+            <p class="lede">Use the email associated with your approved Sira account.</p>
+            <form method="post" class="form-stack">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="form-error">
+                    {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% for field in form %}
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% for error in field.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                <button class="btn btn-pill" type="submit">Access dashboard</button>
+            </form>
+            <p class="muted">Need an account? <a class="link" href="{% url 'clients:signup' %}">Apply for access</a>.</p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>© {% now "Y" %} Sira</div>
+        <div class="footer-links">
+            <a href="/">Overview</a>
+            <a href="/blog/">Insights</a>
+            <a href="/marketing/api/">API Docs</a>
+        </div>
+        <div>Need help? <a class="link" href="mailto:hello@sira.com">hello@sira.com</a></div>
+    </footer>
 </div>
 {% endblock %}
