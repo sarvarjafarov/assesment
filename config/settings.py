@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'assessments',
     'marketing_assessments',
     'pm_assessments',
+    'behavioral_assessments',
 ]
 
 MIDDLEWARE = [

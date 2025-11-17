@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel">
+        <p class="eyebrow">Behavioral assessment</p>
+        <h1>All set!</h1>
+        <p class="lede">Thank you for completing the behavioral inventory.</p>
+        {% if elapsed_minutes %}
+        <p>You took approximately {{ elapsed_minutes }} minutes.</p>
+        {% endif %}
+        <p>Your responses help the team understand collaboration style, adaptability, and risk signals.</p>
+    </section>
+</div>
+{% endblock %}

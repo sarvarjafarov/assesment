@@ -13,26 +13,14 @@
             <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' %}is-active{% endif %}">
                 Dashboard
             </a>
-            <a href="{% url 'console:company-list' %}" class="{% if section == 'companies' %}is-active{% endif %}">
-                Companies
-            </a>
-            <a href="{% url 'console:assessment-list' %}" class="{% if section == 'assessments' %}is-active{% endif %}">
-                Assessments
-            </a>
-            <a href="{% url 'console:candidate-list' %}" class="{% if section == 'candidates' %}is-active{% endif %}">
-                Candidates
-            </a>
             <a href="{% url 'console:marketing-list' %}" class="{% if section == 'marketing' %}is-active{% endif %}">
                 Marketing Assessments
             </a>
             <a href="{% url 'console:pm-list' %}" class="{% if section == 'pm' %}is-active{% endif %}">
                 PM Assessments
             </a>
-            <a href="{% url 'console:blog-list' %}" class="{% if section == 'blog' %}is-active{% endif %}">
-                Blog
-            </a>
-            <a href="{% url 'console:invite-create' %}" class="{% if section == 'invites' %}is-active{% endif %}">
-                Invite Candidate
+            <a href="{% url 'console:behavioral-list' %}" class="{% if section == 'behavioral' %}is-active{% endif %}">
+                Behavioral Assessments
             </a>
         </nav>
         <div class="console-sidebar-foot">

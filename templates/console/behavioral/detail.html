@@ -1,0 +1,57 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Behavioral assessment</p>
+        <h1>{{ session_obj.candidate_id }}</h1>
+        <p class="lede">Share link: <code>{{ share_link }}</code></p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="panel">
+        <header>
+            <h2>Eligibility</h2>
+        </header>
+        <p class="metric">{% if eligibility.score %}{{ eligibility.score }}{% else %}—{% endif %}</p>
+        <p class="muted">{{ eligibility.label|default:"Awaiting submission" }}</p>
+    </article>
+    <article class="panel">
+        <header>
+            <h2>Trait snapshot</h2>
+        </header>
+        {% if traits %}
+        <ul class="trait-list">
+            {% for entry in traits %}
+            <li>
+                <span>{{ entry.label }}</span>
+                <strong>{{ entry.score|floatformat:1 }}</strong>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">No data yet.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Risk & follow-ups</h2>
+    </header>
+    {% if risk_flags %}
+    <ul class="risk-list">
+        {% for flag in risk_flags %}
+        <li>
+            <strong>{{ flag.trait|default:flag.code|title }}</strong>
+            <p>{{ flag.reason }}</p>
+            <small>Level: {{ flag.level|title }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty-state">No red flags triggered.</p>
+    {% endif %}
+</section>
+{% endblock %}

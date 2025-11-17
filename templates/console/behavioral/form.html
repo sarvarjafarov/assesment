@@ -1,0 +1,26 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Behavioral assessment</p>
+        <h1>Create session</h1>
+        <p class="lede">Send a 15-minute behavioral inventory with statement blocks.</p>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="post" class="form-stack">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% for error in field.errors %}
+            <span class="field-error">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-pill" type="submit">Create assessment</button>
+    </form>
+</section>
+{% endblock %}

@@ -3,135 +3,57 @@
 {% block console_content %}
 <section class="console-page-header">
     <div>
-        <p class="eyebrow">Command center</p>
-        <h1>Talent pipeline overview</h1>
-        <p class="lede">Track invites, deadlines, and assessment performance in one place.</p>
-    </div>
-    <div class="header-actions">
-        <a href="{% url 'console:invite-create' %}" class="btn btn-pill">Invite candidate</a>
+        <p class="eyebrow">Assessment console</p>
+        <h1>Marketing, Product & Behavioral</h1>
+        <p class="lede">Manage all async assessments from one lightweight dashboard.</p>
     </div>
 </section>
 
 <section class="stats-grid">
+    {% for card in summary_cards %}
     <article>
-        <p>Total Invites</p>
-        <strong>{{ stats.total_invites }}</strong>
+        <p>{{ card.label }}</p>
+        <strong>{{ card.total }}</strong>
+        <dl>
+            <div>
+                <dt>In progress</dt>
+                <dd>{{ card.in_progress }}</dd>
+            </div>
+            <div>
+                <dt>Completed</dt>
+                <dd>{{ card.completed }}</dd>
+            </div>
+        </dl>
+        <a class="pill subtle" href="{{ card.detail_url }}">View sessions</a>
     </article>
-    <article>
-        <p>In Progress</p>
-        <strong>{{ stats.in_progress }}</strong>
-    </article>
-    <article>
-        <p>Completed</p>
-        <strong>{{ stats.completed }}</strong>
-    </article>
-    <article>
-        <p>Overdue</p>
-        <strong>{{ stats.overdue }}</strong>
-    </article>
-    <article>
-        <p>Companies</p>
-        <strong>{{ company_count }}</strong>
-    </article>
-    <article>
-        <p>Active tasks</p>
-        <strong>{{ active_tasks }}</strong>
-    </article>
-</section>
-
-<section class="panel-grid">
-    <article class="panel">
-        <header>
-            <h2>Upcoming deadlines</h2>
-            <a href="{% url 'console:candidate-list' %}">View all</a>
-        </header>
-        {% if upcoming_due %}
-        <ul class="deadline-list">
-            {% for session in upcoming_due %}
-            <li>
-                <div>
-                    <p>{{ session.candidate.first_name }} · {{ session.assessment.title }}</p>
-                    <small>Due {{ session.due_at|naturaltime }}</small>
-                </div>
-                <span class="pill subtle">{{ session.status|title }}</span>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="empty-state">No deadlines scheduled.</p>
-        {% endif %}
-    </article>
-    <article class="panel">
-        <header>
-            <h2>Recent activity</h2>
-        </header>
-        {% if recent_activity %}
-        <ul class="activity-list">
-            {% for session in recent_activity %}
-            <li>
-                <div>
-                    <p>{{ session.candidate.first_name }} {{ session.candidate.last_name }}</p>
-                    <small>{{ session.assessment.title }}</small>
-                </div>
-                <span>{{ session.status|title }}</span>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="empty-state">No recent updates.</p>
-        {% endif %}
-    </article>
+    {% endfor %}
 </section>
 
 <section class="panel">
     <header>
-        <h2>Top assessments</h2>
+        <h2>Latest activity</h2>
     </header>
-    {% if top_assessments %}
+    {% if recent_sessions %}
     <div class="table">
         <div class="table-row table-head">
+            <span>Candidate</span>
             <span>Assessment</span>
-            <span>Sessions</span>
-            <span>Avg. duration</span>
+            <span>Status</span>
+            <span>Updated</span>
+            <span></span>
         </div>
-        {% for assessment in top_assessments %}
+        {% for entry in recent_sessions %}
         <div class="table-row">
-            <span>{{ assessment.title }}</span>
-            <span>{{ assessment.num_sessions }}</span>
-            <span>{{ assessment.duration_minutes }} min</span>
+            <span>{{ entry.candidate }}</span>
+            <span>{{ entry.label }}</span>
+            <span>{{ entry.status }}</span>
+            <span>{{ entry.timestamp|naturaltime }}</span>
+            <span><a class="pill subtle" href="{{ entry.url }}">Open</a></span>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p class="empty-state">No assessments yet.</p>
-    {% endif %}
-</section>
-
-<section class="panel">
-    <header>
-        <h2>Active position tasks</h2>
-    </header>
-    {% if active_tasks_list %}
-    <div class="table">
-        <div class="table-row table-head">
-            <span>Task</span>
-            <span>Company</span>
-            <span>Assessment</span>
-            <span>Focus</span>
-            <span>Sessions</span>
-        </div>
-        {% for task in active_tasks_list %}
-        <a class="table-row" href="{% url 'console:position-task-detail' task.slug %}">
-            <span>{{ task.title }}</span>
-            <span>{{ task.company.name }}</span>
-            <span>{{ task.assessment.title|default:"—" }}</span>
-            <span>{{ task.behavioral_focus_display }}</span>
-            <span>{{ task.session_total }}</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p class="empty-state">No active tasks available.</p>
+    <p class="empty-state">No activity yet.</p>
     {% endif %}
 </section>
 {% endblock %}

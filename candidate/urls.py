@@ -2,6 +2,7 @@ from django.urls import path
 
 from marketing_assessments import views_candidate as marketing_views
 from pm_assessments import views_candidate as pm_views
+from behavioral_assessments import views_candidate as behavioral_views
 
 from . import views
 
@@ -52,5 +53,20 @@ urlpatterns = [
         "pm/<uuid:session_uuid>/expired/",
         pm_views.ProductAssessmentExpiredView.as_view(),
         name="pm-expired",
+    ),
+    path(
+        "behavioral/<uuid:session_uuid>/",
+        behavioral_views.BehavioralAssessmentView.as_view(),
+        name="behavioral-session",
+    ),
+    path(
+        "behavioral/<uuid:session_uuid>/complete/",
+        behavioral_views.BehavioralAssessmentCompleteView.as_view(),
+        name="behavioral-complete",
+    ),
+    path(
+        "behavioral/<uuid:session_uuid>/expired/",
+        behavioral_views.BehavioralAssessmentExpiredView.as_view(),
+        name="behavioral-expired",
     ),
 ]
