@@ -15,4 +15,9 @@ urlpatterns = [
         views.ClientAssessmentManageView.as_view(),
         name="assessment-manage",
     ),
+    path(
+        "dashboard/assessments/<slug:assessment_type>/<uuid:session_uuid>/",
+        views.ClientAssessmentDetailView.as_view(),
+        name="assessment-detail",
+    ),
 ]

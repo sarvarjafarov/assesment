@@ -156,6 +156,13 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         route = self.assessment_config["candidate_route"]
         return self.request.build_absolute_uri(reverse(route, args=[session.uuid]))
 
+    def get_session_object(self, session_uuid):
+        model = self.assessment_config["session_model"]
+        try:
+            return model.objects.get(client=self.account, uuid=session_uuid)
+        except model.DoesNotExist:
+            raise Http404
+
 
 class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
     template_name = "clients/assessments/manage.html"
@@ -181,6 +188,11 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                     "score": score,
                     "submitted_at": session.submitted_at,
                     "share_link": self.build_share_link(session),
+                    "detail_url": reverse(
+                        "clients:assessment-detail", args=[self.assessment_type, session.uuid]
+                    )
+                    if session.status == "submitted"
+                    else None,
                 }
             )
         context.update(
@@ -190,3 +202,39 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
             }
         )
         return context
+
+
+class ClientAssessmentDetailView(ClientAssessmentMixin, TemplateView):
+    template_name = "clients/assessments/detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        session_uuid = kwargs.get("session_uuid")
+        session = self.get_session_object(session_uuid)
+        report = self._build_report(session)
+        context.update(
+            {
+                "assessment_label": self.assessment_config["label"],
+                "session_obj": session,
+                "share_link": self.build_share_link(session),
+                "report": report,
+                "assessment_type": self.assessment_type,
+            }
+        )
+        return context
+
+    def _build_report(self, session):
+        if self.assessment_type == "behavioral":
+            return {
+                "score": session.eligibility_score,
+                "label": session.eligibility_label,
+                "traits": session.trait_scores or {},
+                "flags": session.risk_flags or [],
+            }
+        return {
+            "overall": session.overall_score,
+            "hard": getattr(session, "hard_skill_score", None),
+            "soft": getattr(session, "soft_skill_score", None),
+            "categories": session.category_breakdown or {},
+            "recommendations": session.recommendations or {},
+        }

@@ -51,6 +51,7 @@
                 <span>Score</span>
                 <span>Updated</span>
                 <span>Link</span>
+                <span>Report</span>
             </div>
             {% for row in sessions %}
             <div class="table-row">
@@ -59,6 +60,7 @@
                 <span>{% if row.score %}{{ row.score }}{% else %}—{% endif %}</span>
                 <span>{% if row.submitted_at %}{{ row.submitted_at|naturaltime }}{% else %}—{% endif %}</span>
                 <span><a class="pill subtle" href="{{ row.share_link }}" target="_blank">Share link</a></span>
+                <span>\n                    {% if row.detail_url %}\n                    <a class=\"pill\" href=\"{{ row.detail_url }}\">View report</a>\n                    {% else %}\n                    <span class=\"muted\">Pending</span>\n                    {% endif %}\n                </span>
             </div>
             {% endfor %}
         </div>

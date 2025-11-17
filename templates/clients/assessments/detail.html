@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="portal-shell">
+    <section class="portal-header">
+        <div class="portal-brand">
+            <div>
+                <p class="eyebrow">{{ assessment_label }}</p>
+                <h1>{{ session_obj.candidate_id }}</h1>
+                <p class="muted">Status: {{ session_obj.get_status_display }}</p>
+            </div>
+        </div>
+        <div class="portal-actions">
+            <a class="btn btn-outline small" href="{% url 'clients:assessment-manage' assessment_type %}">Back to sessions</a>
+        </div>
+    </section>
+
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Summary</p>
+                <h2>Candidate performance</h2>
+            </div>
+        </header>
+        <div class="portal-card-grid">
+            <article class="portal-card">
+                <p class="label">Score</p>
+                <h2>{% if report.score %}{{ report.score }}{% elif report.overall %}{{ report.overall }}{% else %}—{% endif %}</h2>
+                <p class="muted">Share link: <a href="{{ share_link }}" target="_blank">{{ share_link }}</a></p>
+            </article>
+            {% if report.label %}
+            <article class="portal-card">
+                <p class="label">Decision</p>
+                <h2>{{ report.label }}</h2>
+                <p class="muted">Behavioral eligibility rating.</p>
+            </article>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="panel portal-panel">
+        {% if assessment_type == 'behavioral' %}
+        <header>
+            <div>
+                <p class="eyebrow">Behavioral breakdown</p>
+                <h2>Trait scores</h2>
+            </div>
+        </header>
+        <div class="table">
+            <div class="table-row table-head">
+                <span>Trait</span>
+                <span>Score</span>
+            </div>
+            {% for trait, score in report.traits.items %}
+            <div class="table-row">
+                <span>{{ trait|title }}</span>
+                <span>{% if score %}{{ score|floatformat:1 }}{% else %}—{% endif %}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <header>
+            <div>
+                <h2>Risk flags</h2>
+            </div>
+        </header>
+        {% if report.flags %}
+        <ul class="activity-list">
+            {% for flag in report.flags %}
+            <li>
+                <div>
+                    <p>{{ flag.trait|default:flag.code|title }}</p>
+                    <small>{{ flag.reason }}</small>
+                </div>
+                <span>{{ flag.level|title }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">No red flags triggered.</p>
+        {% endif %}
+        {% else %}
+        <header>
+            <div>
+                <p class="eyebrow">Category breakdown</p>
+                <h2>Skill profile</h2>
+            </div>
+        </header>
+        <div class="table">
+            <div class="table-row table-head">
+                <span>Category</span>
+                <span>Score</span>
+            </div>
+            {% for cat, value in report.categories.items %}
+            <div class="table-row">
+                <span>{{ cat|title }}</span>
+                <span>{{ value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <header>
+            <div>
+                <h2>Recommendations</h2>
+            </div>
+        </header>
+        {% if report.recommendations %}
+        <pre class="code-block">{{ report.recommendations|safe }}</pre>
+        {% else %}
+        <p class="muted">No recommendation data recorded.</p>
+        {% endif %}
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
