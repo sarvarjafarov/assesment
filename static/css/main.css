@@ -3141,6 +3141,33 @@ main {
     margin-top: 0.25rem;
     margin-bottom: 1.5rem;
 }
+.confirmation-panel {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(245, 248, 255, 0.95));
+    position: relative;
+    overflow: hidden;
+}
+.confirmation-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    background: rgba(28, 207, 154, 0.15);
+    color: #0faa7c;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+.confirmation-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
 .request-panel {
     background: #f5f7ff;
     padding: 2rem 2.25rem;

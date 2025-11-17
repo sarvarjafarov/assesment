@@ -82,3 +82,11 @@ class ClientAccount(TimeStampedModel):
     def requested_labels(self) -> list[str]:
         catalog = self.ASSESSMENT_DETAILS
         return [catalog.get(code, {}).get("label", code.title()) for code in self.requested_assessments or []]
+
+    def save(self, *args, **kwargs):
+        # Auto-sync the linked user's active flag with client approval status.
+        should_activate = self.status == "approved"
+        if self.user and self.user.is_active != should_activate:
+            self.user.is_active = should_activate
+            self.user.save(update_fields=["is_active"])
+        super().save(*args, **kwargs)
