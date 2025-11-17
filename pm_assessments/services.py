@@ -10,30 +10,46 @@ from django.utils import timezone
 from .models import ProductAssessmentSession, ProductQuestion
 
 CATEGORY_TARGETS = {
-    "strategy": 5,
-    "roadmap": 4,
-    "discovery": 4,
-    "analytics": 4,
-    "delivery": 4,
-    "stakeholder": 4,
-    "behavioral": 5,
+    ProductQuestion.CATEGORY_PRODUCT: 5,
+    ProductQuestion.CATEGORY_EXECUTION: 5,
+    ProductQuestion.CATEGORY_STRATEGY: 5,
+    ProductQuestion.CATEGORY_ANALYTICS: 4,
+    ProductQuestion.CATEGORY_TECHNICAL: 4,
+    ProductQuestion.CATEGORY_DESIGN: 3,
+    ProductQuestion.CATEGORY_BEHAVIORAL: 4,
 }
 
 CATEGORY_WEIGHTS = {
-    "strategy": Decimal("0.2"),
-    "roadmap": Decimal("0.15"),
-    "discovery": Decimal("0.15"),
-    "analytics": Decimal("0.15"),
-    "delivery": Decimal("0.15"),
-    "stakeholder": Decimal("0.1"),
-    "behavioral": Decimal("0.1"),
+    ProductQuestion.CATEGORY_PRODUCT: Decimal("0.2"),
+    ProductQuestion.CATEGORY_EXECUTION: Decimal("0.2"),
+    ProductQuestion.CATEGORY_STRATEGY: Decimal("0.15"),
+    ProductQuestion.CATEGORY_ANALYTICS: Decimal("0.15"),
+    ProductQuestion.CATEGORY_TECHNICAL: Decimal("0.1"),
+    ProductQuestion.CATEGORY_DESIGN: Decimal("0.1"),
+    ProductQuestion.CATEGORY_BEHAVIORAL: Decimal("0.1"),
 }
 
 FIT_GROUPS = {
-    "product_strategy": ["strategy", "roadmap"],
-    "research": ["discovery", "analytics"],
-    "execution": ["delivery", "stakeholder"],
-    "generalist": ["strategy", "roadmap", "discovery", "analytics", "delivery", "stakeholder"],
+    "product_strategy": [
+        ProductQuestion.CATEGORY_PRODUCT,
+        ProductQuestion.CATEGORY_STRATEGY,
+    ],
+    "execution": [
+        ProductQuestion.CATEGORY_EXECUTION,
+        ProductQuestion.CATEGORY_TECHNICAL,
+    ],
+    "insight": [
+        ProductQuestion.CATEGORY_ANALYTICS,
+        ProductQuestion.CATEGORY_DESIGN,
+    ],
+    "generalist": [
+        ProductQuestion.CATEGORY_PRODUCT,
+        ProductQuestion.CATEGORY_EXECUTION,
+        ProductQuestion.CATEGORY_STRATEGY,
+        ProductQuestion.CATEGORY_ANALYTICS,
+        ProductQuestion.CATEGORY_TECHNICAL,
+        ProductQuestion.CATEGORY_DESIGN,
+    ],
 }
 
 SENIORITY_RULES = [

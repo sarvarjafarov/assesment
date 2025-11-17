@@ -21,42 +21,44 @@ class ProductQuestionQuerySet(models.QuerySet):
 
 class ProductQuestion(TimeStampedModel):
     TYPE_MULTIPLE = "multiple_choice"
-    TYPE_SCENARIO = "scenario"
-    TYPE_RANKING = "ranking"
+    TYPE_OPEN_ENDED = "open_ended"
+    TYPE_PRIORITIZATION = "prioritization"
+    TYPE_ESTIMATION = "estimation"
+    TYPE_REASONING = "reasoning"
     TYPE_BEHAVIORAL_MOST = "behavioral_most"
     TYPE_BEHAVIORAL_LEAST = "behavioral_least"
-    TYPE_REASONING = "reasoning"
     QUESTION_TYPES = [
         (TYPE_MULTIPLE, "Multiple choice"),
-        (TYPE_SCENARIO, "Scenario based"),
-        (TYPE_RANKING, "Ranking / Ordering"),
+        (TYPE_OPEN_ENDED, "Open ended"),
+        (TYPE_PRIORITIZATION, "Prioritization"),
+        (TYPE_ESTIMATION, "Estimation"),
+        (TYPE_REASONING, "Reasoning / open response"),
         (TYPE_BEHAVIORAL_MOST, "Behavioral - most like me"),
         (TYPE_BEHAVIORAL_LEAST, "Behavioral - least like me"),
-        (TYPE_REASONING, "Reasoning / open response"),
     ]
 
+    CATEGORY_PRODUCT = "product"
+    CATEGORY_EXECUTION = "execution"
     CATEGORY_STRATEGY = "strategy"
-    CATEGORY_ROADMAP = "roadmap"
-    CATEGORY_DISCOVERY = "discovery"
     CATEGORY_ANALYTICS = "analytics"
-    CATEGORY_DELIVERY = "delivery"
-    CATEGORY_STAKEHOLDER = "stakeholder"
+    CATEGORY_TECHNICAL = "technical"
+    CATEGORY_DESIGN = "design"
     CATEGORY_BEHAVIORAL = "behavioral"
     CATEGORY_CHOICES = [
-        (CATEGORY_STRATEGY, "Product strategy"),
-        (CATEGORY_ROADMAP, "Roadmap & prioritization"),
-        (CATEGORY_DISCOVERY, "Research & discovery"),
-        (CATEGORY_ANALYTICS, "Analytics & experiments"),
-        (CATEGORY_DELIVERY, "Execution & delivery"),
-        (CATEGORY_STAKEHOLDER, "Stakeholder collaboration"),
-        (CATEGORY_BEHAVIORAL, "Behavioral"),
+        (CATEGORY_PRODUCT, "Product sense"),
+        (CATEGORY_EXECUTION, "Execution & delivery"),
+        (CATEGORY_STRATEGY, "Strategy"),
+        (CATEGORY_ANALYTICS, "Analytics"),
+        (CATEGORY_TECHNICAL, "Technical"),
+        (CATEGORY_DESIGN, "UX & research"),
+        (CATEGORY_BEHAVIORAL, "Behavioral & leadership"),
     ]
 
     question_text = models.TextField()
     question_type = models.CharField(max_length=32, choices=QUESTION_TYPES)
     difficulty_level = models.PositiveSmallIntegerField(default=3)
     category = models.CharField(max_length=32, choices=CATEGORY_CHOICES)
-    options = models.JSONField(default=dict, blank=True)
+    options = models.JSONField(default=list, blank=True)
     correct_answer = models.JSONField(blank=True, null=True)
     scoring_weight = models.DecimalField(max_digits=5, decimal_places=2, default=1.0)
     explanation = models.TextField(blank=True)

@@ -1,0 +1,1702 @@
+[
+  {
+    "id": 1,
+    "category": "strategy",
+    "question_type": "reasoning",
+    "difficulty": 5,
+    "question_text": "Your MAU increased 40% after launching a free AI feature, but ARPU dropped 18% and infra costs rose 30%. How do you decide whether to continue investing in this feature?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 2,
+    "category": "analytics",
+    "question_type": "reasoning",
+    "difficulty": 5,
+    "question_text": "Activation rate dropped by 15%, but each onboarding funnel step appears stable. What hypotheses explain this and what data would you investigate first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 3,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "You have 6 weeks and limited engineering capacity. Sales demands an enterprise dashboard, customers complain about slowness, and leadership wants a demo. Define the MVP and justify your priorities.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 4,
+    "category": "technical",
+    "question_type": "reasoning",
+    "difficulty": 5,
+    "question_text": "A UX simplification increased onboarding by 9%, but 30-day churn increased by 6%. Identify likely second-order effects and describe how you would validate them.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 5,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "The CEO says: 'We must expand into the EU as fast as possible.' No KPIs, personas, or constraints provided. How would you structure the problem and design the first experiments?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 6,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which framework is best for comparing Feature A vs Feature B based on value and effort?",
+    "options": ["RICE", "SWOT", "Kano", "North Star"],
+    "correct_answer": "RICE",
+    "scoring_weight": 3
+  },
+  {
+    "id": 7,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which metric is most indicative of early Product-Market Fit?",
+    "options": ["DAU", "DAU/MAU", "Retention curve flattening", "CAC"],
+    "correct_answer": "Retention curve flattening",
+    "scoring_weight": 2
+  },
+  {
+    "id": 8,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 4,
+    "question_text": "In the context of analytics, which of the following metrics is MOST appropriate to judge success of a new feature launch?",
+    "options": ["Activation rate", "Conversion rate", "DAU", "Twitter mentions"],
+    "correct_answer": "Conversion rate",
+    "scoring_weight": 4
+  },
+  {
+    "id": 9,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which metric most directly measures UX usability?",
+    "options": ["Clickthrough rate", "Task completion time", "Churn rate", "MAU"],
+    "correct_answer": "Task completion time",
+    "scoring_weight": 2
+  },
+  {
+    "id": 10,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "What should a PM understand in an API specification?",
+    "options": ["Endpoints and parameters", "Only UI layout", "File structure", "CSS rules"],
+    "correct_answer": "Endpoints and parameters",
+    "scoring_weight": 3
+  },
+  {
+    "id": 11,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the daily scooter rides needed in a city of 1M to break even. Explain your assumptions.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 12,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Users provide conflicting feedback about two major features. How do you synthesize insights and choose a direction?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 13,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "A new feature increased engagement but decreased conversion rate. Which data sources do you check first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 14,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe how you handled a significant disagreement with engineering. What was the resolution approach?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 15,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which tool best supports sprint planning?",
+    "options": ["JIRA", "Figma", "Mailchimp", "Hotjar"],
+    "correct_answer": "JIRA",
+    "scoring_weight": 3
+  },
+  {
+    "id": 16,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which PM concept focuses on the core user problem?",
+    "options": ["Kanban", "JTBD", "Burndown charts", "OKRs"],
+    "correct_answer": "JTBD",
+    "scoring_weight": 2
+  },
+  {
+    "id": 17,
+    "category": "strategy",
+    "question_type": "mcq",
+    "difficulty": 4,
+    "question_text": "What is the first step when selecting a new market to enter?",
+    "options": ["Build a prototype", "Conduct market sizing", "Hire sales reps", "Run ads"],
+    "correct_answer": "Conduct market sizing",
+    "scoring_weight": 4
+  },
+  {
+    "id": 18,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which metric shows how well users return after initial use?",
+    "options": ["Cohort retention", "CTR", "NPS", "MAU"],
+    "correct_answer": "Cohort retention",
+    "scoring_weight": 3
+  },
+  {
+    "id": 19,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Engineering proposes postponing QA to meet a release deadline. How do you respond?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 20,
+    "category": "product_sense",
+    "question_type": "prioritization",
+    "difficulty": 3,
+    "question_text": "You must prioritize 10 backlog items. Which framework do you use and why?",
+    "options": ["RICE", "MoSCoW", "Kano", "ICE"],
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 51,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate how many monthly active users a budgeting app could acquire in its first year in a country with 10M people. State your assumptions clearly.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 52,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "During a sprint, a key engineer becomes unavailable for 2 weeks. The team cannot deliver 50% of committed scope. How do you adjust expectations with stakeholders?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 53,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which user research method is best for uncovering early usability issues?",
+    "options": ["Heatmap analysis", "Remote unmoderated tests", "A/B testing", "Feature surveys"],
+    "correct_answer": "Remote unmoderated tests",
+    "scoring_weight": 2
+  },
+  {
+    "id": 54,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "A competitor releases a very similar feature to your roadmap priority. How do you re-evaluate your roadmap?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 55,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time you had to say 'no' to an executive request. How did you communicate the decision?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 56,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "You see a sudden drop in conversion rate. Which metric would you check first?",
+    "options": ["Page load time", "DAU/MAU", "CAC", "NPS"],
+    "correct_answer": "Page load time",
+    "scoring_weight": 3
+  },
+  {
+    "id": 57,
+    "category": "product_sense",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "You have 3 features: one improves acquisition, one improves retention, and one improves monetization. Which do you prioritize for a pre-PMF startup?",
+    "options": ["Acquisition", "Retention", "Monetization"],
+    "correct_answer": "Retention",
+    "scoring_weight": 4
+  },
+  {
+    "id": 58,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which artifact is most important for aligning engineering and design?",
+    "options": ["User story", "Roadmap", "Sprint retrospective", "Wireframes"],
+    "correct_answer": "User story",
+    "scoring_weight": 3
+  },
+  {
+    "id": 59,
+    "category": "strategy",
+    "question_type": "mcq",
+    "difficulty": 4,
+    "question_text": "Which analysis best supports evaluating new market entry?",
+    "options": ["SWOT", "RICE", "Funnel analysis", "Cohort analysis"],
+    "correct_answer": "SWOT",
+    "scoring_weight": 4
+  },
+  {
+    "id": 60,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Engineering proposes migrating part of the system to microservices. How do you evaluate whether it's worth doing this year?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 61,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "An A/B test shows a small but statistically significant improvement. How do you validate whether to ship the change globally?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 62,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "What is the most important UX metric for an onboarding flow?",
+    "options": ["Activation rate", "MAU", "DAU/MAU", "NPS"],
+    "correct_answer": "Activation rate",
+    "scoring_weight": 2
+  },
+  {
+    "id": 63,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "You must decide whether to sunset a legacy feature used by only 3% of users but required by a key enterprise client. How do you approach the decision?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 64,
+    "category": "product_sense",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the number of monthly restaurant bookings on an app in a city of 2M people.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 65,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your release is ready, but analytics tracking was not implemented. How do you proceed?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 66,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time when you resolved misalignment between cross-functional teams.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 67,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "What does 'latency' refer to in software systems?",
+    "options": ["Storage capacity", "Time taken to load or process", "Number of API calls", "Database size"],
+    "correct_answer": "Time taken to load or process",
+    "scoring_weight": 3
+  },
+  {
+    "id": 68,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which question best uncovers user needs?",
+    "options": ["Do you like feature X?", "How do you solve this problem today?", "Would you pay for this?", "Should we build this feature?"],
+    "correct_answer": "How do you solve this problem today?",
+    "scoring_weight": 3
+  },
+  {
+    "id": 69,
+    "category": "execution",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "You must choose between improving reliability or adding a top-requested feature. How do you decide what comes first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 70,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "User testing reveals that users frequently misunderstand your product’s core value proposition. What should you do next?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 71,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which metric best measures long-term retention?",
+    "options": ["Day-1 retention", "Weekly active users", "Cohort-based Day-30 retention", "Exit rate"],
+    "correct_answer": "Cohort-based Day-30 retention",
+    "scoring_weight": 3
+  },
+  {
+    "id": 72,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "API rate limits are causing failures in your integration. How do you work with engineering to decide next steps?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 73,
+    "category": "product_sense",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the number of daily grocery orders in a city with 500k households.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 74,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Describe a time you had to influence without authority. What approach worked?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 75,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which PM artifact contains acceptance criteria?",
+    "options": ["Wireframe", "User story", "Retro board", "Roadmap"],
+    "correct_answer": "User story",
+    "scoring_weight": 2
+  },
+  {
+    "id": 76,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your dashboards show a sharp spike in traffic from an unknown referral source. How do you diagnose the cause?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 77,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Heatmaps show heavy activity around non-clickable elements. What does this signal about your UX?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 78,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your top competitor drops prices by 20%. How do you evaluate whether to match pricing?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 79,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which is the most important factor when choosing a North Star Metric?",
+    "options": ["Easy to calculate", "Direct link to user value", "Popular in the industry", "Maximizes short-term revenue"],
+    "correct_answer": "Direct link to user value",
+    "scoring_weight": 3
+  },
+  {
+    "id": 80,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which of the following is a database index used for?",
+    "options": ["Reducing file size", "Speeding up queries", "Compressing logs", "Debugging"],
+    "correct_answer": "Speeding up queries",
+    "scoring_weight": 3
+  },
+  {
+    "id": 81,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "A critical bug is found right before launch. What do you do?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 82,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "What best evaluates early concept designs?",
+    "options": ["A/B testing", "Card sorting", "Beta release", "JIRA backlog grooming"],
+    "correct_answer": "Card sorting",
+    "scoring_weight": 2
+  },
+  {
+    "id": 83,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Tell us about a time you managed conflicting deadlines across teams.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 84,
+    "category": "strategy",
+    "question_type": "mcq",
+    "difficulty": 4,
+    "question_text": "Which metric helps evaluate long-term revenue sustainability?",
+    "options": ["CAC", "LTV", "Clickthrough rate", "Activation rate"],
+    "correct_answer": "LTV",
+    "scoring_weight": 4
+  },
+  {
+    "id": 85,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the number of yearly gym subscriptions in a country of 50M people.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 86,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "User research reveals your core users are not the ones you initially targeted. How do you adjust your roadmap?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 87,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which meeting ensures alignment across engineering, design, and PM?",
+    "options": ["Sprint planning", "Standup", "Retro", "Board meeting"],
+    "correct_answer": "Sprint planning",
+    "scoring_weight": 3
+  },
+  {
+    "id": 88,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "How would you decide which user segment to focus on first when entering a global market?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 89,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which research method best identifies hidden user motivations?",
+    "options": ["Qualitative interviews", "A/B testing", "Surveys", "Analytics dashboards"],
+    "correct_answer": "Qualitative interviews",
+    "scoring_weight": 2
+  },
+  {
+    "id": 90,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your team wants to adopt a new front-end framework. How do you evaluate the risk vs reward?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 91,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your funnel is strong until the pricing page, where drop-off doubles. What do you investigate first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 92,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Usability testing shows users consistently fail to understand a core button label. What is your next step?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 93,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which tool is most commonly used to manage engineering work items?",
+    "options": ["Notion", "JIRA", "Slack", "Trello"],
+    "correct_answer": "JIRA",
+    "scoring_weight": 3
+  },
+  {
+    "id": 94,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your data shows that power users are frustrated by lack of advanced features, while casual users want simplicity. How do you design your strategy?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 95,
+    "category": "strategy",
+    "question_type": "mcq",
+    "difficulty": 4,
+    "question_text": "Which metric best evaluates bottom-of-funnel performance?",
+    "options": ["Activation", "Conversion rate", "DAU", "Retention"],
+    "correct_answer": "Conversion rate",
+    "scoring_weight": 4
+  },
+  {
+    "id": 96,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your team repeatedly misses sprint commitments. What do you investigate first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 97,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Tell us about a time when data contradicted your instincts. How did you handle it?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 98,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which term describes how well a system handles increased load?",
+    "options": ["Scalability", "Latency", "Caching", "Compression"],
+    "correct_answer": "Scalability",
+    "scoring_weight": 3
+  },
+  {
+    "id": 99,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the number of daily video uploads on a platform with 100M MAU.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 100,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your product has high engagement but low monetization. What are your next three steps?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 101,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "A key stakeholder demands a last-minute feature addition into a release that is already code-complete. How do you handle this request?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 102,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your product is experiencing slow growth, but churn is low. How do you diagnose the problem and decide which area to focus on?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 103,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which metric best measures the efficiency of your acquisition channel?",
+    "options": ["CTR", "CAC", "Activation rate", "Retention rate"],
+    "correct_answer": "CAC",
+    "scoring_weight": 3
+  },
+  {
+    "id": 104,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Usability tests reveal a confusing checkout flow. What do you fix first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 105,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "What is the main benefit of caching?",
+    "options": ["Improved security", "Faster data retrieval", "Lower storage cost", "Better UI design"],
+    "correct_answer": "Faster data retrieval",
+    "scoring_weight": 3
+  },
+  {
+    "id": 106,
+    "category": "product_sense",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "Users request personalization while leadership requests improved analytics dashboards. How do you prioritize the next quarter’s work?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 107,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your A/B test shows a large conversion lift, but only on mobile. Desktop remains unchanged. How do you decide whether to roll out globally?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 108,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "The engineering team is overloaded and asks you to drop two features from the sprint. How do you negotiate what stays and what moves?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 109,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time when a project you managed failed. What did you learn and what would you do differently?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 110,
+    "category": "product_sense",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the number of digital calendar app users in a country with 40M people.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 111,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "A third-party API provider announces a 25% price increase. How do you evaluate whether to migrate away or absorb the cost?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 112,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which tool is most helpful for identifying bottlenecks in a user journey?",
+    "options": ["Figma", "Heap/Amplitude", "JIRA", "Mailchimp"],
+    "correct_answer": "Heap/Amplitude",
+    "scoring_weight": 2
+  },
+  {
+    "id": 113,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which method reduces bias in an A/B test?",
+    "options": ["Segmenting users manually", "Randomization", "Running the test only on power users", "Comparing only conversion data"],
+    "correct_answer": "Randomization",
+    "scoring_weight": 3
+  },
+  {
+    "id": 114,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "Your company is considering pivoting from SMB customers to enterprise. What strategic risks and opportunities must you consider?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 115,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your top users frequently request a dark mode feature, but analytics suggest only 8% would use it. How do you decide?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 116,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which ceremony helps uncover blockers early?",
+    "options": ["Sprint retrospective", "Daily standup", "Design review", "Backlog refinement"],
+    "correct_answer": "Daily standup",
+    "scoring_weight": 3
+  },
+  {
+    "id": 117,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your MAU is increasing but DAU/MAU is dropping. What does this indicate and what actions do you take?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 118,
+    "category": "product_sense",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the yearly volume of HR software purchases by companies with fewer than 50 employees in a country with 1M small businesses.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 119,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Tell us about a time you had incomplete data but still had to make a decision.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 120,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "What is a webhook typically used for?",
+    "options": ["Pulling data periodically", "Receiving real-time event notifications", "Processing payments", "Authentication"],
+    "correct_answer": "Receiving real-time event notifications",
+    "scoring_weight": 3
+  },
+  {
+    "id": 121,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your team cannot agree on acceptance criteria for a feature. How do you unblock the situation?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 122,
+    "category": "strategy",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "Your company wants to expand its AI product offering. Which criteria do you use to prioritize AI initiatives?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 123,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the percentage of customers that leave an e-commerce checkout due to shipping costs.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 124,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which UX method helps validate whether users understand your product messaging?",
+    "options": ["Card sorting", "Tree testing", "Five-second test", "Heatmaps"],
+    "correct_answer": "Five-second test",
+    "scoring_weight": 2
+  },
+  {
+    "id": 125,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your onboarding completion is strong, but activation is weak. What are the likely reasons and how do you test your hypotheses?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 126,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your mobile app is experiencing high crash rates on older devices. Engineering suggests dropping support. How do you evaluate the trade-offs?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 127,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which technique helps forecast delivery timelines more accurately?",
+    "options": ["T-shirt sizing", "Historical velocity", "User interviews", "Heatmaps"],
+    "correct_answer": "Historical velocity",
+    "scoring_weight": 3
+  },
+  {
+    "id": 128,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your product category is becoming commoditized. How do you reposition your product to maintain differentiation?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 129,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your data shows inconsistent spikes in user activity every few weeks. How do you determine whether these are anomalies or patterns?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 130,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "You discover that users abandon the final step of a workflow. What qualitative method helps diagnose why?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 131,
+    "category": "product_sense",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "You must choose between building a new AI feature or improving the existing core feature. What frameworks help you decide?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 132,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "A dependency team delays a component critical to your launch. How do you handle cross-team alignment?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 133,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "CDN stands for:",
+    "options": ["Content Delivery Network", "Central Data Node", "Cache Distribution Node", "Cloud Data Network"],
+    "correct_answer": "Content Delivery Network",
+    "scoring_weight": 3
+  },
+  {
+    "id": 134,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "A retention curve that flattens at a high level indicates:",
+    "options": ["Strong long-term retention", "Poor onboarding", "High churn risk", "A bug in analytics"],
+    "correct_answer": "Strong long-term retention",
+    "scoring_weight": 3
+  },
+  {
+    "id": 135,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Users say they want more notifications, but engagement drops when you send more. How do you interpret this?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 136,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time when you delivered results despite ambiguous requirements.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 137,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "The board wants aggressive expansion, but your data indicates saturated markets. How do you communicate your recommendation?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 138,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which factor most commonly causes sprint delays?",
+    "options": ["Lack of clarity in acceptance criteria", "High DAU", "Increased ARR", "Too many QA testers"],
+    "correct_answer": "Lack of clarity in acceptance criteria",
+    "scoring_weight": 3
+  },
+  {
+    "id": 139,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the annual number of hotel bookings made online in a country with 20M tourists per year.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 140,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which best describes a minimum viable product (MVP)?",
+    "options": ["The cheapest version of a product", "A version that tests hypotheses with minimal effort", "A fully functional launch", "A polished design prototype"],
+    "correct_answer": "A version that tests hypotheses with minimal effort",
+    "scoring_weight": 2
+  },
+  {
+    "id": 141,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "A performance issue appears only during peak hours. What diagnostic approaches do you take?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 142,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your team delivers functionality that technically works but does not match user expectations. What do you fix first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 143,
+    "category": "strategy",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "How do you prioritize initiatives across acquisition, retention, and monetization for a mature product with slowing growth?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 144,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your conversion funnel shows a large drop on step 3 only for Android users. How do you investigate the root cause?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 145,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which method is most appropriate for validating information architecture?",
+    "options": ["Card sorting", "User interviews", "Heatmaps", "NPS"],
+    "correct_answer": "Card sorting",
+    "scoring_weight": 2
+  },
+  {
+    "id": 146,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "You discover your most valuable users follow very different workflows than typical users. How do you incorporate this into your roadmap?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 147,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your designer and engineer disagree on feasibility vs UX quality. How do you resolve the conflict?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 148,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time you convinced leadership to change direction based on data.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 149,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "Your product is profitable but not defensible. How do you build a long-term competitive moat?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 150,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which factor most affects application scalability?",
+    "options": ["UI animations", "Database structure", "Color palette", "Email frequency"],
+    "correct_answer": "Database structure",
+    "scoring_weight": 3
+  },
+  {
+    "id": 151,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your product is seeing strong engagement from a new, unexpected demographic. How do you evaluate whether to pivot toward this group?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 152,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your engineering team wants to extend the sprint by one week to finish a large feature. Leadership wants the release shipped on time. What is your decision-making process?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 153,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which method helps identify how different touchpoints contribute to conversion?",
+    "options": ["Cohort analysis", "Attribution modeling", "A/B testing", "Session replay"],
+    "correct_answer": "Attribution modeling",
+    "scoring_weight": 3
+  },
+  {
+    "id": 154,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "You must choose between doubling down on your core product or expanding into an adjacent market. What factors do you consider in your strategic analysis?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 155,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your usability testing reveals users are overwhelmed by too many choices on the main screen. What design principles help reduce cognitive load?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 156,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your data engineering team suggests moving analytics processing to a new warehouse solution. What PM considerations go into evaluating this migration?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 157,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time when you had to push back on unrealistic deadlines without harming relationships.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 158,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which one is a sign of poor sprint refinement?",
+    "options": ["Clear user stories", "Well-defined acceptance criteria", "High rollover of tickets", "Consistent velocity"],
+    "correct_answer": "High rollover of tickets",
+    "scoring_weight": 3
+  },
+  {
+    "id": 159,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which is a benefit of building an MVP before scaling a feature?",
+    "options": ["Maximizes revenue", "Reduces engineering cost and risk", "Eliminates user research needs", "Guarantees high retention"],
+    "correct_answer": "Reduces engineering cost and risk",
+    "scoring_weight": 2
+  },
+  {
+    "id": 160,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your retention curve looks flat but low. What techniques help diagnose retention problems?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 161,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "You must communicate to the board that your initial yearly growth target is unrealistic based on current indicators. How do you structure this conversation?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 162,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which option helps reduce server load during peak hours?",
+    "options": ["Increasing CSS animations", "Load balancing", "More meetings", "Adding analytics events"],
+    "correct_answer": "Load balancing",
+    "scoring_weight": 3
+  },
+  {
+    "id": 163,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your checkout button has a low click rate. Heatmaps show users scrolling past it. How do you approach diagnosing this issue?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 164,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time when you helped a struggling teammate succeed.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 165,
+    "category": "strategy",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which analysis helps determine whether users would happily recommend your product?",
+    "options": ["NPS", "CTR", "DAU", "Activation"],
+    "correct_answer": "NPS",
+    "scoring_weight": 3
+  },
+  {
+    "id": 166,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate how many job applications are submitted daily through a job portal with 20M monthly visitors.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 167,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Users ask for many new features, but usage data shows they rarely use existing ones. What does this signal and how do you respond?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 168,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your engineering team suggests using feature flags for all new releases. What do you need to consider as a PM?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 169,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Your QA team reports they lack enough time to test a new feature before the scheduled release. How do you proceed?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 170,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your company wants to move into the education sector. What initial research steps help understand this new market?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 171,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "What is the purpose of a churn analysis?",
+    "options": ["Identify causes of user dropout", "Increase page load time", "Reduce storage cost", "Improve color palette"],
+    "correct_answer": "Identify causes of user dropout",
+    "scoring_weight": 3
+  },
+  {
+    "id": 172,
+    "category": "ux",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which method is best for testing comprehension of content hierarchy?",
+    "options": ["Tree testing", "A/B testing", "CSAT surveys", "Heatmaps"],
+    "correct_answer": "Tree testing",
+    "scoring_weight": 2
+  },
+  {
+    "id": 173,
+    "category": "product_sense",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "Your backlog contains 40 features. Leadership wants 'quick impact' work, but design wants UX improvements. What prioritization model helps balance these needs?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 174,
+    "category": "execution",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which factor most improves sprint predictability?",
+    "options": ["Reducing story size variability", "Adding more meetings", "Hiring interns", "Higher email frequency"],
+    "correct_answer": "Reducing story size variability",
+    "scoring_weight": 3
+  },
+  {
+    "id": 175,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "A competitor launches a drastically cheaper product alternative. How do you evaluate whether to differentiate or compete on price?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 176,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your active users are increasing, but your power users are decreasing. What does this mean and what actions do you take?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 177,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "What is an SLA?",
+    "options": ["Service Level Agreement", "Software License Agreement", "Server Load Analysis", "System Latency Adjustment"],
+    "correct_answer": "Service Level Agreement",
+    "scoring_weight": 3
+  },
+  {
+    "id": 178,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time you had to motivate a team during a difficult phase of a project.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 179,
+    "category": "executive",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "Leadership pressures you to launch an AI feature quickly to impress investors, but the model is inaccurate. How do you make a decision aligned with long-term product health?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 180,
+    "category": "product_sense",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate the market size for an online language learning platform in a country of 60M people.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 181,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your product leads in features but loses in reliability versus competitors. How do you reallocate resources to address this gap?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 182,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which metric best reflects the value of your recurring revenue product?",
+    "options": ["Retention rate", "Referral rate", "DAU/MAU", "CSAT"],
+    "correct_answer": "Retention rate",
+    "scoring_weight": 3
+  },
+  {
+    "id": 183,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Users frequently abandon mid-way through a long form. What UX technique helps identify the biggest sources of friction?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 184,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your engineering manager reports that technical debt has become too high and wants a full sprint dedicated to refactoring. How do you evaluate this?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 185,
+    "category": "strategy",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "Your product team is asked to support both a new international expansion and a major redesign. How do you align priorities across multiple executives?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 186,
+    "category": "technical",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "A backend migration introduces unexpected downtime risk. How do you plan mitigations as a PM?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 187,
+    "category": "product_sense",
+    "question_type": "mcq",
+    "difficulty": 2,
+    "question_text": "Which technique helps clarify user motivations behind behaviors?",
+    "options": ["Interviewing", "A/B testing", "Heatmaps", "Cohort analysis"],
+    "correct_answer": "Interviewing",
+    "scoring_weight": 2
+  },
+  {
+    "id": 188,
+    "category": "analytics",
+    "question_type": "estimation",
+    "difficulty": 4,
+    "question_text": "Estimate how many online payments are processed daily by small businesses in a region with 500k businesses.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 189,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your team repeatedly receives unclear requirements from a partner department. What processes do you implement to ensure better alignment?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 190,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Describe a time when you had to manage conflicting expectations from two high-priority stakeholders.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 191,
+    "category": "product_sense",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your testing shows that users understand the product but don't find it valuable. What steps help determine whether to reposition or rebuild?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 192,
+    "category": "technical",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "What is the purpose of rate limiting in APIs?",
+    "options": ["Prevent UI lag", "Control request volume", "Improve font rendering", "Speed up CSS loading"],
+    "correct_answer": "Control request volume",
+    "scoring_weight": 3
+  },
+  {
+    "id": 193,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your CEO wants you to benchmark pricing across global competitors. How do you structure this analysis?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 194,
+    "category": "ux",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "During testing, users pause on a particular screen for a long time. They do not complain verbally. What might this indicate?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  },
+  {
+    "id": 195,
+    "category": "analytics",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your conversion rate is strong, but revenue per user is declining. What areas do you investigate first?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 196,
+    "category": "strategy",
+    "question_type": "scenario",
+    "difficulty": 5,
+    "question_text": "You must redesign the product vision for a company transitioning from B2C to B2B. What steps ensure cross-functional alignment and long-term coherence?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 5
+  },
+  {
+    "id": 197,
+    "category": "execution",
+    "question_type": "scenario",
+    "difficulty": 4,
+    "question_text": "Your engineering team identifies a critical security vulnerability and wants to halt all sprint work for a fix. Leadership wants new features on time. How do you handle this?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 198,
+    "category": "product_sense",
+    "question_type": "prioritization",
+    "difficulty": 4,
+    "question_text": "You must choose between reducing friction in sign-up or improving long-term customization features. Which KPIs guide your decision?",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 4
+  },
+  {
+    "id": 199,
+    "category": "analytics",
+    "question_type": "mcq",
+    "difficulty": 3,
+    "question_text": "Which visualization helps identify funnel drop-off points most clearly?",
+    "options": ["Bar chart", "Scatter plot", "Flow diagram", "Pie chart"],
+    "correct_answer": "Flow diagram",
+    "scoring_weight": 3
+  },
+  {
+    "id": 200,
+    "category": "behavioral",
+    "question_type": "scenario",
+    "difficulty": 3,
+    "question_text": "Tell us about a time when you turned user complaints into an actionable improvement opportunity.",
+    "options": null,
+    "correct_answer": null,
+    "scoring_weight": 3
+  }
+]

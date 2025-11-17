@@ -12,36 +12,19 @@ class ProductQuestionForm(forms.Form):
         self.question = question
         super().__init__(*args, **kwargs)
         q_type = question.question_type
-        options = question.options or {}
-        self.ranking_items = []
-        if q_type in {ProductQuestion.TYPE_MULTIPLE, ProductQuestion.TYPE_SCENARIO}:
-            choices = [
-                (choice["id"], choice["text"])
-                for choice in options.get("choices", [])
-            ]
+        options = question.options or []
+        if q_type == ProductQuestion.TYPE_MULTIPLE:
+            choices = [(opt, opt) for opt in options]
             self.fields["answer"] = forms.ChoiceField(
                 label="",
                 choices=choices,
                 widget=forms.RadioSelect,
             )
-        elif q_type == ProductQuestion.TYPE_RANKING:
-            items = options.get("items", [])
-            placeholder = ", ".join(items)
-            self.fields["answer"] = forms.CharField(
-                label="Enter the final order (comma separated)",
-                widget=forms.Textarea(
-                    attrs={
-                        "rows": 3,
-                        "placeholder": f"E.g. {placeholder}",
-                    }
-                ),
-            )
-            self.ranking_items = items
         elif q_type in {
             ProductQuestion.TYPE_BEHAVIORAL_MOST,
             ProductQuestion.TYPE_BEHAVIORAL_LEAST,
         }:
-            statements = options.get("statements", [])
+            statements = options or []
             choices = [(str(idx), text) for idx, text in enumerate(statements)]
             self.fields["selected"] = forms.ChoiceField(
                 label="",
