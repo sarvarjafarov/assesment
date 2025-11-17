@@ -10,4 +10,9 @@ urlpatterns = [
     path("login/", views.ClientLoginView.as_view(), name="login"),
     path("logout/", views.ClientLogoutView.as_view(), name="logout"),
     path("dashboard/", views.ClientDashboardView.as_view(), name="dashboard"),
+    path(
+        "dashboard/assessments/<slug:assessment_type>/",
+        views.ClientAssessmentManageView.as_view(),
+        name="assessment-manage",
+    ),
 ]

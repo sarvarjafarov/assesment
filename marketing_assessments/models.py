@@ -77,6 +77,13 @@ class DigitalMarketingAssessmentSession(TimeStampedModel):
         ("in_progress", "In progress"),
         ("submitted", "Submitted"),
     ]
+    client = models.ForeignKey(
+        "clients.ClientAccount",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="marketing_sessions",
+    )
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     candidate_id = models.CharField(max_length=120, db_index=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="draft")

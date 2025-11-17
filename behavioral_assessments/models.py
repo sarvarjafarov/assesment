@@ -43,6 +43,13 @@ class BehavioralAssessmentSession(TimeStampedModel):
         ("in_progress", "In progress"),
         ("submitted", "Submitted"),
     ]
+    client = models.ForeignKey(
+        "clients.ClientAccount",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="behavioral_sessions",
+    )
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     candidate_id = models.CharField(max_length=120, db_index=True)

@@ -1,51 +1,64 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div class="page">
-    <section class="console-page-header">
-        <div>
-            <p class="eyebrow">Welcome back</p>
-            <h1>{{ account.company_name }}</h1>
-            <p class="lede">You have access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }}.</p>
+<div class="portal-shell">
+    <header class="portal-header">
+        <div class="portal-brand">
+            <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo">
+            <div>
+                <p class="eyebrow">Welcome back</p>
+                <h1>{{ account.company_name }}</h1>
+            </div>
         </div>
-        <div class="header-actions">
-            <a class="btn btn-outline" href="{% url 'clients:logout' %}">Sign out</a>
+        <div class="portal-meta">
+            <p class="muted">You have access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }}.</p>
         </div>
-    </section>
+        <div class="portal-actions">
+            <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
+        </div>
+    </header>
 
-    <section class="stats-grid">
-        <article>
-            <p>Status</p>
-            <strong>{{ account.get_status_display }}</strong>
-            <p class="muted">Approved assessments unlock candidate invites.</p>
-        </article>
-        <article>
-            <p>Employee size</p>
-            <strong>{{ account.get_employee_size_display }}</strong>
-            <p class="muted">Full name: {{ account.full_name }}</p>
-        </article>
-        <article>
-            <p>Requested focus</p>
-            <strong>{{ account.get_requested_assessment_display }}</strong>
-            <p class="muted">Update via your account manager.</p>
-        </article>
-    </section>
+    <main>
+        <section class="portal-card-grid">
+            <article class="portal-card">
+                <p class="label">Status</p>
+                <h2>{{ account.get_status_display }}</h2>
+                <p class="muted">Approved assessments unlock candidate invites.</p>
+            </article>
+            <article class="portal-card">
+                <p class="label">Employee size</p>
+                <h2>{{ account.get_employee_size_display }}</h2>
+                <p class="muted">Point of contact: {{ account.full_name }}</p>
+            </article>
+            <article class="portal-card">
+                <p class="label">Support</p>
+                <h2>Account manager</h2>
+                <p class="muted">Update priorities via your account manager.</p>
+            </article>
+        </section>
 
-    <section class="panel">
-        <header>
-            <h2>Assessment access</h2>
-        </header>
-        {% if allowed_assessments %}
-        <ul class="assessment-list">
-            {% for item in allowed_assessments %}
-            <li>
-                <strong>{{ item.label }}</strong>
-                <p class="muted">{{ item.description|default:"Active license" }}</p>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="empty-state">No assessments approved yet. We will notify you when your licenses are ready.</p>
-        {% endif %}
-    </section>
+        <section class="panel portal-panel">
+            <header>
+                <div>
+                    <p class="eyebrow">Assessment catalog</p>
+                    <h2>Live licenses</h2>
+                </div>
+            </header>
+            {% if allowed_assessments %}
+            <div class="portal-assessment-grid">
+                {% for item in allowed_assessments %}
+                <article class="portal-assessment-card">
+                    <div class="pill subtle">Active</div>
+                    <h3>{{ item.label }}</h3>
+                    <p>{{ item.description|default:"Active license" }}</p>
+                    <a class="btn btn-outline small" href="{{ item.manage_url }}">Manage invites</a>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">No assessments approved yet. We will notify you when your licenses are ready.</p>
+            {% endif %}
+        </section>
+    </main>
 </div>
 {% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="portal-shell">
+    <section class="portal-header">
+        <div class="portal-brand">
+            <div>
+                <p class="eyebrow">{{ assessment_label }}</p>
+                <h1>Manage invites</h1>
+            </div>
+        </div>
+        <div class="portal-actions">
+            <a class="btn btn-outline small" href="{% url 'clients:dashboard' %}">Back to dashboard</a>
+        </div>
+    </section>
+
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Launch new invite</p>
+                <h2>Create candidate link</h2>
+            </div>
+        </header>
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button class="btn btn-pill" type="submit">Generate invite</button>
+        </form>
+    </section>
+
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Active sessions</p>
+                <h2>Track candidates</h2>
+            </div>
+        </header>
+        {% if sessions %}
+        <div class="table">
+            <div class="table-row table-head">
+                <span>Candidate</span>
+                <span>Status</span>
+                <span>Score</span>
+                <span>Updated</span>
+                <span>Link</span>
+            </div>
+            {% for row in sessions %}
+            <div class="table-row">
+                <span>{{ row.candidate }}</span>
+                <span>{{ row.status }}</span>
+                <span>{% if row.score %}{{ row.score }}{% else %}—{% endif %}</span>
+                <span>{% if row.submitted_at %}{{ row.submitted_at|naturaltime }}{% else %}—{% endif %}</span>
+                <span><a class="pill subtle" href="{{ row.share_link }}" target="_blank">Share link</a></span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No invites yet. Use the form above to launch your first candidate experience.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
