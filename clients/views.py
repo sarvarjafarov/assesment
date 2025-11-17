@@ -231,10 +231,14 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, TemplateView):
                 "traits": session.trait_scores or {},
                 "flags": session.risk_flags or [],
             }
+        recommendations = session.recommendations or {}
         return {
             "overall": session.overall_score,
             "hard": getattr(session, "hard_skill_score", None),
             "soft": getattr(session, "soft_skill_score", None),
             "categories": session.category_breakdown or {},
-            "recommendations": session.recommendations or {},
+            "fit_scores": recommendations.get("fit_scores", {}),
+            "strengths": recommendations.get("strengths", []),
+            "development": recommendations.get("development", []),
+            "seniority": recommendations.get("seniority"),
         }

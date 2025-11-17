@@ -25,14 +25,27 @@
         <div class="portal-card-grid">
             <article class="portal-card">
                 <p class="label">Score</p>
-                <h2>{% if report.score %}{{ report.score }}{% elif report.overall %}{{ report.overall }}{% else %}—{% endif %}</h2>
-                <p class="muted">Share link: <a href="{{ share_link }}" target="_blank">{{ share_link }}</a></p>
+                <h2>{% if report.score %}{{ report.score|floatformat:2 }}{% elif report.overall %}{{ report.overall|floatformat:2 }}{% else %}—{% endif %}</h2>
+                <p class="muted"><a href="{{ share_link }}" target="_blank">Share link</a></p>
             </article>
-            {% if report.label %}
+            {% if assessment_type == 'behavioral' and report.label %}
             <article class="portal-card">
                 <p class="label">Decision</p>
                 <h2>{{ report.label }}</h2>
-                <p class="muted">Behavioral eligibility rating.</p>
+                <p class="muted">Behavioral eligibility rating</p>
+            </article>
+            {% elif assessment_type != 'behavioral' %}
+            <article class="portal-card">
+                <p class="label">Skill mix</p>
+                <h2>{{ report.hard|default:'—' }}/{{ report.soft|default:'—' }}</h2>
+                <p class="muted">Hard vs. soft skill scores</p>
+            </article>
+            {% endif %}
+            {% if report.seniority %}
+            <article class="portal-card">
+                <p class="label">Recommended level</p>
+                <h2>{{ report.seniority }}</h2>
+                <p class="muted">Suggested seniority band</p>
             </article>
             {% endif %}
         </div>
@@ -99,12 +112,42 @@
         </div>
         <header>
             <div>
-                <h2>Recommendations</h2>
+                <h2>Fit signals</h2>
             </div>
         </header>
-        {% if report.recommendations %}
-        <pre class="code-block">{{ report.recommendations|safe }}</pre>
-        {% else %}
+        {% if report.fit_scores %}
+        <div class="table">
+            <div class="table-row table-head">
+                <span>Domain</span>
+                <span>Score</span>
+            </div>
+            {% for domain, score in report.fit_scores.items %}
+            <div class="table-row">
+                <span>{{ domain|title }}</span>
+                <span>{{ score }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="chip-row">
+            {% if report.strengths %}
+            <div>
+                <p class="label">Strengths</p>
+                {% for item in report.strengths %}
+                <span class="chip">{{ item|title }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if report.development %}
+                <div>
+                    <p class="label">Development areas</p>
+                    {% for item in report.development %}
+                    <span class="chip warning">{{ item|title }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {% if not report.fit_scores and not report.strengths and not report.development %}
         <p class="muted">No recommendation data recorded.</p>
         {% endif %}
         {% endif %}

@@ -2222,6 +2222,10 @@ main {
     font-weight: 600;
     font-size: 0.85rem;
 }
+.chip.warning {
+    background: rgba(255, 100, 100, 0.12);
+    color: #eb5757;
+}
 .chip-row.warning .chip {
     background: rgba(235, 87, 87, 0.12);
     color: #eb5757;

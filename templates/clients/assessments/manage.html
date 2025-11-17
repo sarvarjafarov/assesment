@@ -60,7 +60,13 @@
                 <span>{% if row.score %}{{ row.score }}{% else %}—{% endif %}</span>
                 <span>{% if row.submitted_at %}{{ row.submitted_at|naturaltime }}{% else %}—{% endif %}</span>
                 <span><a class="pill subtle" href="{{ row.share_link }}" target="_blank">Share link</a></span>
-                <span>\n                    {% if row.detail_url %}\n                    <a class=\"pill\" href=\"{{ row.detail_url }}\">View report</a>\n                    {% else %}\n                    <span class=\"muted\">Pending</span>\n                    {% endif %}\n                </span>
+                <span>
+                    {% if row.detail_url %}
+                    <a class="pill" href="{{ row.detail_url }}">View report</a>
+                    {% else %}
+                    <span class="muted">Pending</span>
+                    {% endif %}
+                </span>
             </div>
             {% endfor %}
         </div>
