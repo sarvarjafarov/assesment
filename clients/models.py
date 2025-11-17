@@ -28,10 +28,22 @@ class ClientAccount(TimeStampedModel):
         ("201-500", "201-500"),
         ("500+", "500+"),
     ]
+    ASSESSMENT_DETAILS = {
+        "marketing": {
+            "label": "Marketing Assessment",
+            "description": "Paid media, SEO, and analytics scenarios to vet growth hires.",
+        },
+        "product": {
+            "label": "Product Management Assessment",
+            "description": "Strategy, execution, and product sense cases for PM candidates.",
+        },
+        "behavioral": {
+            "label": "Behavioral Assessment",
+            "description": "Psychometric-backed signals covering teamwork and leadership.",
+        },
+    }
     ASSESSMENT_CHOICES = [
-        ("marketing", "Marketing Assessment"),
-        ("product", "Product Management Assessment"),
-        ("behavioral", "Behavioral Assessment"),
+        (code, meta["label"]) for code, meta in ASSESSMENT_DETAILS.items()
     ]
     STATUS_CHOICES = [
         ("pending", "Pending approval"),
@@ -47,7 +59,7 @@ class ClientAccount(TimeStampedModel):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=32)
     employee_size = models.CharField(max_length=16, choices=EMPLOYEE_SIZE_CHOICES)
-    requested_assessment = models.CharField(max_length=32, choices=ASSESSMENT_CHOICES)
+    requested_assessments = models.JSONField(default=list, blank=True)
     allowed_assessments = models.JSONField(default=list, blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="pending")
     notes = models.TextField(blank=True)
@@ -66,3 +78,7 @@ class ClientAccount(TimeStampedModel):
     @property
     def approved_assessments(self) -> list[str]:
         return self.allowed_assessments or []
+
+    def requested_labels(self) -> list[str]:
+        catalog = self.ASSESSMENT_DETAILS
+        return [catalog.get(code, {}).get("label", code.title()) for code in self.requested_assessments or []]

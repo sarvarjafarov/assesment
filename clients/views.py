@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 
 from .forms import ClientLoginForm, ClientSignupForm
+from .models import ClientAccount
 
 
 class ClientSignupView(FormView):
@@ -18,6 +19,11 @@ class ClientSignupView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["assessment_details"] = ClientAccount.ASSESSMENT_DETAILS
+        return context
 
 
 class ClientSignupCompleteView(TemplateView):
@@ -60,12 +66,16 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         account = self.request.user.client_account
-        catalog = dict(account.ASSESSMENT_CHOICES)
+        catalog = ClientAccount.ASSESSMENT_DETAILS
         context.update(
             {
                 "account": account,
                 "allowed_assessments": [
-                    {"code": code, "label": catalog.get(code, code.title())}
+                    {
+                        "code": code,
+                        "label": catalog.get(code, {}).get("label", code.title()),
+                        "description": catalog.get(code, {}).get("description", ""),
+                    }
                     for code in account.approved_assessments
                 ],
             }

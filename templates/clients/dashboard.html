@@ -39,7 +39,7 @@
             {% for item in allowed_assessments %}
             <li>
                 <strong>{{ item.label }}</strong>
-                <p class="muted">Live and ready to use.</p>
+                <p class="muted">{{ item.description|default:"Active license" }}</p>
             </li>
             {% endfor %}
         </ul>

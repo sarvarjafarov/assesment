@@ -17,6 +17,11 @@ PUBLIC_EMAIL_DOMAINS = {
 class ClientSignupForm(forms.ModelForm):
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
+    requested_assessments = forms.MultipleChoiceField(
+        label="Assessments you'd like to pilot",
+        choices=ClientAccount.ASSESSMENT_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )
 
     class Meta:
         model = ClientAccount
@@ -26,11 +31,8 @@ class ClientSignupForm(forms.ModelForm):
             "email",
             "phone_number",
             "employee_size",
-            "requested_assessment",
+            "requested_assessments",
         ]
-        widgets = {
-            "requested_assessment": forms.RadioSelect,
-        }
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower().strip()
@@ -62,6 +64,7 @@ class ClientSignupForm(forms.ModelForm):
         user.is_active = False
         user.save(update_fields=["is_active"])
         account.user = user
+        account.requested_assessments = self.cleaned_data.get("requested_assessments", [])
         if commit:
             account.save()
         return account

@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load client_tags %}
 {% block content %}
-<div class="page">
-    <section class="panel request-panel panel-contained">
+<div class="page apply-page">
+    <section class="panel request-panel request-panel--glass panel-contained">
         <div class="request-intro">
             <div class="request-copy">
                 <p class="eyebrow">Become a hiring partner</p>
@@ -61,16 +62,21 @@
                     {% endfor %}
                 </div>
                 <div class="form-field">
-                    <label>Requested assessment</label>
-                    <div class="option-list">
-                        {% for radio in form.requested_assessment %}
-                        <label class="option-item">
-                            {{ radio.tag }}
-                            <span>{{ radio.choice_label }}</span>
+                    <label for="{{ form.requested_assessments.id_for_label }}">Select assessments</label>
+                    <div class="assessment-grid">
+                        {% for checkbox in form.requested_assessments %}
+                        {% with detail=assessment_details|dict_get:checkbox.choice_value %}
+                        <label class="assessment-card">
+                            {{ checkbox.tag }}
+                            <div>
+                                <strong>{{ detail.label|default:checkbox.choice_label }}</strong>
+                                <p>{{ detail.description|default:"Pick this assessment to evaluate candidates in this discipline." }}</p>
+                            </div>
                         </label>
+                        {% endwith %}
                         {% endfor %}
                     </div>
-                    {% for error in form.requested_assessment.errors %}
+                    {% for error in form.requested_assessments.errors %}
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
