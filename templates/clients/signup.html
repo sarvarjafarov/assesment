@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
 {% load client_tags %}
 {% block content %}
-<div class="page apply-page">
+<div class="page-shell apply-page">
+    <header class="site-header">
+        <div class="nav">
+            <div class="brand">
+                <span class="glyph">S</span>
+                <span>Sira Assessments</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#products">Products</a></li>
+                <li><a href="/marketing/api/">API</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a class="btn-outline small" href="{% url 'clients:login' %}">Login</a>
+                <a class="btn small" href="{% url 'clients:signup' %}">Apply</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
     <section class="panel request-panel request-panel--glass panel-contained">
         <div class="request-intro">
             <div class="request-copy">
@@ -53,7 +72,7 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="form-row">
+            <div class="form-row single">
                 <div class="form-field">
                     {{ form.employee_size.label_tag }}
                     {{ form.employee_size }}
@@ -61,25 +80,28 @@
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <div class="form-field">
+            </div>
+            <div class="assessment-section">
+                <div class="assessment-section__header">
                     <label for="{{ form.requested_assessments.id_for_label }}">Select assessments</label>
-                    <div class="assessment-grid">
-                        {% for checkbox in form.requested_assessments %}
-                        {% with detail=assessment_details|dict_get:checkbox.data.value %}
-                        <label class="assessment-card">
-                            {{ checkbox.tag }}
-                            <div>
-                                <strong>{{ detail.label|default:checkbox.choice_label }}</strong>
-                                <p>{{ detail.description|default:"Pick this assessment to evaluate candidates in this discipline." }}</p>
-                            </div>
-                        </label>
-                        {% endwith %}
-                        {% endfor %}
-                    </div>
-                    {% for error in form.requested_assessments.errors %}
-                    <span class="field-error">{{ error }}</span>
+                    <p>Choose one or more products to pilot with your team.</p>
+                </div>
+                <div class="assessment-grid">
+                    {% for checkbox in form.requested_assessments %}
+                    {% with detail=assessment_details|dict_get:checkbox.data.value %}
+                    <label class="assessment-card">
+                        {{ checkbox.tag }}
+                        <div>
+                            <strong>{{ detail.label|default:checkbox.choice_label }}</strong>
+                            <p>{{ detail.description|default:"Pick this assessment to evaluate candidates in this discipline." }}</p>
+                        </div>
+                    </label>
+                    {% endwith %}
                     {% endfor %}
                 </div>
+                {% for error in form.requested_assessments.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
             </div>
             <div class="form-row">
                 <div class="form-field">
@@ -100,5 +122,18 @@
             <button class="btn btn-pill" type="submit">Submit application</button>
         </form>
     </section>
+    </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>© {% now "Y" %} Sira</div>
+        <div class="footer-links">
+            <a href="/">Overview</a>
+            <a href="/blog/">Insights</a>
+            <a href="/marketing/api/">API Docs</a>
+            <a href="{% url 'clients:login' %}">Client login</a>
+        </div>
+        <div>Need help? <a class="link" href="mailto:hello@sira.com">hello@sira.com</a></div>
+    </footer>
 </div>
 {% endblock %}
