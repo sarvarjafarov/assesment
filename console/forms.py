@@ -448,12 +448,23 @@ class ProductAssessmentInviteForm(forms.Form):
     notes = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 3}))
     duration_minutes = forms.IntegerField(label="Duration (minutes)", initial=30, min_value=5)
 
+    def clean(self):
+        cleaned = super().clean()
+        question_set = generate_pm_question_set()
+        if not question_set:
+            raise forms.ValidationError(
+                "No PM questions are available yet. Add product questions before creating sessions."
+            )
+        self.question_set = question_set
+        return cleaned
+
     def save(self) -> ProductAssessmentSession:
         candidate_id = self.cleaned_data["candidate_identifier"]
         session, _ = ProductAssessmentSession.objects.get_or_create(
             candidate_id=candidate_id, defaults={"status": "draft"}
         )
-        session.question_set = generate_pm_question_set()
+        question_set = getattr(self, "question_set", None) or generate_pm_question_set()
+        session.question_set = question_set
         session.status = "in_progress"
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
