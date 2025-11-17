@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db import ProgrammingError
 
 from behavioral_assessments.models import BehavioralQuestion
 
@@ -38,16 +39,21 @@ class Command(BaseCommand):
             statements = block.get("statements") or []
             if not isinstance(block_id, int):
                 raise CommandError(f"Invalid block id: {block_id}")
-            _, was_created = BehavioralQuestion.objects.update_or_create(
-                block_id=block_id,
-                defaults={
-                    "statements": statements,
-                    "prompt": block.get(
-                        "prompt",
-                        "Select which statement is most and least like you.",
-                    ),
-                },
-            )
+            try:
+                _, was_created = BehavioralQuestion.objects.update_or_create(
+                    block_id=block_id,
+                    defaults={
+                        "statements": statements,
+                        "prompt": block.get(
+                            "prompt",
+                            "Select which statement is most and least like you.",
+                        ),
+                    },
+                )
+            except ProgrammingError as exc:
+                raise CommandError(
+                    "Behavioral tables are missing. Run `python manage.py migrate behavioral_assessments` first."
+                ) from exc
             if was_created:
                 created += 1
             else:

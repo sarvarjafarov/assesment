@@ -14,6 +14,10 @@ python manage.py seed_assessments
 python manage.py runserver
 ```
 
+### Deploying
+
+The Heroku release phase now automatically runs `python manage.py migrate --no-input` so new tables are applied before the web dyno boots. If you deploy to another platform, be sure to run migrations (at least `python manage.py migrate behavioral_assessments`) before running the new import commands.
+
 ## Running Tests
 
 By default tests run against SQLite so they can execute anywhere (CI, Heroku review apps) without needing database privileges. No extra setup is required locally:
