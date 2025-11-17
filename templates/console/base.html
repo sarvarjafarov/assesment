@@ -13,6 +13,9 @@
             <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' %}is-active{% endif %}">
                 Dashboard
             </a>
+            <a href="{% url 'console:client-list' %}" class="{% if section == 'clients' %}is-active{% endif %}">
+                Clients
+            </a>
             <a href="{% url 'console:marketing-list' %}" class="{% if section == 'marketing' %}is-active{% endif %}">
                 Marketing Assessments
             </a>
@@ -21,6 +24,12 @@
             </a>
             <a href="{% url 'console:behavioral-list' %}" class="{% if section == 'behavioral' %}is-active{% endif %}">
                 Behavioral Assessments
+            </a>
+            <a href="{% url 'console:reports-overview' %}" class="{% if section == 'reports' %}is-active{% endif %}">
+                Reporting
+            </a>
+            <a href="{% url 'admin:auth_user_changelist' %}" target="_blank">
+                Users & Roles
             </a>
         </nav>
         <div class="console-sidebar-foot">

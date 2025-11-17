@@ -17,6 +17,8 @@ urlpatterns = [
     path("pm/", views.ProductAssessmentListView.as_view(), name="pm-list"),
     path("pm/new/", views.ProductAssessmentCreateView.as_view(), name="pm-create"),
     path("pm/<uuid:uuid>/", views.ProductAssessmentDetailView.as_view(), name="pm-detail"),
+    path("clients/", views.ClientAccountListView.as_view(), name="client-list"),
+    path("reports/", views.ReportingOverviewView.as_view(), name="reports-overview"),
     path("behavioral/", views.BehavioralAssessmentListView.as_view(), name="behavioral-list"),
     path(
         "behavioral/new/",

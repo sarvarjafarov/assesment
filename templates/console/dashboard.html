@@ -4,9 +4,30 @@
 <section class="console-page-header">
     <div>
         <p class="eyebrow">Assessment console</p>
-        <h1>Marketing, Product & Behavioral</h1>
-        <p class="lede">Manage all async assessments from one lightweight dashboard.</p>
+        <h1>Superadmin overview</h1>
+        <p class="lede">Monitor assessment throughput, client onboarding, and workspace activity.</p>
     </div>
+</section>
+
+<section class="panel-grid">
+    <article class="panel metric-panel">
+        <p class="metric-label">Client accounts</p>
+        <div class="metric-value">{{ org_summary.clients.total }}</div>
+        <p class="muted">Approved {{ org_summary.clients.approved }} · Pending {{ org_summary.clients.pending }}</p>
+    </article>
+    <article class="panel metric-panel">
+        <p class="metric-label">Console users</p>
+        <div class="metric-value">{{ org_summary.users.total }}</div>
+        <p class="muted">Includes internal reviewers and partners.</p>
+    </article>
+    <article class="panel metric-panel">
+        <p class="metric-label">Quick links</p>
+        <div class="chip-row">
+            {% for link in quick_links %}
+            <a class="chip" href="{{ link.href }}">{{ link.label }}</a>
+            {% endfor %}
+        </div>
+    </article>
 </section>
 
 <section class="stats-grid">
@@ -27,6 +48,33 @@
         <a class="pill subtle" href="{{ card.detail_url }}">View sessions</a>
     </article>
     {% endfor %}
+</section>
+
+<section class="panel">
+    <header>
+        <h2>Pending client approvals</h2>
+        <a href="{% url 'console:client-list' %}?status=pending">View all</a>
+    </header>
+    {% if pending_clients %}
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Company</span>
+            <span>Contact</span>
+            <span>Requested</span>
+            <span>Submitted</span>
+        </div>
+        {% for client in pending_clients %}
+        <div class="table-row">
+            <span>{{ client.company_name }}</span>
+            <span>{{ client.email }}</span>
+            <span>{{ client.requested_assessments|join:", "|title }}</span>
+            <span>{{ client.created_at|naturaltime }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No pending requests.</p>
+    {% endif %}
 </section>
 
 <section class="panel">

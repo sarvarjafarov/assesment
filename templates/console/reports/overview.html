@@ -1,0 +1,75 @@
+{% extends 'console/base.html' %}
+{% load humanize %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Reporting</p>
+        <h1>System overview</h1>
+        <p class="lede">Track licenses, user adoption, and assessment activity across the portfolio.</p>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article>
+        <p>Total clients</p>
+        <strong>{{ org_summary.clients.total }}</strong>
+        <dl>
+            <div>
+                <dt>Approved</dt>
+                <dd>{{ org_summary.clients.approved }}</dd>
+            </div>
+            <div>
+                <dt>Pending</dt>
+                <dd>{{ org_summary.clients.pending }}</dd>
+            </div>
+        </dl>
+    </article>
+    <article>
+        <p>Console users</p>
+        <strong>{{ org_summary.users.total }}</strong>
+        <p class="muted">Unique accounts with access.</p>
+    </article>
+</section>
+
+<section class="panel-grid">
+    <article class="panel">
+        <header>
+            <h2>Assessment throughput</h2>
+        </header>
+        <div class="table">
+            <div class="table-row table-head">
+                <span>Assessment</span>
+                <span>Total sessions</span>
+                <span>In progress</span>
+            </div>
+            {% for row in assessment_totals %}
+            <div class="table-row">
+                <span>{{ row.label }}</span>
+                <span>{{ row.total }}</span>
+                <span>{{ row.in_progress }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="panel">
+        <header>
+            <h2>Recent client activity</h2>
+        </header>
+        {% if latest_clients %}
+        <ul class="activity-list">
+            {% for client in latest_clients %}
+            <li>
+                <div>
+                    <p>{{ client.company_name }}</p>
+                    <small>{{ client.get_status_display }} • {{ client.email }}</small>
+                </div>
+                <span>{{ client.updated_at|naturaltime }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">No recent updates.</p>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

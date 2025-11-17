@@ -1,0 +1,71 @@
+{% extends 'console/base.html' %}
+{% load humanize client_tags %}
+{% block console_content %}
+<section class="console-page-header">
+    <div>
+        <p class="eyebrow">Client accounts</p>
+        <h1>Manage B2B workspaces</h1>
+        <p class="lede">Review pending approvals, track licensed assessments, and jump into the admin for deeper edits.</p>
+    </div>
+    <div class="header-actions">
+        <form method="get" class="inline-form">
+            <label for="status-filter">Status</label>
+            <select name="status" id="status-filter" onchange="this.form.submit()">
+                <option value="">All</option>
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <a class="btn btn-pill" href="{% url 'clients:signup' %}" target="_blank">Invite client</a>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="table">
+        <div class="table-row table-head">
+            <span>Company</span>
+            <span>Contact</span>
+            <span>Status</span>
+            <span>Assessments</span>
+            <span>Updated</span>
+            <span></span>
+        </div>
+        {% for client in clients %}
+        <div class="table-row">
+            <span>{{ client.company_name }}</span>
+            <span>{{ client.email }}</span>
+            <span class="pill subtle">{{ client.get_status_display }}</span>
+            <span>
+                {% if client.allowed_assessments %}
+                    {% for code in client.allowed_assessments %}
+                        {% with detail=assessment_map|dict_get:code %}
+                            {{ detail.label|default:code|title }}{% if not forloop.last %}, {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                {% else %}
+                    Pending
+                {% endif %}
+            </span>
+            <span>{{ client.updated_at|naturaltime }}</span>
+            <span><a class="pill subtle" href="{% url admin_base client.pk %}" target="_blank">Open in admin</a></span>
+        </div>
+        {% empty %}
+        <div class="table-row">
+            <span class="empty-state">No client accounts found.</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

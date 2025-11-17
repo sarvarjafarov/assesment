@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from behavioral_assessments.models import BehavioralAssessmentSession
+from clients.models import ClientAccount
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from pm_assessments.models import ProductAssessmentSession
 
@@ -37,6 +38,14 @@ class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["summary_cards"] = self._build_cards()
         context["recent_sessions"] = self._recent_sessions()
+        context["org_summary"] = self._org_summary()
+        context["pending_clients"] = ClientAccount.objects.filter(status="pending").order_by("-created_at")[:5]
+        context["quick_links"] = [
+            {"label": "Manage clients", "href": reverse("console:client-list")},
+            {"label": "Create marketing invite", "href": reverse("console:marketing-create")},
+            {"label": "System reporting", "href": reverse("console:reports-overview")},
+            {"label": "Users & roles", "href": reverse("admin:auth_user_changelist")},
+        ]
         return context
 
     def _build_cards(self) -> list[dict]:
@@ -92,6 +101,23 @@ class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
                 )
         entries.sort(key=lambda item: item["timestamp"], reverse=True)
         return entries[:10]
+
+    def _org_summary(self) -> dict:
+        user_model = get_user_model()
+        total_clients = ClientAccount.objects.count()
+        approved_clients = ClientAccount.objects.filter(status="approved").count()
+        pending_clients = ClientAccount.objects.filter(status="pending").count()
+        total_users = user_model.objects.count()
+        return {
+            "clients": {
+                "total": total_clients,
+                "approved": approved_clients,
+                "pending": pending_clients,
+            },
+            "users": {
+                "total": total_users,
+            },
+        }
 
 
 class MarketingAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
@@ -240,3 +266,54 @@ class ConsoleLoginView(FormView):
     def form_valid(self, form):
         login(self.request, form.get_user())
         return super().form_valid(form)
+
+
+class ClientAccountListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+    model = ClientAccount
+    template_name = "console/clients/list.html"
+    section = "clients"
+    context_object_name = "clients"
+    paginate_by = 30
+
+    def get_queryset(self):
+        queryset = ClientAccount.objects.order_by("-created_at")
+        status = self.request.GET.get("status")
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["status_filter"] = self.request.GET.get("status", "")
+        context["status_choices"] = ClientAccount.STATUS_CHOICES
+        context["admin_base"] = "admin:clients_clientaccount_change"
+        context["assessment_map"] = ClientAccount.ASSESSMENT_DETAILS
+        return context
+
+
+class ReportingOverviewView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
+    template_name = "console/reports/overview.html"
+    section = "reports"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["org_summary"] = DashboardView()._org_summary()
+        context["assessment_totals"] = [
+            {
+                "label": "Marketing",
+                "total": DigitalMarketingAssessmentSession.objects.count(),
+                "in_progress": DigitalMarketingAssessmentSession.objects.filter(status="in_progress").count(),
+            },
+            {
+                "label": "Product",
+                "total": ProductAssessmentSession.objects.count(),
+                "in_progress": ProductAssessmentSession.objects.filter(status="in_progress").count(),
+            },
+            {
+                "label": "Behavioral",
+                "total": BehavioralAssessmentSession.objects.count(),
+                "in_progress": BehavioralAssessmentSession.objects.filter(status="in_progress").count(),
+            },
+        ]
+        context["latest_clients"] = ClientAccount.objects.order_by("-updated_at")[:10]
+        return context
