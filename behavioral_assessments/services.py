@@ -41,17 +41,18 @@ def evaluate_session(session: BehavioralAssessmentSession):
     if not report:
         return session
 
-    traits = report.get("traits", {})
-    normalized = traits.get("normalized_scores", {}) if traits else {}
-    eligibility = report.get("eligibility", {})
-    risk_signals = report.get("risk_signals", {})
+    normalized = report.get("normalized_scores") or {}
+    eligibility = report.get("eligibility") or {}
+    red_flag_report = report.get("red_flag_report") or {}
 
     session.trait_scores = normalized
-    weighted_score = eligibility.get("weighted_score")
-    session.eligibility_score = round(float(weighted_score), 2) if weighted_score is not None else None
+    weighted_score = eligibility.get("score")
+    session.eligibility_score = (
+        round(float(weighted_score), 2) if weighted_score is not None else None
+    )
     session.eligibility_label = eligibility.get("decision", "")
     session.profile_report = report
-    session.risk_flags = risk_signals.get("flags", [])
+    session.risk_flags = red_flag_report.get("red_flags") or report.get("red_flags") or []
     session.status = "submitted"
     session.submitted_at = timezone.now()
     session.save(
