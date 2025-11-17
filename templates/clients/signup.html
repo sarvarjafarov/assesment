@@ -65,7 +65,7 @@
                     <label for="{{ form.requested_assessments.id_for_label }}">Select assessments</label>
                     <div class="assessment-grid">
                         {% for checkbox in form.requested_assessments %}
-                        {% with detail=assessment_details|dict_get:checkbox.choice_value %}
+                        {% with detail=assessment_details|dict_get:checkbox.data.value %}
                         <label class="assessment-card">
                             {{ checkbox.tag }}
                             <div>
