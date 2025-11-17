@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page narrow">
+    <section class="panel centered">
+        <h1>Signing out...</h1>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn btn-pill" type="submit">Confirm logout</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

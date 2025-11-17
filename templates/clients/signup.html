@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page narrow">
+    <section class="panel">
+        <p class="eyebrow">Become a hiring partner</p>
+        <h1>Create your client workspace</h1>
+        <p class="lede">Tell us about your company and which assessments you want to access. We'll review your request within one business day.</p>
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button class="btn btn-pill" type="submit">Submit application</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

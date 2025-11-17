@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page">
+    <section class="console-page-header">
+        <div>
+            <p class="eyebrow">Welcome back</p>
+            <h1>{{ account.company_name }}</h1>
+            <p class="lede">You have access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }}.</p>
+        </div>
+        <div class="header-actions">
+            <a class="btn btn-outline" href="{% url 'clients:logout' %}">Sign out</a>
+        </div>
+    </section>
+
+    <section class="stats-grid">
+        <article>
+            <p>Status</p>
+            <strong>{{ account.get_status_display }}</strong>
+            <p class="muted">Approved assessments unlock candidate invites.</p>
+        </article>
+        <article>
+            <p>Employee size</p>
+            <strong>{{ account.get_employee_size_display }}</strong>
+            <p class="muted">Full name: {{ account.full_name }}</p>
+        </article>
+        <article>
+            <p>Requested focus</p>
+            <strong>{{ account.get_requested_assessment_display }}</strong>
+            <p class="muted">Update via your account manager.</p>
+        </article>
+    </section>
+
+    <section class="panel">
+        <header>
+            <h2>Assessment access</h2>
+        </header>
+        {% if allowed_assessments %}
+        <ul class="assessment-list">
+            {% for item in allowed_assessments %}
+            <li>
+                <strong>{{ item.label }}</strong>
+                <p class="muted">Live and ready to use.</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">No assessments approved yet. We will notify you when your licenses are ready.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

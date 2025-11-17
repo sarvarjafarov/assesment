@@ -23,6 +23,7 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('console/', include('console.urls')),
     path('candidate/', include('candidate.urls')),
+    path('clients/', include('clients.urls')),
     path('api/assessments/', include('assessments.urls')),
     path('api/marketing-assessment/', include('marketing_assessments.urls')),
     path('api/pm-assessment/', include('pm_assessments.urls')),
