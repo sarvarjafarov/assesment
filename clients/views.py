@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from django.contrib import messages
+import json
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -80,6 +83,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         account = self.request.user.client_account
         catalog = ClientAccount.ASSESSMENT_DETAILS
         stats = self._calculate_stats(account)
+        stats = self._calculate_stats(account)
         context.update(
             {
                 "account": account,
@@ -93,6 +97,13 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                     for code in account.approved_assessments
                 ],
                 "portal_stats": stats,
+                "chart_payload": json.dumps(
+                    {
+                        "breakdown": stats.get("assessment_breakdown", []),
+                        "trend": stats.get("score_trend", []),
+                    },
+                    cls=DjangoJSONEncoder,
+                ),
             }
         )
         return context
@@ -105,31 +116,65 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             marketing_sessions.count() + product_sessions.count() + behavioral_sessions.count()
         )
 
-        scores = []
-        durations = []
-        for score, duration in marketing_sessions.filter(status="submitted").values_list("overall_score", "duration_minutes"):
-            if score is not None:
-                scores.append(float(score))
-            if duration is not None:
-                durations.append(float(duration))
-        for score, duration in product_sessions.filter(status="submitted").values_list("overall_score", "duration_minutes"):
-            if score is not None:
-                scores.append(float(score))
-            if duration is not None:
-                durations.append(float(duration))
-        for score, duration in behavioral_sessions.filter(status="submitted").values_list("eligibility_score", "duration_minutes"):
-            if score is not None:
-                scores.append(float(score))
-            if duration is not None:
-                durations.append(float(duration))
+        breakdown = []
+        scores: list[float] = []
+        durations: list[float] = []
+
+        def _append_scores(queryset, score_field="overall_score"):
+            for score, duration in queryset.filter(status="submitted").values_list(score_field, "duration_minutes"):
+                if score is not None:
+                    scores.append(float(score))
+                if duration is not None:
+                    durations.append(float(duration))
+
+        _append_scores(marketing_sessions)
+        _append_scores(product_sessions)
+        _append_scores(behavioral_sessions, score_field="eligibility_score")
+
+        for code in account.approved_assessments:
+            label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
+            if code == "marketing":
+                inviteqs = marketing_sessions
+            elif code == "product":
+                inviteqs = product_sessions
+            else:
+                inviteqs = behavioral_sessions
+            breakdown.append(
+                {
+                    "label": label,
+                    "invites": inviteqs.count(),
+                    "completed": inviteqs.filter(status="submitted").count(),
+                }
+            )
 
         avg_score = sum(scores) / len(scores) if scores else None
         avg_duration = sum(durations) / len(durations) if durations else None
+
+        recent = list(marketing_sessions.order_by("-created_at")[:5])
+        recent += list(product_sessions.order_by("-created_at")[:5])
+        recent += list(behavioral_sessions.order_by("-created_at")[:5])
+        recent.sort(key=lambda session: session.created_at or session.updated_at)
+        recent = recent[-5:]
+
+        trend = []
+        for session in recent:
+            base_score = getattr(session, "overall_score", None)
+            if base_score is None:
+                base_score = getattr(session, "eligibility_score", None)
+            trend.append(
+                {
+                    "label": session.candidate_id,
+                    "score": float(base_score) if base_score is not None else None,
+                    "ts": session.submitted_at or session.created_at,
+                }
+            )
 
         return {
             "total_candidates": total_candidates,
             "average_score": avg_score,
             "average_duration": avg_duration,
+            "assessment_breakdown": breakdown,
+            "score_trend": trend,
         }
 
 

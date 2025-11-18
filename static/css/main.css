@@ -3177,6 +3177,9 @@ main {
 .portal-card-grid.three-up {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.portal-card-grid.two-up {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
 .portal-card {
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.9);
@@ -3196,6 +3199,11 @@ main {
 }
 .portal-card.card-muted {
     background: rgba(255, 255, 255, 0.6);
+}
+.chart-card canvas {
+    width: 100% !important;
+    height: 260px !important;
+    margin-top: 1rem;
 }
 .portal-card .label {
     text-transform: uppercase;

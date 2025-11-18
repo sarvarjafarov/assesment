@@ -50,6 +50,21 @@
             </article>
         </section>
 
+        {% if chart_payload %}
+        <section class="portal-card-grid two-up charts-row">
+            <article class="portal-card chart-card">
+                <p class="label">Invite mix</p>
+                <h2>Invites vs. completions</h2>
+                <canvas id="inviteChart"></canvas>
+            </article>
+            <article class="portal-card chart-card">
+                <p class="label">Recent scores</p>
+                <h2>Latest submissions</h2>
+                <canvas id="trendChart"></canvas>
+            </article>
+        </section>
+        {% endif %}
+
         <section class="panel portal-panel">
             <header>
                 <div>
@@ -76,4 +91,75 @@
         </section>
     </main>
 </div>
+{% if chart_payload %}
+{{ chart_payload|json_script:"client-chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const payload = JSON.parse(document.getElementById("client-chart-data").textContent);
+    const breakdown = payload.breakdown || [];
+    const trend = payload.trend || [];
+    const inviteCtx = document.getElementById("inviteChart");
+    const trendCtx = document.getElementById("trendChart");
+    if (inviteCtx && breakdown.length) {
+        new Chart(inviteCtx, {
+            type: "bar",
+            data: {
+                labels: breakdown.map((b) => b.label),
+                datasets: [
+                    {
+                        label: "Invites",
+                        data: breakdown.map((b) => b.invites),
+                        backgroundColor: "rgba(255,138,0,0.35)",
+                        borderRadius: 12,
+                    },
+                    {
+                        label: "Completed",
+                        data: breakdown.map((b) => b.completed),
+                        backgroundColor: "rgba(14,20,40,0.8)",
+                        borderRadius: 12,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: "bottom" },
+                },
+                scales: {
+                    y: { beginAtZero: true },
+                },
+            },
+        });
+    }
+    if (trendCtx && trend.length) {
+        new Chart(trendCtx, {
+            type: "line",
+            data: {
+                labels: trend.map((t) => t.label),
+                datasets: [
+                    {
+                        label: "Score",
+                        data: trend.map((t) => t.score),
+                        borderColor: "rgba(14,20,40,0.9)",
+                        backgroundColor: "rgba(14,20,40,0.1)",
+                        tension: 0.35,
+                        fill: true,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                },
+                scales: {
+                    y: { beginAtZero: true, suggestedMax: 100 },
+                },
+            },
+        });
+    }
+})();
+</script>
+{% endif %}
 {% endblock %}
