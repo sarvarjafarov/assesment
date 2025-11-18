@@ -7,6 +7,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, TemplateView
+from django.db import models
 
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from pm_assessments.models import ProductAssessmentSession
@@ -78,6 +79,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         account = self.request.user.client_account
         catalog = ClientAccount.ASSESSMENT_DETAILS
+        stats = self._calculate_stats(account)
         context.update(
             {
                 "account": account,
@@ -90,9 +92,45 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                     }
                     for code in account.approved_assessments
                 ],
+                "portal_stats": stats,
             }
         )
         return context
+
+    def _calculate_stats(self, account: ClientAccount) -> dict:
+        marketing_sessions = DigitalMarketingAssessmentSession.objects.filter(client=account)
+        product_sessions = ProductAssessmentSession.objects.filter(client=account)
+        behavioral_sessions = BehavioralAssessmentSession.objects.filter(client=account)
+        total_candidates = (
+            marketing_sessions.count() + product_sessions.count() + behavioral_sessions.count()
+        )
+
+        scores = []
+        durations = []
+        for score, duration in marketing_sessions.filter(status="submitted").values_list("overall_score", "duration_minutes"):
+            if score is not None:
+                scores.append(float(score))
+            if duration is not None:
+                durations.append(float(duration))
+        for score, duration in product_sessions.filter(status="submitted").values_list("overall_score", "duration_minutes"):
+            if score is not None:
+                scores.append(float(score))
+            if duration is not None:
+                durations.append(float(duration))
+        for score, duration in behavioral_sessions.filter(status="submitted").values_list("eligibility_score", "duration_minutes"):
+            if score is not None:
+                scores.append(float(score))
+            if duration is not None:
+                durations.append(float(duration))
+
+        avg_score = sum(scores) / len(scores) if scores else None
+        avg_duration = sum(durations) / len(durations) if durations else None
+
+        return {
+            "total_candidates": total_candidates,
+            "average_score": avg_score,
+            "average_duration": avg_duration,
+        }
 
 
 class ClientAssessmentMixin(LoginRequiredMixin):

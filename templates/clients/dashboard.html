@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load static %}
 {% block content %}
 <div class="portal-shell">
     <header class="portal-hero">
@@ -28,6 +27,21 @@
                 <p class="label">Employee size</p>
                 <h2>{{ account.get_employee_size_display }}</h2>
                 <p class="muted">Point of contact: {{ account.full_name }}</p>
+            </article>
+            <article class="portal-card">
+                <p class="label">Total candidates</p>
+                <h2>{{ portal_stats.total_candidates }}</h2>
+                <p class="muted"> invites across all assessments</p>
+            </article>
+            <article class="portal-card">
+                <p class="label">Average score</p>
+                <h2>{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</h2>
+                <p class="muted">Across completed sessions</p>
+            </article>
+            <article class="portal-card">
+                <p class="label">Average duration</p>
+                <h2>{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }} min{% else %}—{% endif %}</h2>
+                <p class="muted">From start to submission</p>
             </article>
             <article class="portal-card card-muted">
                 <p class="label">Support</p>

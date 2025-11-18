@@ -19,6 +19,13 @@ class ClientAccountQuerySet(models.QuerySet):
     def approved(self):
         return self.filter(status="approved")
 
+    def with_metrics(self):
+        return self.annotate(
+            total_sessions=models.Count(
+                "marketing_sessions", distinct=True
+            )
+        )
+
 
 class ClientAccount(TimeStampedModel):
     EMPLOYEE_SIZE_CHOICES = [
