@@ -3174,6 +3174,9 @@ main {
     gap: 1rem;
     margin-bottom: 2rem;
 }
+.portal-card-grid.three-up {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
 .portal-card {
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.9);
