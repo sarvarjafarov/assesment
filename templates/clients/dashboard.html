@@ -1,16 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load static %}
 {% block content %}
 <div class="portal-shell">
-    <header class="portal-header">
-        <div class="portal-brand">
-            <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo">
-            <div>
-                <p class="eyebrow">Welcome back</p>
-                <h1>{{ account.company_name }}</h1>
-            </div>
+    <header class="portal-hero">
+        <div class="portal-hero-icon">
+            <span>⚡</span>
         </div>
-        <div class="portal-meta">
+        <div>
+            <p class="eyebrow">Welcome back</p>
+            <h1>{{ account.company_name }}</h1>
             <p class="muted">You have access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }}.</p>
         </div>
         <div class="portal-actions">
@@ -30,7 +29,7 @@
                 <h2>{{ account.get_employee_size_display }}</h2>
                 <p class="muted">Point of contact: {{ account.full_name }}</p>
             </article>
-            <article class="portal-card">
+            <article class="portal-card card-muted">
                 <p class="label">Support</p>
                 <h2>Account manager</h2>
                 <p class="muted">Update priorities via your account manager.</p>
@@ -51,7 +50,9 @@
                     <div class="pill subtle">Active</div>
                     <h3>{{ item.label }}</h3>
                     <p>{{ item.description|default:"Active license" }}</p>
-                    <a class="btn btn-outline small" href="{{ item.manage_url }}">Manage invites</a>
+                    <div class="portal-assessment-actions">
+                        <a class="btn btn-outline small" href="{{ item.manage_url }}">Manage invites</a>
+                    </div>
                 </article>
                 {% endfor %}
             </div>

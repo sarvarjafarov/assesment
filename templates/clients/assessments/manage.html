@@ -2,19 +2,18 @@
 {% load humanize %}
 {% block content %}
 <div class="portal-shell">
-    <section class="portal-header">
-        <div class="portal-brand">
-            <div>
-                <p class="eyebrow">{{ assessment_label }}</p>
-                <h1>Manage invites</h1>
-            </div>
+    <section class="portal-hero compact">
+        <div>
+            <p class="eyebrow">{{ assessment_label }}</p>
+            <h1>Manage invites</h1>
+            <p class="muted">Launch new sessions and monitor your candidates.</p>
         </div>
         <div class="portal-actions">
             <a class="btn btn-outline small" href="{% url 'clients:dashboard' %}">Back to dashboard</a>
         </div>
     </section>
 
-    <section class="panel portal-panel">
+    <section class="panel portal-panel invite-panel">
         <header>
             <div>
                 <p class="eyebrow">Launch new invite</p>

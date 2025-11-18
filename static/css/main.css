@@ -3139,21 +3139,31 @@ main {
     background: linear-gradient(180deg, #f5f6ff 0%, #fff9f2 100%);
     padding: 3rem 1.5rem 4rem;
 }
-.portal-header {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-.portal-brand {
+.portal-hero {
+    background: radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.95), rgba(247, 241, 233, 0.6));
+    border-radius: 32px;
+    padding: 2rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 25px 40px rgba(14, 20, 40, 0.08);
 }
-.portal-brand img {
-    width: 56px;
-    height: 56px;
+.portal-hero.compact {
+    padding: 1.5rem 2rem;
+}
+.portal-hero-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: rgba(255, 138, 0, 0.15);
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+}
+.portal-actions {
+    justify-self: end;
 }
 .portal-actions {
     justify-self: end;
@@ -3170,6 +3180,9 @@ main {
     border-radius: 24px;
     border: 1px solid rgba(14, 20, 40, 0.06);
     box-shadow: 0 12px 35px rgba(14, 20, 40, 0.08);
+}
+.portal-card.card-muted {
+    background: rgba(255, 255, 255, 0.6);
 }
 .portal-card .label {
     text-transform: uppercase;
@@ -3199,6 +3212,19 @@ main {
     border-radius: 18px;
     padding: 1.25rem;
     background: #f7f8ff;
+}
+.portal-assessment-actions {
+    margin-top: 1rem;
+}
+.invite-panel form .btn {
+    width: 100%;
+}
+.portal-panel .table {
+    border-radius: 18px;
+    overflow: hidden;
+}
+.portal-panel .table-row {
+    align-items: center;
 }
 .auth-panel {
     max-width: 520px;
