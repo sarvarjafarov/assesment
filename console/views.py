@@ -33,6 +33,7 @@ class ConsoleSectionMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["section"] = self.section
+        context["parent_section"] = getattr(self, "parent_section", self.section)
         return context
 
 
@@ -300,6 +301,7 @@ class ClientAccountListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
 class ReportingOverviewView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
     template_name = "console/reports/overview.html"
     section = "reports"
+    parent_section = "dashboard"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
