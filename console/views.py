@@ -79,11 +79,15 @@ class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
         total = queryset.count()
         in_progress = queryset.filter(status="in_progress").count()
         completed = queryset.filter(status="submitted").count()
+        completion_pct = round((completed / total) * 100) if total else 0
+        in_progress_pct = round((in_progress / total) * 100) if total else 0
         return {
             "label": label,
             "total": total,
             "in_progress": in_progress,
             "completed": completed,
+            "completion_pct": completion_pct,
+            "in_progress_pct": in_progress_pct,
             "detail_url": detail_url,
         }
 

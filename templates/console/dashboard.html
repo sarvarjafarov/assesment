@@ -25,33 +25,97 @@
     </div>
 </section>
 
-<section class="panel-grid">
-    <article class="panel metric-panel">
-        <p class="metric-label">Client accounts</p>
-        <div class="metric-value">{{ org_summary.clients.total }}</div>
-        <p class="muted">Approved {{ org_summary.clients.approved }} · Pending {{ org_summary.clients.pending }}</p>
+<section class="panel-grid metric-grid metric-cluster">
+    <article class="panel metric-panel accent-clients">
+        <div class="metric-panel-inner">
+            <div class="metric-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M5 21V5a2 2 0 0 1 2-2h3v6h4V3h3a2 2 0 0 1 2 2v16m-14 0h14M9 12h1m0 4H9m5-4h1m0 4h-1"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div>
+                <p class="metric-label">Client accounts</p>
+                <div class="metric-value">{{ org_summary.clients.total }}</div>
+                <ul class="metric-breakdown">
+                    <li>
+                        <span>Approved</span>
+                        <strong>{{ org_summary.clients.approved }}</strong>
+                    </li>
+                    <li>
+                        <span>Pending</span>
+                        <strong>{{ org_summary.clients.pending }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </article>
-    <article class="panel metric-panel">
-        <p class="metric-label">Console users</p>
-        <div class="metric-value">{{ org_summary.users.total }}</div>
-        <p class="muted">Includes internal reviewers and partners.</p>
+    <article class="panel metric-panel accent-users">
+        <div class="metric-panel-inner">
+            <div class="metric-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M12 13.5c-2.9 0-5.25 2.35-5.25 5.25V21h10.5v-2.25c0-2.9-2.35-5.25-5.25-5.25Zm0-2.25A3.75 3.75 0 1 0 12 3.75a3.75 3.75 0 0 0 0 7.5Z"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div>
+                <p class="metric-label">Console users</p>
+                <div class="metric-value">{{ org_summary.users.total }}</div>
+                <p class="metric-helper">Internal reviewers, partners, and client admins.</p>
+            </div>
+        </div>
     </article>
-    <article class="panel metric-panel quick-links-panel">
-        <p class="metric-label">Quick links</p>
-        <div class="chip-row">
-            {% for link in quick_links %}
-            <a class="chip" href="{{ link.href }}">{{ link.label }}</a>
-            {% endfor %}
+    <article class="panel metric-panel quick-links-panel neutral">
+        <div class="metric-panel-inner">
+            <div class="metric-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M7 12h10m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div>
+                <p class="metric-label">Quick links</p>
+                <p class="metric-helper">Jump into the most common console workflows.</p>
+                {% if quick_links %}
+                <div class="chip-row">
+                    {% for link in quick_links %}
+                    <a class="chip" href="{{ link.href }}">{{ link.label }}</a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="muted">No shortcuts available.</p>
+                {% endif %}
+            </div>
         </div>
     </article>
 </section>
 
-<section class="stats-grid">
+<section class="stats-grid three-up assessment-grid">
     {% for card in summary_cards %}
-    <article>
-        <p>{{ card.label }}</p>
-        <strong>{{ card.total }}</strong>
-        <dl>
+    <article class="assessment-stat-card theme-{{ card.label|slugify }}">
+        <header class="assessment-card-header">
+            <div class="assessment-icon" aria-hidden="true">
+                <span>{{ card.label|slice:":1" }}</span>
+            </div>
+            <div class="assessment-heading">
+                <p class="label">Assessment</p>
+                <h3>{{ card.label }}</h3>
+            </div>
+            <span class="micro-pill">{{ card.in_progress }} active</span>
+        </header>
+        <div class="stat-total">
+            {{ card.total }}
+            <span>Total sessions</span>
+        </div>
+        <div class="progress-row" aria-label="Completion progress">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ card.completion_pct }}%;"></div>
+            </div>
+            <span class="progress-label">{{ card.completion_pct }}% completed</span>
+        </div>
+        <dl class="stat-breakdown">
             <div>
                 <dt>In progress</dt>
                 <dd>{{ card.in_progress }}</dd>
@@ -61,7 +125,9 @@
                 <dd>{{ card.completed }}</dd>
             </div>
         </dl>
-        <a class="pill subtle" href="{{ card.detail_url }}">View sessions</a>
+        <div class="card-actions">
+            <a class="pill subtle" href="{{ card.detail_url }}">View sessions</a>
+        </div>
     </article>
     {% endfor %}
 </section>
