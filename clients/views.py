@@ -615,7 +615,10 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                 session_uuid__in=[session.uuid for session in sessions],
             )
             .values("session_uuid")
-            .annotate(note_count=models.Count("id"), needs_review=models.Max("needs_review"))
+            .annotate(
+                note_count=models.Count("id"),
+                needs_review_count=models.Count("id", filter=models.Q(needs_review=True)),
+            )
         }
         for session in sessions:
             score = getattr(session, "overall_score", None)
@@ -638,7 +641,7 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                     if session.status == "submitted"
                     else None,
                     "notes": note_meta.get("note_count", 0),
-                    "needs_review": bool(note_meta.get("needs_review")),
+                    "needs_review": note_meta.get("needs_review_count", 0) > 0,
                     "scheduled_for": session.scheduled_for,
                     "last_reminder_at": session.last_reminder_at,
                     "reminder_count": session.reminder_count,
