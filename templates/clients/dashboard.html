@@ -87,6 +87,35 @@
         <p class="empty-state">No quick actions available.</p>
         {% endif %}
     </section>
+    {% if is_manager %}
+    <section class="branding-section">
+        <article class="portal-card branding-card">
+            <p class="label">Branding</p>
+            <h2>Workspace logo</h2>
+            <p class="muted">Upload a square PNG/JPG/SVG for the hero badge.</p>
+            <form method="post" enctype="multipart/form-data" class="logo-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="upload_logo">
+                {{ logo_form.non_field_errors }}
+                <div class="form-field">
+                    {{ logo_form.logo.label_tag }}
+                    {{ logo_form.logo }}
+                    {% for error in logo_form.logo.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-outline small" type="submit">Upload logo</button>
+            </form>
+            {% if account.logo %}
+            <form method="post" class="remove-logo-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove_logo">
+                <button class="btn btn-ghost small" type="submit">Remove current logo</button>
+            </form>
+            {% endif %}
+        </article>
+    </section>
+    {% endif %}
 
     <main>
         <section class="portal-card-grid metric-snapshot">

@@ -26,6 +26,7 @@
             <div class="form-field">
                 {{ field.label_tag }}
                 {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
                 {% for error in field.errors %}
                 <span class="field-error">{{ error }}</span>
                 {% endfor %}
@@ -33,6 +34,23 @@
             {% endfor %}
             <button class="btn btn-pill" type="submit">Generate invite</button>
         </form>
+        <div class="divider"></div>
+        <div class="bulk-upload">
+            <p class="label">Bulk upload</p>
+            <p class="muted">Upload a CSV with headers (candidate_id, duration_minutes, send_at). send_at expects YYYY-MM-DD HH:MM.</p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="bulk_upload">
+                <div class="form-field">
+                    {{ bulk_form.csv_file.label_tag }}
+                    {{ bulk_form.csv_file }}
+                    {% for error in bulk_form.csv_file.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-outline small" type="submit">Upload CSV</button>
+            </form>
+        </div>
     </section>
 
     <section class="panel portal-panel">
@@ -47,16 +65,25 @@
             <div class="table-row table-head">
                 <span>Candidate</span>
                 <span>Status</span>
+                <span>Timing</span>
                 <span>Score</span>
                 <span>Notes</span>
                 <span>Updated</span>
-                <span>Link</span>
-                <span>Report</span>
+                <span>Actions</span>
             </div>
             {% for row in sessions %}
             <div class="table-row">
                 <span>{{ row.candidate }}</span>
                 <span>{{ row.status }}</span>
+                <span>
+                    {% if row.scheduled_for %}
+                    Scheduled {{ row.scheduled_for|naturaltime }}
+                    {% elif row.last_reminder_at %}
+                    Reminder sent {{ row.last_reminder_at|naturaltime }} ({{ row.reminder_count }})
+                    {% else %}
+                    —
+                    {% endif %}
+                </span>
                 <span>{% if row.score %}{{ row.score }}{% else %}—{% endif %}</span>
                 <span>
                     {% if row.needs_review %}
@@ -68,12 +95,25 @@
                     {% endif %}
                 </span>
                 <span>{% if row.submitted_at %}{{ row.submitted_at|naturaltime }}{% else %}—{% endif %}</span>
-                <span><a class="pill subtle" href="{{ row.share_link }}" target="_blank">Share link</a></span>
-                <span>
+                <span class="table-actions">
+                    <a class="pill subtle" href="{{ row.share_link }}" target="_blank">Share</a>
                     {% if row.detail_url %}
-                    <a class="pill" href="{{ row.detail_url }}">View report</a>
-                    {% else %}
-                    <span class="muted">Pending</span>
+                    <a class="pill" href="{{ row.detail_url }}">Report</a>
+                    {% endif %}
+                    {% if row.scheduled_for %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="launch_now">
+                        <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
+                        <button class="pill subtle" type="submit">Launch now</button>
+                    </form>
+                    {% elif row.status_code == "in_progress" %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="send_reminder">
+                        <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
+                        <button class="pill subtle" type="submit">Send reminder</button>
+                    </form>
                     {% endif %}
                 </span>
             </div>

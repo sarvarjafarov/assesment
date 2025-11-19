@@ -4,6 +4,8 @@ from django.contrib import messages
 import csv
 import json
 from datetime import timedelta
+import csv
+import io
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -22,11 +24,13 @@ from behavioral_assessments.models import BehavioralAssessmentSession
 
 from .forms import (
     ClientBehavioralInviteForm,
+    ClientBulkInviteForm,
     ClientLoginForm,
     ClientMarketingInviteForm,
     ClientProductInviteForm,
     ClientSignupForm,
     ClientSessionNoteForm,
+    ClientLogoForm,
 )
 from .models import ClientAccount, ClientNotification, ClientSessionNote
 
@@ -140,10 +144,12 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "clients/dashboard.html"
     login_url = reverse_lazy("clients:login")
     http_method_names = ["get", "post"]
+    logo_form_class = ClientLogoForm
 
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
+        self.logo_form = self.logo_form_class()
         if request.user.client_account.status != "approved":
             messages.info(request, "Your account is still pending approval.")
             return redirect("clients:signup")
@@ -172,6 +178,29 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             else:
                 notification.is_read = True
                 notification.save(update_fields=["is_read"])
+        elif action == "upload_logo":
+            if account.role != "manager":
+                messages.error(request, "Only managers can update branding.")
+                return redirect("clients:dashboard")
+            form = self.logo_form_class(request.POST, request.FILES)
+            if form.is_valid():
+                account.logo = form.cleaned_data["logo"]
+                account.save(update_fields=["logo"])
+                messages.success(request, "Logo updated.")
+                return redirect("clients:dashboard")
+            self.logo_form = form
+            response = self.get(request, *args, **kwargs)
+            response.status_code = 400
+            return response
+        elif action == "remove_logo":
+            if account.role != "manager":
+                messages.error(request, "Only managers can update branding.")
+                return redirect("clients:dashboard")
+            if account.logo:
+                account.logo.delete(save=False)
+                account.logo = None
+                account.save(update_fields=["logo"])
+            messages.info(request, "Logo removed.")
         return redirect("clients:dashboard")
 
     def get_context_data(self, **kwargs):
@@ -237,6 +266,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "activity_querystring": self.request.GET.urlencode(),
                 "notifications": self._notifications(account),
                 "benchmark_helper": "Benchmarks reference anonymized averages across all clients running the same assessments.",
+                "logo_form": getattr(self, "logo_form", self.logo_form_class()),
             }
         )
         return context
@@ -495,6 +525,7 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             return redirect("clients:dashboard")
         self.assessment_type = assessment_type
         self.assessment_config = self.ASSESSMENT_CONFIG[assessment_type]
+        self._activate_scheduled_invites()
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_class(self):
@@ -523,14 +554,54 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         except model.DoesNotExist:
             raise Http404
 
+    def _activate_scheduled_invites(self):
+        model = self.assessment_config["session_model"]
+        now = timezone.now()
+        scheduled = model.objects.filter(
+            client=self.account,
+            status="draft",
+            scheduled_for__isnull=False,
+            scheduled_for__lte=now,
+        )
+        for session in scheduled:
+            session.status = "in_progress"
+            session.scheduled_for = None
+            session.started_at = None
+            session.save(update_fields=["status", "scheduled_for", "started_at"])
+
 
 class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
     template_name = "clients/assessments/manage.html"
+    bulk_form_class = ClientBulkInviteForm
 
     def form_valid(self, form):
         session = form.save()
         messages.success(self.request, f"Invite ready. Share the link with {session.candidate_id}.")
         return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("action")
+        if action == "bulk_upload":
+            if not self.is_manager:
+                messages.error(request, "Only managers can upload invites.")
+                return redirect(self.get_success_url())
+            bulk_form = self.bulk_form_class(request.POST, request.FILES)
+            if bulk_form.is_valid():
+                created, errors = self._process_bulk_upload(bulk_form.cleaned_data["csv_file"])
+                if created:
+                    messages.success(request, f"Created {created} invite{'' if created == 1 else 's'}.")
+                if errors:
+                    messages.warning(request, f"Issues with rows: {', '.join(errors[:5])}")
+                return redirect(self.get_success_url())
+            context = self.get_context_data(form=self.get_form(), bulk_form=bulk_form)
+            return self.render_to_response(context, status=400)
+        elif action == "send_reminder":
+            self._trigger_reminder(request.POST.get("session_uuid"))
+            return redirect(self.get_success_url())
+        elif action == "launch_now":
+            self._launch_now(request.POST.get("session_uuid"))
+            return redirect(self.get_success_url())
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -557,6 +628,7 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                 {
                     "candidate": session.candidate_id,
                     "status": session.get_status_display(),
+                    "status_code": session.status,
                     "score": score,
                     "submitted_at": session.submitted_at,
                     "share_link": self.build_share_link(session),
@@ -567,15 +639,76 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                     else None,
                     "notes": note_meta.get("note_count", 0),
                     "needs_review": bool(note_meta.get("needs_review")),
+                    "scheduled_for": session.scheduled_for,
+                    "last_reminder_at": session.last_reminder_at,
+                    "reminder_count": session.reminder_count,
+                    "uuid": session.uuid,
                 }
             )
+        bulk_form = context.get("bulk_form")
+        if not bulk_form:
+            bulk_form = self.bulk_form_class()
         context.update(
             {
                 "assessment_label": self.assessment_config["label"],
                 "sessions": session_rows,
+                "bulk_form": bulk_form,
             }
         )
         return context
+
+    def _process_bulk_upload(self, csv_file) -> tuple[int, list[str]]:
+        created = 0
+        errors: list[str] = []
+        decoded = io.TextIOWrapper(csv_file.file, encoding="utf-8")
+        reader = csv.DictReader(decoded)
+        default_duration = self.get_form_class().base_fields["duration_minutes"].initial or 30
+        for idx, row in enumerate(reader, start=1):
+            candidate = row.get("candidate_id") or row.get("candidate_identifier") or row.get("email")
+            if not candidate:
+                errors.append(f"row {idx}: missing candidate_id")
+                continue
+            duration = row.get("duration_minutes") or row.get("duration") or default_duration
+            send_at = row.get("send_at") or row.get("scheduled_for")
+            form_data = {
+                "candidate_identifier": candidate,
+                "duration_minutes": duration,
+                "send_at": send_at,
+            }
+            form = self.get_form_class()(data=form_data, client=self.account)
+            if form.is_valid():
+                form.save()
+                created += 1
+            else:
+                error_text = "; ".join(
+                    [msg for messages in form.errors.values() for msg in messages]
+                )
+                errors.append(f"row {idx}: {error_text}")
+        return created, errors
+
+    def _trigger_reminder(self, session_uuid: str | None):
+        if not session_uuid:
+            return
+        session = self.get_session_object(session_uuid)
+        if session.status != "in_progress":
+            messages.error(self.request, "Reminders are only available for active candidates.")
+            return
+        session.last_reminder_at = timezone.now()
+        session.reminder_count = (session.reminder_count or 0) + 1
+        session.save(update_fields=["last_reminder_at", "reminder_count"])
+        messages.success(self.request, f"Reminder logged for {session.candidate_id}.")
+
+    def _launch_now(self, session_uuid: str | None):
+        if not session_uuid:
+            return
+        session = self.get_session_object(session_uuid)
+        if session.status != "draft" or not session.scheduled_for:
+            messages.info(self.request, "Invite already active.")
+            return
+        session.status = "in_progress"
+        session.scheduled_for = None
+        session.save(update_fields=["status", "scheduled_for"])
+        messages.success(self.request, f"Invite for {session.candidate_id} is now live.")
 
 
 class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):

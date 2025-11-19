@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.utils import timezone
 
 from behavioral_assessments.models import BehavioralAssessmentSession
 from behavioral_assessments.services import generate_question_set as generate_behavioral_question_set
@@ -19,6 +20,19 @@ PUBLIC_EMAIL_DOMAINS = {
     "hotmail.com",
     "icloud.com",
 }
+
+
+def _validate_logo_file(file_obj):
+    if not file_obj:
+        return file_obj
+    content_type = getattr(file_obj, "content_type", "")
+    allowed_types = {"image/png", "image/jpeg", "image/svg+xml"}
+    if content_type and content_type not in allowed_types:
+        raise forms.ValidationError("Upload a PNG, JPG, or SVG file.")
+    max_size = 2 * 1024 * 1024
+    if file_obj.size > max_size:
+        raise forms.ValidationError("Logo must be smaller than 2MB.")
+    return file_obj
 
 
 class ClientSignupForm(forms.ModelForm):
@@ -66,16 +80,7 @@ class ClientSignupForm(forms.ModelForm):
 
     def clean_logo(self):
         logo = self.cleaned_data.get("logo")
-        if not logo:
-            return logo
-        content_type = getattr(logo, "content_type", "")
-        allowed_types = {"image/png", "image/jpeg", "image/svg+xml"}
-        if content_type and content_type not in allowed_types:
-            raise forms.ValidationError("Upload a PNG, JPG, or SVG file.")
-        max_size = 2 * 1024 * 1024
-        if logo.size > max_size:
-            raise forms.ValidationError("Logo must be smaller than 2MB.")
-        return logo
+        return _validate_logo_file(logo)
 
     def save(self, commit=True) -> ClientAccount:
         account = super().save(commit=False)
@@ -120,6 +125,12 @@ class BaseClientInviteForm(forms.Form):
         help_text="Shared with the candidate to access their workspace.",
     )
     duration_minutes = forms.IntegerField(min_value=5, initial=30, label="Duration (minutes)")
+    send_at = forms.DateTimeField(
+        required=False,
+        label="Schedule send (optional)",
+        help_text="Leave blank to send immediately. Use YYYY-MM-DD HH:MM format.",
+        input_formats=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%m/%d/%Y %H:%M"],
+    )
 
     model = None
     generate_question_set = None
@@ -141,6 +152,16 @@ class BaseClientInviteForm(forms.Form):
         self.question_set = question_set
         return cleaned
 
+    def clean_send_at(self):
+        send_at = self.cleaned_data.get("send_at")
+        if not send_at:
+            return send_at
+        if timezone.is_naive(send_at):
+            send_at = timezone.make_aware(send_at, timezone.get_current_timezone())
+        if send_at < timezone.now():
+            raise forms.ValidationError("Scheduled time must be in the future.")
+        return send_at
+
     def save(self):
         raise NotImplementedError
 
@@ -157,11 +178,19 @@ class ClientMarketingInviteForm(BaseClientInviteForm):
             defaults={"status": "draft"},
         )
         session.question_set = getattr(self, "question_set", None) or self.generate_question_set()
-        session.status = "in_progress"
+        send_at = self.cleaned_data.get("send_at")
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
-        session.save(update_fields=["question_set", "status", "duration_minutes", "started_at", "client"])
+        if send_at:
+            session.status = "draft"
+            session.scheduled_for = send_at
+        else:
+            session.status = "in_progress"
+            session.scheduled_for = None
+        session.save(
+            update_fields=["question_set", "status", "scheduled_for", "duration_minutes", "started_at", "client"]
+        )
         return session
 
 
@@ -177,11 +206,19 @@ class ClientProductInviteForm(BaseClientInviteForm):
             defaults={"status": "draft"},
         )
         session.question_set = getattr(self, "question_set", None) or self.generate_question_set()
-        session.status = "in_progress"
+        send_at = self.cleaned_data.get("send_at")
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
-        session.save(update_fields=["question_set", "status", "duration_minutes", "started_at", "client"])
+        if send_at:
+            session.status = "draft"
+            session.scheduled_for = send_at
+        else:
+            session.status = "in_progress"
+            session.scheduled_for = None
+        session.save(
+            update_fields=["question_set", "status", "scheduled_for", "duration_minutes", "started_at", "client"]
+        )
         return session
 
 
@@ -201,12 +238,46 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
             defaults={"status": "draft"},
         )
         session.question_set = getattr(self, "question_set", None) or self.generate_question_set()
-        session.status = "in_progress"
+        send_at = self.cleaned_data.get("send_at")
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
-        session.save(update_fields=["question_set", "status", "duration_minutes", "started_at", "client"])
+        if send_at:
+            session.status = "draft"
+            session.scheduled_for = send_at
+        else:
+            session.status = "in_progress"
+            session.scheduled_for = None
+        session.save(
+            update_fields=["question_set", "status", "scheduled_for", "duration_minutes", "started_at", "client"]
+        )
         return session
+
+
+class ClientLogoForm(forms.Form):
+    logo = forms.FileField(
+        label="Upload new logo",
+        widget=forms.FileInput(attrs={"accept": "image/png,image/jpeg,image/svg+xml"}),
+    )
+
+    def clean_logo(self):
+        logo = self.cleaned_data.get("logo")
+        return _validate_logo_file(logo)
+
+
+class ClientBulkInviteForm(forms.Form):
+    csv_file = forms.FileField(
+        label="Bulk upload (CSV)",
+        help_text="Include headers: candidate_id,duration_minutes,send_at (optional).",
+    )
+
+    def clean_csv_file(self):
+        csv_file = self.cleaned_data.get("csv_file")
+        if not csv_file:
+            return csv_file
+        if csv_file.size > 2 * 1024 * 1024:
+            raise forms.ValidationError("CSV must be under 2MB.")
+        return csv_file
 
 
 class ClientSessionNoteForm(forms.ModelForm):

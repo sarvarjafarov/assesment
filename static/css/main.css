@@ -3659,6 +3659,27 @@ main {
 .notification-card form {
     margin: 0;
 }
+.branding-section {
+    margin-bottom: 2rem;
+}
+.branding-card .form-field {
+    margin-bottom: 0.75rem;
+}
+.branding-card .logo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.branding-card input[type="file"] {
+    border: 1px dashed rgba(14, 20, 40, 0.2);
+    padding: 0.5rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.8);
+}
+.remove-logo-form {
+    margin: 0;
+}
 .activity-filter-row {
     display: flex;
     justify-content: space-between;
@@ -3836,6 +3857,20 @@ main {
 }
 .portal-panel .table-row {
     align-items: center;
+}
+.bulk-upload {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(14, 20, 40, 0.08);
+}
+.table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+}
+.table-actions form {
+    margin: 0;
 }
 .report-hero {
     background: linear-gradient(120deg, #eef1ff 0%, #fff9f2 100%);
@@ -4068,4 +4103,10 @@ main {
     .activity-meta {
         align-items: flex-start;
     }
+}
+.divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(14, 20, 40, 0.08);
+    margin: 1.5rem 0;
 }

@@ -66,6 +66,9 @@ class BehavioralAssessmentSession(TimeStampedModel):
     submitted_at = models.DateTimeField(null=True, blank=True)
     started_at = models.DateTimeField(null=True, blank=True)
     duration_minutes = models.PositiveIntegerField(default=20)
+    scheduled_for = models.DateTimeField(null=True, blank=True)
+    last_reminder_at = models.DateTimeField(null=True, blank=True)
+    reminder_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ("-created_at",)
