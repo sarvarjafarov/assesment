@@ -771,16 +771,29 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
     form_class = ClientSessionNoteForm
     requires_manager_access = False
 
-    def dispatch(self, request, *args, **kwargs):
+    def _ensure_session(self, request, **kwargs):
         try:
-            self.session_obj = self.get_session_object(kwargs.get("session_uuid"))
+            session = self.get_session_object(kwargs.get("session_uuid"))
         except Http404:
             messages.error(request, "That assessment could not be found.")
             return redirect("clients:assessment-manage", assessment_type=kwargs.get("assessment_type"))
-        if self.session_obj.status != "submitted":
+        if session.status != "submitted":
             messages.info(request, "This report becomes available once the candidate submits.")
             return redirect("clients:assessment-manage", assessment_type=kwargs.get("assessment_type"))
-        return super().dispatch(request, *args, **kwargs)
+        self.session_obj = session
+        return None
+
+    def get(self, request, *args, **kwargs):
+        response = self._ensure_session(request, **kwargs)
+        if response:
+            return response
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        response = self._ensure_session(request, **kwargs)
+        if response:
+            return response
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
