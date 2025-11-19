@@ -26,6 +26,22 @@ from .forms import (
     ProductAssessmentInviteForm,
 )
 
+SUPERADMIN_USERNAME = "admin"
+
+
+class SuperAdminRequiredMixin(LoginRequiredMixin):
+    superadmin_username = SUPERADMIN_USERNAME
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        if request.user.username != self.superadmin_username:
+            messages.error(request, "This console is restricted to the Sira superadmin.")
+            if hasattr(request.user, "client_account"):
+                return redirect("clients:dashboard")
+            return redirect("clients:login")
+        return super().dispatch(request, *args, **kwargs)
+
 
 class ConsoleSectionMixin:
     section = ""
@@ -37,7 +53,7 @@ class ConsoleSectionMixin:
         return context
 
 
-class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
+class DashboardView(SuperAdminRequiredMixin, ConsoleSectionMixin, TemplateView):
     template_name = "console/dashboard.html"
     section = "dashboard"
 
@@ -132,7 +148,7 @@ class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
         }
 
 
-class MarketingAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+class MarketingAssessmentListView(SuperAdminRequiredMixin, ConsoleSectionMixin, ListView):
     model = DigitalMarketingAssessmentSession
     template_name = "console/marketing/list.html"
     context_object_name = "sessions"
@@ -143,7 +159,7 @@ class MarketingAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListV
         return DigitalMarketingAssessmentSession.objects.order_by("-created_at")
 
 
-class MarketingAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
+class MarketingAssessmentCreateView(SuperAdminRequiredMixin, ConsoleSectionMixin, FormView):
     template_name = "console/marketing/form.html"
     form_class = MarketingAssessmentInviteForm
     section = "marketing"
@@ -155,7 +171,7 @@ class MarketingAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, For
         return super().form_valid(form)
 
 
-class MarketingAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
+class MarketingAssessmentDetailView(SuperAdminRequiredMixin, ConsoleSectionMixin, DetailView):
     model = DigitalMarketingAssessmentSession
     template_name = "console/marketing/detail.html"
     slug_field = "uuid"
@@ -172,7 +188,7 @@ class MarketingAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, Det
         return context
 
 
-class ProductAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+class ProductAssessmentListView(SuperAdminRequiredMixin, ConsoleSectionMixin, ListView):
     model = ProductAssessmentSession
     template_name = "console/pm/list.html"
     context_object_name = "sessions"
@@ -183,7 +199,7 @@ class ProductAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListVie
         return ProductAssessmentSession.objects.order_by("-created_at")
 
 
-class ProductAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
+class ProductAssessmentCreateView(SuperAdminRequiredMixin, ConsoleSectionMixin, FormView):
     template_name = "console/pm/form.html"
     form_class = ProductAssessmentInviteForm
     section = "pm"
@@ -195,7 +211,7 @@ class ProductAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormV
         return super().form_valid(form)
 
 
-class ProductAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
+class ProductAssessmentDetailView(SuperAdminRequiredMixin, ConsoleSectionMixin, DetailView):
     model = ProductAssessmentSession
     template_name = "console/pm/detail.html"
     slug_field = "uuid"
@@ -212,7 +228,7 @@ class ProductAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, Detai
         return context
 
 
-class BehavioralAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+class BehavioralAssessmentListView(SuperAdminRequiredMixin, ConsoleSectionMixin, ListView):
     model = BehavioralAssessmentSession
     template_name = "console/behavioral/list.html"
     context_object_name = "sessions"
@@ -223,7 +239,7 @@ class BehavioralAssessmentListView(ConsoleSectionMixin, LoginRequiredMixin, List
         return BehavioralAssessmentSession.objects.order_by("-created_at")
 
 
-class BehavioralAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, FormView):
+class BehavioralAssessmentCreateView(SuperAdminRequiredMixin, ConsoleSectionMixin, FormView):
     template_name = "console/behavioral/form.html"
     form_class = BehavioralAssessmentInviteForm
     section = "behavioral"
@@ -235,7 +251,7 @@ class BehavioralAssessmentCreateView(ConsoleSectionMixin, LoginRequiredMixin, Fo
         return super().form_valid(form)
 
 
-class BehavioralAssessmentDetailView(ConsoleSectionMixin, LoginRequiredMixin, DetailView):
+class BehavioralAssessmentDetailView(SuperAdminRequiredMixin, ConsoleSectionMixin, DetailView):
     model = BehavioralAssessmentSession
     template_name = "console/behavioral/detail.html"
     slug_field = "uuid"
@@ -272,15 +288,23 @@ class ConsoleLoginView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect("console:dashboard")
+            if request.user.username == SUPERADMIN_USERNAME:
+                return redirect("console:dashboard")
+            if hasattr(request.user, "client_account"):
+                return redirect("clients:dashboard")
+            return redirect("clients:login")
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        login(self.request, form.get_user())
+        user = form.get_user()
+        if user.username != SUPERADMIN_USERNAME:
+            form.add_error(None, "Only the Sira superadmin can access this console.")
+            return self.form_invalid(form)
+        login(self.request, user)
         return super().form_valid(form)
 
 
-class ClientAccountListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
+class ClientAccountListView(SuperAdminRequiredMixin, ConsoleSectionMixin, ListView):
     model = ClientAccount
     template_name = "console/clients/list.html"
     section = "clients"
@@ -303,7 +327,7 @@ class ClientAccountListView(ConsoleSectionMixin, LoginRequiredMixin, ListView):
         return context
 
 
-class ReportingOverviewView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
+class ReportingOverviewView(SuperAdminRequiredMixin, ConsoleSectionMixin, TemplateView):
     template_name = "console/reports/overview.html"
     section = "reports"
     parent_section = "dashboard"
