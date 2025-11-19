@@ -3494,6 +3494,24 @@ main {
     margin-bottom: 2rem;
     box-shadow: 0 25px 40px rgba(14, 20, 40, 0.08);
 }
+.portal-hero.expanded {
+    flex-wrap: wrap;
+}
+.portal-hero-main {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1 1 40%;
+}
+.portal-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    flex: 1 1 40%;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 1rem 1.25rem;
+}
 .portal-hero.compact {
     padding: 1.5rem 2rem;
 }
@@ -3511,6 +3529,29 @@ main {
 }
 .portal-actions {
     justify-self: end;
+}
+.quick-action-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.quick-action-card {
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    box-shadow: 0 15px 30px rgba(14, 20, 40, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.quick-action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(14, 20, 40, 0.08);
 }
 .portal-card-grid {
     display: grid;
@@ -3531,6 +3572,9 @@ main {
     border: 1px solid rgba(14, 20, 40, 0.06);
     box-shadow: 0 12px 35px rgba(14, 20, 40, 0.08);
     min-height: 170px;
+}
+.metric-snapshot .portal-card {
+    min-height: auto;
 }
 .portal-card-grid > *:nth-child(3n + 1) {
     grid-column: span 1;
@@ -3577,6 +3621,107 @@ main {
     border-radius: 18px;
     padding: 1.25rem;
     background: #f7f8ff;
+}
+.portal-assessment-card.enhanced {
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.85), rgba(237, 240, 255, 0.95));
+    border: 1px solid rgba(14, 20, 40, 0.05);
+    box-shadow: 0 12px 30px rgba(14, 20, 40, 0.06);
+}
+.assessment-metrics {
+    display: flex;
+    gap: 1.25rem;
+    margin: 1rem 0;
+}
+.assessment-metrics dt {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+.assessment-metrics dd {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+.assessment-metrics div {
+    flex: 1;
+}
+.attention-card ul,
+.activity-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.attention-card li strong {
+    display: block;
+    margin-bottom: 0.35rem;
+}
+.activity-card li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(14, 20, 40, 0.06);
+    padding-bottom: 0.75rem;
+}
+.activity-card li:last-child {
+    border-bottom: none;
+}
+.activity-name {
+    font-weight: 600;
+    margin: 0;
+}
+.activity-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+}
+.mini-funnel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(14, 20, 40, 0.08);
+}
+.mini-funnel span {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.mini-funnel strong {
+    font-size: 1.3rem;
+}
+.quick-action-card .label {
+    margin-bottom: 0.25rem;
+    color: var(--navy);
+}
+.activity-card .pill {
+    padding: 0.35rem 0.9rem;
+}
+.portal-hero-stats .hero-stat-value {
+    font-size: 2.4rem;
+}
+.portal-hero-stats .hero-stat-helper {
+    font-size: 0.85rem;
+}
+.activity-row .portal-card {
+    min-height: 280px;
+}
+.quick-action-card span {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.charts-row .portal-card {
+    min-height: 360px;
 }
 .portal-assessment-actions {
     margin-top: 1rem;
@@ -3767,4 +3912,20 @@ main {
     margin: 0;
     color: var(--text-muted);
     font-size: 0.9rem;
+}
+.activity-card ul .muted {
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .portal-hero-stats {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+    .activity-card li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .activity-meta {
+        align-items: flex-start;
+    }
 }

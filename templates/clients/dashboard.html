@@ -1,69 +1,152 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 {% block content %}
 <div class="portal-shell">
-    <header class="portal-hero">
-        <div class="portal-hero-icon">
-            <span>⚡</span>
+    <header class="portal-hero expanded">
+        <div class="portal-hero-main">
+            <div class="portal-hero-icon">
+                <span>⚡</span>
+            </div>
+            <div>
+                <p class="eyebrow">Client workspace</p>
+                <h1>{{ account.company_name }}</h1>
+                <p class="lede">Access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }} · {{ account.get_employee_size_display }} org size</p>
+            </div>
         </div>
-        <div>
-            <p class="eyebrow">Welcome back</p>
-            <h1>{{ account.company_name }}</h1>
-            <p class="muted">You have access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }}.</p>
+        <div class="portal-hero-stats">
+            <div>
+                <p class="hero-stat-label">Completion rate</p>
+                <p class="hero-stat-value">{{ portal_stats.completion_rate|floatformat:0 }}%</p>
+                <p class="hero-stat-helper">{{ portal_stats.completed_count }} completed invites</p>
+            </div>
+            <div>
+                <p class="hero-stat-label">Avg. duration</p>
+                <p class="hero-stat-value">{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}</p>
+                <p class="hero-stat-helper">Start to submission</p>
+            </div>
+            <div>
+                <p class="hero-stat-label">Avg. score</p>
+                <p class="hero-stat-value">{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</p>
+                <p class="hero-stat-helper">Across finished sessions</p>
+            </div>
         </div>
         <div class="portal-actions">
             <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
         </div>
     </header>
 
+    <section class="quick-action-row">
+        {% if quick_actions %}
+        {% for action in quick_actions %}
+        <a class="quick-action-card" href="{{ action.href }}" {% if action.external %}target="_blank" rel="noreferrer"{% endif %}>
+            <div>
+                <p class="label">{{ action.label }}</p>
+                <p class="muted">{{ action.description }}</p>
+            </div>
+            <span aria-hidden="true">→</span>
+        </a>
+        {% endfor %}
+        {% else %}
+        <p class="empty-state">No quick actions available.</p>
+        {% endif %}
+    </section>
+
     <main>
-        <section class="portal-card-grid three-up">
+        <section class="portal-card-grid metric-snapshot">
             <article class="portal-card">
-                <p class="label">Status</p>
+                <p class="label">Account status</p>
                 <h2>{{ account.get_status_display }}</h2>
-                <p class="muted">Approved assessments unlock candidate invites.</p>
-            </article>
-            <article class="portal-card">
-                <p class="label">Employee size</p>
-                <h2>{{ account.get_employee_size_display }}</h2>
                 <p class="muted">Point of contact: {{ account.full_name }}</p>
             </article>
             <article class="portal-card">
-                <p class="label">Total candidates</p>
+                <p class="label">Total invites</p>
                 <h2>{{ portal_stats.total_candidates }}</h2>
-                <p class="muted"> invites across all assessments</p>
+                <p class="muted">All assessments combined</p>
             </article>
             <article class="portal-card">
-                <p class="label">Average score</p>
-                <h2>{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</h2>
-                <p class="muted">Across completed sessions</p>
+                <p class="label">Active invites</p>
+                <h2>{{ portal_stats.in_progress_count }}</h2>
+                <p class="muted">Currently in progress</p>
             </article>
             <article class="portal-card">
-                <p class="label">Average duration</p>
-                <h2>{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }} min{% else %}—{% endif %}</h2>
-                <p class="muted">From start to submission</p>
-            </article>
-            <article class="portal-card card-muted">
-                <p class="label">Support</p>
-                <h2>Account manager</h2>
-                <p class="muted">Update priorities via your account manager.</p>
+                <p class="label">Draft invites</p>
+                <h2>{{ portal_stats.draft_count }}</h2>
+                <p class="muted">Awaiting launch</p>
             </article>
         </section>
 
         {% if chart_payload %}
         <section class="portal-card-grid two-up charts-row">
             <article class="portal-card chart-card">
-                <p class="label">Invite mix</p>
+                <p class="label">Assessment mix</p>
                 <h2>Invites vs. completions</h2>
                 <canvas id="inviteChart"></canvas>
+                <div class="mini-funnel">
+                    <div>
+                        <span>Invited</span>
+                        <strong>{{ portal_stats.funnel.invited }}</strong>
+                    </div>
+                    <div>
+                        <span>Started</span>
+                        <strong>{{ portal_stats.funnel.started }}</strong>
+                    </div>
+                    <div>
+                        <span>Completed</span>
+                        <strong>{{ portal_stats.funnel.completed }}</strong>
+                    </div>
+                </div>
             </article>
             <article class="portal-card chart-card">
-                <p class="label">Recent scores</p>
+                <p class="label">Performance trend</p>
                 <h2>Latest submissions</h2>
                 <canvas id="trendChart"></canvas>
             </article>
         </section>
         {% endif %}
+
+        <section class="portal-card-grid two-up activity-row">
+            <article class="portal-card attention-card">
+                <p class="label">Attention</p>
+                {% if attention_items %}
+                <ul>
+                    {% for item in attention_items %}
+                    <li>
+                        <strong>{{ item.label }}</strong>
+                        <p>{{ item.detail }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="muted">Everything looks good. No outstanding actions.</p>
+                {% endif %}
+            </article>
+            <article class="portal-card activity-card">
+                <p class="label">Recent activity</p>
+                {% if activity_feed %}
+                <ul>
+                    {% for entry in activity_feed %}
+                    <li>
+                        <div>
+                            <p class="activity-name">{{ entry.candidate }}</p>
+                            <span class="muted">{{ entry.assessment }} · {{ entry.status }}</span>
+                        </div>
+                        <div class="activity-meta">
+                            <span class="muted">{{ entry.timestamp|naturaltime }}</span>
+                            {% if entry.detail_url %}
+                            <a class="pill subtle" href="{{ entry.detail_url }}">View report</a>
+                            {% else %}
+                            <a class="pill subtle" href="{{ entry.manage_url }}">Manage</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="muted">No candidate activity yet.</p>
+                {% endif %}
+            </article>
+        </section>
 
         <section class="panel portal-panel">
             <header>
@@ -75,10 +158,24 @@
             {% if allowed_assessments %}
             <div class="portal-assessment-grid">
                 {% for item in allowed_assessments %}
-                <article class="portal-assessment-card">
+                <article class="portal-assessment-card enhanced">
                     <div class="pill subtle">Active</div>
                     <h3>{{ item.label }}</h3>
                     <p>{{ item.description|default:"Active license" }}</p>
+                    <dl class="assessment-metrics">
+                        <div>
+                            <dt>Invites</dt>
+                            <dd>{{ item.metrics.invites|default:0 }}</dd>
+                        </div>
+                        <div>
+                            <dt>In progress</dt>
+                            <dd>{{ item.metrics.in_progress|default:0 }}</dd>
+                        </div>
+                        <div>
+                            <dt>Completed</dt>
+                            <dd>{{ item.metrics.completed|default:0 }}</dd>
+                        </div>
+                    </dl>
                     <div class="portal-assessment-actions">
                         <a class="btn btn-outline small" href="{{ item.manage_url }}">Manage invites</a>
                     </div>
@@ -101,6 +198,7 @@
     const trend = payload.trend || [];
     const inviteCtx = document.getElementById("inviteChart");
     const trendCtx = document.getElementById("trendChart");
+    const funnel = payload.funnel || {};
     if (inviteCtx && breakdown.length) {
         new Chart(inviteCtx, {
             type: "bar",

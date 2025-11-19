@@ -9,6 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 from django.db import models
 
@@ -83,7 +84,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         account = self.request.user.client_account
         catalog = ClientAccount.ASSESSMENT_DETAILS
         stats = self._calculate_stats(account)
-        stats = self._calculate_stats(account)
+        assessment_stats_map = {item["code"]: item for item in stats.get("assessment_breakdown", [])}
         context.update(
             {
                 "account": account,
@@ -93,6 +94,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                         "label": catalog.get(code, {}).get("label", code.title()),
                         "description": catalog.get(code, {}).get("description", ""),
                         "manage_url": reverse("clients:assessment-manage", args=[code]),
+                        "metrics": assessment_stats_map.get(code, {}),
                     }
                     for code in account.approved_assessments
                 ],
@@ -101,12 +103,49 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                     {
                         "breakdown": stats.get("assessment_breakdown", []),
                         "trend": stats.get("score_trend", []),
+                        "funnel": stats.get("funnel", {}),
                     },
                     cls=DjangoJSONEncoder,
                 ),
+                "quick_actions": self._quick_actions(account),
+                "attention_items": stats.get("attention_items", []),
+                "activity_feed": stats.get("recent_activity", []),
             }
         )
         return context
+
+    def _quick_actions(self, account: ClientAccount) -> list[dict]:
+        actions = []
+        first_assessment = next(iter(account.approved_assessments), None)
+        primary_url = (
+            reverse("clients:assessment-manage", args=[first_assessment])
+            if first_assessment
+            else reverse("clients:dashboard")
+        )
+        if first_assessment:
+            actions.append(
+                {
+                    "label": "Invite candidate",
+                    "description": "Launch a new assessment invite",
+                    "href": primary_url,
+                }
+            )
+        actions.append(
+            {
+                "label": "Download CSV",
+                "description": "Export recent results",
+                "href": primary_url,
+            }
+        )
+        actions.append(
+            {
+                "label": "Support",
+                "description": "Email account management",
+                "href": "mailto:support@sira.app",
+                "external": True,
+            }
+        )
+        return actions
 
     def _calculate_stats(self, account: ClientAccount) -> dict:
         marketing_sessions = DigitalMarketingAssessmentSession.objects.filter(client=account)
@@ -119,6 +158,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         breakdown = []
         scores: list[float] = []
         durations: list[float] = []
+        status_totals = {"draft": 0, "in_progress": 0, "submitted": 0}
+        attention_items: list[dict] = []
+        recent_activity: list[dict] = []
 
         def _append_scores(queryset, score_field="overall_score"):
             for score, duration in queryset.filter(status="submitted").values_list(score_field, "duration_minutes"):
@@ -131,21 +173,59 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         _append_scores(product_sessions)
         _append_scores(behavioral_sessions, score_field="eligibility_score")
 
+        dataset_map = {
+            "marketing": marketing_sessions,
+            "product": product_sessions,
+            "behavioral": behavioral_sessions,
+        }
+
         for code in account.approved_assessments:
             label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
-            if code == "marketing":
-                inviteqs = marketing_sessions
-            elif code == "product":
-                inviteqs = product_sessions
-            else:
-                inviteqs = behavioral_sessions
+            inviteqs = dataset_map.get(code)
+            if inviteqs is None:
+                continue
+            invites = inviteqs.count()
+            in_progress = inviteqs.filter(status="in_progress").count()
+            completed = inviteqs.filter(status="submitted").count()
+            draft = inviteqs.filter(status="draft").count()
+            status_totals["draft"] += draft
+            status_totals["in_progress"] += in_progress
+            status_totals["submitted"] += completed
             breakdown.append(
                 {
+                    "code": code,
                     "label": label,
-                    "invites": inviteqs.count(),
-                    "completed": inviteqs.filter(status="submitted").count(),
+                    "invites": invites,
+                    "completed": completed,
+                    "in_progress": in_progress,
+                    "draft": draft,
                 }
             )
+
+        def _recent_payload(qs, code):
+            label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
+            entries = []
+            for session in qs.order_by("-updated_at")[:5]:
+                timestamp = session.updated_at or session.created_at
+                entries.append(
+                    {
+                        "candidate": session.candidate_id,
+                        "assessment": label,
+                        "status": session.get_status_display(),
+                        "timestamp": timestamp,
+                        "detail_url": reverse("clients:assessment-detail", args=[code, session.uuid])
+                        if session.status == "submitted"
+                        else None,
+                        "manage_url": reverse("clients:assessment-manage", args=[code]),
+                    }
+                )
+            return entries
+
+        for code, queryset in dataset_map.items():
+            recent_activity.extend(_recent_payload(queryset, code))
+
+        recent_activity.sort(key=lambda item: item["timestamp"] or timezone.now(), reverse=True)
+        recent_activity = recent_activity[:6]
 
         avg_score = sum(scores) / len(scores) if scores else None
         avg_duration = sum(durations) / len(durations) if durations else None
@@ -169,12 +249,41 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 }
             )
 
+        if status_totals["in_progress"]:
+            attention_items.append(
+                {
+                    "label": "Invites in progress",
+                    "detail": f"{status_totals['in_progress']} candidate(s) are still working through assessments.",
+                }
+            )
+        if status_totals["draft"]:
+            attention_items.append(
+                {
+                    "label": "Draft invites",
+                    "detail": f"{status_totals['draft']} invite(s) have not been launched.",
+                }
+            )
+
+        funnel = {
+            "invited": total_candidates,
+            "started": status_totals["in_progress"] + status_totals["submitted"],
+            "completed": status_totals["submitted"],
+        }
+        completion_rate = (funnel["completed"] / funnel["invited"] * 100) if funnel["invited"] else 0
+
         return {
             "total_candidates": total_candidates,
+            "completed_count": status_totals["submitted"],
+            "in_progress_count": status_totals["in_progress"],
+            "draft_count": status_totals["draft"],
+            "completion_rate": completion_rate,
             "average_score": avg_score,
             "average_duration": avg_duration,
             "assessment_breakdown": breakdown,
             "score_trend": trend,
+            "recent_activity": recent_activity,
+            "attention_items": attention_items,
+            "funnel": funnel,
         }
 
 
