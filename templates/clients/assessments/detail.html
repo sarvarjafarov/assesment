@@ -15,23 +15,25 @@
 
     {% if actionable_summary %}
     <section class="panel portal-panel summary-callout tone-{{ actionable_summary.tone }}">
-        <div class="summary-callout-main">
-            <span class="pill">{{ actionable_summary.label }}</span>
-            <h2>{{ actionable_summary.headline }}</h2>
-            <p>{{ actionable_summary.subline }}</p>
-        </div>
-        <div class="summary-callout-metrics">
-            <div>
-                <p class="label">Score</p>
-                <strong>{{ actionable_summary.metrics.score }}</strong>
+        <div class="summary-callout-responsive">
+            <div class="summary-callout-main">
+                <span class="pill">{{ actionable_summary.label }}</span>
+                <h2>{{ actionable_summary.headline }}</h2>
+                <p>{{ actionable_summary.subline }}</p>
             </div>
-            <div>
-                <p class="label">Risk</p>
-                <strong>{{ actionable_summary.metrics.flags }}</strong>
-            </div>
-            <div>
-                <p class="label">Highlight</p>
-                <strong>{{ actionable_summary.metrics.strength }}</strong>
+            <div class="summary-callout-metrics">
+                <article class="metric-chip">
+                    <p class="label">Score</p>
+                    <strong>{{ actionable_summary.metrics.score }}</strong>
+                </article>
+                <article class="metric-chip">
+                    <p class="label">Risk</p>
+                    <strong>{{ actionable_summary.metrics.flags }}</strong>
+                </article>
+                <article class="metric-chip">
+                    <p class="label">Highlight</p>
+                    <strong>{{ actionable_summary.metrics.strength }}</strong>
+                </article>
             </div>
         </div>
     </section>
@@ -48,23 +50,36 @@
         <form method="post" class="decision-cta-form">
             {% csrf_token %}
             <input type="hidden" name="action" value="quick_decision">
-            <label>
+            <div class="decision-tabs">
+                <button type="submit" name="decision" value="advance" class="decision-tab positive">
+                    <span class="tab-title">Advance</span>
+                    <span class="tab-helper">Move to next stage</span>
+                </button>
+                <button type="submit" name="decision" value="hold" class="decision-tab neutral">
+                    <span class="tab-title">Hold</span>
+                    <span class="tab-helper">Need more signals</span>
+                </button>
+                <button type="submit" name="decision" value="reject" class="decision-tab warning">
+                    <span class="tab-title">Reject</span>
+                    <span class="tab-helper">Send decline note</span>
+                </button>
+            </div>
+            <label class="decision-note">
                 <span>Add context (optional)</span>
                 <textarea name="note" rows="2" placeholder="Add next steps or notes for the candidate"></textarea>
             </label>
-            <div class="decision-cta-buttons">
-                <button class="btn positive" type="submit" name="decision" value="advance">Advance</button>
-                <button class="btn neutral" type="submit" name="decision" value="hold">Hold</button>
-                <button class="btn warning" type="submit" name="decision" value="reject">Reject</button>
-            </div>
         </form>
         {% if quick_followups %}
         <div class="followup-grid">
             {% for link in quick_followups %}
-            <article>
-                <p class="label">{{ link.label }}</p>
-                <p class="muted">{{ link.description }}</p>
-                <a class="pill subtle" href="{{ link.href }}" {% if link.external %}target="_blank" rel="noreferrer"{% endif %}>Open</a>
+            <article class="followup-card">
+                <div>
+                    <p class="card-title">{{ link.label }}</p>
+                    <p class="muted">{{ link.description }}</p>
+                </div>
+                <a class="pill subtle" href="{{ link.href }}" {% if link.external %}target="_blank" rel="noreferrer"{% endif %}>
+                    Open
+                </a>
             </article>
             {% endfor %}
         </div>
@@ -113,9 +128,14 @@
             <li>
                 <div class="timeline-dot"></div>
                 <div>
-                    <p class="timeline-label">{{ event.label }}</p>
-                    <p class="timeline-meta">{{ event.timestamp|date:"M j, Y · H:i" }} ({{ event.timestamp|naturaltime }})</p>
-                    <p class="timeline-desc">{{ event.description }}</p>
+                    <div class="timeline-header">
+                        <p class="timeline-label">{{ event.label }}</p>
+                        <span class="timeline-meta">{{ event.timestamp|naturaltime }}</span>
+                    </div>
+                    <p class="timeline-desc">
+                        <span>{{ event.timestamp|date:"M j, Y · H:i" }}</span>
+                        <span>{{ event.description }}</span>
+                    </p>
                 </div>
             </li>
             {% endfor %}
@@ -132,20 +152,20 @@
             </div>
         </header>
         <div class="comparative-grid">
-            <article>
+            <article class="metric-chip">
                 <p class="label">Percentile</p>
                 <strong>{% if comparative_insights.percentile %}Top {{ comparative_insights.percentile|floatformat:0 }}%{% else %}—{% endif %}</strong>
             </article>
-            <article>
+            <article class="metric-chip">
                 <p class="label">Cohort size</p>
                 <strong>{{ comparative_insights.cohort_total }}</strong>
                 <p class="muted">{{ comparative_insights.cohort_recent }} in last 30 days</p>
             </article>
-            <article>
+            <article class="metric-chip">
                 <p class="label">Avg. score</p>
                 <strong>{% if comparative_insights.cohort_avg %}{{ comparative_insights.cohort_avg|floatformat:1 }}{% else %}—{% endif %}</strong>
             </article>
-            <article>
+            <article class="metric-chip">
                 <p class="label">Top score</p>
                 <strong>{% if comparative_insights.top_score %}{{ comparative_insights.top_score|floatformat:1 }}{% else %}—{% endif %}</strong>
             </article>
@@ -185,18 +205,15 @@
                 <h2>Recent activity</h2>
             </div>
         </header>
-        <ol class="timeline-list">
+        <div class="audit-grid">
             {% for item in audit_log %}
-            <li>
-                <div class="timeline-dot"></div>
-                <div>
-                    <p class="timeline-label">{{ item.label }}</p>
-                    <p class="timeline-meta">{{ item.timestamp|naturaltime }}</p>
-                    <p class="timeline-desc">{{ item.description }}</p>
-                </div>
-            </li>
+            <article class="audit-card">
+                <span class="audit-time">{{ item.timestamp|naturaltime }}</span>
+                <h3>{{ item.label }}</h3>
+                <p>{{ item.description }}</p>
+            </article>
             {% endfor %}
-        </ol>
+        </div>
     </section>
     {% endif %}
 
@@ -207,29 +224,29 @@
                 <h2>Candidate performance</h2>
             </div>
         </header>
-        <div class="portal-card-grid">
-            <article class="portal-card">
-                <p class="label">Score</p>
-                <h2>{% if report.score %}{{ report.score|floatformat:2 }}{% elif report.overall %}{{ report.overall|floatformat:2 }}{% else %}—{% endif %}</h2>
-                <p class="muted"><a href="{{ share_link }}" target="_blank">Share link</a></p>
+        <div class="summary-grid">
+            <article class="summary-card">
+                <h3>Overall score</h3>
+                <p class="summary-value">{% if report.score %}{{ report.score|floatformat:2 }}{% elif report.overall %}{{ report.overall|floatformat:2 }}{% else %}—{% endif %}</p>
+                <a class="link" href="{{ share_link }}" target="_blank">Share report</a>
             </article>
             {% if assessment_type == 'behavioral' and report.label %}
-            <article class="portal-card">
-                <p class="label">Decision</p>
-                <h2>{{ report.label }}</h2>
+            <article class="summary-card">
+                <h3>Eligibility decision</h3>
+                <p class="summary-value">{{ report.label }}</p>
                 <p class="muted">Behavioral eligibility rating</p>
             </article>
             {% elif assessment_type != 'behavioral' %}
-            <article class="portal-card">
-                <p class="label">Skill mix</p>
-                <h2>{{ report.hard|default:'—' }}/{{ report.soft|default:'—' }}</h2>
-                <p class="muted">Hard vs. soft skill scores</p>
+            <article class="summary-card">
+                <h3>Skill mix</h3>
+                <p class="summary-value">{{ report.hard|default:'—' }}/{{ report.soft|default:'—' }}</p>
+                <p class="muted">Hard vs. soft skills</p>
             </article>
             {% endif %}
             {% if report.seniority %}
-            <article class="portal-card">
-                <p class="label">Recommended level</p>
-                <h2>{{ report.seniority }}</h2>
+            <article class="summary-card">
+                <h3>Recommended level</h3>
+                <p class="summary-value">{{ report.seniority }}</p>
                 <p class="muted">Suggested seniority band</p>
             </article>
             {% endif %}
@@ -237,18 +254,19 @@
     </section>
 
     {% if decision_summary %}
-    <section class="panel portal-panel">
+    <section class="panel portal-panel review-panel">
         <header>
             <div>
                 <p class="eyebrow">Review panel</p>
                 <h2>Decision votes</h2>
             </div>
         </header>
-        <div class="chip-row">
+        <div class="review-grid">
             {% for item in decision_summary %}
-            <span class="chip{% if recommended_decision and recommended_decision.decision == item.decision %} emphasis{% endif %}">
-                {{ item.decision|title }} · {{ item.count }}
-            </span>
+            <article class="review-card{% if recommended_decision and recommended_decision.decision == item.decision %} is-recommended{% endif %}">
+                <span class="badge">{{ item.decision|title }}</span>
+                <strong>{{ item.count }}</strong>
+            </article>
             {% endfor %}
         </div>
         {% if recommended_decision %}
@@ -265,16 +283,19 @@
                 <h2>Trait scores</h2>
             </div>
         </header>
-        <div class="table">
-            <div class="table-row table-head">
-                <span>Trait</span>
-                <span>Score</span>
-            </div>
+        <div class="heatmap-grid">
             {% for trait, score in report.traits.items %}
-            <div class="table-row">
-                <span>{{ trait|title }}</span>
-                <span>{% if score %}{{ score|floatformat:1 }}{% else %}—{% endif %}</span>
-            </div>
+            {% with percent=score|floatformat:0 %}
+            <article class="trait-bar">
+                <div class="trait-bar-header">
+                    <span class="label">{{ trait|title }}</span>
+                    <span class="value">{% if score %}{{ score|floatformat:1 }}{% else %}—{% endif %}</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-fill" style="width: {{ percent }}%;"></div>
+                </div>
+            </article>
+            {% endwith %}
             {% endfor %}
         </div>
         <header>
@@ -421,16 +442,21 @@
                 <li>
                     <div class="note-dot"></div>
                     <div class="note-body">
-                        <p class="note-meta">
-                            {{ note.created_at|naturaltime }}
-                            {% if note.author %}· {{ note.author.get_full_name|default:note.author.username }}{% endif %}
-                            · {{ note.get_note_type_display }}
-                            {% if note.decision %}· {{ note.get_decision_display }}{% endif %}
-                            {% if note.author_role %}· {{ note.get_author_role_display|default:note.author_role|title }}{% endif %}
-                        </p>
+                        <div class="note-heading">
+                            <p class="note-meta">
+                                {{ note.created_at|naturaltime }}
+                                {% if note.author %}· {{ note.author.get_full_name|default:note.author.username }}{% endif %}
+                            </p>
+                            {% if note.note_type == 'decision' %}
+                            <span class="badge">{{ note.get_decision_display }}</span>
+                            {% endif %}
+                        </div>
                         {% if note.note %}
                         <p>{{ note.note }}</p>
                         {% endif %}
+                        <p class="muted">
+                            {{ note.get_note_type_display }} · {{ note.get_author_role_display|default:note.author_role|title }}
+                        </p>
                         {% if note.needs_review %}
                         <span class="pill warning">Needs review</span>
                         {% endif %}
