@@ -5,8 +5,12 @@
 <div class="portal-shell">
     <header class="portal-hero expanded">
         <div class="portal-hero-main">
-            <div class="portal-hero-icon">
+            <div class="portal-hero-icon{% if account.logo %} logo{% endif %}">
+                {% if account.logo %}
+                <img src="{{ account.logo.url }}" alt="{{ account.company_name }} logo">
+                {% else %}
                 <span>⚡</span>
+                {% endif %}
             </div>
             <div>
                 <p class="eyebrow">Client workspace</p>
@@ -33,6 +37,7 @@
         </div>
         <div class="portal-actions stacked">
             <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
+            {% if is_manager %}
             <form method="post" class="summary-toggle">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="toggle_summary">
@@ -41,8 +46,31 @@
                     <span>Weekly summary emails</span>
                 </label>
             </form>
+            {% endif %}
         </div>
     </header>
+
+    {% if notifications %}
+    <section class="notification-row">
+        {% for note in notifications %}
+        <article class="notification-card notification-{{ note.level }}">
+            <div>
+                <p class="label">{{ note.title }}</p>
+                <p>{{ note.message }}</p>
+                {% if note.link_url %}
+                <a class="link" href="{{ note.link_url }}" target="_blank" rel="noreferrer">Open link</a>
+                {% endif %}
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="dismiss_notification">
+                <input type="hidden" name="notification_id" value="{{ note.id }}">
+                <button class="pill subtle" type="submit">Dismiss</button>
+            </form>
+        </article>
+        {% endfor %}
+    </section>
+    {% endif %}
 
     <section class="quick-action-row">
         {% if quick_actions %}
@@ -87,12 +115,12 @@
         {% if benchmark %}
         <section class="portal-card-grid two-up benchmark-row">
             <article class="portal-card benchmark-card">
-                <p class="label">Benchmark comparison</p>
+                <p class="label">Benchmark comparison <span class="info-badge" title="{{ benchmark_helper }}">i</span></p>
                 <h2>{{ portal_stats.completion_rate|floatformat:0 }}% vs {{ benchmark.completion_rate|floatformat:0 }}%</h2>
                 <p class="muted">Client completion rate vs. network average.</p>
             </article>
             <article class="portal-card benchmark-card">
-                <p class="label">Avg. duration</p>
+                <p class="label">Avg. duration <span class="info-badge" title="{{ benchmark_helper }}">i</span></p>
                 <h2>
                     {% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}
                     /
@@ -155,6 +183,14 @@
                     <select name="window">
                         {% for value, label in activity_filter_options.windows %}
                         <option value="{{ value }}" {% if activity_filters.window == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    <span>Preset</span>
+                    <select name="preset">
+                        {% for value, label in activity_filter_options.presets %}
+                        <option value="{{ value }}" {% if activity_filters.preset == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
                 </label>

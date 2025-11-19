@@ -37,7 +37,7 @@
                 </ul>
             </div>
         </div>
-        <form method="post" class="request-form">
+        <form method="post" enctype="multipart/form-data" class="request-form">
             {% csrf_token %}
             <div class="form-row">
                 <div class="form-field">
@@ -51,6 +51,16 @@
                     {{ form.company_name.label_tag }}
                     {{ form.company_name }}
                     {% for error in form.company_name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-row single">
+                <div class="form-field">
+                    {{ form.logo.label_tag }}
+                    {{ form.logo }}
+                    {% if form.logo.help_text %}<small>{{ form.logo.help_text }}</small>{% endif %}
+                    {% for error in form.logo.errors %}
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>

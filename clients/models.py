@@ -57,6 +57,10 @@ class ClientAccount(TimeStampedModel):
         ("approved", "Approved"),
         ("rejected", "Rejected"),
     ]
+    ROLE_CHOICES = [
+        ("manager", "Manager"),
+        ("viewer", "Viewer"),
+    ]
 
     user = models.OneToOneField(
         User, related_name="client_account", on_delete=models.CASCADE, null=True, blank=True
@@ -69,8 +73,10 @@ class ClientAccount(TimeStampedModel):
     requested_assessments = models.JSONField(default=list, blank=True)
     allowed_assessments = models.JSONField(default=list, blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="pending")
+    role = models.CharField(max_length=16, choices=ROLE_CHOICES, default="manager")
     notes = models.TextField(blank=True)
     receive_weekly_summary = models.BooleanField(default=False)
+    logo = models.FileField(upload_to="client_logos/", null=True, blank=True)
 
     objects = ClientAccountQuerySet.as_manager()
 
@@ -98,6 +104,27 @@ class ClientAccount(TimeStampedModel):
             self.user.is_active = should_activate
             self.user.save(update_fields=["is_active"])
         super().save(*args, **kwargs)
+
+
+class ClientNotification(TimeStampedModel):
+    LEVEL_CHOICES = [
+        ("info", "Info"),
+        ("warning", "Warning"),
+        ("success", "Success"),
+    ]
+
+    client = models.ForeignKey(ClientAccount, on_delete=models.CASCADE, related_name="notifications")
+    title = models.CharField(max_length=255)
+    message = models.TextField(blank=True)
+    level = models.CharField(max_length=16, choices=LEVEL_CHOICES, default="info")
+    link_url = models.URLField(blank=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.client.company_name}: {self.title}"
 
 
 class ClientSessionNote(TimeStampedModel):

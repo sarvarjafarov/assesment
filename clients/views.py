@@ -28,24 +28,33 @@ from .forms import (
     ClientSignupForm,
     ClientSessionNoteForm,
 )
-from .models import ClientAccount, ClientSessionNote
+from .models import ClientAccount, ClientNotification, ClientSessionNote
 
 ACTIVITY_STATUS_CHOICES = {"all", "draft", "in_progress", "submitted"}
 ACTIVITY_ASSESSMENT_CHOICES = {"all"} | {choice[0] for choice in ClientAccount.ASSESSMENT_CHOICES}
 ACTIVITY_WINDOWS = {"7": 7, "30": 30, "90": 90}
+ACTIVITY_PRESETS = {
+    "needs_review": {"status": "in_progress", "assessment": "all"},
+    "completed_last_7": {"status": "submitted", "window": "7"},
+}
 
 
 def parse_activity_filters(params):
     assessment = params.get("assessment", "all")
     status = params.get("status", "all")
     window = params.get("window", "30")
+    preset = params.get("preset", "")
     if assessment not in ACTIVITY_ASSESSMENT_CHOICES:
         assessment = "all"
     if status not in ACTIVITY_STATUS_CHOICES:
         status = "all"
     if window not in ACTIVITY_WINDOWS:
         window = "30"
-    return {"assessment": assessment, "status": status, "window": window}
+    result = {"assessment": assessment, "status": status, "window": window, "preset": ""}
+    if preset in ACTIVITY_PRESETS:
+        result.update(ACTIVITY_PRESETS[preset])
+        result["preset"] = preset
+    return result
 
 
 def build_dataset_map(account: ClientAccount):
@@ -144,6 +153,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         account = request.user.client_account
         action = request.POST.get("action")
         if action == "toggle_summary":
+            if account.role != "manager":
+                messages.error(request, "Only managers can edit email settings.")
+                return redirect("clients:dashboard")
             opt_in = request.POST.get("weekly_summary") == "on"
             account.receive_weekly_summary = opt_in
             account.save(update_fields=["receive_weekly_summary"])
@@ -151,6 +163,15 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 messages.success(request, "Weekly summary emails enabled.")
             else:
                 messages.info(request, "Weekly summary emails disabled.")
+        elif action == "dismiss_notification":
+            note_id = request.POST.get("notification_id")
+            try:
+                notification = account.notifications.get(id=note_id)
+            except ClientNotification.DoesNotExist:
+                messages.error(request, "Notification not found.")
+            else:
+                notification.is_read = True
+                notification.save(update_fields=["is_read"])
         return redirect("clients:dashboard")
 
     def get_context_data(self, **kwargs):
@@ -180,6 +201,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         context.update(
             {
                 "account": account,
+                "is_manager": account.role == "manager",
                 "allowed_assessments": [
                     {
                         "code": code,
@@ -210,8 +232,11 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                     "assessments": [("all", "All assessments")] + list(ClientAccount.ASSESSMENT_CHOICES),
                     "statuses": [("all", "All statuses"), ("draft", "Draft"), ("in_progress", "In progress"), ("submitted", "Completed")],
                     "windows": [("7", "Last 7 days"), ("30", "Last 30 days"), ("90", "Last 90 days")],
+                    "presets": [("", "Choose preset"), ("needs_review", "Needs review"), ("completed_last_7", "Completed last 7 days")],
                 },
                 "activity_querystring": self.request.GET.urlencode(),
+                "notifications": self._notifications(account),
+                "benchmark_helper": "Benchmarks reference anonymized averages across all clients running the same assessments.",
             }
         )
         return context
@@ -219,12 +244,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
     def _quick_actions(self, account: ClientAccount) -> list[dict]:
         actions = []
         first_assessment = next(iter(account.approved_assessments), None)
-        primary_url = (
-            reverse("clients:assessment-manage", args=[first_assessment])
-            if first_assessment
-            else reverse("clients:dashboard")
-        )
-        if first_assessment:
+        primary_url = reverse("clients:dashboard")
+        if first_assessment and account.role == "manager":
+            primary_url = reverse("clients:assessment-manage", args=[first_assessment])
             actions.append(
                 {
                     "label": "Invite candidate",
@@ -236,7 +258,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             {
                 "label": "Download CSV",
                 "description": "Export recent results",
-                "href": primary_url,
+                "href": self._activity_export_url(),
             }
         )
         actions.append(
@@ -392,6 +414,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             "average_score": avg_score,
         }
 
+    def _notifications(self, account: ClientAccount) -> list[ClientNotification]:
+        return list(account.notifications.filter(is_read=False)[:5])
+
 
 class ClientActivityExportView(LoginRequiredMixin, View):
     login_url = reverse_lazy("clients:login")
@@ -428,6 +453,7 @@ class ClientActivityExportView(LoginRequiredMixin, View):
 class ClientAssessmentMixin(LoginRequiredMixin):
     login_url = reverse_lazy("clients:login")
     assessment_type: str
+    requires_manager_access = True
 
     ASSESSMENT_CONFIG = {
         "marketing": {
@@ -454,6 +480,7 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
         self.account = request.user.client_account
+        self.is_manager = self.account.role == "manager"
         if self.account.status != "approved":
             messages.info(request, "Your account is pending approval.")
             return redirect("clients:dashboard")
@@ -462,6 +489,9 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             raise Http404
         if assessment_type not in self.account.approved_assessments:
             messages.error(request, "You do not have access to that assessment.")
+            return redirect("clients:dashboard")
+        if self.requires_manager_access and not self.is_manager:
+            messages.error(request, "Only managers can perform that action.")
             return redirect("clients:dashboard")
         self.assessment_type = assessment_type
         self.assessment_config = self.ASSESSMENT_CONFIG[assessment_type]
@@ -551,6 +581,7 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
 class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
     template_name = "clients/assessments/detail.html"
     form_class = ClientSessionNoteForm
+    requires_manager_access = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -570,6 +601,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                     assessment_type=self.assessment_type,
                     session_uuid=session.uuid,
                 ),
+                "can_edit_notes": self.is_manager,
             }
         )
         return context
@@ -597,6 +629,9 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
     def form_valid(self, form):
         session_uuid = self.kwargs.get("session_uuid")
         session = self.get_session_object(session_uuid)
+        if not self.is_manager:
+            messages.error(self.request, "Only managers can add notes.")
+            return redirect(self.get_success_url())
         note = form.save(commit=False)
         note.client = self.account
         note.assessment_type = self.assessment_type

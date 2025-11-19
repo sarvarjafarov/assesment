@@ -158,6 +158,7 @@
                 <h2>Candidate notes</h2>
             </div>
         </header>
+        {% if can_edit_notes %}
         <form method="post" class="note-form">
             {% csrf_token %}
             {{ note_form.non_field_errors }}
@@ -177,6 +178,9 @@
             {% endfor %}
             <button class="btn btn-outline small" type="submit">Save note</button>
         </form>
+        {% else %}
+        <p class="muted">You have viewer access. Contact your admin to share feedback.</p>
+        {% endif %}
         {% if notes %}
         <ul class="notes-list">
             {% for note in notes %}

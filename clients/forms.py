@@ -29,12 +29,19 @@ class ClientSignupForm(forms.ModelForm):
         choices=ClientAccount.ASSESSMENT_CHOICES,
         widget=forms.CheckboxSelectMultiple,
     )
+    logo = forms.FileField(
+        label="Company logo",
+        required=False,
+        help_text="Optional. Upload a PNG or SVG so your dashboard is branded.",
+        widget=forms.FileInput(attrs={"accept": "image/png,image/jpeg,image/svg+xml"}),
+    )
 
     class Meta:
         model = ClientAccount
         fields = [
             "full_name",
             "company_name",
+            "logo",
             "email",
             "phone_number",
             "employee_size",
@@ -56,6 +63,19 @@ class ClientSignupForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             self.add_error("password2", "Passwords do not match.")
         return cleaned
+
+    def clean_logo(self):
+        logo = self.cleaned_data.get("logo")
+        if not logo:
+            return logo
+        content_type = getattr(logo, "content_type", "")
+        allowed_types = {"image/png", "image/jpeg", "image/svg+xml"}
+        if content_type and content_type not in allowed_types:
+            raise forms.ValidationError("Upload a PNG, JPG, or SVG file.")
+        max_size = 2 * 1024 * 1024
+        if logo.size > max_size:
+            raise forms.ValidationError("Logo must be smaller than 2MB.")
+        return logo
 
     def save(self, commit=True) -> ClientAccount:
         account = super().save(commit=False)
