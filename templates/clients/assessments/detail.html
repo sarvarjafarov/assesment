@@ -49,6 +49,27 @@
         </div>
     </section>
 
+    {% if decision_summary %}
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Review panel</p>
+                <h2>Decision votes</h2>
+            </div>
+        </header>
+        <div class="chip-row">
+            {% for item in decision_summary %}
+            <span class="chip{% if recommended_decision and recommended_decision.decision == item.decision %} emphasis{% endif %}">
+                {{ item.decision|title }} · {{ item.count }}
+            </span>
+            {% endfor %}
+        </div>
+        {% if recommended_decision %}
+        <p class="muted">Recommended direction: <strong>{{ recommended_decision.decision|title }}</strong></p>
+        {% endif %}
+    </section>
+    {% endif %}
+
     <section class="panel portal-panel">
         {% if assessment_type == 'behavioral' %}
         <header>
@@ -158,10 +179,24 @@
                 <h2>Candidate notes</h2>
             </div>
         </header>
-        {% if can_edit_notes %}
+        {% if can_edit_notes or can_record_decision %}
         <form method="post" class="note-form">
             {% csrf_token %}
             {{ note_form.non_field_errors }}
+            <div class="form-field">
+                {{ note_form.note_type.label_tag }}
+                {{ note_form.note_type }}
+                {% for error in note_form.note_type.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="form-field">
+                {{ note_form.decision.label_tag }}
+                {{ note_form.decision }}
+                {% for error in note_form.decision.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
             <div class="form-field">
                 {{ note_form.note.label_tag }}
                 {{ note_form.note }}
@@ -189,6 +224,9 @@
                     <p class="note-meta">
                         {{ note.created_at|naturaltime }}
                         {% if note.author %}· {{ note.author.get_full_name|default:note.author.username }}{% endif %}
+                        · {{ note.get_note_type_display }}
+                        {% if note.decision %}· {{ note.get_decision_display }}{% endif %}
+                        {% if note.author_role %}· {{ note.get_author_role_display|default:note.author_role|title }}{% endif %}
                     </p>
                     {% if note.note %}
                     <p>{{ note.note }}</p>

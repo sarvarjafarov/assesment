@@ -281,9 +281,16 @@ class ClientBulkInviteForm(forms.Form):
 
 
 class ClientSessionNoteForm(forms.ModelForm):
+    note_type = forms.ChoiceField(choices=ClientSessionNote.NOTE_TYPES, label="Type")
+    decision = forms.ChoiceField(
+        choices=[("", "— Select decision —")] + ClientSessionNote.DECISION_CHOICES,
+        required=False,
+        label="Decision outcome",
+    )
+
     class Meta:
         model = ClientSessionNote
-        fields = ["note", "needs_review"]
+        fields = ["note_type", "decision", "note", "needs_review"]
         widgets = {
             "note": forms.Textarea(attrs={"rows": 3, "placeholder": "Add context or next steps"}),
         }
@@ -294,8 +301,14 @@ class ClientSessionNoteForm(forms.ModelForm):
 
     def clean(self):
         cleaned = super().clean()
+        note_type = cleaned.get("note_type")
+        decision = cleaned.get("decision")
+        if note_type == "decision" and not decision:
+            self.add_error("decision", "Pick a decision outcome.")
+        if note_type != "decision":
+            cleaned["decision"] = ""
         note = cleaned.get("note", "").strip()
         needs_review = cleaned.get("needs_review")
-        if not note and not needs_review:
-            raise forms.ValidationError("Add a note or flag the session for review.")
+        if not note and not needs_review and note_type != "decision":
+            raise forms.ValidationError("Add a note, flag the session, or record a decision.")
         return cleaned

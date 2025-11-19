@@ -93,6 +93,9 @@
                     {% else %}
                     <span class="muted">—</span>
                     {% endif %}
+                    {% if row.decision_summary %}
+                    <span class="pill subtle decision-pill">{{ row.decision_summary }}</span>
+                    {% endif %}
                 </span>
                 <span>{% if row.submitted_at %}{{ row.submitted_at|naturaltime }}{% else %}—{% endif %}</span>
                 <span class="table-actions">

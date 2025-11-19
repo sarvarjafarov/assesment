@@ -15,7 +15,7 @@
             <div>
                 <p class="eyebrow">Client workspace</p>
                 <h1>{{ account.company_name }}</h1>
-                <p class="lede">Access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }} · {{ account.get_employee_size_display }} org size</p>
+                <p class="lede">Access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }} · {{ account.get_employee_size_display }} org size · {{ role_label }} role</p>
             </div>
         </div>
         <div class="portal-hero-stats">
@@ -37,7 +37,7 @@
         </div>
         <div class="portal-actions stacked">
             <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
-            {% if is_manager %}
+            {% if can_manage_branding or is_manager %}
             <form method="post" class="summary-toggle">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="toggle_summary">
@@ -87,7 +87,7 @@
         <p class="empty-state">No quick actions available.</p>
         {% endif %}
     </section>
-    {% if is_manager %}
+    {% if can_manage_branding %}
     <section class="branding-section">
         <article class="portal-card branding-card">
             <p class="label">Branding</p>

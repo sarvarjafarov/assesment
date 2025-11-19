@@ -2570,6 +2570,10 @@ main {
     background: rgba(255, 100, 100, 0.12);
     color: #eb5757;
 }
+.chip.emphasis {
+    background: rgba(15, 170, 124, 0.15);
+    color: #0faa7c;
+}
 .chip-row.warning .chip {
     background: rgba(235, 87, 87, 0.12);
     color: #eb5757;
@@ -3862,6 +3866,10 @@ main {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid rgba(14, 20, 40, 0.08);
+}
+.decision-pill {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
 }
 .table-actions {
     display: flex;

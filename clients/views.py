@@ -4,7 +4,6 @@ from django.contrib import messages
 import csv
 import json
 from datetime import timedelta
-import csv
 import io
 
 from django.contrib.auth import login, logout
@@ -67,6 +66,13 @@ def build_dataset_map(account: ClientAccount):
         "product": ProductAssessmentSession.objects.filter(client=account),
         "behavioral": BehavioralAssessmentSession.objects.filter(client=account),
     }
+
+
+ALL_ROLE_CODES = {code for code, _ in ClientAccount.ROLE_CHOICES}
+ROLE_INVITE_ACCESS = {"manager", "recruiter"}
+ROLE_NOTE_ACCESS = {"manager", "recruiter", "interviewer"}
+ROLE_DECISION_ACCESS = {"manager", "recruiter"}
+ROLE_BRANDING_ACCESS = ALL_ROLE_CODES
 
 
 def build_activity_feed(account: ClientAccount, dataset_map: dict, filters: dict, activity_limit: int | None = 6):
@@ -159,7 +165,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         account = request.user.client_account
         action = request.POST.get("action")
         if action == "toggle_summary":
-            if account.role != "manager":
+            if account.role not in ROLE_INVITE_ACCESS and account.role not in ROLE_BRANDING_ACCESS:
                 messages.error(request, "Only managers can edit email settings.")
                 return redirect("clients:dashboard")
             opt_in = request.POST.get("weekly_summary") == "on"
@@ -179,7 +185,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 notification.is_read = True
                 notification.save(update_fields=["is_read"])
         elif action == "upload_logo":
-            if account.role != "manager":
+            if account.role not in ROLE_BRANDING_ACCESS:
                 messages.error(request, "Only managers can update branding.")
                 return redirect("clients:dashboard")
             form = self.logo_form_class(request.POST, request.FILES)
@@ -193,7 +199,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             response.status_code = 400
             return response
         elif action == "remove_logo":
-            if account.role != "manager":
+            if account.role not in ROLE_BRANDING_ACCESS:
                 messages.error(request, "Only managers can update branding.")
                 return redirect("clients:dashboard")
             if account.logo:
@@ -231,6 +237,8 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             {
                 "account": account,
                 "is_manager": account.role == "manager",
+                "role_label": dict(ClientAccount.ROLE_CHOICES).get(account.role, account.role.title()),
+                "can_manage_branding": account.role in ROLE_BRANDING_ACCESS,
                 "allowed_assessments": [
                     {
                         "code": code,
@@ -267,6 +275,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "notifications": self._notifications(account),
                 "benchmark_helper": "Benchmarks reference anonymized averages across all clients running the same assessments.",
                 "logo_form": getattr(self, "logo_form", self.logo_form_class()),
+                "can_manage_invites": account.role in ROLE_INVITE_ACCESS,
             }
         )
         return context
@@ -275,7 +284,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         actions = []
         first_assessment = next(iter(account.approved_assessments), None)
         primary_url = reverse("clients:dashboard")
-        if first_assessment and account.role == "manager":
+        if first_assessment and account.role in ROLE_INVITE_ACCESS:
             primary_url = reverse("clients:assessment-manage", args=[first_assessment])
             actions.append(
                 {
@@ -483,7 +492,8 @@ class ClientActivityExportView(LoginRequiredMixin, View):
 class ClientAssessmentMixin(LoginRequiredMixin):
     login_url = reverse_lazy("clients:login")
     assessment_type: str
-    requires_manager_access = True
+    requires_manager_access = False
+    allowed_roles: set[str] | None = None
 
     ASSESSMENT_CONFIG = {
         "marketing": {
@@ -520,11 +530,14 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         if assessment_type not in self.account.approved_assessments:
             messages.error(request, "You do not have access to that assessment.")
             return redirect("clients:dashboard")
-        if self.requires_manager_access and not self.is_manager:
-            messages.error(request, "Only managers can perform that action.")
+        if self.allowed_roles and self.account.role not in self.allowed_roles:
+            messages.error(request, "You do not have access to this workspace.")
             return redirect("clients:dashboard")
         self.assessment_type = assessment_type
         self.assessment_config = self.ASSESSMENT_CONFIG[assessment_type]
+        self.can_manage_invites = self.account.role in ROLE_INVITE_ACCESS
+        self.can_add_notes = self.account.role in ROLE_NOTE_ACCESS
+        self.can_record_decision = self.account.role in ROLE_DECISION_ACCESS
         self._activate_scheduled_invites()
         return super().dispatch(request, *args, **kwargs)
 
@@ -573,8 +586,12 @@ class ClientAssessmentMixin(LoginRequiredMixin):
 class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
     template_name = "clients/assessments/manage.html"
     bulk_form_class = ClientBulkInviteForm
+    allowed_roles = ROLE_INVITE_ACCESS
 
     def form_valid(self, form):
+        if not self.can_manage_invites:
+            messages.error(self.request, "You do not have permission to create invites.")
+            return redirect(self.get_success_url())
         session = form.save()
         messages.success(self.request, f"Invite ready. Share the link with {session.candidate_id}.")
         return super().form_valid(form)
@@ -596,9 +613,15 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
             context = self.get_context_data(form=self.get_form(), bulk_form=bulk_form)
             return self.render_to_response(context, status=400)
         elif action == "send_reminder":
+            if not self.can_manage_invites:
+                messages.error(request, "You do not have permission to send reminders.")
+                return redirect(self.get_success_url())
             self._trigger_reminder(request.POST.get("session_uuid"))
             return redirect(self.get_success_url())
         elif action == "launch_now":
+            if not self.can_manage_invites:
+                messages.error(self.request, "You do not have permission to launch invites.")
+                return redirect(self.get_success_url())
             self._launch_now(request.POST.get("session_uuid"))
             return redirect(self.get_success_url())
         return super().post(request, *args, **kwargs)
@@ -620,6 +643,22 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                 needs_review_count=models.Count("id", filter=models.Q(needs_review=True)),
             )
         }
+        decision_lookup = {
+            row["session_uuid"]: row
+            for row in ClientSessionNote.objects.filter(
+                client=self.account,
+                assessment_type=self.assessment_type,
+                session_uuid__in=[session.uuid for session in sessions],
+                note_type="decision",
+                decision__gt="",
+            )
+            .values("session_uuid")
+            .annotate(
+                advance=models.Count("id", filter=models.Q(decision="advance")),
+                hold=models.Count("id", filter=models.Q(decision="hold")),
+                reject=models.Count("id", filter=models.Q(decision="reject")),
+            )
+        }
         for session in sessions:
             score = getattr(session, "overall_score", None)
             if score is None:
@@ -627,6 +666,17 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
             if score is None:
                 score = getattr(session, "eligibility_score", None)
             note_meta = note_lookup.get(session.uuid, {})
+            decision_meta = decision_lookup.get(session.uuid, {})
+            decision_label = ""
+            if decision_meta:
+                options = {
+                    "advance": decision_meta.get("advance", 0),
+                    "hold": decision_meta.get("hold", 0),
+                    "reject": decision_meta.get("reject", 0),
+                }
+                best = max(options.items(), key=lambda item: item[1])
+                if best[1]:
+                    decision_label = f"{best[0].title()} ({best[1]})"
             session_rows.append(
                 {
                     "candidate": session.candidate_id,
@@ -646,6 +696,7 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                     "last_reminder_at": session.last_reminder_at,
                     "reminder_count": session.reminder_count,
                     "uuid": session.uuid,
+                    "decision_summary": decision_label,
                 }
             )
         bulk_form = context.get("bulk_form")
@@ -663,6 +714,7 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
     def _process_bulk_upload(self, csv_file) -> tuple[int, list[str]]:
         created = 0
         errors: list[str] = []
+        csv_file.seek(0)
         decoded = io.TextIOWrapper(csv_file.file, encoding="utf-8")
         reader = csv.DictReader(decoded)
         default_duration = self.get_form_class().base_fields["duration_minutes"].initial or 30
@@ -723,7 +775,24 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
         context = super().get_context_data(**kwargs)
         session_uuid = kwargs.get("session_uuid")
         session = self.get_session_object(session_uuid)
+        if session.status != "submitted":
+            messages.info(self.request, "This report is not available yet. Please wait until the candidate submits the assessment.")
+            return redirect("clients:assessment-manage", assessment_type=self.assessment_type)
         report = self._build_report(session)
+        decision_summary = list(
+            ClientSessionNote.objects.filter(
+                client=self.account,
+                assessment_type=self.assessment_type,
+                session_uuid=session.uuid,
+                note_type="decision",
+                decision__gt="",
+            )
+            .values("decision")
+            .annotate(count=models.Count("id"))
+        )
+        recommended_decision = None
+        if decision_summary:
+            recommended_decision = max(decision_summary, key=lambda item: item["count"])
         context.update(
             {
                 "assessment_label": self.assessment_config["label"],
@@ -737,7 +806,10 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                     assessment_type=self.assessment_type,
                     session_uuid=session.uuid,
                 ),
-                "can_edit_notes": self.is_manager,
+                "can_edit_notes": self.can_add_notes,
+                "can_record_decision": self.can_record_decision,
+                "decision_summary": decision_summary,
+                "recommended_decision": recommended_decision,
             }
         )
         return context
@@ -765,8 +837,14 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
     def form_valid(self, form):
         session_uuid = self.kwargs.get("session_uuid")
         session = self.get_session_object(session_uuid)
-        if not self.is_manager:
-            messages.error(self.request, "Only managers can add notes.")
+        if not self.can_add_notes and form.cleaned_data.get("note_type") != "decision":
+            messages.error(self.request, "You do not have permission to add notes.")
+            return redirect(self.get_success_url())
+        if (
+            form.cleaned_data.get("note_type") == "decision"
+            and not self.can_record_decision
+        ):
+            messages.error(self.request, "You do not have permission to record decisions.")
             return redirect(self.get_success_url())
         note = form.save(commit=False)
         note.client = self.account
@@ -774,6 +852,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
         note.session_uuid = session.uuid
         note.candidate_id = session.candidate_id
         note.author = self.request.user
+        note.author_role = self.account.role
         note.save()
         messages.success(self.request, "Note saved.")
         return super().form_valid(form)

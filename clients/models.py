@@ -59,6 +59,9 @@ class ClientAccount(TimeStampedModel):
     ]
     ROLE_CHOICES = [
         ("manager", "Manager"),
+        ("recruiter", "Recruiter"),
+        ("interviewer", "Interviewer"),
+        ("executive", "Executive"),
         ("viewer", "Viewer"),
     ]
 
@@ -129,18 +132,30 @@ class ClientNotification(TimeStampedModel):
 
 class ClientSessionNote(TimeStampedModel):
     ASSESSMENT_CHOICES = ClientAccount.ASSESSMENT_CHOICES
+    NOTE_TYPES = [
+        ("comment", "Comment"),
+        ("decision", "Decision"),
+    ]
+    DECISION_CHOICES = [
+        ("advance", "Advance"),
+        ("hold", "Hold"),
+        ("reject", "Reject"),
+    ]
 
     client = models.ForeignKey(ClientAccount, related_name="session_notes", on_delete=models.CASCADE)
     assessment_type = models.CharField(max_length=32, choices=ASSESSMENT_CHOICES)
     session_uuid = models.UUIDField()
     candidate_id = models.CharField(max_length=120)
     note = models.TextField(blank=True)
+    note_type = models.CharField(max_length=20, choices=NOTE_TYPES, default="comment")
+    decision = models.CharField(max_length=20, choices=DECISION_CHOICES, blank=True)
     needs_review = models.BooleanField(default=False)
     author = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    author_role = models.CharField(max_length=20, choices=ClientAccount.ROLE_CHOICES, default="manager")
 
     class Meta:
         ordering = ("-created_at",)
 
     def __str__(self):
-        status = "Needs review" if self.needs_review else "Note"
+        status = "Needs review" if self.needs_review else self.get_note_type_display()
         return f"{status} for {self.candidate_id}"
