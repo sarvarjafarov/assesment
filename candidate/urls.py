@@ -25,6 +25,21 @@ urlpatterns = [
         name="session-complete",
     ),
     path(
+        "<uuid:session_uuid>/pause/",
+        views.SessionPauseActionView.as_view(),
+        name="session-pause",
+    ),
+    path(
+        "<uuid:session_uuid>/paused/",
+        views.SessionPausedView.as_view(),
+        name="session-paused",
+    ),
+    path(
+        "<uuid:session_uuid>/resume/",
+        views.SessionResumeView.as_view(),
+        name="session-resume",
+    ),
+    path(
         "marketing/<uuid:session_uuid>/",
         marketing_views.MarketingAssessmentView.as_view(),
         name="marketing-session",
@@ -38,6 +53,21 @@ urlpatterns = [
         "marketing/<uuid:session_uuid>/expired/",
         marketing_views.MarketingAssessmentExpiredView.as_view(),
         name="marketing-expired",
+    ),
+    path(
+        "marketing/<uuid:session_uuid>/pause/",
+        marketing_views.MarketingSessionPauseView.as_view(),
+        name="marketing-pause",
+    ),
+    path(
+        "marketing/<uuid:session_uuid>/paused/",
+        marketing_views.MarketingSessionPausedView.as_view(),
+        name="marketing-paused",
+    ),
+    path(
+        "marketing/<uuid:session_uuid>/resume/",
+        marketing_views.MarketingSessionResumeView.as_view(),
+        name="marketing-resume",
     ),
     path(
         "pm/<uuid:session_uuid>/",
@@ -55,6 +85,21 @@ urlpatterns = [
         name="pm-expired",
     ),
     path(
+        "pm/<uuid:session_uuid>/pause/",
+        pm_views.ProductAssessmentPauseView.as_view(),
+        name="pm-pause",
+    ),
+    path(
+        "pm/<uuid:session_uuid>/paused/",
+        pm_views.ProductAssessmentPausedView.as_view(),
+        name="pm-paused",
+    ),
+    path(
+        "pm/<uuid:session_uuid>/resume/",
+        pm_views.ProductAssessmentResumeView.as_view(),
+        name="pm-resume",
+    ),
+    path(
         "behavioral/<uuid:session_uuid>/",
         behavioral_views.BehavioralAssessmentView.as_view(),
         name="behavioral-session",
@@ -68,5 +113,20 @@ urlpatterns = [
         "behavioral/<uuid:session_uuid>/expired/",
         behavioral_views.BehavioralAssessmentExpiredView.as_view(),
         name="behavioral-expired",
+    ),
+    path(
+        "behavioral/<uuid:session_uuid>/pause/",
+        behavioral_views.BehavioralAssessmentPauseView.as_view(),
+        name="behavioral-pause",
+    ),
+    path(
+        "behavioral/<uuid:session_uuid>/paused/",
+        behavioral_views.BehavioralAssessmentPausedView.as_view(),
+        name="behavioral-paused",
+    ),
+    path(
+        "behavioral/<uuid:session_uuid>/resume/",
+        behavioral_views.BehavioralAssessmentResumeView.as_view(),
+        name="behavioral-resume",
     ),
 ]

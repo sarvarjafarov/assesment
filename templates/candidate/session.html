@@ -9,17 +9,49 @@
                     <span class="chip-dot"></span>
                     Assessment in progress
                 </span>
-                <div class="progress-count">
-                    <span class="progress-step">Step {{ step_number }}</span>
-                    <span class="progress-total">of {{ total_steps }}</span>
-                </div>
             </div>
             <div class="progress-meter">
                 <div class="progress-bar">
                     <span style="width: {{ progress_percent }}%"></span>
                 </div>
-                <p class="progress-percent">{{ progress_percent }}% complete</p>
             </div>
+            <div class="progress-stats">
+                <article class="progress-stat">
+                    <span>Step</span>
+                    <strong>{{ step_number }} / {{ total_steps }}</strong>
+                </article>
+                <article class="progress-stat">
+                    <span>Complete</span>
+                    <strong>{{ progress_percent }}%</strong>
+                </article>
+                {% if remaining_minutes %}
+                <article class="progress-stat">
+                    <span>Time left</span>
+                    <strong>{{ remaining_minutes }} min</strong>
+                </article>
+                {% elif due_at %}
+                <article class="progress-stat">
+                    <span>Due</span>
+                    <strong>{{ due_at|date:"M j, H:i" }}</strong>
+                </article>
+                {% endif %}
+            </div>
+        </div>
+        <div class="session-utility-bar">
+            <div>
+                <p class="eyebrow">Progress saved</p>
+                <strong>
+                    {% if last_saved_at %}
+                        {{ last_saved_at|naturaltime }}
+                    {% else %}
+                        Just now
+                    {% endif %}
+                </strong>
+            </div>
+            <form method="post" action="{{ pause_url }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">Pause &amp; resume later</button>
+            </form>
         </div>
         {% if instructions %}
         <div class="question-instructions">

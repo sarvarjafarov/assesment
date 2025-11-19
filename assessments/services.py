@@ -239,9 +239,12 @@ def record_responses(
         focus_traits=focus_traits,
     )
 
+    now = timezone.now()
+    session.last_activity_at = now
+
     if mark_completed:
         session.status = "completed"
-        session.submitted_at = timezone.now()
+        session.submitted_at = now
         evaluation: SessionEvaluation | None = None
         if overall_score is None or score_breakdown is None:
             evaluation = evaluate_session_performance(session)
@@ -277,9 +280,13 @@ def record_responses(
                 "overall_score",
                 "score_breakdown",
                 "decision",
+                "last_activity_at",
                 "updated_at",
             ]
         )
+
+    else:
+        session.save(update_fields=["last_activity_at", "updated_at"])
 
     return session
 

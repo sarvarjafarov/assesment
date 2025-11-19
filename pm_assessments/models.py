@@ -77,6 +77,7 @@ class ProductAssessmentSession(TimeStampedModel):
     STATUS_CHOICES = [
         ("draft", "Draft"),
         ("in_progress", "In progress"),
+        ("paused", "Paused"),
         ("submitted", "Submitted"),
     ]
     client = models.ForeignKey(
@@ -112,6 +113,9 @@ class ProductAssessmentSession(TimeStampedModel):
     candidate_feedback_score = models.PositiveSmallIntegerField(null=True, blank=True)
     candidate_feedback_comment = models.TextField(blank=True)
     candidate_feedback_submitted_at = models.DateTimeField(null=True, blank=True)
+    paused_at = models.DateTimeField(null=True, blank=True)
+    total_paused_seconds = models.PositiveIntegerField(default=0)
+    last_activity_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ("-created_at",)

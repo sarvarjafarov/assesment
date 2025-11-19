@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel pause-panel">
+        <p class="eyebrow">Session paused</p>
+        <h1>{{ assessment_label }}</h1>
+        <p class="lede">Take a breather—your responses are safe and we will hold your place.</p>
+        <div class="pause-meta">
+            <article>
+                <span>Last saved</span>
+                <strong>
+                    {% if last_saved_at %}
+                        {{ last_saved_at|naturaltime }}
+                    {% else %}
+                        Moments ago
+                    {% endif %}
+                </strong>
+            </article>
+            {% if paused_at %}
+            <article>
+                <span>Paused at</span>
+                <strong>{{ paused_at|date:"M j, g:i A" }}</strong>
+            </article>
+            {% endif %}
+        </div>
+        <form method="post" action="{{ resume_url }}" class="resume-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-pill">Resume assessment</button>
+        </form>
+        <p class="help-text">
+            Need help? Let your recruiter know or reply to the invitation email and we will follow up.
+        </p>
+    </section>
+</div>
+{% endblock %}

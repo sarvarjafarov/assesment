@@ -5,6 +5,7 @@ import json
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.views import View
 from django.views.generic import FormView, TemplateView
 
 from assessments.behavioral import get_behavioral_blocks
@@ -41,6 +42,7 @@ class SessionMixin:
             "due_at": self.session.due_at,
             "behavioral_focus_traits": self.session.behavioral_focus_traits,
             "behavioral_focus_label": self.session.behavioral_focus_display,
+            "last_saved_at": self.session.last_activity_at,
         }
 
 
@@ -57,6 +59,11 @@ class SessionIntroView(SessionMixin, TemplateView):
             self.session.due_at and self.session.due_at < timezone.now()
         )
         context["has_started"] = self.session.status in {"in_progress", "completed"}
+        context["is_paused"] = self.session.status == "paused"
+        context["paused_at"] = self.session.paused_at
+        context["resume_url"] = reverse(
+            "candidate:session-resume", args=[self.session.uuid]
+        )
         return context
 
 
@@ -66,6 +73,8 @@ class SessionAssessmentView(SessionMixin, FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.load_session(**kwargs)
+        if self.session.status == "paused":
+            return redirect("candidate:session-paused", session_uuid=self.session.uuid)
         if self.session.status == "completed":
             return redirect(
                 "candidate:session-complete", session_uuid=self.session.uuid
@@ -82,10 +91,20 @@ class SessionAssessmentView(SessionMixin, FormView):
 
     def _ensure_started(self):
         if self.session.status in {"draft", "invited"}:
+            now = timezone.now()
             self.session.status = "in_progress"
             if not self.session.started_at:
-                self.session.started_at = timezone.now()
-            self.session.save(update_fields=["status", "started_at", "updated_at"])
+                self.session.started_at = now
+            if not self.session.last_activity_at:
+                self.session.last_activity_at = now
+            self.session.save(
+                update_fields=[
+                    "status",
+                    "started_at",
+                    "last_activity_at",
+                    "updated_at",
+                ]
+            )
 
     def _prepare_questions(self):
         self.questions = list(
@@ -201,6 +220,9 @@ class SessionAssessmentView(SessionMixin, FormView):
             else None
         )
         context["behavioral_total_blocks"] = self.behavioral_total_blocks
+        context["pause_url"] = reverse(
+            "candidate:session-pause", args=[self.session.uuid]
+        )
         return context
 
     def form_valid(self, form):
@@ -245,3 +267,71 @@ class SessionCompleteView(SessionMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(self.base_context())
         return context
+
+
+class SessionPauseActionView(SessionMixin, View):
+    """Persist a manual pause request and redirect to the pause confirmation view."""
+
+    def post(self, request, *args, **kwargs):
+        self.load_session(**kwargs)
+        if self.session.status != "completed":
+            now = timezone.now()
+            self.session.status = "paused"
+            self.session.paused_at = now
+            self.session.last_activity_at = now
+            self.session.save(
+                update_fields=[
+                    "status",
+                    "paused_at",
+                    "last_activity_at",
+                    "updated_at",
+                ]
+            )
+        return redirect("candidate:session-paused", session_uuid=self.session.uuid)
+
+
+class SessionPausedView(SessionMixin, TemplateView):
+    template_name = "candidate/pause_state.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.load_session(**kwargs)
+        if self.session.status != "paused":
+            return redirect("candidate:session-start", session_uuid=self.session.uuid)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(self.base_context())
+        context["paused_at"] = self.session.paused_at
+        context["resume_url"] = reverse(
+            "candidate:session-resume", args=[self.session.uuid]
+        )
+        context["assessment_label"] = self.session.assessment.title
+        return context
+
+
+class SessionResumeView(SessionMixin, View):
+    """Resume a paused assessment and return the candidate to the next question."""
+
+    def post(self, request, *args, **kwargs):
+        self.load_session(**kwargs)
+        if self.session.status != "paused":
+            return redirect("candidate:session-start", session_uuid=self.session.uuid)
+        now = timezone.now()
+        paused_seconds = self.session.total_paused_seconds or 0
+        if self.session.paused_at:
+            paused_seconds += int((now - self.session.paused_at).total_seconds())
+        self.session.total_paused_seconds = paused_seconds
+        self.session.paused_at = None
+        self.session.status = "in_progress"
+        self.session.last_activity_at = now
+        self.session.save(
+            update_fields=[
+                "status",
+                "paused_at",
+                "total_paused_seconds",
+                "last_activity_at",
+                "updated_at",
+            ]
+        )
+        return redirect("candidate:session-start", session_uuid=self.session.uuid)

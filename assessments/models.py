@@ -256,6 +256,7 @@ class AssessmentSession(TimeStampedModel):
         ("draft", "Draft"),
         ("invited", "Invited"),
         ("in_progress", "In Progress"),
+        ("paused", "Paused"),
         ("completed", "Completed"),
         ("expired", "Expired"),
     ]
@@ -308,6 +309,20 @@ class AssessmentSession(TimeStampedModel):
         null=True,
         blank=True,
         help_text="Optional deadline communicated to the candidate.",
+    )
+    paused_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when the candidate paused the assessment.",
+    )
+    total_paused_seconds = models.PositiveIntegerField(
+        default=0,
+        help_text="How long the session has been paused in aggregate.",
+    )
+    last_activity_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Tracks the most recent time the candidate interacted.",
     )
     DECISION_CHOICES = [
         ("undecided", "Undecided"),

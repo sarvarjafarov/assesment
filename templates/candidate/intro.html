@@ -41,8 +41,25 @@
             <p>{{ instructions|linebreaksbr }}</p>
         </div>
         {% endif %}
+        {% if is_paused %}
+        <div class="candidate-callout">
+            <strong>You're currently paused</strong>
+            <p>
+                {% if last_saved_at %}
+                Last saved {{ last_saved_at|naturaltime }}.
+                {% else %}
+                We'll hold your answers until you are ready.
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
         <div class="candidate-actions">
-            {% if has_started %}
+            {% if is_paused %}
+            <form method="post" action="{{ resume_url }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-pill">Resume assessment</button>
+            </form>
+            {% elif has_started %}
             <a class="btn btn-pill" href="{% url 'candidate:session-start' session.uuid %}">Resume assessment</a>
             {% else %}
             <a class="btn btn-pill" href="{{ start_url }}">Start assessment</a>
