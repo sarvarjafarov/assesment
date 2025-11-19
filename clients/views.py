@@ -771,13 +771,20 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
     form_class = ClientSessionNoteForm
     requires_manager_access = False
 
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.session_obj = self.get_session_object(kwargs.get("session_uuid"))
+        except Http404:
+            messages.error(request, "That assessment could not be found.")
+            return redirect("clients:assessment-manage", assessment_type=kwargs.get("assessment_type"))
+        if self.session_obj.status != "submitted":
+            messages.info(request, "This report becomes available once the candidate submits.")
+            return redirect("clients:assessment-manage", assessment_type=kwargs.get("assessment_type"))
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        session_uuid = kwargs.get("session_uuid")
-        session = self.get_session_object(session_uuid)
-        if session.status != "submitted":
-            messages.info(self.request, "This report is not available yet. Please wait until the candidate submits the assessment.")
-            return redirect("clients:assessment-manage", assessment_type=self.assessment_type)
+        session = getattr(self, "session_obj", None)
         report = self._build_report(session)
         decision_summary = list(
             ClientSessionNote.objects.filter(
@@ -835,8 +842,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
         }
 
     def form_valid(self, form):
-        session_uuid = self.kwargs.get("session_uuid")
-        session = self.get_session_object(session_uuid)
+        session = getattr(self, "session_obj", None)
         if not self.can_add_notes and form.cleaned_data.get("note_type") != "decision":
             messages.error(self.request, "You do not have permission to add notes.")
             return redirect(self.get_success_url())
