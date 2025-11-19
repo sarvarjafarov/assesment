@@ -10,7 +10,7 @@
             </div>
         </div>
         <nav>
-            <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' % or section == 'reports' %}is-active{% endif %}">
+            <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' or section == 'reports' %}is-active{% endif %}">
                 Dashboard & Reporting
             </a>
             <a href="{% url 'console:client-list' %}" class="{% if section == 'clients' %}is-active{% endif %}">
@@ -24,9 +24,6 @@
             </a>
             <a href="{% url 'console:behavioral-list' %}" class="{% if section == 'behavioral' %}is-active{% endif %}">
                 Behavioral Assessments
-            </a>
-            <a href="{% url 'console:reports-overview' %}" class="{% if section == 'reports' %}is-active{% endif %}">
-                Reporting
             </a>
             <a href="{% url 'admin:auth_user_changelist' %}" target="_blank">
                 Users & Roles
