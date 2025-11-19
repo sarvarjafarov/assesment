@@ -1071,12 +1071,17 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
         queryset = session.__class__.objects.filter(status="submitted")
         total_assessment = queryset.count()
         recent = queryset.filter(created_at__gte=timezone.now() - timedelta(days=30)).count()
-        top_score = queryset.aggregate(models.Max("overall_score")).get("overall_score__max")
-        cohort_score = queryset.aggregate(models.Avg("overall_score")).get("overall_score__avg")
+        score_field = "overall_score"
+        if not hasattr(session, "overall_score") or session.overall_score is None:
+            if hasattr(session, "eligibility_score"):
+                score_field = "eligibility_score"
+        top_score = queryset.aggregate(models.Max(score_field)).get(f"{score_field}__max")
+        cohort_score = queryset.aggregate(models.Avg(score_field)).get(f"{score_field}__avg")
         percentile = None
-        if session.overall_score is not None and total_assessment:
-            better = queryset.filter(overall_score__gt=session.overall_score).count()
-            equal = queryset.filter(overall_score=session.overall_score).count()
+        candidate_score = getattr(session, score_field, None)
+        if candidate_score is not None and total_assessment:
+            better = queryset.filter(**{f"{score_field}__gt": candidate_score}).count()
+            equal = queryset.filter(**{f"{score_field}": candidate_score}).count()
             cumulative = better + equal
             percentile = max(0, 100 - round((cumulative / total_assessment) * 100))
         return {
@@ -1084,7 +1089,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
             "cohort_recent": recent,
             "cohort_avg": cohort_score,
             "top_score": top_score,
-            "candidate_score": session.overall_score,
+            "candidate_score": candidate_score,
             "percentile": percentile,
         }
 
