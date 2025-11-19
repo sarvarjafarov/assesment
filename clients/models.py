@@ -70,6 +70,7 @@ class ClientAccount(TimeStampedModel):
     allowed_assessments = models.JSONField(default=list, blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="pending")
     notes = models.TextField(blank=True)
+    receive_weekly_summary = models.BooleanField(default=False)
 
     objects = ClientAccountQuerySet.as_manager()
 
@@ -97,3 +98,22 @@ class ClientAccount(TimeStampedModel):
             self.user.is_active = should_activate
             self.user.save(update_fields=["is_active"])
         super().save(*args, **kwargs)
+
+
+class ClientSessionNote(TimeStampedModel):
+    ASSESSMENT_CHOICES = ClientAccount.ASSESSMENT_CHOICES
+
+    client = models.ForeignKey(ClientAccount, related_name="session_notes", on_delete=models.CASCADE)
+    assessment_type = models.CharField(max_length=32, choices=ASSESSMENT_CHOICES)
+    session_uuid = models.UUIDField()
+    candidate_id = models.CharField(max_length=120)
+    note = models.TextField(blank=True)
+    needs_review = models.BooleanField(default=False)
+    author = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        status = "Needs review" if self.needs_review else "Note"
+        return f"{status} for {self.candidate_id}"

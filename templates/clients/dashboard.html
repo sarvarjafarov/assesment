@@ -31,8 +31,16 @@
                 <p class="hero-stat-helper">Across finished sessions</p>
             </div>
         </div>
-        <div class="portal-actions">
+        <div class="portal-actions stacked">
             <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
+            <form method="post" class="summary-toggle">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_summary">
+                <label class="toggle-control">
+                    <input type="checkbox" name="weekly_summary" {% if weekly_summary_enabled %}checked{% endif %} onchange="this.form.submit()">
+                    <span>Weekly summary emails</span>
+                </label>
+            </form>
         </div>
     </header>
 
@@ -76,6 +84,25 @@
             </article>
         </section>
 
+        {% if benchmark %}
+        <section class="portal-card-grid two-up benchmark-row">
+            <article class="portal-card benchmark-card">
+                <p class="label">Benchmark comparison</p>
+                <h2>{{ portal_stats.completion_rate|floatformat:0 }}% vs {{ benchmark.completion_rate|floatformat:0 }}%</h2>
+                <p class="muted">Client completion rate vs. network average.</p>
+            </article>
+            <article class="portal-card benchmark-card">
+                <p class="label">Avg. duration</p>
+                <h2>
+                    {% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}
+                    /
+                    {% if benchmark.average_duration %}{{ benchmark.average_duration|floatformat:0 }}m{% else %}—{% endif %}
+                </h2>
+                <p class="muted">Your candidates vs. industry peers.</p>
+            </article>
+        </section>
+        {% endif %}
+
         {% if chart_payload %}
         <section class="portal-card-grid two-up charts-row">
             <article class="portal-card chart-card">
@@ -104,6 +131,40 @@
             </article>
         </section>
         {% endif %}
+
+        <section class="activity-filter-row">
+            <form method="get" class="activity-filter-form">
+                <label>
+                    <span>Assessment</span>
+                    <select name="assessment">
+                        {% for value, label in activity_filter_options.assessments %}
+                        <option value="{{ value }}" {% if activity_filters.assessment == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    <span>Status</span>
+                    <select name="status">
+                        {% for value, label in activity_filter_options.statuses %}
+                        <option value="{{ value }}" {% if activity_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    <span>Window</span>
+                    <select name="window">
+                        {% for value, label in activity_filter_options.windows %}
+                        <option value="{{ value }}" {% if activity_filters.window == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button class="btn btn-outline small" type="submit">Apply</button>
+                {% if activity_querystring %}
+                <a class="link reset-link" href="{% url 'clients:dashboard' %}">Reset</a>
+                {% endif %}
+            </form>
+            <a class="pill" href="{{ activity_export_url }}">Export CSV</a>
+        </section>
 
         <section class="portal-card-grid two-up activity-row">
             <article class="portal-card attention-card">
@@ -143,7 +204,7 @@
                     {% endfor %}
                 </ul>
                 {% else %}
-                <p class="muted">No candidate activity yet.</p>
+                <p class="muted">No candidate activity for this filter set.</p>
                 {% endif %}
             </article>
         </section>
@@ -198,7 +259,6 @@
     const trend = payload.trend || [];
     const inviteCtx = document.getElementById("inviteChart");
     const trendCtx = document.getElementById("trendChart");
-    const funnel = payload.funnel || {};
     if (inviteCtx && breakdown.length) {
         new Chart(inviteCtx, {
             type: "bar",

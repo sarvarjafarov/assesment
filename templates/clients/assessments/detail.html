@@ -150,5 +150,55 @@
         {% endif %}
         {% endif %}
     </section>
+
+    <section class="panel portal-panel notes-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Collaboration</p>
+                <h2>Candidate notes</h2>
+            </div>
+        </header>
+        <form method="post" class="note-form">
+            {% csrf_token %}
+            {{ note_form.non_field_errors }}
+            <div class="form-field">
+                {{ note_form.note.label_tag }}
+                {{ note_form.note }}
+                {% for error in note_form.note.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <label class="note-flag">
+                {{ note_form.needs_review }}
+                <span>{{ note_form.needs_review.label }}</span>
+            </label>
+            {% for error in note_form.needs_review.errors %}
+            <span class="field-error">{{ error }}</span>
+            {% endfor %}
+            <button class="btn btn-outline small" type="submit">Save note</button>
+        </form>
+        {% if notes %}
+        <ul class="notes-list">
+            {% for note in notes %}
+            <li>
+                <div>
+                    <p class="note-meta">
+                        {{ note.created_at|naturaltime }}
+                        {% if note.author %}· {{ note.author.get_full_name|default:note.author.username }}{% endif %}
+                    </p>
+                    {% if note.note %}
+                    <p>{{ note.note }}</p>
+                    {% endif %}
+                </div>
+                {% if note.needs_review %}
+                <span class="pill warning">Needs review</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">No notes yet. Use the form above to capture feedback or flag follow-ups.</p>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}

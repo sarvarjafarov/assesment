@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from django.contrib import messages
+import csv
 import json
+from datetime import timedelta
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.views import View
 from django.views.generic import FormView, TemplateView
 from django.db import models
 
@@ -23,8 +26,65 @@ from .forms import (
     ClientMarketingInviteForm,
     ClientProductInviteForm,
     ClientSignupForm,
+    ClientSessionNoteForm,
 )
-from .models import ClientAccount
+from .models import ClientAccount, ClientSessionNote
+
+ACTIVITY_STATUS_CHOICES = {"all", "draft", "in_progress", "submitted"}
+ACTIVITY_ASSESSMENT_CHOICES = {"all"} | {choice[0] for choice in ClientAccount.ASSESSMENT_CHOICES}
+ACTIVITY_WINDOWS = {"7": 7, "30": 30, "90": 90}
+
+
+def parse_activity_filters(params):
+    assessment = params.get("assessment", "all")
+    status = params.get("status", "all")
+    window = params.get("window", "30")
+    if assessment not in ACTIVITY_ASSESSMENT_CHOICES:
+        assessment = "all"
+    if status not in ACTIVITY_STATUS_CHOICES:
+        status = "all"
+    if window not in ACTIVITY_WINDOWS:
+        window = "30"
+    return {"assessment": assessment, "status": status, "window": window}
+
+
+def build_dataset_map(account: ClientAccount):
+    return {
+        "marketing": DigitalMarketingAssessmentSession.objects.filter(client=account),
+        "product": ProductAssessmentSession.objects.filter(client=account),
+        "behavioral": BehavioralAssessmentSession.objects.filter(client=account),
+    }
+
+
+def build_activity_feed(account: ClientAccount, dataset_map: dict, filters: dict, activity_limit: int | None = 6):
+    entries: list[dict] = []
+    cutoff = timezone.now() - timedelta(days=ACTIVITY_WINDOWS.get(filters.get("window", "30"), 30))
+    for code, queryset in dataset_map.items():
+        if filters.get("assessment") not in ("all", code):
+            continue
+        qs = queryset
+        if filters.get("status") not in ("all", None):
+            qs = qs.filter(status=filters["status"])
+        qs = qs.filter(models.Q(updated_at__gte=cutoff) | models.Q(created_at__gte=cutoff))
+        label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
+        for session in qs.order_by("-updated_at")[:200]:
+            timestamp = session.updated_at or session.created_at
+            entries.append(
+                {
+                    "candidate": session.candidate_id,
+                    "assessment": label,
+                    "status": session.get_status_display(),
+                    "timestamp": timestamp,
+                    "detail_url": reverse("clients:assessment-detail", args=[code, session.uuid])
+                    if session.status == "submitted"
+                    else None,
+                    "manage_url": reverse("clients:assessment-manage", args=[code]),
+                }
+            )
+    entries.sort(key=lambda item: item["timestamp"] or timezone.now(), reverse=True)
+    if activity_limit:
+        return entries[:activity_limit]
+    return entries
 
 
 class ClientSignupView(FormView):
@@ -70,6 +130,7 @@ class ClientLogoutView(LoginRequiredMixin, TemplateView):
 class ClientDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "clients/dashboard.html"
     login_url = reverse_lazy("clients:login")
+    http_method_names = ["get", "post"]
 
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(request.user, "client_account"):
@@ -79,12 +140,43 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             return redirect("clients:signup")
         return super().dispatch(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        account = request.user.client_account
+        action = request.POST.get("action")
+        if action == "toggle_summary":
+            opt_in = request.POST.get("weekly_summary") == "on"
+            account.receive_weekly_summary = opt_in
+            account.save(update_fields=["receive_weekly_summary"])
+            if opt_in:
+                messages.success(request, "Weekly summary emails enabled.")
+            else:
+                messages.info(request, "Weekly summary emails disabled.")
+        return redirect("clients:dashboard")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         account = self.request.user.client_account
         catalog = ClientAccount.ASSESSMENT_DETAILS
-        stats = self._calculate_stats(account)
+        dataset_map = build_dataset_map(account)
+        activity_filters = parse_activity_filters(self.request.GET)
+        stats = self._calculate_stats(account, dataset_map, activity_filters)
         assessment_stats_map = {item["code"]: item for item in stats.get("assessment_breakdown", [])}
+        benchmarks = self._benchmark_snapshot()
+        if benchmarks and stats.get("completion_rate") is not None:
+            if stats["completion_rate"] + 10 < benchmarks.get("completion_rate", 0):
+                stats["attention_items"].append(
+                    {
+                        "label": "Completion rate below benchmark",
+                        "detail": f"Your completion rate ({stats['completion_rate']:.0f}%) trails the network average ({benchmarks.get('completion_rate', 0):.0f}%).",
+                    }
+                )
+        if stats["total_candidates"] < max(3, len(account.approved_assessments) * 2):
+            stats["attention_items"].append(
+                {
+                    "label": "Low invite volume",
+                    "detail": "Send more invites to keep your pipeline active.",
+                }
+            )
         context.update(
             {
                 "account": account,
@@ -110,6 +202,16 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "quick_actions": self._quick_actions(account),
                 "attention_items": stats.get("attention_items", []),
                 "activity_feed": stats.get("recent_activity", []),
+                "activity_filters": activity_filters,
+                "activity_export_url": self._activity_export_url(),
+                "benchmark": benchmarks,
+                "weekly_summary_enabled": account.receive_weekly_summary,
+                "activity_filter_options": {
+                    "assessments": [("all", "All assessments")] + list(ClientAccount.ASSESSMENT_CHOICES),
+                    "statuses": [("all", "All statuses"), ("draft", "Draft"), ("in_progress", "In progress"), ("submitted", "Completed")],
+                    "windows": [("7", "Last 7 days"), ("30", "Last 30 days"), ("90", "Last 90 days")],
+                },
+                "activity_querystring": self.request.GET.urlencode(),
             }
         )
         return context
@@ -147,10 +249,15 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         )
         return actions
 
-    def _calculate_stats(self, account: ClientAccount) -> dict:
-        marketing_sessions = DigitalMarketingAssessmentSession.objects.filter(client=account)
-        product_sessions = ProductAssessmentSession.objects.filter(client=account)
-        behavioral_sessions = BehavioralAssessmentSession.objects.filter(client=account)
+    def _activity_export_url(self):
+        base = reverse("clients:activity-export")
+        query = self.request.GET.urlencode()
+        return f"{base}?{query}" if query else base
+
+    def _calculate_stats(self, account: ClientAccount, dataset_map: dict, activity_filters: dict, activity_limit: int = 6) -> dict:
+        marketing_sessions = dataset_map["marketing"]
+        product_sessions = dataset_map["product"]
+        behavioral_sessions = dataset_map["behavioral"]
         total_candidates = (
             marketing_sessions.count() + product_sessions.count() + behavioral_sessions.count()
         )
@@ -160,7 +267,6 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         durations: list[float] = []
         status_totals = {"draft": 0, "in_progress": 0, "submitted": 0}
         attention_items: list[dict] = []
-        recent_activity: list[dict] = []
 
         def _append_scores(queryset, score_field="overall_score"):
             for score, duration in queryset.filter(status="submitted").values_list(score_field, "duration_minutes"):
@@ -172,12 +278,6 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         _append_scores(marketing_sessions)
         _append_scores(product_sessions)
         _append_scores(behavioral_sessions, score_field="eligibility_score")
-
-        dataset_map = {
-            "marketing": marketing_sessions,
-            "product": product_sessions,
-            "behavioral": behavioral_sessions,
-        }
 
         for code in account.approved_assessments:
             label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
@@ -202,31 +302,6 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 }
             )
 
-        def _recent_payload(qs, code):
-            label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
-            entries = []
-            for session in qs.order_by("-updated_at")[:5]:
-                timestamp = session.updated_at or session.created_at
-                entries.append(
-                    {
-                        "candidate": session.candidate_id,
-                        "assessment": label,
-                        "status": session.get_status_display(),
-                        "timestamp": timestamp,
-                        "detail_url": reverse("clients:assessment-detail", args=[code, session.uuid])
-                        if session.status == "submitted"
-                        else None,
-                        "manage_url": reverse("clients:assessment-manage", args=[code]),
-                    }
-                )
-            return entries
-
-        for code, queryset in dataset_map.items():
-            recent_activity.extend(_recent_payload(queryset, code))
-
-        recent_activity.sort(key=lambda item: item["timestamp"] or timezone.now(), reverse=True)
-        recent_activity = recent_activity[:6]
-
         avg_score = sum(scores) / len(scores) if scores else None
         avg_duration = sum(durations) / len(durations) if durations else None
 
@@ -235,6 +310,8 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         recent += list(behavioral_sessions.order_by("-created_at")[:5])
         recent.sort(key=lambda session: session.created_at or session.updated_at)
         recent = recent[-5:]
+
+        filtered_activity = build_activity_feed(account, dataset_map, activity_filters, activity_limit=activity_limit)
 
         trend = []
         for session in recent:
@@ -281,10 +358,71 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             "average_duration": avg_duration,
             "assessment_breakdown": breakdown,
             "score_trend": trend,
-            "recent_activity": recent_activity,
+            "recent_activity": filtered_activity,
             "attention_items": attention_items,
             "funnel": funnel,
         }
+
+    def _benchmark_snapshot(self) -> dict:
+        durations: list[float] = []
+        scores: list[float] = []
+        total_invites = 0
+        total_completed = 0
+        datasets = (
+            (DigitalMarketingAssessmentSession.objects.all(), "overall_score"),
+            (ProductAssessmentSession.objects.all(), "overall_score"),
+            (BehavioralAssessmentSession.objects.all(), "eligibility_score"),
+        )
+        for queryset, score_field in datasets:
+            total_invites += queryset.count()
+            completed = queryset.filter(status="submitted")
+            total_completed += completed.count()
+            durations.extend(
+                float(val) for val in completed.values_list("duration_minutes", flat=True) if val is not None
+            )
+            scores.extend(
+                float(val) for val in completed.values_list(score_field, flat=True) if val is not None
+            )
+        completion_rate = (total_completed / total_invites * 100) if total_invites else 0
+        avg_duration = sum(durations) / len(durations) if durations else None
+        avg_score = sum(scores) / len(scores) if scores else None
+        return {
+            "completion_rate": completion_rate,
+            "average_duration": avg_duration,
+            "average_score": avg_score,
+        }
+
+
+class ClientActivityExportView(LoginRequiredMixin, View):
+    login_url = reverse_lazy("clients:login")
+
+    def get(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        account = request.user.client_account
+        if account.status != "approved":
+            messages.error(request, "Your account is not approved yet.")
+            return redirect("clients:dashboard")
+        filters = parse_activity_filters(request.GET)
+        dataset_map = build_dataset_map(account)
+        activity_rows = build_activity_feed(account, dataset_map, filters, activity_limit=None)
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = "attachment; filename=assessment-activity.csv"
+        writer = csv.writer(response)
+        writer.writerow(["Candidate", "Assessment", "Status", "Updated", "Report URL", "Manage URL"])
+        for row in activity_rows:
+            timestamp = row.get("timestamp")
+            writer.writerow(
+                [
+                    row.get("candidate"),
+                    row.get("assessment"),
+                    row.get("status"),
+                    timestamp.strftime("%Y-%m-%d %H:%M") if timestamp else "",
+                    row.get("detail_url") or "",
+                    row.get("manage_url") or "",
+                ]
+            )
+        return response
 
 
 class ClientAssessmentMixin(LoginRequiredMixin):
@@ -367,12 +505,24 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session_rows = []
-        for session in self.sessions():
+        sessions = list(self.sessions())
+        note_lookup = {
+            row["session_uuid"]: row
+            for row in ClientSessionNote.objects.filter(
+                client=self.account,
+                assessment_type=self.assessment_type,
+                session_uuid__in=[session.uuid for session in sessions],
+            )
+            .values("session_uuid")
+            .annotate(note_count=models.Count("id"), needs_review=models.Max("needs_review"))
+        }
+        for session in sessions:
             score = getattr(session, "overall_score", None)
             if score is None:
                 score = getattr(session, "hard_skill_score", None)
             if score is None:
                 score = getattr(session, "eligibility_score", None)
+            note_meta = note_lookup.get(session.uuid, {})
             session_rows.append(
                 {
                     "candidate": session.candidate_id,
@@ -385,6 +535,8 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                     )
                     if session.status == "submitted"
                     else None,
+                    "notes": note_meta.get("note_count", 0),
+                    "needs_review": bool(note_meta.get("needs_review")),
                 }
             )
         context.update(
@@ -396,8 +548,9 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
         return context
 
 
-class ClientAssessmentDetailView(ClientAssessmentMixin, TemplateView):
+class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
     template_name = "clients/assessments/detail.html"
+    form_class = ClientSessionNoteForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -411,6 +564,12 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, TemplateView):
                 "share_link": self.build_share_link(session),
                 "report": report,
                 "assessment_type": self.assessment_type,
+                "note_form": context.get("form") or self.get_form(),
+                "notes": ClientSessionNote.objects.filter(
+                    client=self.account,
+                    assessment_type=self.assessment_type,
+                    session_uuid=session.uuid,
+                ),
             }
         )
         return context
@@ -434,3 +593,19 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, TemplateView):
             "development": recommendations.get("development", []),
             "seniority": recommendations.get("seniority"),
         }
+
+    def form_valid(self, form):
+        session_uuid = self.kwargs.get("session_uuid")
+        session = self.get_session_object(session_uuid)
+        note = form.save(commit=False)
+        note.client = self.account
+        note.assessment_type = self.assessment_type
+        note.session_uuid = session.uuid
+        note.candidate_id = session.candidate_id
+        note.author = self.request.user
+        note.save()
+        messages.success(self.request, "Note saved.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("clients:assessment-detail", args=[self.assessment_type, self.kwargs.get("session_uuid")])

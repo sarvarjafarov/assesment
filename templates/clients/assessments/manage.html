@@ -48,6 +48,7 @@
                 <span>Candidate</span>
                 <span>Status</span>
                 <span>Score</span>
+                <span>Notes</span>
                 <span>Updated</span>
                 <span>Link</span>
                 <span>Report</span>
@@ -57,6 +58,15 @@
                 <span>{{ row.candidate }}</span>
                 <span>{{ row.status }}</span>
                 <span>{% if row.score %}{{ row.score }}{% else %}—{% endif %}</span>
+                <span>
+                    {% if row.needs_review %}
+                    <span class="pill warning">Needs review</span>
+                    {% elif row.notes %}
+                    <span class="muted">{{ row.notes }} note{{ row.notes|pluralize }}</span>
+                    {% else %}
+                    <span class="muted">—</span>
+                    {% endif %}
+                </span>
                 <span>{% if row.submitted_at %}{{ row.submitted_at|naturaltime }}{% else %}—{% endif %}</span>
                 <span><a class="pill subtle" href="{{ row.share_link }}" target="_blank">Share link</a></span>
                 <span>

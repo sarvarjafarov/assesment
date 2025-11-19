@@ -10,7 +10,7 @@ from marketing_assessments.services import generate_question_set as generate_mar
 from pm_assessments.models import ProductAssessmentSession
 from pm_assessments.services import generate_question_set as generate_pm_question_set
 
-from .models import ClientAccount
+from .models import ClientAccount, ClientSessionNote
 
 PUBLIC_EMAIL_DOMAINS = {
     "gmail.com",
@@ -187,3 +187,24 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
         session.client = self.client
         session.save(update_fields=["question_set", "status", "duration_minutes", "started_at", "client"])
         return session
+
+
+class ClientSessionNoteForm(forms.ModelForm):
+    class Meta:
+        model = ClientSessionNote
+        fields = ["note", "needs_review"]
+        widgets = {
+            "note": forms.Textarea(attrs={"rows": 3, "placeholder": "Add context or next steps"}),
+        }
+        labels = {
+            "note": "Internal note",
+            "needs_review": "Mark as needs review",
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        note = cleaned.get("note", "").strip()
+        needs_review = cleaned.get("needs_review")
+        if not note and not needs_review:
+            raise forms.ValidationError("Add a note or flag the session for review.")
+        return cleaned
