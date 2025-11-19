@@ -10,8 +10,8 @@
             </div>
         </div>
         <nav>
-            <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' %}is-active{% endif %}">
-                Dashboard
+            <a href="{% url 'console:dashboard' %}" class="{% if section == 'dashboard' % or section == 'reports' %}is-active{% endif %}">
+                Dashboard & Reporting
             </a>
             <a href="{% url 'console:client-list' %}" class="{% if section == 'clients' %}is-active{% endif %}">
                 Clients
