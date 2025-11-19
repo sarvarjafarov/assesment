@@ -53,6 +53,7 @@ class DashboardView(ConsoleSectionMixin, LoginRequiredMixin, TemplateView):
             {"label": "System reporting", "href": reverse("console:reports-overview")},
             {"label": "Users & roles", "href": reverse("admin:auth_user_changelist")},
         ]
+        context["reporting"] = ReportingOverviewView().get_data_for_dashboard()
         return context
 
     def _build_cards(self) -> list[dict]:
@@ -305,8 +306,28 @@ class ReportingOverviewView(ConsoleSectionMixin, LoginRequiredMixin, TemplateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["org_summary"] = DashboardView()._org_summary()
-        assessment_totals = [
+        data = self.get_data_for_dashboard()
+        context.update(data)
+        return context
+
+    def get_data_for_dashboard(self):
+        org_summary = DashboardView()._org_summary()
+        assessment_totals = self._assessment_totals()
+        latest_clients = ClientAccount.objects.order_by("-updated_at")[:10]
+        chart_payload = {
+            "assessment_mix": assessment_totals,
+            "timeline": self._session_timeline(),
+            "status_breakdown": self._client_breakdown(),
+        }
+        return {
+            "org_summary": org_summary,
+            "assessment_totals": assessment_totals,
+            "latest_clients": latest_clients,
+            "charts": json.dumps(chart_payload, cls=DjangoJSONEncoder),
+        }
+
+    def _assessment_totals(self):
+        return [
             {
                 "label": "Marketing",
                 "total": DigitalMarketingAssessmentSession.objects.count(),
@@ -323,15 +344,6 @@ class ReportingOverviewView(ConsoleSectionMixin, LoginRequiredMixin, TemplateVie
                 "in_progress": BehavioralAssessmentSession.objects.filter(status="in_progress").count(),
             },
         ]
-        context["assessment_totals"] = assessment_totals
-        context["latest_clients"] = ClientAccount.objects.order_by("-updated_at")[:10]
-        chart_payload = {
-            "assessment_mix": assessment_totals,
-            "timeline": self._session_timeline(),
-            "status_breakdown": self._client_breakdown(),
-        }
-        context["charts"] = json.dumps(chart_payload, cls=DjangoJSONEncoder)
-        return context
 
     def _session_timeline(self) -> list[dict]:
         today = timezone.now().date()
