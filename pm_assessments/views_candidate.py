@@ -3,9 +3,11 @@ from __future__ import annotations
 from datetime import timedelta
 
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 
+from candidate.forms import CandidateFeedbackForm
 from .forms import ProductQuestionForm
 from .models import ProductAssessmentSession, ProductQuestion
 from .services import evaluate_session
@@ -71,18 +73,47 @@ class ProductAssessmentView(FormView):
         return redirect("candidate:pm-session", session_uuid=self.session.uuid)
 
 
-class ProductAssessmentCompleteView(TemplateView):
+class ProductAssessmentCompleteView(FormView):
     template_name = "candidate/pm_complete.html"
+    form_class = CandidateFeedbackForm
 
-    def get_context_data(self, **kwargs):
-        session = get_object_or_404(
+    def dispatch(self, request, *args, **kwargs):
+        self.session = get_object_or_404(
             ProductAssessmentSession, uuid=kwargs["session_uuid"]
         )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.session.candidate_feedback_score:
+            initial["score"] = self.session.candidate_feedback_score
+        if self.session.candidate_feedback_comment:
+            initial["comment"] = self.session.candidate_feedback_comment
+        return initial
+
+    def form_valid(self, form):
+        self.session.candidate_feedback_score = int(form.cleaned_data["score"])
+        self.session.candidate_feedback_comment = form.cleaned_data["comment"]
+        self.session.candidate_feedback_submitted_at = timezone.now()
+        self.session.save(
+            update_fields=[
+                "candidate_feedback_score",
+                "candidate_feedback_comment",
+                "candidate_feedback_submitted_at",
+            ]
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("candidate:pm-complete", args=[self.session.uuid])
+
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["session"] = session
-        if session.started_at and session.submitted_at:
-            duration = (session.submitted_at - session.started_at).total_seconds() / 60
+        context["session"] = self.session
+        if self.session.started_at and self.session.submitted_at:
+            duration = (self.session.submitted_at - self.session.started_at).total_seconds() / 60
             context["elapsed_minutes"] = round(duration, 1)
+        context["feedback_submitted"] = bool(self.session.candidate_feedback_score)
         return context
 
 

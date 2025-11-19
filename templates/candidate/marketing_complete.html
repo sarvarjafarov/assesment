@@ -10,6 +10,32 @@
         <p>You completed the assessment in {{ elapsed_minutes }} minutes.</p>
         {% endif %}
         <p>Your responses were recorded. The talent team will review your scores shortly.</p>
+        <div class="feedback-panel">
+            <h3>How was your experience?</h3>
+            {% if feedback_submitted %}
+            <p>Thanks for submitting feedback!</p>
+            {% else %}
+            <form method="post" class="feedback-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="feedback-scale">
+                    {{ form.score.label_tag }}
+                    {{ form.score }}
+                    {% for error in form.score.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-field">
+                    {{ form.comment.label_tag }}
+                    {{ form.comment }}
+                    {% for error in form.comment.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-pill" type="submit">Send feedback</button>
+            </form>
+            {% endif %}
+        </div>
     </section>
 </div>
 {% endblock %}

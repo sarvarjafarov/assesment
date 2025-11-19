@@ -123,3 +123,23 @@ class QuestionStepForm(forms.Form):
     @staticmethod
     def _choice_pairs(question: Question) -> list[tuple[int, str]]:
         return [(choice.id, choice.label) for choice in question.choices.all()]
+
+
+class CandidateFeedbackForm(forms.Form):
+    score = forms.ChoiceField(
+        label="How was this assessment experience?",
+        choices=[
+            (5, "Excellent"),
+            (4, "Good"),
+            (3, "Neutral"),
+            (2, "Challenging"),
+            (1, "Poor"),
+        ],
+        widget=forms.RadioSelect,
+        required=True,
+    )
+    comment = forms.CharField(
+        label="Anything we should know?",
+        widget=forms.Textarea(attrs={"rows": 3}),
+        required=False,
+    )

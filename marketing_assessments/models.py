@@ -106,6 +106,9 @@ class DigitalMarketingAssessmentSession(TimeStampedModel):
     scheduled_for = models.DateTimeField(null=True, blank=True)
     last_reminder_at = models.DateTimeField(null=True, blank=True)
     reminder_count = models.PositiveIntegerField(default=0)
+    candidate_feedback_score = models.PositiveSmallIntegerField(null=True, blank=True)
+    candidate_feedback_comment = models.TextField(blank=True)
+    candidate_feedback_submitted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ("-created_at",)

@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 
+from candidate.forms import CandidateFeedbackForm
 from .forms import BehavioralQuestionForm
 from .models import BehavioralAssessmentSession, BehavioralQuestion
 from .services import evaluate_session
@@ -69,23 +70,52 @@ class BehavioralAssessmentView(FormView):
         return redirect("candidate:behavioral-session", session_uuid=self.session.uuid)
 
 
-class BehavioralAssessmentCompleteView(TemplateView):
+class BehavioralAssessmentCompleteView(FormView):
     template_name = "candidate/behavioral_complete.html"
+    form_class = CandidateFeedbackForm
 
-    def get_context_data(self, **kwargs):
-        session = get_object_or_404(
+    def dispatch(self, request, *args, **kwargs):
+        self.session = get_object_or_404(
             BehavioralAssessmentSession, uuid=kwargs["session_uuid"]
         )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.session.candidate_feedback_score:
+            initial["score"] = self.session.candidate_feedback_score
+        if self.session.candidate_feedback_comment:
+            initial["comment"] = self.session.candidate_feedback_comment
+        return initial
+
+    def form_valid(self, form):
+        self.session.candidate_feedback_score = int(form.cleaned_data["score"])
+        self.session.candidate_feedback_comment = form.cleaned_data["comment"]
+        self.session.candidate_feedback_submitted_at = timezone.now()
+        self.session.save(
+            update_fields=[
+                "candidate_feedback_score",
+                "candidate_feedback_comment",
+                "candidate_feedback_submitted_at",
+            ]
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("candidate:behavioral-complete", args=[self.session.uuid])
+
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["session"] = session
-        if session.started_at and session.submitted_at:
-            duration = (session.submitted_at - session.started_at).total_seconds() / 60
+        context["session"] = self.session
+        if self.session.started_at and self.session.submitted_at:
+            duration = (self.session.submitted_at - self.session.started_at).total_seconds() / 60
             context["elapsed_minutes"] = round(duration, 1)
-        context["trait_scores"] = session.trait_scores or {}
+        context["trait_scores"] = self.session.trait_scores or {}
         context["eligibility"] = {
-            "score": session.eligibility_score,
-            "label": session.eligibility_label,
+            "score": self.session.eligibility_score,
+            "label": self.session.eligibility_label,
         }
+        context["feedback_submitted"] = bool(self.session.candidate_feedback_score)
         return context
 
 

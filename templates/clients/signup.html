@@ -91,6 +91,16 @@
                     {% endfor %}
                 </div>
             </div>
+            <div class="form-row single">
+                <div class="form-field">
+                    {{ form.objectives.label_tag }}
+                    {{ form.objectives }}
+                    {% if form.objectives.help_text %}<small>{{ form.objectives.help_text }}</small>{% endif %}
+                    {% for error in form.objectives.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
             <div class="assessment-section">
                 <div class="assessment-section__header">
                     <label for="{{ form.requested_assessments.id_for_label }}">Select assessments</label>
@@ -112,6 +122,25 @@
                 {% for error in form.requested_assessments.errors %}
                 <span class="field-error">{{ error }}</span>
                 {% endfor %}
+            </div>
+            <div class="form-row single">
+                <div class="form-field">
+                    {{ form.talent_stack.label_tag }}
+                    {{ form.talent_stack }}
+                    {% if form.talent_stack.help_text %}<small>{{ form.talent_stack.help_text }}</small>{% endif %}
+                    {% for error in form.talent_stack.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-row single">
+                <div class="form-field">
+                    {{ form.stakeholders.label_tag }}
+                    {{ form.stakeholders }}
+                    {% for error in form.stakeholders.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-field">

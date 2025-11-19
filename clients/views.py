@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from django.conf import settings
 from django.contrib import messages
 import csv
 import json
@@ -276,6 +277,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "benchmark_helper": "Benchmarks reference anonymized averages across all clients running the same assessments.",
                 "logo_form": getattr(self, "logo_form", self.logo_form_class()),
                 "can_manage_invites": account.role in ROLE_INVITE_ACCESS,
+                "account_objectives": account.notes,
             }
         )
         return context
@@ -487,6 +489,8 @@ class ClientActivityExportView(LoginRequiredMixin, View):
                 ]
             )
         return response
+
+
 
 
 class ClientAssessmentMixin(LoginRequiredMixin):
@@ -793,6 +797,25 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
         response = self._ensure_session(request, **kwargs)
         if response:
             return response
+        action = request.POST.get("action")
+        if action == "quick_decision" and self.can_record_decision:
+            decision = request.POST.get("decision")
+            valid_decisions = {choice[0] for choice in ClientSessionNote.DECISION_CHOICES}
+            if decision in valid_decisions:
+                note_text = request.POST.get("note", "").strip()
+                ClientSessionNote.objects.create(
+                    client=self.account,
+                    assessment_type=self.assessment_type,
+                    session_uuid=self.session_obj.uuid,
+                    candidate_id=self.session_obj.candidate_id,
+                    note=note_text,
+                    note_type="decision",
+                    decision=decision,
+                    author=self.request.user,
+                    author_role=self.account.role,
+                )
+                messages.success(request, f"Decision '{decision.title()}' recorded.")
+                return redirect(self.get_success_url())
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -813,11 +836,12 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
         recommended_decision = None
         if decision_summary:
             recommended_decision = max(decision_summary, key=lambda item: item["count"])
+        share_link = self.build_share_link(session)
         context.update(
             {
                 "assessment_label": self.assessment_config["label"],
                 "session_obj": session,
-                "share_link": self.build_share_link(session),
+                "share_link": share_link,
                 "report": report,
                 "assessment_type": self.assessment_type,
                 "note_form": context.get("form") or self.get_form(),
@@ -830,6 +854,17 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                 "can_record_decision": self.can_record_decision,
                 "decision_summary": decision_summary,
                 "recommended_decision": recommended_decision,
+                "actionable_summary": self._build_actionable_summary(report, decision_summary, recommended_decision),
+                "response_drilldown": self._build_response_drilldown(session),
+                "activity_timeline": self._build_activity_timeline(session),
+                "comparative_insights": self._build_comparative_insights(session),
+                "quick_followups": self._build_followup_links(session, share_link),
+                "candidate_feedback": self._candidate_feedback(session),
+                "pdf_export_url": reverse(
+                    "clients:assessment-export",
+                    args=[self.assessment_type, session.uuid],
+                ),
+                "audit_log": self._build_audit_log(session),
             }
         )
         return context
@@ -843,11 +878,27 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                 "flags": session.risk_flags or [],
             }
         recommendations = session.recommendations or {}
+        categories = session.category_breakdown or {}
+        baseline = getattr(settings, "ASSESSMENT_PASSING_SCORE", 70)
+        heatmap = []
+        for label, value in categories.items():
+            try:
+                score = float(value)
+            except (TypeError, ValueError):
+                score = None
+            status = "neutral"
+            if score is not None:
+                if score >= baseline + 5:
+                    status = "positive"
+                elif score < baseline - 5:
+                    status = "warning"
+            heatmap.append({"label": label, "score": score, "status": status})
         return {
             "overall": session.overall_score,
             "hard": getattr(session, "hard_skill_score", None),
             "soft": getattr(session, "soft_skill_score", None),
-            "categories": session.category_breakdown or {},
+            "categories": categories,
+            "category_heatmap": heatmap,
             "fit_scores": recommendations.get("fit_scores", {}),
             "strengths": recommendations.get("strengths", []),
             "development": recommendations.get("development", []),
@@ -878,3 +929,259 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
 
     def get_success_url(self):
         return reverse("clients:assessment-detail", args=[self.assessment_type, self.kwargs.get("session_uuid")])
+
+    def _build_actionable_summary(self, report, decision_summary, recommended_decision):
+        base_score = report.get("overall")
+        if base_score is None:
+            base_score = report.get("score")
+        threshold = getattr(settings, "ASSESSMENT_PASSING_SCORE", 70)
+        flags = len(report.get("flags", [])) if isinstance(report, dict) else 0
+        if recommended_decision:
+            recommendation = recommended_decision["decision"]
+        elif decision_summary:
+            top = max(decision_summary, key=lambda item: item["count"])
+            recommendation = top["decision"]
+        else:
+            if base_score is None:
+                recommendation = "hold"
+            elif base_score >= threshold and flags == 0:
+                recommendation = "advance"
+            elif base_score >= threshold - 5:
+                recommendation = "hold"
+            else:
+                recommendation = "reject"
+        tone_map = {
+            "advance": ("Advance candidate", "Strong score and minimal risk.", "positive"),
+            "hold": ("Gather more signals", "Borderline score or pending follow-up.", "neutral"),
+            "reject": ("Do not advance", "Score or risk indicators fall below expectations.", "warning"),
+        }
+        headline, default_subline, tone = tone_map.get(recommendation, tone_map["hold"])
+        if base_score is not None:
+            subline = f"Score {base_score:.1f} vs. target {threshold}"
+        else:
+            subline = default_subline
+        strengths = report.get("strengths") or report.get("traits", {})
+        strength_focus = ""
+        if isinstance(strengths, list) and strengths:
+            strength_focus = strengths[0].title()
+        elif isinstance(strengths, dict) and strengths:
+            top_trait = max(strengths.items(), key=lambda item: item[1])
+            strength_focus = top_trait[0].replace("_", " ").title()
+        metrics = {
+            "score": f"{base_score:.1f}" if base_score is not None else "—",
+            "flags": f"{flags} risk flag{'s' if flags != 1 else ''}",
+            "strength": strength_focus or "—",
+        }
+        return {
+            "headline": headline,
+            "subline": subline,
+            "tone": tone,
+            "label": recommendation.title(),
+            "metrics": metrics,
+        }
+
+    def _build_response_drilldown(self, session):
+        questions = session.question_set or []
+        responses = session.responses or []
+        breakdown = []
+        for idx, question in enumerate(questions):
+            resp = responses[idx] if idx < len(responses) else None
+            if isinstance(resp, dict):
+                answer = resp.get("answer") or resp.get("value") or resp.get("selection")
+                is_correct = resp.get("is_correct")
+                elapsed = resp.get("elapsed_seconds") or resp.get("time_spent")
+            else:
+                answer = resp
+                is_correct = None
+                elapsed = None
+            prompt = question.get("question_text") if isinstance(question, dict) else None
+            if not prompt and isinstance(question, dict):
+                prompt = question.get("prompt") or question.get("title")
+            if not prompt:
+                prompt = f"Question {idx + 1}"
+            category = question.get("category") if isinstance(question, dict) else ""
+            outcome = "n/a"
+            outcome_class = "neutral"
+            if is_correct is True:
+                outcome = "Correct"
+                outcome_class = "positive"
+            elif is_correct is False:
+                outcome = "Incorrect"
+                outcome_class = "warning"
+            elif isinstance(resp, dict) and resp.get("score") is not None:
+                outcome = f"Score {resp.get('score')}"
+            if elapsed:
+                elapsed = f"{float(elapsed):.1f}s"
+            breakdown.append(
+                {
+                    "prompt": prompt,
+                    "answer": answer or "—",
+                    "category": category,
+                    "elapsed": elapsed or "—",
+                    "outcome": outcome,
+                    "outcome_class": outcome_class,
+                }
+            )
+        return breakdown
+
+    def _build_activity_timeline(self, session):
+        events = []
+        if session.created_at:
+            events.append(
+                {"label": "Invite created", "timestamp": session.created_at, "description": "Assessment invite issued."}
+            )
+        if session.scheduled_for:
+            events.append(
+                {
+                    "label": "Scheduled",
+                    "timestamp": session.scheduled_for,
+                    "description": "Invite scheduled to send automatically.",
+                }
+            )
+        if session.started_at:
+            events.append(
+                {"label": "Candidate started", "timestamp": session.started_at, "description": "Candidate opened the assessment."}
+            )
+        if session.last_reminder_at:
+            events.append(
+                {
+                    "label": "Reminder sent",
+                    "timestamp": session.last_reminder_at,
+                    "description": f"{session.reminder_count} reminder{'s' if (session.reminder_count or 0) != 1 else ''} issued.",
+                }
+            )
+        if session.submitted_at:
+            duration = None
+            if session.started_at:
+                delta = session.submitted_at - session.started_at
+                minutes = max(round(delta.total_seconds() / 60), 1)
+                duration = f"Took {minutes} min"
+            events.append(
+                {
+                    "label": "Assessment submitted",
+                    "timestamp": session.submitted_at,
+                    "description": duration or "Candidate completed the assessment.",
+                }
+            )
+        return events
+
+    def _build_comparative_insights(self, session):
+        if not session.client or not session.client.approved_assessments:
+            return {}
+        queryset = session.__class__.objects.filter(status="submitted")
+        total_assessment = queryset.count()
+        recent = queryset.filter(created_at__gte=timezone.now() - timedelta(days=30)).count()
+        top_score = queryset.aggregate(models.Max("overall_score")).get("overall_score__max")
+        cohort_score = queryset.aggregate(models.Avg("overall_score")).get("overall_score__avg")
+        percentile = None
+        if session.overall_score is not None and total_assessment:
+            better = queryset.filter(overall_score__gt=session.overall_score).count()
+            equal = queryset.filter(overall_score=session.overall_score).count()
+            cumulative = better + equal
+            percentile = max(0, 100 - round((cumulative / total_assessment) * 100))
+        return {
+            "cohort_total": total_assessment,
+            "cohort_recent": recent,
+            "cohort_avg": cohort_score,
+            "top_score": top_score,
+            "candidate_score": session.overall_score,
+            "percentile": percentile,
+        }
+
+    def _build_followup_links(self, session, share_link):
+        candidate = session.candidate_id
+        subject = f"Next steps for {candidate}"
+        base_body = f"Candidate report: {share_link}"
+        return [
+            {
+                "label": "Schedule interview",
+                "description": "Draft an email to schedule the next round.",
+                "href": f"mailto:?subject={subject}%20-%20Interview&body={base_body}",
+                "external": True,
+            },
+            {
+                "label": "Request more info",
+                "description": "Send candidate a follow-up questionnaire.",
+                "href": share_link,
+                "external": True,
+            },
+            {
+                "label": "Share report",
+                "description": "Copy the report link for your ATS or manager.",
+                "href": share_link,
+                "external": True,
+            },
+        ]
+
+    def _candidate_feedback(self, session):
+        if not session.candidate_feedback_score and not session.candidate_feedback_comment:
+            return {}
+        labels = {5: "Excellent", 4: "Good", 3: "Neutral", 2: "Challenging", 1: "Poor"}
+        return {
+            "score": session.candidate_feedback_score,
+            "label": labels.get(session.candidate_feedback_score),
+            "comment": session.candidate_feedback_comment,
+            "submitted_at": session.candidate_feedback_submitted_at,
+        }
+
+    def _build_audit_log(self, session):
+        events = []
+        events.append(
+            {
+                "label": "Assessment created",
+                "timestamp": session.created_at,
+                "description": f"Invite issued for {session.candidate_id}",
+            }
+        )
+        if session.started_at:
+            events.append(
+                {
+                    "label": "Candidate started",
+                    "timestamp": session.started_at,
+                    "description": "Candidate opened the assessment link.",
+                }
+            )
+        if session.submitted_at:
+            events.append(
+                {
+                    "label": "Candidate submitted",
+                    "timestamp": session.submitted_at,
+                    "description": "Responses were finalized.",
+                }
+            )
+        if session.candidate_feedback_submitted_at:
+            events.append(
+                {
+                    "label": "Feedback captured",
+                    "timestamp": session.candidate_feedback_submitted_at,
+                    "description": f"Rated {session.candidate_feedback_score}/5",
+                }
+            )
+        note_events = ClientSessionNote.objects.filter(
+            client=self.account, session_uuid=session.uuid
+        ).order_by("-created_at")[:10]
+        for note in note_events:
+            events.append(
+                {
+                    "label": "Reviewer note",
+                    "timestamp": note.created_at,
+                    "description": note.note[:120] + ("..." if note.note and len(note.note) > 120 else ""),
+                }
+            )
+        return sorted(events, key=lambda entry: entry["timestamp"] or timezone.now(), reverse=True)
+
+
+class ClientAssessmentExportView(ClientAssessmentMixin, View):
+    requires_manager_access = False
+
+    def get(self, request, *args, **kwargs):
+        try:
+            session = self.get_session_object(kwargs.get("session_uuid"))
+        except Http404:
+            messages.error(request, "Assessment not available.")
+            return redirect("clients:assessment-manage", assessment_type=kwargs.get("assessment_type"))
+        if session.status != "submitted":
+            messages.error(request, "Report not finalized yet.")
+            return redirect("clients:assessment-manage", assessment_type=kwargs.get("assessment_type"))
+        response = ClientAssessmentDetailView.as_view()(request, *args, **kwargs)
+        return response

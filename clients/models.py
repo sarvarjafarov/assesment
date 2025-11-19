@@ -80,6 +80,7 @@ class ClientAccount(TimeStampedModel):
     notes = models.TextField(blank=True)
     receive_weekly_summary = models.BooleanField(default=False)
     logo = models.FileField(upload_to="client_logos/", null=True, blank=True)
+    data_retention_days = models.PositiveIntegerField(default=365)
 
     objects = ClientAccountQuerySet.as_manager()
 

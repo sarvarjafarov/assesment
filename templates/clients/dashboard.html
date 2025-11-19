@@ -386,3 +386,8 @@
 </script>
 {% endif %}
 {% endblock %}
+            <article class="portal-card">
+                <p class="label">Hiring objectives</p>
+                <h2>Focus</h2>
+                <p class="muted">{% if account_objectives %}{{ account_objectives|linebreaksbr }}{% else %}No objectives provided yet.{% endif %}</p>
+            </article>

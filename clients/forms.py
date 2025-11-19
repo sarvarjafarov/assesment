@@ -38,6 +38,31 @@ def _validate_logo_file(file_obj):
 class ClientSignupForm(forms.ModelForm):
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
+    objectives = forms.CharField(
+        label="Hiring objectives",
+        widget=forms.Textarea(attrs={"rows": 3, "placeholder": "Tell us what success looks like for your hiring funnel."}),
+        help_text="What roles, volume, or timelines are most important?",
+        required=False,
+    )
+    talent_stack = forms.MultipleChoiceField(
+        label="Which tools do you rely on?",
+        required=False,
+        choices=[
+            ("greenhouse", "Greenhouse"),
+            ("lever", "Lever"),
+            ("ashby", "Ashby"),
+            ("smartrecruiters", "SmartRecruiters"),
+            ("workday", "Workday"),
+            ("other", "Other"),
+        ],
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Helps us prioritize integrations.",
+    )
+    stakeholders = forms.CharField(
+        label="Key stakeholders",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "e.g., Head of Talent, CTO"}),
+    )
     requested_assessments = forms.MultipleChoiceField(
         label="Assessments you'd like to pilot",
         choices=ClientAccount.ASSESSMENT_CHOICES,
@@ -60,6 +85,9 @@ class ClientSignupForm(forms.ModelForm):
             "phone_number",
             "employee_size",
             "requested_assessments",
+            "objectives",
+            "talent_stack",
+            "stakeholders",
         ]
 
     def clean_email(self):
@@ -97,6 +125,16 @@ class ClientSignupForm(forms.ModelForm):
         user.save(update_fields=["is_active"])
         account.user = user
         account.requested_assessments = self.cleaned_data.get("requested_assessments", [])
+        account.notes = "\n".join(
+            filter(
+                None,
+                [
+                    f"Objectives: {self.cleaned_data.get('objectives')}".strip(),
+                    f"Talent stack: {', '.join(self.cleaned_data.get('talent_stack', []))}".strip(),
+                    f"Stakeholders: {self.cleaned_data.get('stakeholders')}".strip(),
+                ],
+            )
+        )
         if commit:
             account.save()
         return account
