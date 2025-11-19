@@ -2,10 +2,26 @@
 {% load humanize %}
 {% block console_content %}
 <section class="console-page-header">
-    <div>
-        <p class="eyebrow">Assessment console</p>
-        <h1>Superadmin overview</h1>
-        <p class="lede">Monitor assessment throughput, client onboarding, and workspace activity.</p>
+    <div class="console-hero">
+        <div class="hero-content">
+            <p class="eyebrow">Assessment console</p>
+            <h1>Superadmin overview</h1>
+            <p class="lede">Monitor assessment throughput, client onboarding, and workspace activity.</p>
+        </div>
+        <div class="hero-highlight">
+            <div>
+                <p>Total assessments</p>
+                <strong>{{ summary_cards|length }}</strong>
+            </div>
+            <div>
+                <p>Clients</p>
+                <strong>{{ org_summary.clients.total }}</strong>
+            </div>
+            <div>
+                <p>Users</p>
+                <strong>{{ org_summary.users.total }}</strong>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -20,7 +36,7 @@
         <div class="metric-value">{{ org_summary.users.total }}</div>
         <p class="muted">Includes internal reviewers and partners.</p>
     </article>
-    <article class="panel metric-panel">
+    <article class="panel metric-panel quick-links-panel">
         <p class="metric-label">Quick links</p>
         <div class="chip-row">
             {% for link in quick_links %}

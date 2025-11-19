@@ -1475,6 +1475,37 @@ main {
     align-items: flex-start;
     gap: 2rem;
 }
+.console-hero {
+    width: 100%;
+    background: linear-gradient(120deg, #eef1ff 0%, #fff9f2 100%);
+    border-radius: 32px;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 25px 45px rgba(14, 20, 40, 0.08);
+}
+.hero-content {
+    max-width: 520px;
+}
+.hero-highlight {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 120px));
+    gap: 1rem;
+    text-align: center;
+}
+.hero-highlight p {
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+}
+.hero-highlight strong {
+    display: block;
+    font-size: 2rem;
+    color: var(--navy);
+}
 
 .console-page-header .lede {
     margin-top: 0.5rem;
@@ -1533,6 +1564,9 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
+}
+.quick-links-panel .chip-row {
+    justify-content: flex-start;
 }
 
 .deadline-list,
