@@ -9,18 +9,46 @@
             <p class="lede">Monitor assessment throughput, client onboarding, and workspace activity.</p>
         </div>
         <div class="hero-highlight">
-            <div>
-                <p>Total assessments</p>
-                <strong>{{ summary_cards|length }}</strong>
-            </div>
-            <div>
-                <p>Clients</p>
-                <strong>{{ org_summary.clients.total }}</strong>
-            </div>
-            <div>
-                <p>Users</p>
-                <strong>{{ org_summary.users.total }}</strong>
-            </div>
+            <article class="hero-highlight-stat">
+                <div class="hero-stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                        <path d="M6 18v-6m6 6V6m6 12v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                            stroke-linejoin="round" fill="none" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="hero-stat-label">Total assessments</p>
+                    <p class="hero-stat-value">{{ summary_cards|length }}</p>
+                    <p class="hero-stat-helper">Active modules</p>
+                </div>
+            </article>
+            <article class="hero-highlight-stat">
+                <div class="hero-stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                        <path d="M5 21V8a2 2 0 0 1 2-2h3V3h4v3h3a2 2 0 0 1 2 2v13" stroke="currentColor"
+                            stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="hero-stat-label">Clients</p>
+                    <p class="hero-stat-value">{{ org_summary.clients.total }}</p>
+                    <p class="hero-stat-helper">Org accounts</p>
+                </div>
+            </article>
+            <article class="hero-highlight-stat">
+                <div class="hero-stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                        <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm-6 9v-1a6 6 0 0 1 12 0v1"
+                            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+                            fill="none" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="hero-stat-label">Users</p>
+                    <p class="hero-stat-value">{{ org_summary.users.total }}</p>
+                    <p class="hero-stat-helper">Console logins</p>
+                </div>
+            </article>
         </div>
     </div>
 </section>

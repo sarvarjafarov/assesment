@@ -1495,24 +1495,82 @@ main {
 }
 .hero-highlight {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 120px));
-    gap: 1rem;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 20px;
-    padding: 1rem 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(254, 244, 233, 0.9));
+    border-radius: 26px;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid rgba(14, 20, 40, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
-.hero-highlight p {
+
+.hero-highlight-stat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    padding-right: 1rem;
+}
+
+.hero-highlight-stat:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 10%;
+    right: 0;
+    width: 1px;
+    height: 80%;
+    background: rgba(14, 20, 40, 0.08);
+}
+
+.hero-stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: rgba(14, 20, 40, 0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+}
+
+.hero-stat-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.hero-stat-label {
     margin: 0;
-    text-transform: uppercase;
     font-size: 0.75rem;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--text-muted);
 }
-.hero-highlight strong {
-    display: block;
-    font-size: 2rem;
+
+.hero-stat-value {
+    margin: 0.15rem 0 0;
+    font-size: 2.1rem;
+    font-weight: 700;
     color: var(--navy);
+}
+
+.hero-stat-helper {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+    .hero-highlight {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-highlight-stat {
+        padding-right: 0;
+    }
+
+    .hero-highlight-stat:not(:last-child)::after {
+        display: none;
+    }
 }
 
 .console-page-header .lede {
