@@ -1,7 +1,7 @@
 {% extends 'console/base.html' %}
 {% load humanize %}
 {% block console_content %}
-<section class="console-page-header">
+<section class="report-hero">
     <div>
         <p class="eyebrow">Reporting</p>
         <h1>System overview</h1>
@@ -9,25 +9,34 @@
     </div>
 </section>
 
-<section class="stats-grid">
-    <article>
-        <p>Total clients</p>
-        <strong>{{ org_summary.clients.total }}</strong>
-        <dl>
-            <div>
-                <dt>Approved</dt>
-                <dd>{{ org_summary.clients.approved }}</dd>
-            </div>
-            <div>
-                <dt>Pending</dt>
-                <dd>{{ org_summary.clients.pending }}</dd>
-            </div>
-        </dl>
+<section class="report-card-grid">
+    <article class="report-card">
+        <p class="label">Total clients</p>
+        <h2>{{ org_summary.clients.total }}</h2>
+        <p class="muted">Approved {{ org_summary.clients.approved }} · Pending {{ org_summary.clients.pending }}</p>
     </article>
-    <article>
-        <p>Console users</p>
-        <strong>{{ org_summary.users.total }}</strong>
+    <article class="report-card">
+        <p class="label">Console users</p>
+        <h2>{{ org_summary.users.total }}</h2>
         <p class="muted">Unique accounts with access.</p>
+    </article>
+    <article class="report-card">
+        <p class="label">Assessments live</p>
+        <h2>{{ assessment_totals|length }}</h2>
+        <p class="muted">Modules active for partners.</p>
+    </article>
+</section>
+
+<section class="report-card-grid two-up">
+    <article class="report-card chart-card">
+        <p class="label">Assessment mix</p>
+        <h2>Invites vs. in progress</h2>
+        <canvas id="assessmentMixChart"></canvas>
+    </article>
+    <article class="report-card chart-card">
+        <p class="label">7-day timeline</p>
+        <h2>Sessions created</h2>
+        <canvas id="timelineChart"></canvas>
     </article>
 </section>
 
@@ -72,4 +81,69 @@
         {% endif %}
     </article>
 </section>
+
+{{ charts|json_script:"report-chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const payload = JSON.parse(document.getElementById("report-chart-data").textContent);
+    const mixCanvas = document.getElementById("assessmentMixChart");
+    const timelineCanvas = document.getElementById("timelineChart");
+
+    if (mixCanvas) {
+        const mix = payload.assessment_mix || [];
+        new Chart(mixCanvas, {
+            type: "bar",
+            data: {
+                labels: mix.map((m) => m.label),
+                datasets: [
+                    {
+                        label: "Total sessions",
+                        data: mix.map((m) => m.total),
+                        backgroundColor: "rgba(255,138,0,0.4)",
+                        borderRadius: 12,
+                    },
+                    {
+                        label: "In progress",
+                        data: mix.map((m) => m.in_progress),
+                        backgroundColor: "rgba(14,20,40,0.85)",
+                        borderRadius: 12,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "bottom" } },
+                scales: { y: { beginAtZero: true } },
+            },
+        });
+    }
+
+    if (timelineCanvas) {
+        const timeline = payload.timeline || [];
+        new Chart(timelineCanvas, {
+            type: "line",
+            data: {
+                labels: timeline.map((t) => t.label),
+                datasets: [
+                    {
+                        label: "Sessions",
+                        data: timeline.map((t) => t.count),
+                        borderColor: "rgba(14,20,40,0.85)",
+                        backgroundColor: "rgba(14,20,40,0.15)",
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } },
+            },
+        });
+    }
+})();
+</script>
 {% endblock %}

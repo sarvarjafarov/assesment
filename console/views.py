@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import json
+from collections import Counter
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -298,7 +303,7 @@ class ReportingOverviewView(ConsoleSectionMixin, LoginRequiredMixin, TemplateVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["org_summary"] = DashboardView()._org_summary()
-        context["assessment_totals"] = [
+        assessment_totals = [
             {
                 "label": "Marketing",
                 "total": DigitalMarketingAssessmentSession.objects.count(),
@@ -315,5 +320,34 @@ class ReportingOverviewView(ConsoleSectionMixin, LoginRequiredMixin, TemplateVie
                 "in_progress": BehavioralAssessmentSession.objects.filter(status="in_progress").count(),
             },
         ]
+        context["assessment_totals"] = assessment_totals
         context["latest_clients"] = ClientAccount.objects.order_by("-updated_at")[:10]
+        chart_payload = {
+            "assessment_mix": assessment_totals,
+            "timeline": self._session_timeline(),
+            "status_breakdown": self._client_breakdown(),
+        }
+        context["charts"] = json.dumps(chart_payload, cls=DjangoJSONEncoder)
         return context
+
+    def _session_timeline(self) -> list[dict]:
+        today = timezone.now().date()
+        days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+        counts = Counter()
+        for model in (
+            DigitalMarketingAssessmentSession,
+            ProductAssessmentSession,
+            BehavioralAssessmentSession,
+        ):
+            for row in model.objects.values("created_at__date").annotate(count=models.Count("id")):
+                counts[row["created_at__date"]] += row["count"]
+        return [
+            {"label": day.strftime("%b %d"), "count": counts.get(day, 0)}
+            for day in days
+        ]
+
+    def _client_breakdown(self) -> list[dict]:
+        return [
+            {"label": label, "count": ClientAccount.objects.filter(status=value).count()}
+            for value, label in ClientAccount.STATUS_CHOICES
+        ]
