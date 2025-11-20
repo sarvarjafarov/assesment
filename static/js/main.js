@@ -256,4 +256,31 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll("form.question-form").forEach((form) => {
         form.addEventListener("submit", () => captureTelemetryPayload(form));
     });
+
+    const velocityCanvas = document.getElementById("velocityChart");
+    if (velocityCanvas && velocityCanvas.getContext) {
+        const ctx = velocityCanvas.getContext("2d");
+        const points = [52, 48, 44, 40, 36, 33];
+        const width = velocityCanvas.width;
+        const height = velocityCanvas.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.strokeStyle = "#ff8a00";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        points.forEach((value, idx) => {
+            const x = (idx / (points.length - 1 || 1)) * width;
+            const y = height - (value / 60) * height;
+            if (idx === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255,138,0,0.15)";
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+    }
 });

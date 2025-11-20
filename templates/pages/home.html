@@ -10,14 +10,14 @@
                 <span>Sira</span>
             </div>
             <ul class="nav-links">
-                <li><a href="#products">Products</a></li>
-                <li><a href="#industries">Industries</a></li>
-                <li><a href="#blog">Blog</a></li>
+                <li><a href="#suite">For talent teams</a></li>
+                <li><a href="#journey">For candidates</a></li>
+                <li><a href="#resources">Resources</a></li>
                 <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
             </ul>
             <div class="nav-actions">
                 <a class="btn btn-outline small" href="{% url 'console:login' %}">Customer Login</a>
-                <button class="btn btn-pill">Book a Demo</button>
+                <a class="btn btn-pill nav-primary-cta" href="#cta">Book a walkthrough</a>
             </div>
         </nav>
     </header>
@@ -25,20 +25,69 @@
     <main>
         <section class="hero">
             <div class="hero-inner">
-                <div class="hero-badge">Backed by <span>Y&nbsp;Combinator</span></div>
-                <h1>Run <span class="highlight">assessments</span> and hiring decisions from one console</h1>
+                <div class="hero-badge">Purpose-built for <span>B2B talent teams</span></div>
+                <h1>Launch <span class="highlight">marketing, PM, and behavioral</span> assessments from one console.</h1>
                 <p class="hero-subtitle">
-                    Sira unifies company workflows and the candidate experience—invite talent, capture evidence,
-                    auto score, and advance top performers in minutes.
+                    Sira calibrates every assignment for B2B hiring: invite candidates, benchmark real work, and share a defensible report with stakeholders in under an hour.
                 </p>
                 <div class="hero-cta">
-                    <button class="btn btn-pill">Book a Demo</button>
-                    <a class="btn btn-outline" href="#workflow">See how it works</a>
+                    <a class="btn btn-pill" href="#cta">Book a walkthrough</a>
+                    <a class="btn btn-outline" href="#sample-report">See a sample report</a>
                 </div>
             </div>
             <div class="hero-grid"></div>
             <div class="hero-orb orb-one"></div>
             <div class="hero-orb orb-two"></div>
+        </section>
+        <section class="trusted-strip">
+            <p class="eyebrow">Trusted by modern hiring teams</p>
+            <div class="logo-row">
+                <span>Stripe</span>
+                <span>Bench</span>
+                <span>Northwind</span>
+                <span>GoRecruit</span>
+            </div>
+            <blockquote>“Sira’s PM + marketing assessments cut our time-to-offer by 37% while giving candidates an experience they rave about.” <cite>— VP Talent, Series B SaaS</cite></blockquote>
+        </section>
+
+        <section class="suite" id="suite">
+            <div class="section-heading section-heading-tight">
+                <p class="eyebrow">Assessment suite</p>
+                <h2>Pick the right instrument for every role.</h2>
+                <p class="lede">Three calibrated banks cover GTM, product, and leadership signals—each with fresh questions, scoring rubrics, and reporting templates.</p>
+            </div>
+            <div class="suite-grid">
+                <article class="suite-card">
+                    <p class="pill subtle accent-marketing">Marketing IQ</p>
+                    <h3>Digital Marketing</h3>
+                    <p>40-scene catalog spanning paid media, SEO, analytics, and GTM strategy.</p>
+                    <ul>
+                        <li>Avg. completion: 32 mins</li>
+                        <li>Auto-scored MCQ + scenarios</li>
+                        <li>Benchmarks by seniority</li>
+                    </ul>
+                </article>
+                <article class="suite-card">
+                    <p class="pill subtle accent-product">Product Sense</p>
+                    <h3>Product Management</h3>
+                    <p>Reasoning, estimation, prioritization, and UX prompts tuned for ICs and leads.</p>
+                    <ul>
+                        <li>Dynamic scoring by difficulty</li>
+                        <li>Stakeholder-ready scorecards</li>
+                        <li>Power user vs. broad PM profiles</li>
+                    </ul>
+                </article>
+                <article class="suite-card">
+                    <p class="pill subtle accent-behavioral">Behavioral DNA</p>
+                    <h3>Leadership &amp; soft skills</h3>
+                    <p>Adaptive blocks that map collaboration style, risk posture, and coaching needs.</p>
+                    <ul>
+                        <li>15-min behavioral inventory</li>
+                        <li>Integrity + engagement flags</li>
+                        <li>Guidance for debriefs and onboarding</li>
+                    </ul>
+                </article>
+            </div>
         </section>
 
         <section class="pillars">
@@ -71,6 +120,38 @@
                         <li>Auto-save, confirmations, and instant status updates</li>
                         <li>Feedback loops once a decision is made</li>
                     </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="outcomes" id="sample-report">
+            <div class="section-heading">
+                <p class="eyebrow">Outcomes that matter</p>
+                <h2>Proof built into every rollout.</h2>
+                <p class="lede">Turn assessment data into faster offers and confident stakeholder updates.</p>
+            </div>
+            <div class="outcome-grid">
+                <article class="metric-card large">
+                    <p class="metric-label">Avg. time-to-offer</p>
+                    <p class="metric-value">-37%</p>
+                    <p class="muted">After centralizing marketing + PM assignments in Sira.</p>
+                    <canvas id="velocityChart" width="200" height="100"></canvas>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Candidate CSAT</p>
+                    <p class="metric-value">4.8 / 5</p>
+                    <p class="muted">Guided portals, pause/resume, and instant updates improve NPS.</p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Hiring manager confidence</p>
+                    <p class="metric-value">2x</p>
+                    <p class="muted">Side-by-side scoring + integrity signals for every candidate.</p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Audit-ready reports</p>
+                    <p class="metric-value">Under 5 min</p>
+                    <p class="muted">Download a sample report to share with execs or clients.</p>
+                    <a class="btn btn-outline small" href="mailto:hello@sira.so?subject=Sira%20sample%20report">Request sample report</a>
                 </article>
             </div>
         </section>
@@ -168,7 +249,7 @@
             </div>
         </section>
 
-        <section class="journey-hero">
+        <section class="journey-hero" id="journey">
             <div class="journey-hero-content">
                 <p class="eyebrow">Candidate Journey</p>
                 <h2>Show HR teams and applicants what happens between invite and decision.</h2>
@@ -232,7 +313,7 @@
             </div>
         </section>
 
-        <section class="resources" id="blog">
+        <section class="resources" id="resources">
             <div class="section-heading section-heading-tight">
                 <p class="eyebrow">Resources &amp; Insights</p>
                 <h2>Stay informed with the latest HR trends</h2>
