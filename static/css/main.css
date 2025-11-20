@@ -299,6 +299,11 @@ img {
     text-align: center;
     padding: 6rem 1rem 8rem;
     overflow: hidden;
+    background: linear-gradient(135deg, #fffdf8, #f6f9ff);
+    transition: background 0.6s ease;
+}
+.hero[data-persona="candidate"] {
+    background: linear-gradient(135deg, #f2f7ff, #fff6fb);
 }
 
 .hero-inner {
@@ -418,6 +423,23 @@ img {
 .feed-slot {
     font-weight: 500;
     color: var(--navy);
+    min-height: 24px;
+}
+.feed-slot .ticker-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: ticker-slide 4s ease;
+}
+
+@keyframes ticker-slide {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .suite {
@@ -472,6 +494,30 @@ img {
     margin-top: 0.4rem;
     color: var(--text-muted);
 }
+.suite-panel.is-active li {
+    opacity: 0;
+    animation: suite-list 0.4s forwards;
+}
+.suite-panel.is-active li:nth-child(1) {
+    animation-delay: 0.05s;
+}
+.suite-panel.is-active li:nth-child(2) {
+    animation-delay: 0.15s;
+}
+.suite-panel.is-active li:nth-child(3) {
+    animation-delay: 0.25s;
+}
+
+@keyframes suite-list {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 .accent-marketing {
     background: rgba(14, 116, 144, 0.12);
@@ -516,15 +562,23 @@ img {
     min-height: 220px;
 }
 .case-panel {
-    display: none;
+    opacity: 0;
     border: 1px solid rgba(14, 20, 40, 0.08);
     border-radius: 24px;
     padding: 2rem;
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 25px 45px rgba(14, 20, 40, 0.05);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(10px);
 }
 .case-panel.is-active {
-    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    position: relative;
 }
 .case-metric {
     margin-top: 1.25rem;
@@ -551,6 +605,16 @@ img {
 }
 .case-dots button.is-active {
     background: var(--orange);
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .hero-grid {

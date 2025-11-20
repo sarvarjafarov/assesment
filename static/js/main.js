@@ -288,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const heroSubtitle = document.getElementById("heroSubtitle");
     const heroPrimary = document.getElementById("heroPrimaryCta");
     const heroSecondary = document.getElementById("heroSecondaryCta");
+    const heroSection = document.querySelector(".hero");
     heroButtons.forEach((button) => {
         button.addEventListener("click", () => {
             heroButtons.forEach((btn) => btn.classList.remove("is-active"));
@@ -306,6 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (button.dataset.secondaryLink) {
                     heroSecondary.setAttribute("href", button.dataset.secondaryLink);
                 }
+            }
+            if (heroSection && button.dataset.persona) {
+                heroSection.setAttribute("data-persona", button.dataset.persona);
             }
         });
     });
@@ -336,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             const current = events[eventIndex];
-            liveFeedSlot.textContent = `${current.company} launched a ${current.assessment} • ${current.ago}`;
+            liveFeedSlot.innerHTML = `<span class="ticker-text">${current.company} launched a ${current.assessment} • ${current.ago}</span>`;
             eventIndex = (eventIndex + 1) % events.length;
         };
         renderEvent();
@@ -358,5 +362,23 @@ document.addEventListener('DOMContentLoaded', () => {
             caseIndex = (caseIndex + 1) % caseButtons.length;
             setCase(caseIndex);
         }, 6000);
+    }
+
+    const revealItems = document.querySelectorAll(".reveal");
+    if (revealItems.length && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.15 }
+        );
+        revealItems.forEach((el) => observer.observe(el));
+    } else {
+        revealItems.forEach((el) => el.classList.add("is-visible"));
     }
 });
