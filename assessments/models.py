@@ -304,6 +304,11 @@ class AssessmentSession(TimeStampedModel):
         blank=True,
         help_text="Store per-skill statistics and confidence intervals.",
     )
+    telemetry_log = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Raw telemetry such as device info, ip history, paste events.",
+    )
     notes = models.TextField(blank=True)
     due_at = models.DateTimeField(
         null=True,

@@ -113,9 +113,13 @@ class ProductAssessmentSession(TimeStampedModel):
     candidate_feedback_score = models.PositiveSmallIntegerField(null=True, blank=True)
     candidate_feedback_comment = models.TextField(blank=True)
     candidate_feedback_submitted_at = models.DateTimeField(null=True, blank=True)
+    candidate_feedback_email = models.EmailField(blank=True)
+    candidate_feedback_phone = models.CharField(max_length=120, blank=True)
+    candidate_feedback_opt_in = models.BooleanField(default=False)
     paused_at = models.DateTimeField(null=True, blank=True)
     total_paused_seconds = models.PositiveIntegerField(default=0)
     last_activity_at = models.DateTimeField(null=True, blank=True)
+    telemetry_log = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ("-created_at",)

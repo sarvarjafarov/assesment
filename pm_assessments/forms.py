@@ -38,13 +38,22 @@ class ProductQuestionForm(forms.Form):
                     attrs={
                         "rows": 5,
                         "placeholder": "Briefly explain your reasoning or approach.",
+                        "class": "long-form-input",
+                        "data-min-length": 180,
                     }
                 ),
             )
         else:
             self.fields["answer"] = forms.CharField(
                 label="",
-                widget=forms.Textarea(attrs={"rows": 3}),
+                widget=forms.Textarea(
+                    attrs={
+                        "rows": 4,
+                        "class": "long-form-input",
+                        "data-min-length": 180,
+                        "placeholder": "Outline your assumptions, solution, and expected impact.",
+                    }
+                ),
             )
 
     def to_response(self) -> dict:

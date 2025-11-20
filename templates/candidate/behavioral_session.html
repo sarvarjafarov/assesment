@@ -45,11 +45,46 @@
                 <button type="submit" class="btn btn-outline">Pause &amp; resume later</button>
             </form>
         </div>
+        <div class="device-support">
+            <div>
+                <p class="eyebrow">Switch device</p>
+                <p>Send the secure link to your inbox and resume on whichever device is most comfortable.</p>
+            </div>
+            <form method="post" action="{{ switch_device_url }}" class="device-form">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address for the assessment link">
+                <button type="submit" class="btn btn-ghost">Send link</button>
+            </form>
+        </div>
+        {% if help_topics %}
+        <details class="help-drawer">
+            <summary>
+                <span>FAQ &amp; support</span>
+                <span class="chevron" aria-hidden="true"></span>
+            </summary>
+            <div class="help-content">
+                {% for topic in help_topics %}
+                <article>
+                    <strong>{{ topic.question }}</strong>
+                    <p>{{ topic.answer }}</p>
+                </article>
+                {% endfor %}
+                <p class="muted">Need more help? Email <a href="mailto:support@sira.so">support@sira.so</a> or <a href="{{ practice_url }}">use practice mode</a>.</p>
+            </div>
+        </details>
+        {% endif %}
         <form method="post" class="question-form">
             {% csrf_token %}
+            <input type="hidden" name="telemetry_payload" data-telemetry-field>
             <div class="question-card">
                 <p class="eyebrow">Select one for each column</p>
                 <h2>{{ question.prompt }}</h2>
+                {% if guidance_tip %}
+                <div class="question-guidance">
+                    <strong>{{ guidance_tip.title }}</strong>
+                    <p>{{ guidance_tip.body }}</p>
+                </div>
+                {% endif %}
                 <div class="question-input">
                     <p class="help-text">Choose which statement is most like you and which is least like you.</p>
                     {% for field in form %}

@@ -45,13 +45,48 @@
                 <button type="submit" class="btn btn-outline">Pause &amp; resume later</button>
             </form>
         </div>
+        <div class="device-support">
+            <div>
+                <p class="eyebrow">Switch device</p>
+                <p>Send the secure link to your inbox so you can continue on another screen.</p>
+            </div>
+            <form method="post" action="{{ switch_device_url }}" class="device-form">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address for the assessment link">
+                <button type="submit" class="btn btn-ghost">Send link</button>
+            </form>
+        </div>
+        {% if help_topics %}
+        <details class="help-drawer">
+            <summary>
+                <span>FAQ &amp; support</span>
+                <span class="chevron" aria-hidden="true"></span>
+            </summary>
+            <div class="help-content">
+                {% for topic in help_topics %}
+                <article>
+                    <strong>{{ topic.question }}</strong>
+                    <p>{{ topic.answer }}</p>
+                </article>
+                {% endfor %}
+                <p class="muted">Need more help? Email <a href="mailto:support@sira.so">support@sira.so</a> or <a href="{{ practice_url }}">try the practice questions</a>.</p>
+            </div>
+        </details>
+        {% endif %}
         <form method="post" class="question-form">
             {% csrf_token %}
+            <input type="hidden" name="telemetry_payload" data-telemetry-field>
             <div class="question-card">
                 <p class="eyebrow">{{ question.get_category_display }}</p>
                 <h2>{{ question.question_text }}</h2>
                 {% if question.explanation %}
                 <p class="help-text">{{ question.explanation }}</p>
+                {% endif %}
+                {% if guidance_tip %}
+                <div class="question-guidance">
+                    <strong>{{ guidance_tip.title }}</strong>
+                    <p>{{ guidance_tip.body }}</p>
+                </div>
                 {% endif %}
                 <div class="question-input">
                     {% if question.question_type == 'ranking' %}
@@ -73,6 +108,16 @@
                         {% endfor %}
                     {% endfor %}
                 </div>
+                {% if show_preview %}
+                <div class="answer-preview">
+                    <div class="preview-head">
+                        <p class="eyebrow">Live preview</p>
+                        <span class="char-count" data-char-count data-min-length="{{ preview_min_length }}">0 characters</span>
+                    </div>
+                    <p class="preview-hint">We autosave every few seconds. Aim for at least {{ preview_min_length }} characters that explain your approach.</p>
+                    <div class="preview-body" data-preview-body data-placeholder="Start typing to see your response preview."></div>
+                </div>
+                {% endif %}
             </div>
             <button type="submit" class="btn btn-pill">
                 {% if step_number == total_steps %}Submit assessment{% else %}Save & Continue{% endif %}

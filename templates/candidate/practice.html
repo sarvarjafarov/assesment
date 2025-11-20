@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel practice-panel">
+        <p class="eyebrow">Warm up</p>
+        <h1>Try a practice question</h1>
+        <p class="lede">Use these sample prompts to get comfortable before working on the real assessment. Your answers here are not recorded.</p>
+        <div class="practice-actions">
+            <a class="btn btn-outline" href="{% url 'candidate:session-start' session.uuid %}">Return to assessment</a>
+        </div>
+        <form method="post" class="practice-form" action="{{ practice_url }}">
+            {% csrf_token %}
+            {% for question in practice_questions %}
+            <article class="practice-card">
+                <p class="eyebrow">
+                    {% if question.type == 'multiple_choice' %}
+                    Sample multiple choice
+                    {% else %}
+                    Sample text response
+                    {% endif %}
+                </p>
+                <h2>{{ question.prompt }}</h2>
+                {% if question.type == 'multiple_choice' %}
+                <ul class="option-list">
+                    {% for option in question.options %}
+                    <li>
+                        <label class="option-item">
+                            <input type="radio" name="practice_choice" value="{{ option.value }}" {% if submitted_choice == option.value %}checked{% endif %}>
+                            <span>{{ option.value }}. {{ option.label }}</span>
+                        </label>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if practice_results.multiple_choice|default:'' != '' %}
+                <p class="practice-feedback {% if practice_results.multiple_choice %}success{% else %}warning{% endif %}">
+                    {% if practice_results.multiple_choice %}
+                    Nice! That's correct.
+                    {% else %}
+                    The best answer is "{{ question.answer }}". {{ question.rationale }}
+                    {% endif %}
+                </p>
+                {% endif %}
+                {% else %}
+                <p class="help-text">{{ question.guidance }}</p>
+                <textarea name="practice_text" rows="4" placeholder="Start typing..." class="long-form-input">{% if submitted_text %}{{ submitted_text }}{% endif %}</textarea>
+                {% if question.example %}
+                <p class="muted">Example: {{ question.example }}</p>
+                {% endif %}
+                {% if practice_results.text|default:'' != '' %}
+                <p class="practice-feedback {% if practice_results.text %}success{% else %}warning{% endif %}">
+                    {% if practice_results.text %}
+                    Great—your response has enough detail to move forward.
+                    {% else %}
+                    Try writing at least two sentences that mention both impact and tradeoffs.
+                    {% endif %}
+                </p>
+                {% endif %}
+                {% endif %}
+            </article>
+            {% endfor %}
+            <button class="btn btn-pill" type="submit">Check my answers</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

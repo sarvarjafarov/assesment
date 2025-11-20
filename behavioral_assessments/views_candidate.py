@@ -2,17 +2,26 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import FormView, TemplateView
 
+from candidate.constants import DEFAULT_HELP_TOPICS
 from candidate.forms import CandidateFeedbackForm
+from candidate.utils import send_switch_device_email, update_session_telemetry
 from .forms import BehavioralQuestionForm
 from .models import BehavioralAssessmentSession, BehavioralQuestion
 from .services import evaluate_session
 
+BEHAVIORAL_GUIDANCE = {
+    "title": "Behavioral block",
+    "body": "Pick one statement for each column. Each statement can only be used once per block.",
+}
 
 class BehavioralAssessmentView(FormView):
     template_name = "candidate/behavioral_session.html"
@@ -39,6 +48,7 @@ class BehavioralAssessmentView(FormView):
             updates.append("last_activity_at")
         if updates:
             self.session.save(update_fields=updates + ["updated_at"])
+        update_session_telemetry(self.session, request=request)
         duration_minutes = self.session.duration_minutes or 0
         if duration_minutes:
             pause_delta = timedelta(
@@ -84,6 +94,14 @@ class BehavioralAssessmentView(FormView):
                     "candidate:behavioral-pause", args=[self.session.uuid]
                 ),
                 "last_saved_at": self.session.last_activity_at,
+                "guidance_tip": BEHAVIORAL_GUIDANCE,
+                "switch_device_url": reverse(
+                    "candidate:behavioral-send-link", args=[self.session.uuid]
+                ),
+                "help_topics": DEFAULT_HELP_TOPICS,
+                "practice_url": reverse(
+                    "candidate:session-practice", args=[self.session.uuid]
+                ),
             }
         )
         return context
@@ -94,6 +112,9 @@ class BehavioralAssessmentView(FormView):
         self.session.responses = responses
         self.session.last_activity_at = timezone.now()
         self.session.save(update_fields=["responses", "last_activity_at"])
+        update_session_telemetry(
+            self.session, payload=self.request.POST.get("telemetry_payload")
+        )
         if len(responses) >= len(self.session.question_set):
             evaluate_session(self.session)
             return redirect("candidate:behavioral-complete", session_uuid=self.session.uuid)
@@ -116,16 +137,28 @@ class BehavioralAssessmentCompleteView(FormView):
             initial["score"] = self.session.candidate_feedback_score
         if self.session.candidate_feedback_comment:
             initial["comment"] = self.session.candidate_feedback_comment
+        if self.session.candidate_feedback_email:
+            initial["contact_email"] = self.session.candidate_feedback_email
+        if self.session.candidate_feedback_phone:
+            initial["contact_phone"] = self.session.candidate_feedback_phone
+        if self.session.candidate_feedback_opt_in:
+            initial["allow_follow_up"] = True
         return initial
 
     def form_valid(self, form):
         self.session.candidate_feedback_score = int(form.cleaned_data["score"])
         self.session.candidate_feedback_comment = form.cleaned_data["comment"]
+        self.session.candidate_feedback_email = form.cleaned_data.get("contact_email", "")
+        self.session.candidate_feedback_phone = form.cleaned_data.get("contact_phone", "")
+        self.session.candidate_feedback_opt_in = form.cleaned_data.get("allow_follow_up") or False
         self.session.candidate_feedback_submitted_at = timezone.now()
         self.session.save(
             update_fields=[
                 "candidate_feedback_score",
                 "candidate_feedback_comment",
+                "candidate_feedback_email",
+                "candidate_feedback_phone",
+                "candidate_feedback_opt_in",
                 "candidate_feedback_submitted_at",
             ]
         )
@@ -235,4 +268,37 @@ class BehavioralAssessmentResumeView(View):
                 "updated_at",
             ]
         )
+        return redirect("candidate:behavioral-session", session_uuid=session.uuid)
+
+
+class BehavioralAssessmentSendLinkView(View):
+    """Email the behavioral assessment link to an address provided by the candidate."""
+
+    def post(self, request, *args, **kwargs):
+        session = get_object_or_404(
+            BehavioralAssessmentSession, uuid=kwargs["session_uuid"]
+        )
+        target_email = (request.POST.get("email") or "").strip()
+        try:
+            validate_email(target_email)
+        except ValidationError:
+            messages.error(request, "Please enter a valid email address.")
+            return redirect("candidate:behavioral-session", session_uuid=session.uuid)
+
+        resume_link = request.build_absolute_uri(
+            reverse("candidate:behavioral-session", args=[session.uuid])
+        )
+        success, error = send_switch_device_email(
+            email=target_email,
+            candidate_name=session.candidate_id,
+            resume_link=resume_link,
+            assessment_label="Behavioral Inventory",
+        )
+        if success:
+            messages.success(
+                request,
+                f"We emailed the secure link to {target_email}.",
+            )
+        else:
+            messages.error(request, error or "We could not send the link right now.")
         return redirect("candidate:behavioral-session", session_uuid=session.uuid)

@@ -150,4 +150,110 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    const longFormInputs = document.querySelectorAll(".long-form-input");
+    longFormInputs.forEach((input) => {
+        const card = input.closest(".question-card");
+        if (!card) {
+            return;
+        }
+        const container = card.querySelector(".answer-preview");
+        if (!container) {
+            return;
+        }
+        const charCount = container.querySelector("[data-char-count]");
+        const previewBody = container.querySelector("[data-preview-body]");
+        if (!previewBody) {
+            return;
+        }
+        const placeholder = previewBody.dataset.placeholder || "Start typing…";
+        const minLength =
+            Number(input.dataset.minLength || charCount?.dataset.minLength || 0) || 0;
+        const updatePreview = () => {
+            const value = input.value;
+            if (charCount) {
+                const label =
+                    minLength > 0
+                        ? `${value.length} characters · aim for ${minLength}+`
+                        : `${value.length} characters`;
+                charCount.textContent = label;
+                charCount.classList.toggle("is-warning", minLength > 0 && value.length < minLength);
+            }
+            if (!value.trim()) {
+                previewBody.textContent = placeholder;
+                previewBody.classList.add("is-empty");
+                return;
+            }
+            previewBody.textContent = value;
+            previewBody.classList.remove("is-empty");
+        };
+        input.addEventListener("input", updatePreview);
+        updatePreview();
+    });
+
+    const body = document.body;
+    const contrastToggle = document.getElementById("contrastToggle");
+    const applyContrastPreference = (enabled) => {
+        body.classList.toggle("contrast-mode", enabled);
+        if (contrastToggle) {
+            contrastToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+            contrastToggle.textContent = enabled ? "Standard contrast" : "High contrast";
+        }
+    };
+    const storedPreference = localStorage.getItem("contrast-mode");
+    if (storedPreference) {
+        applyContrastPreference(storedPreference === "true");
+    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        applyContrastPreference(true);
+    }
+    if (contrastToggle) {
+        contrastToggle.addEventListener("click", () => {
+            const enabled = !body.classList.contains("contrast-mode");
+            applyContrastPreference(enabled);
+            localStorage.setItem("contrast-mode", enabled ? "true" : "false");
+        });
+    }
+
+    const telemetryState = {
+        pasteCount: 0,
+        fieldPastes: {},
+    };
+
+    document.addEventListener("paste", (event) => {
+        const target = event.target;
+        if (
+            target &&
+            (target.matches(".long-form-input") ||
+                target.matches("textarea") ||
+                target.matches("input[type='text']"))
+        ) {
+            telemetryState.pasteCount += 1;
+            const key = target.name || target.id || "field";
+            telemetryState.fieldPastes[key] = (telemetryState.fieldPastes[key] || 0) + 1;
+        }
+    });
+
+    const captureTelemetryPayload = (form) => {
+        const field = form.querySelector("[data-telemetry-field]");
+        if (!field) {
+            return;
+        }
+        const payload = {
+            pasteCount: telemetryState.pasteCount,
+            fieldPastes: telemetryState.fieldPastes,
+            deviceHints: {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                screen: `${window.screen.width}x${window.screen.height}`,
+                viewport: `${window.innerWidth}x${window.innerHeight}`,
+            },
+            page: window.location.pathname,
+        };
+        field.value = JSON.stringify(payload);
+    };
+
+    document.querySelectorAll("form.question-form").forEach((form) => {
+        form.addEventListener("submit", () => captureTelemetryPayload(form));
+    });
 });

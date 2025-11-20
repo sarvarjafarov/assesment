@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -11,7 +12,36 @@ from django.views.generic import FormView, TemplateView
 from assessments.behavioral import get_behavioral_blocks
 from assessments.models import AssessmentSession, Question
 from assessments.services import record_responses
+from .constants import DEFAULT_HELP_TOPICS, PRACTICE_QUESTIONS
 from .forms import QuestionStepForm
+from .utils import send_switch_device_email, update_session_telemetry
+
+
+DEFAULT_PREVIEW_MIN_CHARS = 120
+QUESTION_GUIDANCE = {
+    Question.TYPE_SINGLE: {
+        "title": "Single best answer",
+        "body": "Choose the strongest option. We only record one selection per question.",
+    },
+    Question.TYPE_MULTI: {
+        "title": "Select all that apply",
+        "body": "Check every option that fits. Partial credit is awarded for solid coverage.",
+    },
+    Question.TYPE_SCALE: {
+        "title": "Scale response",
+        "body": "Use the full scale and anchor your choice to how confident you feel.",
+    },
+    Question.TYPE_TEXT: {
+        "title": "Structured response",
+        "body": "Share the context, the actions you took, and the measurable outcome. Bullet points are fine.",
+    },
+    Question.TYPE_BEHAVIORAL: {
+        "title": "Behavioral block",
+        "body": "Pick one statement that is most like you and another that is least like you. Each must be unique.",
+    },
+}
+
+LONGFORM_PREVIEW_TYPES = {Question.TYPE_TEXT}
 
 
 class SessionMixin:
@@ -43,6 +73,7 @@ class SessionMixin:
             "behavioral_focus_traits": self.session.behavioral_focus_traits,
             "behavioral_focus_label": self.session.behavioral_focus_display,
             "last_saved_at": self.session.last_activity_at,
+            "help_topics": DEFAULT_HELP_TOPICS,
         }
 
 
@@ -64,6 +95,9 @@ class SessionIntroView(SessionMixin, TemplateView):
         context["resume_url"] = reverse(
             "candidate:session-resume", args=[self.session.uuid]
         )
+        context["practice_url"] = reverse(
+            "candidate:session-practice", args=[self.session.uuid]
+        )
         return context
 
 
@@ -80,6 +114,7 @@ class SessionAssessmentView(SessionMixin, FormView):
                 "candidate:session-complete", session_uuid=self.session.uuid
             )
         self._ensure_started()
+        update_session_telemetry(self.session, request=request)
         self._prepare_questions()
         self._prepare_progress()
         self._determine_current_step()
@@ -223,6 +258,19 @@ class SessionAssessmentView(SessionMixin, FormView):
         context["pause_url"] = reverse(
             "candidate:session-pause", args=[self.session.uuid]
         )
+        context["switch_device_url"] = reverse(
+            "candidate:session-send-link", args=[self.session.uuid]
+        )
+        context["practice_url"] = reverse(
+            "candidate:session-practice", args=[self.session.uuid]
+        )
+        context["guidance_tip"] = QUESTION_GUIDANCE.get(
+            self.current_question.question_type
+        )
+        context["show_preview"] = (
+            self.current_question.question_type in LONGFORM_PREVIEW_TYPES
+        )
+        context["preview_min_length"] = DEFAULT_PREVIEW_MIN_CHARS
         return context
 
     def form_valid(self, form):
@@ -232,6 +280,9 @@ class SessionAssessmentView(SessionMixin, FormView):
             session=self.session,
             answers=answers,
             mark_completed=is_final_step,
+        )
+        update_session_telemetry(
+            self.session, payload=self.request.POST.get("telemetry_payload")
         )
         if (
             self.current_question.question_type == Question.TYPE_BEHAVIORAL
@@ -266,6 +317,61 @@ class SessionCompleteView(SessionMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.base_context())
+        return context
+
+
+class SessionSendLinkView(SessionMixin, View):
+    """Email the candidate their secure session URL so they can change devices."""
+
+    def post(self, request, *args, **kwargs):
+        self.load_session(**kwargs)
+        candidate = self.session.candidate
+        resume_link = request.build_absolute_uri(
+            reverse("candidate:session-entry", args=[self.session.uuid])
+        )
+        success, error = send_switch_device_email(
+            email=candidate.email,
+            candidate_name=candidate.first_name,
+            resume_link=resume_link,
+            assessment_label=self.session.assessment.title,
+        )
+        if success:
+            messages.success(
+                request,
+                f"We emailed the secure link to {candidate.email}.",
+            )
+        else:
+            messages.error(request, error or "We could not send the link right now.")
+        return redirect("candidate:session-start", session_uuid=self.session.uuid)
+
+
+class SessionPracticeView(SessionMixin, TemplateView):
+    template_name = "candidate/practice.html"
+
+    def post(self, request, *args, **kwargs):
+        self.load_session(**kwargs)
+        context = self.get_context_data(**kwargs)
+        mcq_answer = request.POST.get("practice_choice")
+        text_answer = request.POST.get("practice_text", "").strip()
+        results = {}
+        for question in PRACTICE_QUESTIONS:
+            if question["type"] == "multiple_choice" and mcq_answer:
+                results["multiple_choice"] = mcq_answer == question["answer"]
+            if question["type"] == "text" and text_answer:
+                results["text"] = len(text_answer.split()) >= 10
+        context["practice_results"] = results
+        context["submitted_choice"] = mcq_answer
+        context["submitted_text"] = text_answer
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(self.base_context())
+        context["practice_questions"] = PRACTICE_QUESTIONS
+        context["practice_results"] = context.get("practice_results") or {}
+        context["practice_url"] = reverse(
+            "candidate:session-practice", args=[self.session.uuid]
+        )
         return context
 
 

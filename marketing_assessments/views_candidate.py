@@ -2,18 +2,58 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import FormView, TemplateView
 
+from candidate.constants import DEFAULT_HELP_TOPICS
 from candidate.forms import CandidateFeedbackForm
+from candidate.utils import send_switch_device_email, update_session_telemetry
 
 from .forms import MarketingQuestionForm
 from .models import DigitalMarketingAssessmentSession, DigitalMarketingQuestion
 from .services import evaluate_session
 
+MARKETING_GUIDANCE = {
+    "multiple_choice": {
+        "title": "Multiple choice",
+        "body": "Pick the best option backed by metrics or logic. We only record one selection.",
+    },
+    "scenario": {
+        "title": "Scenario response",
+        "body": "Use the available data points and select the tactic you would try first.",
+    },
+    "ranking": {
+        "title": "Rank the items",
+        "body": "Reorder every item so it reflects your recommended priority. List them comma separated.",
+    },
+    "behavioral_most": {
+        "title": "Behavioral block",
+        "body": "Choose the statement that feels most like you for this situation. Only one per prompt.",
+    },
+    "behavioral_least": {
+        "title": "Behavioral block",
+        "body": "Choose the statement that is least like you. Avoid repeating previous picks.",
+    },
+    "reasoning": {
+        "title": "Open response",
+        "body": "Explain your thinking in 3–5 sentences, calling out assumptions and tradeoffs.",
+    },
+}
+
+NON_LONGFORM_MARKETING_TYPES = {
+    "multiple_choice",
+    "scenario",
+    "ranking",
+    "behavioral_most",
+    "behavioral_least",
+}
+MARKETING_PREVIEW_MIN = 150
 
 class MarketingAssessmentView(FormView):
     template_name = "candidate/marketing_session.html"
@@ -44,6 +84,7 @@ class MarketingAssessmentView(FormView):
             updates.append("last_activity_at")
         if updates:
             self.session.save(update_fields=updates + ["updated_at"])
+        update_session_telemetry(self.session, request=request)
         duration_minutes = self.session.duration_minutes or 0
         if duration_minutes:
             pause_delta = timedelta(
@@ -92,6 +133,19 @@ class MarketingAssessmentView(FormView):
                     "candidate:marketing-pause", args=[self.session.uuid]
                 ),
                 "last_saved_at": self.session.last_activity_at,
+                "guidance_tip": MARKETING_GUIDANCE.get(
+                    self.current_question.question_type
+                ),
+                "show_preview": self.current_question.question_type
+                not in NON_LONGFORM_MARKETING_TYPES,
+                "preview_min_length": MARKETING_PREVIEW_MIN,
+                "switch_device_url": reverse(
+                    "candidate:marketing-send-link", args=[self.session.uuid]
+                ),
+                "help_topics": DEFAULT_HELP_TOPICS,
+                "practice_url": reverse(
+                    "candidate:session-practice", args=[self.session.uuid]
+                ),
             }
         )
         return context
@@ -102,6 +156,9 @@ class MarketingAssessmentView(FormView):
         self.session.responses = responses
         self.session.last_activity_at = timezone.now()
         self.session.save(update_fields=["responses", "last_activity_at"])
+        update_session_telemetry(
+            self.session, payload=self.request.POST.get("telemetry_payload")
+        )
         if len(responses) >= len(self.session.question_set):
             evaluate_session(self.session)
             return redirect(
@@ -128,16 +185,28 @@ class MarketingAssessmentCompleteView(FormView):
             initial["score"] = self.session.candidate_feedback_score
         if self.session.candidate_feedback_comment:
             initial["comment"] = self.session.candidate_feedback_comment
+        if self.session.candidate_feedback_email:
+            initial["contact_email"] = self.session.candidate_feedback_email
+        if self.session.candidate_feedback_phone:
+            initial["contact_phone"] = self.session.candidate_feedback_phone
+        if self.session.candidate_feedback_opt_in:
+            initial["allow_follow_up"] = True
         return initial
 
     def form_valid(self, form):
         self.session.candidate_feedback_score = int(form.cleaned_data["score"])
         self.session.candidate_feedback_comment = form.cleaned_data["comment"]
+        self.session.candidate_feedback_email = form.cleaned_data.get("contact_email", "")
+        self.session.candidate_feedback_phone = form.cleaned_data.get("contact_phone", "")
+        self.session.candidate_feedback_opt_in = form.cleaned_data.get("allow_follow_up") or False
         self.session.candidate_feedback_submitted_at = timezone.now()
         self.session.save(
             update_fields=[
                 "candidate_feedback_score",
                 "candidate_feedback_comment",
+                "candidate_feedback_email",
+                "candidate_feedback_phone",
+                "candidate_feedback_opt_in",
                 "candidate_feedback_submitted_at",
             ]
         )
@@ -242,4 +311,37 @@ class MarketingSessionResumeView(View):
                 "updated_at",
             ]
         )
+        return redirect("candidate:marketing-session", session_uuid=session.uuid)
+
+
+class MarketingSessionSendLinkView(View):
+    """Email a session link so the candidate can resume on another device."""
+
+    def post(self, request, *args, **kwargs):
+        session = get_object_or_404(
+            DigitalMarketingAssessmentSession, uuid=kwargs["session_uuid"]
+        )
+        target_email = (request.POST.get("email") or "").strip()
+        try:
+            validate_email(target_email)
+        except ValidationError:
+            messages.error(request, "Please enter a valid email address.")
+            return redirect("candidate:marketing-session", session_uuid=session.uuid)
+
+        resume_link = request.build_absolute_uri(
+            reverse("candidate:marketing-session", args=[session.uuid])
+        )
+        success, error = send_switch_device_email(
+            email=target_email,
+            candidate_name=session.candidate_id,
+            resume_link=resume_link,
+            assessment_label="Digital Marketing",
+        )
+        if success:
+            messages.success(
+                request,
+                f"We emailed the secure link to {target_email}.",
+            )
+        else:
+            messages.error(request, error or "We could not send the link right now.")
         return redirect("candidate:marketing-session", session_uuid=session.uuid)

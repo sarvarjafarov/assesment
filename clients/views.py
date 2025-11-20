@@ -860,6 +860,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                 "comparative_insights": self._build_comparative_insights(session),
                 "quick_followups": self._build_followup_links(session, share_link),
                 "candidate_feedback": self._candidate_feedback(session),
+                "integrity_signals": self._integrity_signals(session),
                 "pdf_export_url": reverse(
                     "clients:assessment-export",
                     args=[self.assessment_type, session.uuid],
@@ -1127,6 +1128,25 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
             "label": labels.get(session.candidate_feedback_score),
             "comment": session.candidate_feedback_comment,
             "submitted_at": session.candidate_feedback_submitted_at,
+            "contact_email": session.candidate_feedback_email,
+            "contact_phone": session.candidate_feedback_phone,
+            "allow_follow_up": session.candidate_feedback_opt_in,
+        }
+
+    def _integrity_signals(self, session):
+        telemetry = session.telemetry_log or {}
+        if not telemetry:
+            return {}
+        device = telemetry.get("device_info") or {}
+        hints = telemetry.get("device_hints") or {}
+        events = telemetry.get("events") or []
+        return {
+            "ip_address": device.get("ip"),
+            "ip_switches": max(0, len(telemetry.get("ip_history") or []) - 1),
+            "user_agent": device.get("user_agent") or hints.get("userAgent"),
+            "paste_count": telemetry.get("paste_count", 0),
+            "last_event": events[-1] if events else None,
+            "timezone": hints.get("timezone"),
         }
 
     def _build_audit_log(self, session):

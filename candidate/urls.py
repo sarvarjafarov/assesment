@@ -40,6 +40,16 @@ urlpatterns = [
         name="session-resume",
     ),
     path(
+        "<uuid:session_uuid>/send-link/",
+        views.SessionSendLinkView.as_view(),
+        name="session-send-link",
+    ),
+    path(
+        "<uuid:session_uuid>/practice/",
+        views.SessionPracticeView.as_view(),
+        name="session-practice",
+    ),
+    path(
         "marketing/<uuid:session_uuid>/",
         marketing_views.MarketingAssessmentView.as_view(),
         name="marketing-session",
@@ -68,6 +78,11 @@ urlpatterns = [
         "marketing/<uuid:session_uuid>/resume/",
         marketing_views.MarketingSessionResumeView.as_view(),
         name="marketing-resume",
+    ),
+    path(
+        "marketing/<uuid:session_uuid>/send-link/",
+        marketing_views.MarketingSessionSendLinkView.as_view(),
+        name="marketing-send-link",
     ),
     path(
         "pm/<uuid:session_uuid>/",
@@ -100,6 +115,11 @@ urlpatterns = [
         name="pm-resume",
     ),
     path(
+        "pm/<uuid:session_uuid>/send-link/",
+        pm_views.ProductAssessmentSendLinkView.as_view(),
+        name="pm-send-link",
+    ),
+    path(
         "behavioral/<uuid:session_uuid>/",
         behavioral_views.BehavioralAssessmentView.as_view(),
         name="behavioral-session",
@@ -128,5 +148,10 @@ urlpatterns = [
         "behavioral/<uuid:session_uuid>/resume/",
         behavioral_views.BehavioralAssessmentResumeView.as_view(),
         name="behavioral-resume",
+    ),
+    path(
+        "behavioral/<uuid:session_uuid>/send-link/",
+        behavioral_views.BehavioralAssessmentSendLinkView.as_view(),
+        name="behavioral-send-link",
     ),
 ]

@@ -31,6 +31,29 @@
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
+                <div class="form-grid">
+                    <div class="form-field">
+                        {{ form.contact_email.label_tag }}
+                        {{ form.contact_email }}
+                        {% for error in form.contact_email.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        {{ form.contact_phone.label_tag }}
+                        {{ form.contact_phone }}
+                        {% for error in form.contact_phone.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <label class="inline-checkbox">
+                    {{ form.allow_follow_up }}
+                    <span>{{ form.allow_follow_up.label }}</span>
+                </label>
+                {% for error in form.allow_follow_up.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
                 <button class="btn btn-pill" type="submit">Send feedback</button>
             </form>
             {% endif %}

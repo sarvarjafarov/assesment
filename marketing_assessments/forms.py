@@ -52,13 +52,22 @@ class MarketingQuestionForm(forms.Form):
                     attrs={
                         "rows": 5,
                         "placeholder": "Briefly explain your reasoning or approach.",
+                        "class": "long-form-input",
+                        "data-min-length": 150,
                     }
                 ),
             )
         else:
             self.fields["answer"] = forms.CharField(
                 label="",
-                widget=forms.Textarea(attrs={"rows": 3}),
+                widget=forms.Textarea(
+                    attrs={
+                        "rows": 3,
+                        "class": "long-form-input",
+                        "data-min-length": 150,
+                        "placeholder": "Capture your thought process and any tradeoffs you considered.",
+                    }
+                ),
             )
 
     def to_response(self) -> dict:

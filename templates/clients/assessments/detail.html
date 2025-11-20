@@ -194,6 +194,53 @@
         {% if candidate_feedback.comment %}
         <p class="muted">“{{ candidate_feedback.comment }}”</p>
         {% endif %}
+        {% if candidate_feedback.contact_email or candidate_feedback.contact_phone %}
+        <div class="feedback-contact">
+            {% if candidate_feedback.contact_email %}
+            <p><strong>Email:</strong> <a href="mailto:{{ candidate_feedback.contact_email }}">{{ candidate_feedback.contact_email }}</a></p>
+            {% endif %}
+            {% if candidate_feedback.contact_phone %}
+            <p><strong>Phone / chat:</strong> {{ candidate_feedback.contact_phone }}</p>
+            {% endif %}
+            {% if candidate_feedback.allow_follow_up %}
+            <p class="pill subtle success">Candidate opted in for follow-up</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {% if integrity_signals %}
+    <section class="panel portal-panel integrity-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Integrity signals</p>
+                <h2>Environment telemetry</h2>
+            </div>
+        </header>
+        <div class="integrity-grid">
+            <article>
+                <p class="label">Primary IP</p>
+                <strong>{{ integrity_signals.ip_address|default:"—" }}</strong>
+                {% if integrity_signals.ip_switches %}
+                <p class="muted">{{ integrity_signals.ip_switches }} change(s) detected</p>
+                {% endif %}
+            </article>
+            <article>
+                <p class="label">Device</p>
+                <p class="muted">{{ integrity_signals.user_agent|default:"Unknown" }}</p>
+                {% if integrity_signals.timezone %}
+                <p class="muted">Timezone: {{ integrity_signals.timezone }}</p>
+                {% endif %}
+            </article>
+            <article>
+                <p class="label">Paste events</p>
+                <strong>{{ integrity_signals.paste_count }}</strong>
+            </article>
+        </div>
+        {% if integrity_signals.last_event %}
+        <p class="muted small">Last telemetry event captured {{ integrity_signals.last_event.timestamp }}</p>
+        {% endif %}
     </section>
     {% endif %}
 

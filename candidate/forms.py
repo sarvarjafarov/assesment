@@ -53,7 +53,14 @@ class QuestionStepForm(forms.Form):
         elif question.question_type == Question.TYPE_TEXT:
             self.fields["response"] = forms.CharField(
                 label=question.prompt,
-                widget=forms.Textarea(attrs={"rows": 5}),
+                widget=forms.Textarea(
+                    attrs={
+                        "rows": 5,
+                        "class": "long-form-input",
+                        "data-min-length": 120,
+                        "placeholder": "Share a structured response covering context, actions, and outcomes.",
+                    }
+                ),
                 required=True,
             )
         elif question.question_type == Question.TYPE_BEHAVIORAL:
@@ -141,5 +148,19 @@ class CandidateFeedbackForm(forms.Form):
     comment = forms.CharField(
         label="Anything we should know?",
         widget=forms.Textarea(attrs={"rows": 3}),
+        required=False,
+    )
+    contact_email = forms.EmailField(
+        label="Email for follow-up (optional)",
+        required=False,
+        widget=forms.EmailInput(attrs={"placeholder": "you@example.com"}),
+    )
+    contact_phone = forms.CharField(
+        label="Phone or chat handle (optional)",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "+1 555 123 4567"}),
+    )
+    allow_follow_up = forms.BooleanField(
+        label="The recruiting team may contact me about this feedback.",
         required=False,
     )

@@ -54,6 +54,7 @@
         </div>
         {% endif %}
         <div class="candidate-actions">
+            <a class="btn btn-outline" href="{{ practice_url }}">Try a practice question</a>
             {% if is_paused %}
             <form method="post" action="{{ resume_url }}">
                 {% csrf_token %}
