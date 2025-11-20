@@ -9,6 +9,42 @@ from blog.models import BlogPost
 
 def home(request):
     """Render the marketing landing page."""
+    assessment_suite = [
+        {
+            "slug": "marketing",
+            "label": "Marketing IQ",
+            "title": "Digital marketing",
+            "summary": "Scenario-based prompts spanning paid media, SEO, analytics, and GTM strategy.",
+            "stats": [
+                "40-scene curated bank",
+                "32 min avg completion",
+                "Role-based benchmarks",
+            ],
+        },
+        {
+            "slug": "product",
+            "label": "Product Sense",
+            "title": "Product management",
+            "summary": "Reasoning, estimation, prioritization, and UX critiques calibrated for ICs and leads.",
+            "stats": [
+                "Blend of open response + scoring rubrics",
+                "Difficulty ladders by seniority",
+                "Power-user vs broad PM profiles",
+            ],
+        },
+        {
+            "slug": "behavioral",
+            "label": "Behavioral DNA",
+            "title": "Leadership & soft skills",
+            "summary": "Adaptive block inventory highlighting collaboration style, risk posture, and coaching needs.",
+            "stats": [
+                "15-minute inventory",
+                "Integrity + engagement flags",
+                "Guided debrief talking points",
+            ],
+        },
+    ]
+
     features = [
         {
             "slug": "scope",
@@ -57,6 +93,39 @@ def home(request):
                 "Shareable highlight reels for interviewers.",
                 "Audit trail covering every reviewer action.",
             ],
+        },
+    ]
+
+    live_events = [
+        {"company": "Latitude Labs", "assessment": "PM scope challenge", "ago": "2 min ago"},
+        {"company": "Northwind", "assessment": "Behavioral inventory", "ago": "7 min ago"},
+        {"company": "Copper Build", "assessment": "Growth marketing scenario", "ago": "12 min ago"},
+    ]
+
+    case_studies = [
+        {
+            "slug": "atlas",
+            "company": "Atlas CRM",
+            "headline": "37% faster time-to-offer for product hires.",
+            "result": "Centralized PM assessments with automated scoring and shared highlights.",
+            "metric_label": "Hiring speed",
+            "metric_value": "-37%",
+        },
+        {
+            "slug": "northwind",
+            "company": "Northwind Commerce",
+            "headline": "2x more signal from marketing assignments.",
+            "result": "Introduced scenario prompts + integrity signals for remote candidates.",
+            "metric_label": "Signal depth",
+            "metric_value": "2x",
+        },
+        {
+            "slug": "aster",
+            "company": "Aster Care",
+            "headline": "Candidate NPS jumped to 4.9 / 5.",
+            "result": "Behavioral inventory + guided portal kept clinical leaders engaged.",
+            "metric_label": "Candidate CSAT",
+            "metric_value": "4.9",
         },
     ]
 
@@ -121,8 +190,11 @@ def home(request):
         "pages/home.html",
         {
             "features": features,
+            "suite": assessment_suite,
             "articles": articles,
             "testimonials": testimonials,
             "invite_form": form,
+            "live_events": live_events,
+            "case_studies": case_studies,
         },
     )

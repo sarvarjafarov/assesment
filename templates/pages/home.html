@@ -25,14 +25,32 @@
     <main>
         <section class="hero">
             <div class="hero-inner">
-                <div class="hero-badge">Purpose-built for <span>B2B talent teams</span></div>
+                <div class="hero-badge">Purpose-built for <span>B2B hiring</span></div>
                 <h1>Launch <span class="highlight">marketing, PM, and behavioral</span> assessments from one console.</h1>
-                <p class="hero-subtitle">
-                    Sira calibrates every assignment for B2B hiring: invite candidates, benchmark real work, and share a defensible report with stakeholders in under an hour.
+                <div class="hero-persona-toggle">
+                    <button class="persona-btn is-active"
+                        data-subtitle="Sira calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour."
+                        data-primary="Book a walkthrough"
+                        data-primary-link="#cta"
+                        data-secondary="See reporting tour"
+                        data-secondary-link="#suite">
+                        For talent teams
+                    </button>
+                    <button class="persona-btn"
+                        data-subtitle="Candidates get a guided, mobile-ready workspace with practice prompts, pause/resume, and instant status updates."
+                        data-primary="Preview candidate flow"
+                        data-primary-link="#journey"
+                        data-secondary="Explore practice mode"
+                        data-secondary-link="#resources">
+                        For candidates
+                    </button>
+                </div>
+                <p class="hero-subtitle" id="heroSubtitle">
+                    Sira calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour.
                 </p>
                 <div class="hero-cta">
-                    <a class="btn btn-pill" href="#cta">Book a walkthrough</a>
-                    <a class="btn btn-outline" href="#sample-report">See a sample report</a>
+                    <a class="btn btn-pill" id="heroPrimaryCta" href="#cta">Book a walkthrough</a>
+                    <a class="btn btn-outline" id="heroSecondaryCta" href="#suite">See reporting tour</a>
                 </div>
             </div>
             <div class="hero-grid"></div>
@@ -50,43 +68,40 @@
             <blockquote>“Sira’s PM + marketing assessments cut our time-to-offer by 37% while giving candidates an experience they rave about.” <cite>— VP Talent, Series B SaaS</cite></blockquote>
         </section>
 
+        <section class="live-feed">
+            <div class="feed-label">Live on Sira</div>
+            <div class="feed-slot" id="liveFeedSlot">Monitoring recent activity…</div>
+        </section>
+
         <section class="suite" id="suite">
             <div class="section-heading section-heading-tight">
                 <p class="eyebrow">Assessment suite</p>
                 <h2>Pick the right instrument for every role.</h2>
                 <p class="lede">Three calibrated banks cover GTM, product, and leadership signals—each with fresh questions, scoring rubrics, and reporting templates.</p>
             </div>
-            <div class="suite-grid">
-                <article class="suite-card">
-                    <p class="pill subtle accent-marketing">Marketing IQ</p>
-                    <h3>Digital Marketing</h3>
-                    <p>40-scene catalog spanning paid media, SEO, analytics, and GTM strategy.</p>
-                    <ul>
-                        <li>Avg. completion: 32 mins</li>
-                        <li>Auto-scored MCQ + scenarios</li>
-                        <li>Benchmarks by seniority</li>
-                    </ul>
-                </article>
-                <article class="suite-card">
-                    <p class="pill subtle accent-product">Product Sense</p>
-                    <h3>Product Management</h3>
-                    <p>Reasoning, estimation, prioritization, and UX prompts tuned for ICs and leads.</p>
-                    <ul>
-                        <li>Dynamic scoring by difficulty</li>
-                        <li>Stakeholder-ready scorecards</li>
-                        <li>Power user vs. broad PM profiles</li>
-                    </ul>
-                </article>
-                <article class="suite-card">
-                    <p class="pill subtle accent-behavioral">Behavioral DNA</p>
-                    <h3>Leadership &amp; soft skills</h3>
-                    <p>Adaptive blocks that map collaboration style, risk posture, and coaching needs.</p>
-                    <ul>
-                        <li>15-min behavioral inventory</li>
-                        <li>Integrity + engagement flags</li>
-                        <li>Guidance for debriefs and onboarding</li>
-                    </ul>
-                </article>
+            <div class="suite-map">
+                <div class="suite-list">
+                    {% for item in suite %}
+                    <button class="suite-card {% if forloop.first %}is-active{% endif %}" data-suite-button data-target="{{ item.slug }}">
+                        <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
+                        <h3>{{ item.title }}</h3>
+                        <p>{{ item.summary }}</p>
+                    </button>
+                    {% endfor %}
+                </div>
+                <div class="suite-detail">
+                    {% for item in suite %}
+                    <article class="suite-panel {% if forloop.first %}is-active{% endif %}" data-suite-panel="{{ item.slug }}">
+                        <h4>{{ item.label }}</h4>
+                        <ul>
+                            {% for stat in item.stats %}
+                            <li>{{ stat }}</li>
+                            {% endfor %}
+                        </ul>
+                        <a class="btn btn-outline small" href="mailto:hello@sira.so?subject={{ item.label|urlencode }}%20rubric">Download {{ item.title }} rubric</a>
+                    </article>
+                    {% endfor %}
+                </div>
             </div>
         </section>
 
@@ -384,6 +399,33 @@
             </div>
         </section>
 
+        <section class="case-slider" id="caseStories">
+            <div class="section-heading">
+                <p class="eyebrow">Customer proof</p>
+                <h2>Browse outcome stories.</h2>
+            </div>
+            <div class="case-slider-body">
+                <div class="case-panels">
+                    {% for case in case_studies %}
+                    <article class="case-panel {% if forloop.first %}is-active{% endif %}" data-case-panel="{{ forloop.counter0 }}">
+                        <p class="pill subtle">{{ case.company }}</p>
+                        <h3>{{ case.headline }}</h3>
+                        <p class="muted">{{ case.result }}</p>
+                        <div class="case-metric">
+                            <span>{{ case.metric_label }}</span>
+                            <strong>{{ case.metric_value }}</strong>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                <div class="case-dots">
+                    {% for case in case_studies %}
+                    <button class="{% if forloop.first %}is-active{% endif %}" data-case-button="{{ forloop.counter0 }}" aria-label="View case study {{ forloop.counter }}"></button>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
         <section class="cta panel-contained" id="cta">
             <div class="cta-card">
                 <p class="eyebrow">Ready to partner?</p>
@@ -472,5 +514,6 @@
         </div>
         <div>Made with <span>♥</span> by Sira</div>
     </footer>
+{{ live_events|json_script:"live-events-data" }}
 </div>
 {% endblock %}

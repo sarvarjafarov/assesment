@@ -283,4 +283,80 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.closePath();
         ctx.fill();
     }
+
+    const heroButtons = document.querySelectorAll(".persona-btn");
+    const heroSubtitle = document.getElementById("heroSubtitle");
+    const heroPrimary = document.getElementById("heroPrimaryCta");
+    const heroSecondary = document.getElementById("heroSecondaryCta");
+    heroButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            heroButtons.forEach((btn) => btn.classList.remove("is-active"));
+            button.classList.add("is-active");
+            if (heroSubtitle) {
+                heroSubtitle.textContent = button.dataset.subtitle || heroSubtitle.textContent;
+            }
+            if (heroPrimary) {
+                heroPrimary.textContent = button.dataset.primary || heroPrimary.textContent;
+                if (button.dataset.primaryLink) {
+                    heroPrimary.setAttribute("href", button.dataset.primaryLink);
+                }
+            }
+            if (heroSecondary) {
+                heroSecondary.textContent = button.dataset.secondary || heroSecondary.textContent;
+                if (button.dataset.secondaryLink) {
+                    heroSecondary.setAttribute("href", button.dataset.secondaryLink);
+                }
+            }
+        });
+    });
+
+    const suiteButtons = document.querySelectorAll("[data-suite-button]");
+    const suitePanels = document.querySelectorAll("[data-suite-panel]");
+    suiteButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            suiteButtons.forEach((btn) => btn.classList.remove("is-active"));
+            suitePanels.forEach((panel) => panel.classList.remove("is-active"));
+            button.classList.add("is-active");
+            const target = button.dataset.target;
+            const nextPanel = document.querySelector(`[data-suite-panel=\"${target}\"]`);
+            if (nextPanel) {
+                nextPanel.classList.add("is-active");
+            }
+        });
+    });
+
+    const liveFeedSlot = document.getElementById("liveFeedSlot");
+    const liveFeedDataElem = document.getElementById("live-events-data");
+    if (liveFeedSlot && liveFeedDataElem) {
+        const events = JSON.parse(liveFeedDataElem.textContent);
+        let eventIndex = 0;
+        const renderEvent = () => {
+            if (!events.length) {
+                liveFeedSlot.textContent = "Teams worldwide are currently assessing with Sira.";
+                return;
+            }
+            const current = events[eventIndex];
+            liveFeedSlot.textContent = `${current.company} launched a ${current.assessment} • ${current.ago}`;
+            eventIndex = (eventIndex + 1) % events.length;
+        };
+        renderEvent();
+        setInterval(renderEvent, 4000);
+    }
+
+    const caseButtons = document.querySelectorAll("[data-case-button]");
+    const casePanels = document.querySelectorAll("[data-case-panel]");
+    if (caseButtons.length && casePanels.length) {
+        const setCase = (index) => {
+            caseButtons.forEach((btn, idx) => btn.classList.toggle("is-active", idx === index));
+            casePanels.forEach((panel, idx) => panel.classList.toggle("is-active", idx === index));
+        };
+        caseButtons.forEach((button) => {
+            button.addEventListener("click", () => setCase(Number(button.dataset.caseButton)));
+        });
+        let caseIndex = 0;
+        setInterval(() => {
+            caseIndex = (caseIndex + 1) % caseButtons.length;
+            setCase(caseIndex);
+        }, 6000);
+    }
 });
