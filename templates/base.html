@@ -34,7 +34,8 @@
         {% block content %}{% endblock %}
     </main>
     {% block site_footer %}
-        {% if not (request.path|startswith:"/clients" or request.path|startswith:"/console" or request.path|startswith:"/candidate") %}
+        {% hide_site_footer as footer_hidden %}
+        {% if not footer_hidden %}
             {% include 'includes/site_footer.html' %}
         {% endif %}
     {% endblock %}
