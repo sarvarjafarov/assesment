@@ -30,4 +30,10 @@ urlpatterns = [
         views.BehavioralAssessmentDetailView.as_view(),
         name="behavioral-detail",
     ),
+    path("site-content/", views.SiteContentListView.as_view(), name="content-list"),
+    path("site-content/new/", views.SiteContentCreateView.as_view(), name="content-create"),
+    path("site-content/<int:pk>/", views.SiteContentUpdateView.as_view(), name="content-edit"),
+    path("resource-library/", views.ResourceAssetListView.as_view(), name="resource-list"),
+    path("resource-library/new/", views.ResourceAssetCreateView.as_view(), name="resource-create"),
+    path("resource-library/<int:pk>/", views.ResourceAssetUpdateView.as_view(), name="resource-edit"),
 ]

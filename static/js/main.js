@@ -711,4 +711,22 @@ document.addEventListener('DOMContentLoaded', () => {
             setIndex(0);
         }
     }
+
+    const blogCards = document.querySelectorAll("[data-blog-card]");
+    if (blogCards.length && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.2 }
+        );
+        blogCards.forEach((card) => observer.observe(card));
+    } else {
+        blogCards.forEach((card) => card.classList.add("is-visible"));
+    }
 });

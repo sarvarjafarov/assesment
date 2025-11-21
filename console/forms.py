@@ -8,6 +8,7 @@ from marketing_assessments.models import DigitalMarketingAssessmentSession
 from marketing_assessments.services import generate_question_set as generate_marketing_question_set
 from pm_assessments.models import ProductAssessmentSession
 from pm_assessments.services import generate_question_set as generate_pm_question_set
+from .models import SiteContentBlock, ResourceAsset
 
 
 class MarketingAssessmentInviteForm(forms.Form):
@@ -104,3 +105,53 @@ class BehavioralAssessmentInviteForm(forms.Form):
             update_fields=["question_set", "status", "duration_minutes", "started_at"]
         )
         return session
+
+
+class SiteContentBlockForm(forms.ModelForm):
+    list_items = forms.CharField(
+        label="List items",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 4}),
+        help_text="One bullet per line.",
+    )
+    meta_items = forms.CharField(
+        label="Meta pairs",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 4}),
+        help_text="Example: Question bank | 40 scenes",
+    )
+
+    class Meta:
+        model = SiteContentBlock
+        fields = [
+            "page",
+            "slot",
+            "title",
+            "subtitle",
+            "body",
+            "badge",
+            "cta_label",
+            "cta_url",
+            "secondary_cta_label",
+            "secondary_cta_url",
+            "list_items",
+            "meta_items",
+            "order",
+            "is_active",
+        ]
+
+
+class ResourceAssetForm(forms.ModelForm):
+    class Meta:
+        model = ResourceAsset
+        fields = [
+            "title",
+            "summary",
+            "category",
+            "file",
+            "external_url",
+            "version",
+            "tags",
+            "order",
+            "is_active",
+        ]

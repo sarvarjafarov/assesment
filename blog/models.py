@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -57,6 +59,7 @@ class BlogPost(TimeStampedModel):
     is_featured = models.BooleanField(
         default=False, help_text="Surface in the homepage hero slot."
     )
+    preview_key = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     objects = BlogPostQuerySet.as_manager()
 

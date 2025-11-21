@@ -25,6 +25,12 @@
             <a href="{% url 'console:behavioral-list' %}" class="{% if section == 'behavioral' %}is-active{% endif %}">
                 Behavioral Assessments
             </a>
+            <a href="{% url 'console:content-list' %}" class="{% if section == 'site_content' %}is-active{% endif %}">
+                Site content
+            </a>
+            <a href="{% url 'console:resource-list' %}" class="{% if section == 'resources' %}is-active{% endif %}">
+                Resource library
+            </a>
             <a href="{% url 'admin:auth_user_changelist' %}" target="_blank">
                 Users & Roles
             </a>

@@ -2,13 +2,31 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django import forms
+from django.utils.text import slugify
 
 from assessments.forms import AssessmentInviteForm
 from assessments.services import send_invite_email
 from blog.models import BlogPost
+from console.models import SiteContentBlock, ResourceAsset
 
 def home(request):
     """Render the marketing landing page."""
+    hero_content = {
+        "badge": "Purpose-built for <span>B2B hiring</span>",
+        "title": "Launch <span class=\"highlight\">marketing, PM, and behavioral</span> assessments from one console.",
+        "subtitle": "Sira calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour.",
+        "primary_label": "Book a walkthrough",
+        "primary_url": "#cta",
+        "secondary_label": "See reporting tour",
+        "secondary_url": "#suite",
+    }
+
+    suite_heading = {
+        "title": "Pick the right instrument for every role.",
+        "subtitle": "Three calibrated banks cover GTM, product, and leadership signals—each with fresh questions, scoring rubrics, and reporting templates.",
+        "instructions": "Select a card to see scoring metrics & download the rubric.",
+    }
+
     assessment_suite = [
         {
             "slug": "marketing",
@@ -157,6 +175,91 @@ def home(request):
         },
     ]
 
+    # Apply CMS overrides if blocks exist
+    hero_block = (
+        SiteContentBlock.objects.filter(
+            page=SiteContentBlock.PAGE_HOME, slot=SiteContentBlock.SLOT_HERO, is_active=True
+        )
+        .order_by("order")
+        .first()
+    )
+    if hero_block:
+        hero_content.update(
+            {
+                "badge": hero_block.badge or hero_content["badge"],
+                "title": hero_block.title or hero_content["title"],
+                "subtitle": hero_block.body or hero_content["subtitle"],
+                "primary_label": hero_block.cta_label or hero_content["primary_label"],
+                "primary_url": hero_block.cta_url or hero_content["primary_url"],
+                "secondary_label": hero_block.secondary_cta_label or hero_content["secondary_label"],
+                "secondary_url": hero_block.secondary_cta_url or hero_content["secondary_url"],
+            }
+        )
+
+    heading_block = (
+        SiteContentBlock.objects.filter(
+            page=SiteContentBlock.PAGE_HOME,
+            slot=SiteContentBlock.SLOT_SUITE_HEADING,
+            is_active=True,
+        )
+        .order_by("order")
+        .first()
+    )
+    if heading_block:
+        suite_heading.update(
+            {
+                "title": heading_block.title or suite_heading["title"],
+                "subtitle": heading_block.body or suite_heading["subtitle"],
+                "instructions": heading_block.cta_label or suite_heading["instructions"],
+            }
+        )
+
+    suite_blocks = SiteContentBlock.objects.filter(
+        page=SiteContentBlock.PAGE_HOME, slot=SiteContentBlock.SLOT_SUITE, is_active=True
+    ).order_by("order")
+    if suite_blocks:
+        assessment_suite = [
+            {
+                "slug": slugify(block.title) or f"suite-{block.pk}",
+                "label": block.badge or block.title,
+                "title": block.title,
+                "summary": block.body,
+                "focus": block.list_values(),
+                "stats": block.meta_pairs(),
+            }
+            for block in suite_blocks
+        ]
+
+    feature_blocks = SiteContentBlock.objects.filter(
+        page=SiteContentBlock.PAGE_HOME, slot=SiteContentBlock.SLOT_FEATURE, is_active=True
+    ).order_by("order")
+    if feature_blocks:
+        features = [
+            {
+                "slug": slugify(block.title) or f"feature-{block.pk}",
+                "title": block.title,
+                "description": block.body,
+                "panel_title": block.subtitle or block.title,
+                "panel_subtitle": block.cta_label,
+                "panel_points": block.list_values(),
+            }
+            for block in feature_blocks
+        ]
+
+    testimonial_blocks = SiteContentBlock.objects.filter(
+        page=SiteContentBlock.PAGE_HOME, slot=SiteContentBlock.SLOT_TESTIMONIAL, is_active=True
+    ).order_by("order")
+    if testimonial_blocks:
+        testimonials = [
+            {
+                "name": block.title,
+                "role": block.subtitle,
+                "quote": block.body,
+                "avatar": block.cta_url or "img/avatar-savannah.svg",
+            }
+            for block in testimonial_blocks
+        ]
+
     if request.method == "POST":
         form = AssessmentInviteForm(request.POST)
         if form.is_valid():
@@ -194,8 +297,10 @@ def home(request):
         {
             "features": features,
             "suite": assessment_suite,
+            "suite_heading": suite_heading,
             "articles": articles,
             "testimonials": testimonials,
+            "hero_content": hero_content,
             "invite_form": form,
             "live_events": live_events,
             "case_studies": case_studies,
@@ -204,207 +309,277 @@ def home(request):
 
 
 def contact(request):
+    fallback = {
+        "hero": {
+            "eyebrow": "Contact us",
+            "title": "We respond faster than most ticket portals.",
+            "lede": "Whether you’re evaluating Sira, onboarding a team, or requesting a security review, we’ll route you to the right humans.",
+        },
+        "sections": [
+            {
+                "badge": "Sales & demos",
+                "title": "hello@sira.so",
+                "body": "Replies within 1 business day.",
+                "list": [
+                    "Live product walkthroughs",
+                    "Pricing & implementation help",
+                    "Vendor security responses",
+                ],
+            },
+            {
+                "badge": "Support",
+                "title": "support@sira.so",
+                "body": "Replies within 4 business hours.",
+                "list": [
+                    "Assessment troubleshooting",
+                    "Candidate portal assistance",
+                    "Account & billing changes",
+                ],
+            },
+            {
+                "badge": "Partnerships",
+                "title": "partners@sira.so",
+                "body": "Replies within 2 business days.",
+                "list": [
+                    "ATS & HRIS integrations",
+                    "Research collaborations",
+                    "Content & event requests",
+                ],
+            },
+            {
+                "badge": "Headquarters",
+                "title": "85 2nd Street, San Francisco, CA 94105",
+                "body": "Monday–Friday · 9am–6pm PT · +1 (415) 555-0143",
+            },
+        ],
+    }
     return render(
         request,
-        "pages/contact.html",
-        {
-            "channels": [
-                {
-                    "label": "Sales & demos",
-                    "email": "hello@sira.so",
-                    "sla": "Replies within 1 business day",
-                    "details": [
-                        "Live product walkthroughs",
-                        "Pricing & implementation help",
-                        "Vendor security responses",
-                    ],
-                },
-                {
-                    "label": "Support",
-                    "email": "support@sira.so",
-                    "sla": "Replies within 4 business hours",
-                    "details": [
-                        "Assessment troubleshooting",
-                        "Candidate portal assistance",
-                        "Account & billing changes",
-                    ],
-                },
-                {
-                    "label": "Partnerships",
-                    "email": "partners@sira.so",
-                    "sla": "Replies within 2 business days",
-                    "details": [
-                        "ATS & HRIS integrations",
-                        "Research collaborations",
-                        "Content & event requests",
-                    ],
-                },
-            ],
-            "hq": {
-                "address": "85 2nd Street, San Francisco, CA 94105",
-                "office_hours": "Monday–Friday · 9am–6pm PT",
-                "phone": "+1 (415) 555-0143",
-            },
-        },
+        "pages/page_builder.html",
+        _page_builder_context(SiteContentBlock.PAGE_CONTACT, fallback),
     )
 
 
 def careers(request):
+    fallback = {
+        "hero": {
+            "eyebrow": "Careers",
+            "title": "Build assessment infrastructure hiring teams actually love.",
+            "lede": "We’re a distributed team of builders, researchers, and talent nerds shipping fast and supporting each other along the way.",
+        },
+        "sections": [
+            {
+                "badge": "Values",
+                "title": "Ship with empathy",
+                "body": "We build around the candidate experience and respect the time of every recruiter.",
+            },
+            {
+                "badge": "Values",
+                "title": "Bias-aware decisions",
+                "body": "We hold ourselves to the same standard we enable: structured, fair assessment.",
+            },
+            {
+                "badge": "Values",
+                "title": "Progress over polish",
+                "body": "We launch thoughtful experiments weekly and learn fast.",
+            },
+            {
+                "badge": "Benefits",
+                "title": "Designed for focus and longevity.",
+                "list": [
+                    "Fully remote with quarterly in-person team weeks",
+                    "Competitive equity, 401(k) match, & learning stipend",
+                    "12 weeks paid parental leave + flexible time off",
+                ],
+            },
+        ],
+    }
     return render(
         request,
-        "pages/careers.html",
-        {
-            "values": [
-                {
-                    "title": "Ship with empathy",
-                    "text": "We build around the candidate experience and respect the time of every recruiter.",
-                },
-                {
-                    "title": "Bias-aware decisions",
-                    "text": "We hold ourselves to the same standard we enable: structured, fair assessment.",
-                },
-                {
-                    "title": "Progress over polish",
-                    "text": "We launch thoughtful experiments weekly and learn fast.",
-                },
-            ],
-            "benefits": [
-                "Fully remote with quarterly in-person team weeks",
-                "Competitive equity, 401(k) match, & learning stipend",
-                "12 weeks paid parental leave + flexible time off",
-            ],
-            "roles": [
-                {
-                    "title": "Product Marketing Manager",
-                    "location": "Remote (US)",
-                    "type": "Full time",
-                    "tag": "Go-to-market",
-                },
-                {
-                    "title": "Senior Data Engineer",
-                    "location": "Remote (US/EU)",
-                    "type": "Full time",
-                    "tag": "Engineering",
-                },
-                {
-                    "title": "Customer Success Lead",
-                    "location": "Remote (US)",
-                    "type": "Full time",
-                    "tag": "Customer success",
-                },
-            ],
-        },
+        "pages/page_builder.html",
+        _page_builder_context(SiteContentBlock.PAGE_CAREERS, fallback),
     )
 
 
 def security(request):
+    fallback = {
+        "hero": {
+            "eyebrow": "Security",
+            "title": "Assessment data deserves enterprise-grade safeguards.",
+            "lede": "From SOC 2 controls to proactive monitoring, we treat candidate responses and hiring signals like the crown jewels.",
+        },
+        "sections": [
+            {
+                "badge": "Trust & compliance",
+                "title": "Audited controls",
+                "list": [
+                    "SOC 2 Type II controls, audited annually",
+                    "GDPR-ready data processing agreements",
+                    "SSO via Okta, Azure AD, and Google Workspace",
+                ],
+            },
+            {
+                "badge": "Data protection",
+                "title": "Encryption + retention",
+                "list": [
+                    "Encryption in transit (TLS 1.3) and at rest (AES-256)",
+                    "Hourly backups with 35-day retention",
+                    "Role-based permissions with audit trails",
+                ],
+            },
+            {
+                "badge": "Product security",
+                "title": "Testing + disclosure",
+                "list": [
+                    "Feature flags + staged rollouts to reduce risk",
+                    "Independent penetration testing twice per year",
+                    "Responsible disclosure program for researchers",
+                ],
+            },
+            {
+                "badge": "Need to report something?",
+                "title": "security@sira.so",
+                "body": "Visit https://status.sira.so for live uptime. Email us for questionnaires or penetration test reports.",
+            },
+        ],
+    }
     return render(
         request,
-        "pages/security.html",
-        {
-            "pillars": [
-                {
-                    "title": "Trust & compliance",
-                    "points": [
-                        "SOC 2 Type II controls, audited annually",
-                        "GDPR-ready data processing agreements",
-                        "SSO via Okta, Azure AD, and Google Workspace",
-                    ],
-                },
-                {
-                    "title": "Data protection",
-                    "points": [
-                        "Encryption in transit (TLS 1.3) and at rest (AES-256)",
-                        "Hourly backups with 35-day retention",
-                        "Role-based permissions with audit trails",
-                    ],
-                },
-                {
-                    "title": "Product security",
-                    "points": [
-                        "Feature flags + staged rollouts to reduce risk",
-                        "Independent penetration testing twice per year",
-                        "Responsible disclosure program for researchers",
-                    ],
-                },
-            ],
-            "contact_email": "security@sira.so",
-            "status_page": "https://status.sira.so",
-        },
+        "pages/page_builder.html",
+        _page_builder_context(SiteContentBlock.PAGE_SECURITY, fallback),
     )
 
 
 def privacy(request):
-    sections = [
-        {
-            "title": "What we collect",
-            "points": [
-                "Account data (name, email, role) when customers onboard.",
-                "Assessment activity (timestamps, reviewer notes) stored for 24 months by default.",
-                "Platform telemetry (browser, device, IP) used for security and performance.",
-            ],
+    fallback = {
+        "hero": {
+            "eyebrow": "Privacy Policy",
+            "title": "Your data belongs to you.",
+            "lede": "Sira handles candidate responses and hiring notes with care. Here’s how we collect, use, and protect your information.",
         },
-        {
-            "title": "How we use data",
-            "points": [
-                "Deliver assessment experiences and share results with authorized users.",
-                "Improve scoring models and product workflows.",
-                "Communicate updates, notify candidates, and provide support.",
-            ],
-        },
-        {
-            "title": "Your rights",
-            "points": [
-                "Customers can export, modify, or delete data via the admin console or by contacting privacy@sira.so.",
-                "We enter DPAs and SCCs upon request.",
-                "Data residency options are available for enterprise plans.",
-            ],
-        },
-    ]
-    return render(request, "pages/privacy.html", {"sections": sections})
+        "sections": [
+            {
+                "badge": "What we collect",
+                "title": "Minimal data for assessments",
+                "list": [
+                    "Account data (name, email, role) when customers onboard.",
+                    "Assessment activity (timestamps, reviewer notes) stored for 24 months by default.",
+                    "Platform telemetry (browser, device, IP) used for security and performance.",
+                ],
+            },
+            {
+                "badge": "How we use data",
+                "title": "Operate & improve Sira",
+                "list": [
+                    "Deliver assessment experiences and share results with authorized users.",
+                    "Improve scoring models and product workflows.",
+                    "Communicate updates, notify candidates, and provide support.",
+                ],
+            },
+            {
+                "badge": "Your rights",
+                "title": "Control your data",
+                "list": [
+                    "Customers can export, modify, or delete data via the admin console or by contacting privacy@sira.so.",
+                    "We enter DPAs and SCCs upon request.",
+                    "Data residency options are available for enterprise plans.",
+                ],
+            },
+        ],
+    }
+    return render(
+        request,
+        "pages/page_builder.html",
+        _page_builder_context(SiteContentBlock.PAGE_PRIVACY, fallback),
+    )
 
 
 def terms(request):
-    terms_sections = [
-        {
-            "title": "Use of the service",
-            "body": "Sira grants you a non-exclusive, revocable license to use the platform for internal hiring purposes. You agree to safeguard candidate data and comply with all applicable laws.",
+    fallback = {
+        "hero": {
+            "eyebrow": "Terms of Service",
+            "title": "The legal bits, written for humans.",
+            "lede": "By using Sira, you agree to the principles below. Reach out if you need a signed copy or custom language.",
         },
-        {
-            "title": "Payment & renewal",
-            "body": "Subscription fees are invoiced annually unless otherwise agreed. Plans auto-renew unless canceled in writing 30 days prior to renewal.",
-        },
-        {
-            "title": "Limitation of liability",
-            "body": "Our total liability will not exceed fees paid in the prior 12 months. We are not liable for consequential or indirect damages.",
-        },
-        {
-            "title": "Termination",
-            "body": "Either party may terminate for material breach with 30 days’ notice. Upon termination, you may export your data for 30 days.",
-        },
-    ]
-    return render(request, "pages/terms.html", {"sections": terms_sections})
+        "sections": [
+            {
+                "badge": "Use of the service",
+                "title": "License",
+                "body": "Sira grants you a non-exclusive, revocable license to use the platform for internal hiring purposes. You agree to safeguard candidate data and comply with all applicable laws.",
+            },
+            {
+                "badge": "Payment & renewal",
+                "title": "Billing",
+                "body": "Subscription fees are invoiced annually unless otherwise agreed. Plans auto-renew unless canceled in writing 30 days prior to renewal.",
+            },
+            {
+                "badge": "Limitation of liability",
+                "title": "Liability cap",
+                "body": "Our total liability will not exceed fees paid in the prior 12 months. We are not liable for consequential or indirect damages.",
+            },
+            {
+                "badge": "Termination",
+                "title": "Data & access",
+                "body": "Either party may terminate for material breach with 30 days’ notice. Upon termination, you may export your data for 30 days.",
+            },
+        ],
+    }
+    return render(
+        request,
+        "pages/page_builder.html",
+        _page_builder_context(SiteContentBlock.PAGE_TERMS, fallback),
+    )
 
 
 def resources(request):
-    guides = [
-        {
-            "title": "Assessment launch checklist",
-            "summary": "A five-step checklist to align hiring pods before inviting candidates.",
-            "link": "#",
-            "type": "Guide",
+    fallback = {
+        "hero": {
+            "eyebrow": "Resources",
+            "title": "Download-ready playbooks for hiring teams.",
+            "lede": "Guides and templates we share with customers during assessments, now available to you.",
         },
-        {
-            "title": "Scorecard template",
-            "summary": "Structured rubric covering execution, strategy, analytics, and communication.",
-            "link": "#",
-            "type": "Template",
-        },
-        {
-            "title": "Candidate comms kit",
-            "summary": "Email scripts and portal copy to keep candidates informed and engaged.",
-            "link": "#",
-            "type": "Toolkit",
-        },
-    ]
-    return render(request, "pages/resources.html", {"guides": guides})
+    }
+    context = _page_builder_context(SiteContentBlock.PAGE_RESOURCES, fallback)
+    assets = ResourceAsset.objects.filter(is_active=True).order_by("order")
+    context["assets"] = assets
+    return render(request, "pages/resources.html", context)
+
+
+def _page_builder_context(page_slug, fallback):
+    hero_block = (
+        SiteContentBlock.objects.filter(page=page_slug, slot=SiteContentBlock.SLOT_PAGE_HERO, is_active=True)
+        .order_by("order")
+        .first()
+    )
+    hero = {
+        "eyebrow": fallback["hero"].get("eyebrow"),
+        "title": fallback["hero"].get("title"),
+        "lede": fallback["hero"].get("lede"),
+    }
+    if hero_block:
+        hero.update(
+            {
+                "eyebrow": hero_block.badge or hero["eyebrow"],
+                "title": hero_block.title or hero["title"],
+                "lede": hero_block.body or hero["lede"],
+            }
+        )
+    section_blocks = SiteContentBlock.objects.filter(
+        page=page_slug, slot=SiteContentBlock.SLOT_PAGE_SECTION, is_active=True
+    ).order_by("order")
+    if section_blocks:
+        sections = [
+            {
+                "badge": block.badge,
+                "title": block.title,
+                "body": block.body,
+                "list": block.list_values(),
+                "meta": block.meta_pairs(),
+                "cta_label": block.cta_label,
+                "cta_url": block.cta_url,
+            }
+            for block in section_blocks
+        ]
+    else:
+        sections = fallback.get("sections", [])
+    return {"hero": hero, "sections": sections}

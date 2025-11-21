@@ -1,0 +1,29 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-panel">
+    <header class="panel-heading">
+        <div>
+            <p class="eyebrow">Site content</p>
+            <h1>{% if form.instance.pk %}Edit block{% else %}Create block{% endif %}</h1>
+        </div>
+        <a class="btn btn-outline" href="{% url 'console:content-list' %}">Back to list</a>
+    </header>
+    <form method="post" class="console-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-grid">
+            {% for field in form %}
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <button class="btn btn-pill" type="submit">Save block</button>
+    </form>
+</section>
+{% endblock %}

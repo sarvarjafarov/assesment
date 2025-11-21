@@ -13,7 +13,7 @@ from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, FormView, ListView, TemplateView
+from django.views.generic import CreateView, DetailView, FormView, ListView, TemplateView, UpdateView
 
 from behavioral_assessments.models import BehavioralAssessmentSession
 from clients.models import ClientAccount
@@ -24,7 +24,10 @@ from .forms import (
     BehavioralAssessmentInviteForm,
     MarketingAssessmentInviteForm,
     ProductAssessmentInviteForm,
+    SiteContentBlockForm,
+    ResourceAssetForm,
 )
+from .models import SiteContentBlock, ResourceAsset
 
 SUPERADMIN_USERNAME = "admin"
 
@@ -279,6 +282,60 @@ class BehavioralAssessmentDetailView(SuperAdminRequiredMixin, ConsoleSectionMixi
         }
         context["risk_flags"] = self.object.risk_flags or []
         return context
+
+
+class SiteContentListView(SuperAdminRequiredMixin, ConsoleSectionMixin, TemplateView):
+    template_name = "console/site_content/list.html"
+    section = "site_content"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        groups = []
+        for slot, label in SiteContentBlock.SLOT_CHOICES:
+            blocks = SiteContentBlock.objects.filter(slot=slot).order_by("order")
+            groups.append({"label": label, "slot": slot, "blocks": blocks})
+        context["groups"] = groups
+        return context
+
+
+class SiteContentCreateView(SuperAdminRequiredMixin, ConsoleSectionMixin, CreateView):
+    template_name = "console/site_content/form.html"
+    form_class = SiteContentBlockForm
+    section = "site_content"
+    success_url = reverse_lazy("console:content-list")
+
+
+class SiteContentUpdateView(SuperAdminRequiredMixin, ConsoleSectionMixin, UpdateView):
+    template_name = "console/site_content/form.html"
+    form_class = SiteContentBlockForm
+    section = "site_content"
+    success_url = reverse_lazy("console:content-list")
+    model = SiteContentBlock
+
+
+class ResourceAssetListView(SuperAdminRequiredMixin, ConsoleSectionMixin, TemplateView):
+    template_name = "console/resource_assets/list.html"
+    section = "resources"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["assets"] = ResourceAsset.objects.order_by("order")
+        return context
+
+
+class ResourceAssetCreateView(SuperAdminRequiredMixin, ConsoleSectionMixin, CreateView):
+    template_name = "console/site_content/form.html"
+    form_class = ResourceAssetForm
+    section = "resources"
+    success_url = reverse_lazy("console:resource-list")
+
+
+class ResourceAssetUpdateView(SuperAdminRequiredMixin, ConsoleSectionMixin, UpdateView):
+    template_name = "console/site_content/form.html"
+    form_class = ResourceAssetForm
+    section = "resources"
+    success_url = reverse_lazy("console:resource-list")
+    model = ResourceAsset
 
 
 class ConsoleLoginView(FormView):

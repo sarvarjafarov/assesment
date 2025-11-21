@@ -25,8 +25,8 @@
     <main>
         <section class="hero" data-persona="talent">
             <div class="hero-inner">
-                <div class="hero-badge">Purpose-built for <span>B2B hiring</span></div>
-                <h1>Launch <span class="highlight">marketing, PM, and behavioral</span> assessments from one console.</h1>
+                <div class="hero-badge">{{ hero_content.badge|safe }}</div>
+                <h1>{{ hero_content.title|safe }}</h1>
                 <div class="hero-persona-toggle">
                     <button class="persona-btn is-active"
                         data-persona="talent"
@@ -48,11 +48,11 @@
                     </button>
                 </div>
                 <p class="hero-subtitle" id="heroSubtitle">
-                    Sira calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour.
+                    {{ hero_content.subtitle }}
                 </p>
                 <div class="hero-cta">
-                    <a class="btn btn-pill" id="heroPrimaryCta" href="#cta">Book a walkthrough</a>
-                    <a class="btn btn-outline" id="heroSecondaryCta" href="#suite">See reporting tour</a>
+                    <a class="btn btn-pill" id="heroPrimaryCta" href="{{ hero_content.primary_url }}">{{ hero_content.primary_label }}</a>
+                    <a class="btn btn-outline" id="heroSecondaryCta" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
                 </div>
             </div>
             <div class="hero-grid"></div>
@@ -83,12 +83,12 @@
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
                     <p class="eyebrow">Assessment suite</p>
-                    <h2>Pick the right instrument for every role.</h2>
-                    <p class="lede">Three calibrated banks cover GTM, product, and leadership signals—each with fresh questions, scoring rubrics, and reporting templates.</p>
+                    <h2>{{ suite_heading.title }}</h2>
+                    <p class="lede">{{ suite_heading.subtitle }}</p>
                 </div>
                 <div class="suite-instructions">
                     <p class="pill subtle">Compare the banks</p>
-                    <span>Select a card to see scoring metrics &amp; download the rubric.</span>
+                    <span>{{ suite_heading.instructions }}</span>
                 </div>
                 <div class="suite-map">
                     <div class="suite-list" role="tablist" aria-label="Assessment suite">

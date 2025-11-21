@@ -26,6 +26,12 @@
             <div class="reading-progress" data-reading-progress>
                 <span></span>
             </div>
+            {% if preview_mode %}
+            <div class="preview-banner">
+                <strong>Preview mode</strong>
+                <span>Only visible with a valid preview link.</span>
+            </div>
+            {% endif %}
         </div>
         {% if post.hero_image %}
         <figure class="article-hero">

@@ -1,0 +1,38 @@
+{% extends 'console/base.html' %}
+{% block console_content %}
+<section class="console-panel">
+    <header class="panel-heading">
+        <div>
+            <p class="eyebrow">Resource library</p>
+            <h1>Manage guides, templates, and toolkits.</h1>
+        </div>
+        <a class="btn btn-pill" href="{% url 'console:resource-create' %}">Add resource</a>
+    </header>
+    <table class="console-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Tags</th>
+                <th>Version</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr>
+                <td>{{ asset.title }}</td>
+                <td>{{ asset.get_category_display }}</td>
+                <td>{{ asset.tags }}</td>
+                <td>{{ asset.version|default:"—" }}</td>
+                <td>{% if asset.is_active %}Active{% else %}Hidden{% endif %}</td>
+                <td><a class="btn btn-outline small" href="{% url 'console:resource-edit' asset.pk %}">Edit</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No resources yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

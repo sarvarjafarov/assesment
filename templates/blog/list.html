@@ -6,7 +6,7 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='blog' %}
     <main>
-        <div class="blog-shell simple">
+        <div class="blog-shell simple" data-blog-list-shell>
             <section class="blog-simple-hero">
                 <p class="eyebrow">Insights</p>
                 <h1>Hiring ideas, playbooks, and product news.</h1>
@@ -15,7 +15,7 @@
 
             <section class="blog-grid simple-grid" id="grid">
                 {% for post in posts %}
-                <article class="blog-card simple-card">
+                <article class="blog-card simple-card" data-blog-card>
                     <div class="meta-row">
                         <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
                         <span class="date">{{ post.published_at|date:"M j, Y" }}</span>

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">{{ hero.eyebrow }}</p>
+                    <h1>{{ hero.title }}</h1>
+                    <p class="lede">{{ hero.lede }}</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="value-grid">
+                    {% for section in sections %}
+                    <article class="value-card">
+                        {% if section.badge %}<p class="label">{{ section.badge }}</p>{% endif %}
+                        <h3>{{ section.title }}</h3>
+                        {% if section.body %}<p>{{ section.body }}</p>{% endif %}
+                        {% if section.list %}
+                        <ul>
+                            {% for item in section.list %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% if section.meta %}
+                        <ul class="stacked-list">
+                            {% for meta in section.meta %}
+                            <li><strong>{{ meta.label }}</strong><span>{{ meta.value }}</span></li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% if section.cta_label %}
+                        <a class="btn btn-pill" href="{{ section.cta_url }}">{{ section.cta_label }}</a>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.views.generic import DetailView, ListView
 
 from .models import BlogPost
@@ -37,4 +38,27 @@ class BlogDetailView(DetailView):
                 related.tag_list = tags[:2]
             else:
                 related.tag_list = []
+        return context
+
+
+class BlogPreviewView(DetailView):
+    template_name = "blog/detail.html"
+    context_object_name = "post"
+
+    def get_object(self, queryset=None):
+        slug = self.kwargs.get("slug")
+        token = self.kwargs.get("token")
+        if not slug or not token:
+            raise Http404
+        try:
+            post = BlogPost.objects.get(slug=slug)
+        except BlogPost.DoesNotExist:
+            raise Http404
+        if str(post.preview_key) != str(token) and not self.request.user.is_staff:
+            raise Http404
+        return post
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["preview_mode"] = True
         return context
