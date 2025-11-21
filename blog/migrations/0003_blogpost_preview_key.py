@@ -20,7 +20,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="blogpost",
             name="preview_key",
-            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
+            field=models.UUIDField(default=uuid.uuid4, editable=False, null=True),
         ),
         migrations.RunPython(populate_preview_keys, migrations.RunPython.noop),
+        migrations.AlterField(
+            model_name="blogpost",
+            name="preview_key",
+            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
+        ),
     ]
