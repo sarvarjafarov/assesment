@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Terms of Service · Sira{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">Terms of Service</p>
+                    <h1>The legal bits, written for humans.</h1>
+                    <p class="lede">By using Sira, you agree to the principles below. Reach out if you need a signed copy or custom language.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="pillar-grid">
+                    {% for section in sections %}
+                    <article class="pillar-card">
+                        <h3>{{ section.title }}</h3>
+                        <p>{{ section.body }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="panel">
+                <p class="eyebrow">Need a vendor package?</p>
+                <h2>Email <a href="mailto:legal@sira.so">legal@sira.so</a> for MSAs, security reviews, and procurement docs.</h2>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

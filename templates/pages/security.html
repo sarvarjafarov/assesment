@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Security · Sira{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">Security</p>
+                    <h1>Assessment data deserves enterprise-grade safeguards.</h1>
+                    <p class="lede">From SOC 2 controls to proactive monitoring, we treat candidate responses and hiring signals like the crown jewels.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="pillar-grid">
+                    {% for pillar in pillars %}
+                    <article class="pillar-card">
+                        <h3>{{ pillar.title }}</h3>
+                        <ul>
+                            {% for point in pillar.points %}
+                            <li>{{ point }}</li>
+                            {% endfor %}
+                        </ul>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="panel split-panel">
+                <div>
+                    <p class="eyebrow">Report an issue</p>
+                    <h2>Security is a shared responsibility.</h2>
+                    <p>Email <a href="mailto:{{ contact_email }}">{{ contact_email }}</a> for disclosures, penetration test reports, or questionnaires.</p>
+                    <p>For real-time uptime incidents visit <a href="{{ status_page }}" target="_blank" rel="noopener">{{ status_page }}</a>.</p>
+                </div>
+                <div class="panel">
+                    <p class="eyebrow">Highlights</p>
+                    <ul class="stacked-list">
+                        <li>Quarterly disaster recovery drills</li>
+                        <li>24/7 anomaly detection & alerting</li>
+                        <li>Granular data retention controls per client</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

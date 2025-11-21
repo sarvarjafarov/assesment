@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Careers · Sira{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">Careers</p>
+                    <h1>Build assessment infrastructure that hiring teams actually love.</h1>
+                    <p class="lede">We’re a distributed team of builders, researchers, and talent nerds shipping fast and supporting each other along the way.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="value-grid">
+                    {% for value in values %}
+                    <article class="value-card">
+                        <h3>{{ value.title }}</h3>
+                        <p>{{ value.text }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="panel split-panel">
+                <div>
+                    <p class="eyebrow">Benefits</p>
+                    <h2>Designed for focus and longevity.</h2>
+                    <ul class="stacked-list">
+                        {% for benefit in benefits %}
+                        <li>{{ benefit }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="panel">
+                    <p class="eyebrow">Open roles</p>
+                    <div class="roles-list">
+                        {% for role in roles %}
+                        <article>
+                            <div>
+                                <h3>{{ role.title }}</h3>
+                                <p>{{ role.tag }}</p>
+                            </div>
+                            <p class="role-meta">{{ role.location }} · {{ role.type }}</p>
+                            <a class="btn btn-pill" href="mailto:careers@sira.so?subject={{ role.title|urlencode }}">Apply</a>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

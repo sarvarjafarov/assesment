@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Contact · Sira{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">Contact us</p>
+                    <h1>We respond faster than most ticket portals.</h1>
+                    <p class="lede">Whether you’re evaluating Sira, onboarding a team, or requesting a security review, we’ll route you to the right humans.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="info-grid">
+                    {% for channel in channels %}
+                    <article class="info-card">
+                        <p class="label">{{ channel.label }}</p>
+                        <h3>{{ channel.email }}</h3>
+                        <p class="sla">{{ channel.sla }}</p>
+                        <ul>
+                            {% for detail in channel.details %}
+                            <li>{{ detail }}</li>
+                            {% endfor %}
+                        </ul>
+                        <a class="btn btn-pill" href="mailto:{{ channel.email }}">Email {{ channel.label|lower }}</a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="panel split-panel">
+                <div>
+                    <p class="eyebrow">Headquarters</p>
+                    <h2>Visit our SF studio.</h2>
+                    <p>{{ hq.address }}</p>
+                    <ul class="stacked-list">
+                        <li><strong>Office hours</strong><span>{{ hq.office_hours }}</span></li>
+                        <li><strong>Phone</strong><span>{{ hq.phone }}</span></li>
+                    </ul>
+                </div>
+                <div class="map-card">
+                    <p>Need to meet in person? Book time with our customer team and we’ll host you at our SoMa studio.</p>
+                    <div class="map-visual"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}
