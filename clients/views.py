@@ -1137,7 +1137,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                 "recommended_decision": recommended_decision,
                 "actionable_summary": build_actionable_summary(report, decision_summary, recommended_decision),
                 "response_drilldown": build_response_drilldown(session),
-                "activity_timeline": self._build_activity_timeline(session),
+                "activity_timeline": build_activity_timeline(session),
                 "comparative_insights": self._build_comparative_insights(session),
                 "quick_followups": self._build_followup_links(session, share_link),
                 "candidate_feedback": self._candidate_feedback(session),
@@ -1441,6 +1441,51 @@ def build_response_drilldown(session):
             }
         )
     return breakdown
+
+
+def build_activity_timeline(session):
+    events = []
+    if session.created_at:
+        events.append(
+            {"label": "Invite created", "timestamp": session.created_at, "description": "Assessment invite issued."}
+        )
+    if session.scheduled_for:
+        events.append(
+            {
+                "label": "Scheduled",
+                "timestamp": session.scheduled_for,
+                "description": "Invite scheduled to send automatically.",
+            }
+        )
+    if session.started_at:
+        events.append(
+            {"label": "Candidate started", "timestamp": session.started_at, "description": "Candidate opened the assessment."}
+        )
+    if session.last_reminder_at:
+        events.append(
+            {
+                "label": "Reminder sent",
+                "timestamp": session.last_reminder_at,
+                "description": f"Reminder email #{session.reminder_count or 1} sent.",
+            }
+        )
+    if session.paused_at:
+        events.append(
+            {"label": "Paused", "timestamp": session.paused_at, "description": "Candidate paused the assessment."}
+        )
+    if session.submitted_at:
+        duration = None
+        if session.started_at:
+            total_minutes = (session.submitted_at - session.started_at).total_seconds() / 60
+            duration = f"Completed in {total_minutes:.1f} minutes."
+        events.append(
+            {
+                "label": "Submitted",
+                "timestamp": session.submitted_at,
+                "description": duration or "Candidate completed the assessment.",
+            }
+        )
+    return events
 
     def _build_activity_timeline(self, session):
         events = []
