@@ -11,7 +11,7 @@
     {% include 'includes/site_header.html' with active='blog' %}
     <main>
 <div class="blog-shell blog-shell-detail">
-    <header class="hero-card detail-hero">
+    <header class="hero-card detail-hero" data-article-hero>
         <div class="hero-copy">
             <div class="breadcrumb">
                 <a href="{% url 'blog:list' %}">← All articles</a>
@@ -19,6 +19,13 @@
             <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
             <h1>{{ post.title }}</h1>
             <p class="meta">Published {{ post.published_at|date:"F j, Y" }} · {{ post.display_author }}</p>
+            <div class="reading-meta">
+                <span>{{ post.estimated_read_minutes }} min read</span>
+                <span>Updated {{ post.updated_at|date:"M j, Y" }}</span>
+            </div>
+            <div class="reading-progress" data-reading-progress>
+                <span></span>
+            </div>
         </div>
         {% if post.hero_image %}
         <figure class="article-hero">
@@ -28,7 +35,13 @@
     </header>
 
     <article class="blog-article">
-        <div class="article-body">
+        <aside class="article-toc" id="articleToc">
+            <p>Jump to section</p>
+            <nav>
+                <ul data-article-toc></ul>
+            </nav>
+        </aside>
+        <div class="article-body" data-article-body>
             {{ post.body|linebreaks }}
         </div>
     </article>
@@ -39,9 +52,10 @@
             <h2>Keep reading</h2>
             <p class="lede">More ideas from teams building with Sira.</p>
         </div>
-        <div class="blog-grid compact-grid">
+        <div class="reading-carousel" data-related-slider>
+            <div class="reading-track" data-related-track>
             {% for related in recent_posts %}
-            <article class="blog-card compact">
+            <article class="blog-card compact" data-related-slide>
                 <div class="meta-row">
                     <span class="pill {{ related.pill_style }}">{{ related.pill_label }}</span>
                     <span class="date">{{ related.published_at|date:"M j, Y" }}</span>
@@ -49,9 +63,20 @@
                 <h3><a href="{{ related.get_absolute_url }}">{{ related.title }}</a></h3>
                 <p>{{ related.excerpt }}</p>
                 <div class="author">By {{ related.display_author }}</div>
+                <div class="related-tags">
+                    <a href="{% url 'blog:list' %}?pillar={{ related.pill_label|urlencode }}">More {{ related.pill_label }}</a>
+                    {% for tag in related.tag_list %}
+                    <a href="{% url 'blog:list' %}?tag={{ tag|urlencode }}">#{{ tag }}</a>
+                    {% endfor %}
+                </div>
                 <a class="outline-link" href="{{ related.get_absolute_url }}">Read</a>
             </article>
             {% endfor %}
+            </div>
+        </div>
+        <div class="reading-carousel-controls">
+            <button type="button" class="slider-btn" data-related-prev aria-label="Previous recommendation">←</button>
+            <button type="button" class="slider-btn" data-related-next aria-label="Next recommendation">→</button>
         </div>
     </section>
     {% endif %}

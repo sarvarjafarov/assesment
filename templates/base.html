@@ -8,11 +8,17 @@
     {% block extra_meta %}{% endblock %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body data-page-theme="{% block page_theme %}light{% endblock %}">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <button type="button" class="contrast-toggle" id="contrastToggle" aria-pressed="false">
         High contrast
+    </button>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">
+        Dark mode
     </button>
     {% if messages %}
     <div class="flash-container">

@@ -81,3 +81,11 @@ class BlogPost(TimeStampedModel):
         if self.author_title:
             return f"{self.author_name}, {self.author_title}"
         return self.author_name
+
+    def estimated_read_minutes(self) -> int:
+        """Roughly estimate read time assuming ~200 words per minute."""
+        if not self.body:
+            return 3
+        word_count = len(self.body.split())
+        minutes = max(1, round(word_count / 200))
+        return max(3, minutes)
