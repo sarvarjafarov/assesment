@@ -60,49 +60,55 @@
             <div class="hero-orb orb-two"></div>
         </section>
         <section class="trusted-strip reveal">
-            <p class="eyebrow">Trusted by modern hiring teams</p>
-            <div class="logo-row">
-                <span>Stripe</span>
-                <span>Bench</span>
-                <span>Northwind</span>
-                <span>GoRecruit</span>
+            <div class="section-shell">
+                <p class="eyebrow">Trusted by modern hiring teams</p>
+                <div class="logo-row">
+                    <span>Stripe</span>
+                    <span>Bench</span>
+                    <span>Northwind</span>
+                    <span>GoRecruit</span>
+                </div>
+                <blockquote>“Sira’s PM + marketing assessments cut our time-to-offer by 37% while giving candidates an experience they rave about.” <cite>— VP Talent, Series B SaaS</cite></blockquote>
             </div>
-            <blockquote>“Sira’s PM + marketing assessments cut our time-to-offer by 37% while giving candidates an experience they rave about.” <cite>— VP Talent, Series B SaaS</cite></blockquote>
         </section>
 
         <section class="live-feed reveal">
-            <div class="feed-label">Live on Sira</div>
-            <div class="feed-slot" id="liveFeedSlot">Monitoring recent activity…</div>
+            <div class="section-shell live-feed-shell">
+                <div class="feed-label">Live on Sira</div>
+                <div class="feed-slot" id="liveFeedSlot">Monitoring recent activity…</div>
+            </div>
         </section>
 
         <section class="suite reveal" id="suite">
-            <div class="section-heading section-heading-tight">
-                <p class="eyebrow">Assessment suite</p>
-                <h2>Pick the right instrument for every role.</h2>
-                <p class="lede">Three calibrated banks cover GTM, product, and leadership signals—each with fresh questions, scoring rubrics, and reporting templates.</p>
-            </div>
-            <div class="suite-map">
-                <div class="suite-list">
-                    {% for item in suite %}
-                    <button class="suite-card {% if forloop.first %}is-active{% endif %}" data-suite-button data-target="{{ item.slug }}">
-                        <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
-                        <h3>{{ item.title }}</h3>
-                        <p>{{ item.summary }}</p>
-                    </button>
-                    {% endfor %}
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Assessment suite</p>
+                    <h2>Pick the right instrument for every role.</h2>
+                    <p class="lede">Three calibrated banks cover GTM, product, and leadership signals—each with fresh questions, scoring rubrics, and reporting templates.</p>
                 </div>
-                <div class="suite-detail">
-                    {% for item in suite %}
-                    <article class="suite-panel {% if forloop.first %}is-active{% endif %}" data-suite-panel="{{ item.slug }}">
-                        <h4>{{ item.label }}</h4>
-                        <ul>
-                            {% for stat in item.stats %}
-                            <li>{{ stat }}</li>
-                            {% endfor %}
-                        </ul>
-                        <a class="btn btn-outline small" href="mailto:hello@sira.so?subject={{ item.label|urlencode }}%20rubric">Download {{ item.title }} rubric</a>
-                    </article>
-                    {% endfor %}
+                <div class="suite-map">
+                    <div class="suite-list">
+                        {% for item in suite %}
+                        <button class="suite-card {% if forloop.first %}is-active{% endif %}" data-suite-button data-target="{{ item.slug }}">
+                            <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
+                            <h3>{{ item.title }}</h3>
+                            <p>{{ item.summary }}</p>
+                        </button>
+                        {% endfor %}
+                    </div>
+                    <div class="suite-detail">
+                        {% for item in suite %}
+                        <article class="suite-panel {% if forloop.first %}is-active{% endif %}" data-suite-panel="{{ item.slug }}">
+                            <h4>{{ item.label }}</h4>
+                            <ul>
+                                {% for stat in item.stats %}
+                                <li>{{ stat }}</li>
+                                {% endfor %}
+                            </ul>
+                            <a class="btn btn-outline small" href="mailto:hello@sira.so?subject={{ item.label|urlencode }}%20rubric">Download {{ item.title }} rubric</a>
+                        </article>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </section>
@@ -142,34 +148,36 @@
         </section>
 
         <section class="outcomes" id="sample-report">
-            <div class="section-heading">
-                <p class="eyebrow">Outcomes that matter</p>
-                <h2>Proof built into every rollout.</h2>
-                <p class="lede">Turn assessment data into faster offers and confident stakeholder updates.</p>
-            </div>
-            <div class="outcome-grid">
-                <article class="metric-card large">
-                    <p class="metric-label">Avg. time-to-offer</p>
-                    <p class="metric-value">-37%</p>
-                    <p class="muted">After centralizing marketing + PM assignments in Sira.</p>
-                    <canvas id="velocityChart" width="200" height="100"></canvas>
-                </article>
-                <article class="metric-card">
-                    <p class="metric-label">Candidate CSAT</p>
-                    <p class="metric-value">4.8 / 5</p>
-                    <p class="muted">Guided portals, pause/resume, and instant updates improve NPS.</p>
-                </article>
-                <article class="metric-card">
-                    <p class="metric-label">Hiring manager confidence</p>
-                    <p class="metric-value">2x</p>
-                    <p class="muted">Side-by-side scoring + integrity signals for every candidate.</p>
-                </article>
-                <article class="metric-card">
-                    <p class="metric-label">Audit-ready reports</p>
-                    <p class="metric-value">Under 5 min</p>
-                    <p class="muted">Download a sample report to share with execs or clients.</p>
-                    <a class="btn btn-outline small" href="mailto:hello@sira.so?subject=Sira%20sample%20report">Request sample report</a>
-                </article>
+            <div class="section-shell">
+                <div class="section-heading">
+                    <p class="eyebrow">Outcomes that matter</p>
+                    <h2>Proof built into every rollout.</h2>
+                    <p class="lede">Turn assessment data into faster offers and confident stakeholder updates.</p>
+                </div>
+                <div class="outcome-grid">
+                    <article class="metric-card large">
+                        <p class="metric-label">Avg. time-to-offer</p>
+                        <p class="metric-value">-37%</p>
+                        <p class="muted">After centralizing marketing + PM assignments in Sira.</p>
+                        <canvas id="velocityChart" width="200" height="100"></canvas>
+                    </article>
+                    <article class="metric-card">
+                        <p class="metric-label">Candidate CSAT</p>
+                        <p class="metric-value">4.8 / 5</p>
+                        <p class="muted">Guided portals, pause/resume, and instant updates improve NPS.</p>
+                    </article>
+                    <article class="metric-card">
+                        <p class="metric-label">Hiring manager confidence</p>
+                        <p class="metric-value">2x</p>
+                        <p class="muted">Side-by-side scoring + integrity signals for every candidate.</p>
+                    </article>
+                    <article class="metric-card">
+                        <p class="metric-label">Audit-ready reports</p>
+                        <p class="metric-value">Under 5 min</p>
+                        <p class="muted">Download a sample report to share with execs or clients.</p>
+                        <a class="btn btn-outline small" href="mailto:hello@sira.so?subject=Sira%20sample%20report">Request sample report</a>
+                    </article>
+                </div>
             </div>
         </section>
 
