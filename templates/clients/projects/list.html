@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="portal-shell">
+    <section class="portal-hero compact">
+        <div>
+            <p class="eyebrow">Projects</p>
+            <h1>Open roles & assessment pipelines.</h1>
+            <p class="muted">Group candidates by role so hiring teams can track progress separately.</p>
+        </div>
+        <div class="portal-actions">
+            <a class="btn btn-outline small" href="{% url 'clients:dashboard' %}">Back to dashboard</a>
+        </div>
+    </section>
+
+    {% if is_manager %}
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Create project</p>
+                <h2>New role</h2>
+            </div>
+        </header>
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button class="btn btn-pill" type="submit">Create project</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Projects</p>
+                <h2>Your open roles</h2>
+            </div>
+        </header>
+        {% if projects %}
+        <div class="portal-card-grid metric-snapshot">
+            {% for project in projects %}
+            <article class="portal-card">
+                <p class="label">{{ project.get_status_display }}</p>
+                <h2>{{ project.title }}</h2>
+                <p class="muted">{{ project.department }}{% if project.location %} · {{ project.location }}{% endif %}</p>
+                <p class="muted">{{ project.open_roles }} open role{{ project.open_roles|pluralize }}</p>
+                <p class="muted">Assessments: {{ project.total_sessions }}</p>
+                <a class="btn btn-outline small" href="{% url 'clients:project-detail' project.uuid %}">View project</a>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No projects yet. Create one above to get started.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

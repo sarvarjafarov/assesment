@@ -11,7 +11,7 @@ from marketing_assessments.services import generate_question_set as generate_mar
 from pm_assessments.models import ProductAssessmentSession
 from pm_assessments.services import generate_question_set as generate_pm_question_set
 
-from .models import ClientAccount, ClientSessionNote
+from .models import ClientAccount, ClientSessionNote, ClientProject
 
 PUBLIC_EMAIL_DOMAINS = {
     "gmail.com",
@@ -169,6 +169,11 @@ class BaseClientInviteForm(forms.Form):
         help_text="Leave blank to send immediately. Use YYYY-MM-DD HH:MM format.",
         input_formats=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%m/%d/%Y %H:%M"],
     )
+    project = forms.ModelChoiceField(
+        label="Project",
+        queryset=ClientProject.objects.none(),
+        help_text="Each invite must be tied to a project/role.",
+    )
 
     model = None
     generate_question_set = None
@@ -178,9 +183,15 @@ class BaseClientInviteForm(forms.Form):
         if not client:
             raise ValueError("client is required")
         super().__init__(*args, **kwargs)
+        project_qs = client.projects.order_by("-created_at")
+        self.fields["project"].queryset = project_qs
+        if not project_qs.exists():
+            self.fields["project"].help_text = "Create a project first."
 
     def clean(self):
         cleaned = super().clean()
+        if not self.client.projects.exists():
+            raise forms.ValidationError("Create a project before inviting candidates.")
         generator = self.generate_question_set
         if not generator:
             raise forms.ValidationError("Assessment configuration missing.")
@@ -220,6 +231,7 @@ class ClientMarketingInviteForm(BaseClientInviteForm):
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
+        session.project = self.cleaned_data["project"]
         if send_at:
             session.status = "draft"
             session.scheduled_for = send_at
@@ -227,7 +239,15 @@ class ClientMarketingInviteForm(BaseClientInviteForm):
             session.status = "in_progress"
             session.scheduled_for = None
         session.save(
-            update_fields=["question_set", "status", "scheduled_for", "duration_minutes", "started_at", "client"]
+            update_fields=[
+                "question_set",
+                "status",
+                "scheduled_for",
+                "duration_minutes",
+                "started_at",
+                "client",
+                "project",
+            ]
         )
         return session
 
@@ -248,6 +268,7 @@ class ClientProductInviteForm(BaseClientInviteForm):
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
+        session.project = self.cleaned_data["project"]
         if send_at:
             session.status = "draft"
             session.scheduled_for = send_at
@@ -255,7 +276,15 @@ class ClientProductInviteForm(BaseClientInviteForm):
             session.status = "in_progress"
             session.scheduled_for = None
         session.save(
-            update_fields=["question_set", "status", "scheduled_for", "duration_minutes", "started_at", "client"]
+            update_fields=[
+                "question_set",
+                "status",
+                "scheduled_for",
+                "duration_minutes",
+                "started_at",
+                "client",
+                "project",
+            ]
         )
         return session
 
@@ -280,6 +309,7 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
+        session.project = self.cleaned_data["project"]
         if send_at:
             session.status = "draft"
             session.scheduled_for = send_at
@@ -287,7 +317,15 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
             session.status = "in_progress"
             session.scheduled_for = None
         session.save(
-            update_fields=["question_set", "status", "scheduled_for", "duration_minutes", "started_at", "client"]
+            update_fields=[
+                "question_set",
+                "status",
+                "scheduled_for",
+                "duration_minutes",
+                "started_at",
+                "client",
+                "project",
+            ]
         )
         return session
 
@@ -304,10 +342,21 @@ class ClientLogoForm(forms.Form):
 
 
 class ClientBulkInviteForm(forms.Form):
+    project = forms.ModelChoiceField(
+        label="Project",
+        queryset=ClientProject.objects.none(),
+    )
     csv_file = forms.FileField(
         label="Bulk upload (CSV)",
         help_text="Include headers: candidate_id,duration_minutes,send_at (optional).",
     )
+
+    def __init__(self, *args, client: ClientAccount | None = None, **kwargs):
+        self.client = client
+        if not client:
+            raise ValueError("client is required")
+        super().__init__(*args, **kwargs)
+        self.fields["project"].queryset = client.projects.order_by("-created_at")
 
     def clean_csv_file(self):
         csv_file = self.cleaned_data.get("csv_file")
@@ -316,6 +365,12 @@ class ClientBulkInviteForm(forms.Form):
         if csv_file.size > 2 * 1024 * 1024:
             raise forms.ValidationError("CSV must be under 2MB.")
         return csv_file
+
+    def clean(self):
+        cleaned = super().clean()
+        if not self.client.projects.exists():
+            raise forms.ValidationError("Create a project before uploading invites.")
+        return cleaned
 
 
 class ClientSessionNoteForm(forms.ModelForm):
@@ -350,3 +405,34 @@ class ClientSessionNoteForm(forms.ModelForm):
         if not note and not needs_review and note_type != "decision":
             raise forms.ValidationError("Add a note, flag the session, or record a decision.")
         return cleaned
+
+
+class ClientProjectForm(forms.ModelForm):
+    class Meta:
+        model = ClientProject
+        fields = [
+            "title",
+            "role_level",
+            "department",
+            "location",
+            "priority",
+            "status",
+            "open_roles",
+            "target_start_date",
+            "description",
+        ]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+            "target_start_date": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    def __init__(self, *args, client: ClientAccount, **kwargs):
+        self.client = client
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        project = super().save(commit=False)
+        project.client = self.client
+        if commit:
+            project.save()
+        return project

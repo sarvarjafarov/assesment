@@ -26,4 +26,6 @@ urlpatterns = [
         views.ClientAssessmentExportView.as_view(),
         name="assessment-export",
     ),
+    path("dashboard/projects/", views.ClientProjectListView.as_view(), name="project-list"),
+    path("dashboard/projects/<uuid:project_uuid>/", views.ClientProjectDetailView.as_view(), name="project-detail"),
 ]

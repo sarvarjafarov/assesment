@@ -87,6 +87,29 @@
         <p class="empty-state">No quick actions available.</p>
         {% endif %}
     </section>
+    <section class="portal-card project-preview">
+        <header class="project-preview-head">
+            <div>
+                <p class="eyebrow">Projects</p>
+                <h2>Active roles</h2>
+            </div>
+            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Manage projects</a>
+        </header>
+        {% if project_preview %}
+        <div class="project-preview-grid">
+            {% for project in project_preview %}
+            <article>
+                <p class="label">{{ project.status }}</p>
+                <h3>{{ project.title }}</h3>
+                <p class="muted">{{ project.open_roles }} open · {{ project.sessions }} invites</p>
+                <a class="pill subtle" href="{{ project.href }}">View</a>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No projects yet. Create one to organize invites.</p>
+        {% endif %}
+    </section>
     {% if can_manage_branding %}
     <section class="branding-section">
         <article class="portal-card branding-card">

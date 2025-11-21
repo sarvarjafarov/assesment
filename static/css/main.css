@@ -6615,6 +6615,30 @@ main {
     font-weight: 600;
     color: var(--text-muted);
 }
+.project-preview {
+    margin-top: 1.5rem;
+}
+.project-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+.project-preview-grid article {
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    box-shadow: 0 20px 35px rgba(14, 20, 40, 0.05);
+}
+.project-preview-grid h3 {
+    margin: 0.25rem 0 0.4rem;
+}
+.project-preview-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
 .charts-row .portal-card {
     min-height: 360px;
 }
@@ -6635,6 +6659,19 @@ main {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid rgba(14, 20, 40, 0.08);
+}
+.alert-card {
+    border: 1px solid rgba(255, 138, 0, 0.3);
+    background: rgba(255, 214, 170, 0.2);
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+}
+.project-filter {
+    margin-bottom: 1rem;
+}
+.project-filter select {
+    min-width: 220px;
 }
 .decision-pill {
     margin-left: 0.5rem;

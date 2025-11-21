@@ -20,8 +20,15 @@
                 <h2>Create candidate link</h2>
             </div>
         </header>
+        {% if not has_projects %}
+        <div class="alert-card">
+            <p>You need at least one project before inviting candidates.</p>
+            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Create project</a>
+        </div>
+        {% endif %}
         <form method="post" class="form-stack">
             {% csrf_token %}
+            {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
             {% for field in form %}
             <div class="form-field">
                 {{ field.label_tag }}
@@ -41,6 +48,14 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="bulk_upload">
+                {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
+                <div class="form-field">
+                    {{ bulk_form.project.label_tag }}
+                    {{ bulk_form.project }}
+                    {% for error in bulk_form.project.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
                 <div class="form-field">
                     {{ bulk_form.csv_file.label_tag }}
                     {{ bulk_form.csv_file }}
@@ -60,10 +75,22 @@
                 <h2>Track candidates</h2>
             </div>
         </header>
+        <form method="get" class="project-filter">
+            <label>
+                <span>Project</span>
+                <select name="project" onchange="this.form.submit()">
+                    <option value="">All projects</option>
+                    {% for project in projects %}
+                    <option value="{{ project.uuid }}" {% if selected_project and selected_project.uuid == project.uuid %}selected{% endif %}>{{ project.title }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </form>
         {% if sessions %}
         <div class="table">
             <div class="table-row table-head">
                 <span>Candidate</span>
+                <span>Project</span>
                 <span>Status</span>
                 <span>Timing</span>
                 <span>Score</span>
@@ -74,6 +101,13 @@
             {% for row in sessions %}
             <div class="table-row">
                 <span>{{ row.candidate }}</span>
+                <span>
+                    {% if row.project_url %}
+                    <a href="{{ row.project_url }}">{{ row.project_title }}</a>
+                    {% else %}
+                    {{ row.project_title }}
+                    {% endif %}
+                </span>
                 <span>{{ row.status }}</span>
                 <span>
                     {% if row.scheduled_for %}
@@ -108,6 +142,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="action" value="launch_now">
                         <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
+                        {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
                         <button class="pill subtle" type="submit">Launch now</button>
                     </form>
                     {% elif row.status_code == "in_progress" %}
@@ -115,6 +150,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="action" value="send_reminder">
                         <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
+                        {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
                         <button class="pill subtle" type="submit">Send reminder</button>
                     </form>
                     {% endif %}

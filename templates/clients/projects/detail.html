@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="portal-shell">
+    <section class="portal-hero compact">
+        <div>
+            <p class="eyebrow">{{ project.get_status_display }}</p>
+            <h1>{{ project.title }}</h1>
+            <p class="muted">
+                {% if project.department %}{{ project.department }} · {% endif %}
+                {% if project.location %}{{ project.location }} · {% endif %}
+                Priority {{ project.get_priority_display }}
+            </p>
+        </div>
+        <div class="portal-actions">
+            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Back to projects</a>
+        </div>
+    </section>
+
+    <section class="portal-card-grid metric-snapshot">
+        <article class="portal-card">
+            <p class="label">Open roles</p>
+            <h2>{{ project.open_roles }}</h2>
+            <p class="muted">Target start {% if project.target_start_date %}{{ project.target_start_date|date:"M j, Y" }}{% else %}—{% endif %}</p>
+        </article>
+        <article class="portal-card">
+            <p class="label">Total invites</p>
+            <h2>{{ project.total_sessions }}</h2>
+            <p class="muted">Across all assessments</p>
+        </article>
+        <article class="portal-card">
+            <p class="label">Description</p>
+            <p class="muted">{{ project.description|default:"No description yet." }}</p>
+        </article>
+    </section>
+
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Assessment breakdown</p>
+                <h2>By assessment type</h2>
+            </div>
+        </header>
+        {% if assessment_details %}
+        <div class="portal-card-grid metric-snapshot">
+            {% for row in assessment_details %}
+            <article class="portal-card">
+                <p class="label">{{ row.label }}</p>
+                <h2>{{ row.total }} invites</h2>
+                <p class="muted">{{ row.submitted }} completed · {{ row.in_progress }} in progress · {{ row.draft }} draft</p>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No invites have been created for this project yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Recent activity</p>
+                <h2>Latest candidates</h2>
+            </div>
+        </header>
+        {% if recent_sessions %}
+        <div class="table">
+            <div class="table-row table-head">
+                <span>Candidate</span>
+                <span>Assessment</span>
+                <span>Status</span>
+                <span>Updated</span>
+                <span>Actions</span>
+            </div>
+            {% for row in recent_sessions %}
+            <div class="table-row">
+                <span>{{ row.candidate }}</span>
+                <span>{{ row.assessment }}</span>
+                <span>{{ row.status }}</span>
+                <span>{{ row.updated_at|naturaltime }}</span>
+                <span>
+                    {% if row.detail_url %}
+                    <a class="pill" href="{{ row.detail_url }}">Report</a>
+                    {% else %}
+                    <span class="muted">—</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No candidate activity yet for this project.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

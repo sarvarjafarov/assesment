@@ -80,6 +80,13 @@ class BehavioralAssessmentSession(TimeStampedModel):
     total_paused_seconds = models.PositiveIntegerField(default=0)
     last_activity_at = models.DateTimeField(null=True, blank=True)
     telemetry_log = models.JSONField(default=dict, blank=True)
+    project = models.ForeignKey(
+        "clients.ClientProject",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="behavioral_sessions",
+    )
 
     class Meta:
         ordering = ("-created_at",)

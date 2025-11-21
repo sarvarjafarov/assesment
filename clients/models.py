@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
+import uuid
 
 User = get_user_model()
 
@@ -160,3 +161,47 @@ class ClientSessionNote(TimeStampedModel):
     def __str__(self):
         status = "Needs review" if self.needs_review else self.get_note_type_display()
         return f"{status} for {self.candidate_id}"
+
+
+class ClientProject(TimeStampedModel):
+    STATUS_ACTIVE = "active"
+    STATUS_ON_HOLD = "on_hold"
+    STATUS_FILLED = "filled"
+    STATUS_ARCHIVED = "archived"
+    STATUS_CHOICES = [
+        (STATUS_ACTIVE, "Actively hiring"),
+        (STATUS_ON_HOLD, "On hold"),
+        (STATUS_FILLED, "Role filled"),
+        (STATUS_ARCHIVED, "Archived"),
+    ]
+    PRIORITY_CHOICES = [
+        ("p0", "Critical"),
+        ("p1", "High"),
+        ("p2", "Medium"),
+        ("p3", "Low"),
+    ]
+
+    client = models.ForeignKey(ClientAccount, related_name="projects", on_delete=models.CASCADE)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    title = models.CharField(max_length=200)
+    role_level = models.CharField(max_length=120, blank=True)
+    department = models.CharField(max_length=120, blank=True)
+    location = models.CharField(max_length=120, blank=True)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default="p1")
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
+    open_roles = models.PositiveIntegerField(default=1)
+    target_start_date = models.DateField(blank=True, null=True)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.title} ({self.client.company_name})"
+
+    def total_sessions(self):
+        return (
+            self.marketing_sessions.count()
+            + self.product_sessions.count()
+            + self.behavioral_sessions.count()
+        )

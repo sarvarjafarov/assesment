@@ -11,7 +11,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import Http404, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
@@ -31,8 +31,9 @@ from .forms import (
     ClientSignupForm,
     ClientSessionNoteForm,
     ClientLogoForm,
+    ClientProjectForm,
 )
-from .models import ClientAccount, ClientNotification, ClientSessionNote
+from .models import ClientAccount, ClientNotification, ClientSessionNote, ClientProject
 
 ACTIVITY_STATUS_CHOICES = {"all", "draft", "in_progress", "submitted"}
 ACTIVITY_ASSESSMENT_CHOICES = {"all"} | {choice[0] for choice in ClientAccount.ASSESSMENT_CHOICES}
@@ -63,9 +64,9 @@ def parse_activity_filters(params):
 
 def build_dataset_map(account: ClientAccount):
     return {
-        "marketing": DigitalMarketingAssessmentSession.objects.filter(client=account),
-        "product": ProductAssessmentSession.objects.filter(client=account),
-        "behavioral": BehavioralAssessmentSession.objects.filter(client=account),
+        "marketing": DigitalMarketingAssessmentSession.objects.filter(client=account).select_related("project"),
+        "product": ProductAssessmentSession.objects.filter(client=account).select_related("project"),
+        "behavioral": BehavioralAssessmentSession.objects.filter(client=account).select_related("project"),
     }
 
 
@@ -278,6 +279,18 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "logo_form": getattr(self, "logo_form", self.logo_form_class()),
                 "can_manage_invites": account.role in ROLE_INVITE_ACCESS,
                 "account_objectives": account.notes,
+                "project_preview": [
+                    {
+                        "title": project.title,
+                        "status": project.get_status_display(),
+                        "priority": dict(ClientProject.PRIORITY_CHOICES).get(project.priority, project.priority),
+                        "open_roles": project.open_roles,
+                        "href": reverse("clients:project-detail", args=[project.uuid]),
+                        "sessions": project.total_sessions(),
+                    }
+                    for project in account.projects.order_by("-created_at")[:3]
+                ],
+                "project_count": account.projects.count(),
             }
         )
         return context
@@ -308,6 +321,13 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "description": "Email account management",
                 "href": "mailto:support@sira.app",
                 "external": True,
+            }
+        )
+        actions.append(
+            {
+                "label": "Projects",
+                "description": "Track open roles",
+                "href": reverse("clients:project-list"),
             }
         )
         return actions
@@ -553,12 +573,27 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         kwargs["client"] = self.account
         return kwargs
 
+    def get_initial(self):
+        initial = super().get_initial()
+        project = self.get_selected_project()
+        if project:
+            initial["project"] = project
+        return initial
+
     def get_success_url(self):
-        return reverse("clients:assessment-manage", args=[self.assessment_type])
+        url = reverse("clients:assessment-manage", args=[self.assessment_type])
+        project = self.request.GET.get("project") or self.request.POST.get("project_filter")
+        if project:
+            url = f"{url}?project={project}"
+        return url
 
     def sessions(self):
         model = self.assessment_config["session_model"]
-        return model.objects.filter(client=self.account).order_by("-created_at")
+        qs = model.objects.filter(client=self.account)
+        project = self.get_selected_project()
+        if project:
+            qs = qs.filter(project=project)
+        return qs.order_by("-created_at")
 
     def build_share_link(self, session):
         route = self.assessment_config["candidate_route"]
@@ -586,6 +621,19 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             session.started_at = None
             session.save(update_fields=["status", "scheduled_for", "started_at"])
 
+    def get_selected_project(self):
+        if hasattr(self, "_selected_project"):
+            return self._selected_project
+        project_uuid = self.request.GET.get("project") or self.request.POST.get("project_filter")
+        project = None
+        if project_uuid:
+            try:
+                project = self.account.projects.get(uuid=project_uuid)
+            except ClientProject.DoesNotExist:
+                project = None
+        self._selected_project = project
+        return project
+
 
 class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
     template_name = "clients/assessments/manage.html"
@@ -606,9 +654,12 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
             if not self.is_manager:
                 messages.error(request, "Only managers can upload invites.")
                 return redirect(self.get_success_url())
-            bulk_form = self.bulk_form_class(request.POST, request.FILES)
+            bulk_form = self.bulk_form_class(request.POST, request.FILES, client=self.account)
             if bulk_form.is_valid():
-                created, errors = self._process_bulk_upload(bulk_form.cleaned_data["csv_file"])
+                created, errors = self._process_bulk_upload(
+                    bulk_form.cleaned_data["csv_file"],
+                    bulk_form.cleaned_data["project"],
+                )
                 if created:
                     messages.success(request, f"Created {created} invite{'' if created == 1 else 's'}.")
                 if errors:
@@ -681,6 +732,7 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                 best = max(options.items(), key=lambda item: item[1])
                 if best[1]:
                     decision_label = f"{best[0].title()} ({best[1]})"
+            project = session.project
             session_rows.append(
                 {
                     "candidate": session.candidate_id,
@@ -701,21 +753,29 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                     "reminder_count": session.reminder_count,
                     "uuid": session.uuid,
                     "decision_summary": decision_label,
+                    "project_title": project.title if project else "Unassigned",
+                    "project_url": reverse("clients:project-detail", args=[project.uuid])
+                    if project
+                    else None,
                 }
             )
         bulk_form = context.get("bulk_form")
         if not bulk_form:
-            bulk_form = self.bulk_form_class()
+            bulk_form = self.bulk_form_class(client=self.account, initial={"project": self.get_selected_project()})
+        selected_project = self.get_selected_project()
         context.update(
             {
                 "assessment_label": self.assessment_config["label"],
                 "sessions": session_rows,
                 "bulk_form": bulk_form,
+                "projects": self.account.projects.order_by("-created_at"),
+                "selected_project": selected_project,
+                "has_projects": self.account.projects.exists(),
             }
         )
         return context
 
-    def _process_bulk_upload(self, csv_file) -> tuple[int, list[str]]:
+    def _process_bulk_upload(self, csv_file, project: ClientProject) -> tuple[int, list[str]]:
         created = 0
         errors: list[str] = []
         csv_file.seek(0)
@@ -733,6 +793,7 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                 "candidate_identifier": candidate,
                 "duration_minutes": duration,
                 "send_at": send_at,
+                "project": str(project.pk),
             }
             form = self.get_form_class()(data=form_data, client=self.account)
             if form.is_valid():
@@ -866,6 +927,92 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                     args=[self.assessment_type, session.uuid],
                 ),
                 "audit_log": self._build_audit_log(session),
+            }
+        )
+        return context
+
+
+class ClientProjectAccessMixin(LoginRequiredMixin):
+    login_url = reverse_lazy("clients:login")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        self.account = request.user.client_account
+        if self.account.status != "approved":
+            messages.info(request, "Your account is pending approval.")
+            return redirect("clients:dashboard")
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/projects/list.html"
+    form_class = ClientProjectForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["projects"] = self.account.projects.order_by("-created_at")
+        context["form"] = getattr(self, "form", self.form_class(client=self.account))
+        context["is_manager"] = self.account.role == "manager"
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if self.account.role != "manager":
+            messages.error(request, "Only managers can create projects.")
+            return redirect("clients:project-list")
+        form = self.form_class(request.POST, client=self.account)
+        if form.is_valid():
+            project = form.save()
+            messages.success(request, "Project created.")
+            return redirect("clients:project-detail", project_uuid=project.uuid)
+        self.form = form
+        return self.render_to_response(self.get_context_data(), status=400)
+
+
+class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/projects/detail.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(self.account.projects, uuid=kwargs.get("project_uuid"))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dataset_map = build_dataset_map(self.account)
+        assessment_details = []
+        recent_sessions = []
+        for code, queryset in dataset_map.items():
+            label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
+            qs = queryset.filter(project=self.project)
+            total = qs.count()
+            if total:
+                assessment_details.append(
+                    {
+                        "label": label,
+                        "total": total,
+                        "submitted": qs.filter(status="submitted").count(),
+                        "in_progress": qs.filter(status="in_progress").count(),
+                        "draft": qs.filter(status="draft").count(),
+                    }
+                )
+            for session in qs.order_by("-updated_at")[:50]:
+                recent_sessions.append(
+                    {
+                        "candidate": session.candidate_id,
+                        "assessment": label,
+                        "status": session.get_status_display(),
+                        "updated_at": session.updated_at or session.created_at,
+                        "detail_url": reverse("clients:assessment-detail", args=[code, session.uuid])
+                        if session.status == "submitted"
+                        else None,
+                    }
+                )
+        recent_sessions.sort(key=lambda item: item["updated_at"], reverse=True)
+        context.update(
+            {
+                "project": self.project,
+                "assessment_details": assessment_details,
+                "recent_sessions": recent_sessions[:20],
             }
         )
         return context
