@@ -133,6 +133,50 @@ def build_session_report(session, assessment_type: str):
     }
 
 
+def build_actionable_summary(report, decision_summary, recommended_decision):
+    base_score = report.get("overall")
+    if base_score is None:
+        base_score = report.get("score")
+    threshold = getattr(settings, "ASSESSMENT_PASSING_SCORE", 70)
+    flags = len(report.get("flags", [])) if isinstance(report, dict) else 0
+    if recommended_decision:
+        recommendation = recommended_decision["decision"]
+    elif decision_summary:
+        top = max(decision_summary, key=lambda item: item["count"])
+        recommendation = top["decision"]
+    else:
+        if base_score is None:
+            recommendation = "hold"
+        elif base_score >= threshold and flags == 0:
+            recommendation = "advance"
+        elif base_score >= threshold - 5:
+            recommendation = "hold"
+        else:
+            recommendation = "reject"
+    tone_map = {
+        "advance": ("Advance candidate", "Strong score and minimal risk.", "positive"),
+        "hold": ("Gather more signals", "Borderline score or pending follow-up.", "neutral"),
+        "reject": ("Do not advance", "Score or risk indicators fall below expectations.", "warning"),
+    }
+    headline, default_subline, tone = tone_map.get(recommendation, tone_map["hold"])
+    if base_score is not None:
+        subline = f"Score {base_score:.1f} vs. target {threshold}"
+    else:
+        subline = default_subline
+    strengths = report.get("strengths") or report.get("traits", {})
+    strength_focus = ""
+    if isinstance(strengths, list) and strengths:
+        strength_focus = strengths[0].title()
+    elif isinstance(strengths, dict) and strengths:
+        strength_focus = max(strengths.items(), key=lambda item: item[1])[0].title()
+    return {
+        "headline": headline,
+        "subline": subline,
+        "tone": tone,
+        "strength_focus": strength_focus,
+    }
+
+
 def _default_project_health(project=None):
     return {
         "project": project,
@@ -1091,7 +1135,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                 "can_record_decision": self.can_record_decision,
                 "decision_summary": decision_summary,
                 "recommended_decision": recommended_decision,
-                "actionable_summary": self._build_actionable_summary(report, decision_summary, recommended_decision),
+                "actionable_summary": build_actionable_summary(report, decision_summary, recommended_decision),
                 "response_drilldown": self._build_response_drilldown(session),
                 "activity_timeline": self._build_activity_timeline(session),
                 "comparative_insights": self._build_comparative_insights(session),
