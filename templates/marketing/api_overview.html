@@ -6,10 +6,39 @@
     {% include 'includes/site_header.html' with active='api' %}
 
     <main class="api-shell">
-        <section class="panel hero">
-            <p class="eyebrow">API integration</p>
-            <h1>Connect every Sira assessment to your stack.</h1>
-            <p class="lede">Behavioral, digital marketing, and future role modules run through one secure REST API.</p>
+        <section class="panel hero api-hero">
+            <div>
+                <p class="eyebrow">API integration</p>
+                <h1>Connect every Sira assessment to your stack.</h1>
+                <p class="lede">Behavioral, digital marketing, and future role modules run through one secure REST API.</p>
+            </div>
+            <ul class="api-hero-list">
+                {% for use_case in hero_use_cases %}
+                <li>{{ use_case }}</li>
+                {% endfor %}
+            </ul>
+            <div class="hero-cta">
+                <a class="btn btn-pill" href="#api-request">Request API access</a>
+                <a class="btn btn-outline" href="{{ postman_url }}" target="_blank" rel="noopener">Download Postman collection</a>
+            </div>
+        </section>
+
+        <section class="panel env-panel">
+            <header class="panel-heading">
+                <div>
+                    <p class="eyebrow">Environment & security</p>
+                    <h2>Ready for production on day one.</h2>
+                </div>
+                <p class="lede">Use dedicated keys per workspace, ship via sandbox, then flip to production.</p>
+            </header>
+            <div class="env-grid">
+                {% for item in environment_details %}
+                <article>
+                    <p class="label">{{ item.label }}</p>
+                    <strong>{{ item.value }}</strong>
+                </article>
+                {% endfor %}
+            </div>
         </section>
 
         <section class="panel endpoint-panel">
@@ -45,6 +74,22 @@
                     <button class="btn btn-pill secondary token-generate" type="button" data-token-target="#tokenSample">Generate mock token</button>
                     <button class="btn btn-pill copy-trigger" type="button" data-copy-target="#tokenSample" data-copy-label="Copy header" data-copy-success="Copied!">Copy header</button>
                 </div>
+            </div>
+        </section>
+
+        <section class="panel architecture-panel">
+            <div class="section-heading align-left">
+                <p class="eyebrow">How it fits</p>
+                <h2>Simple three-step flow.</h2>
+                <p class="lede">Sira handles the candidate experience, scoring, and telemetry. You control invites and reporting.</p>
+            </div>
+            <div class="arch-grid">
+                {% for flow in architecture_flows %}
+                <article class="arch-card">
+                    <h3>{{ flow.title }}</h3>
+                    <p>{{ flow.description|safe }}</p>
+                </article>
+                {% endfor %}
             </div>
         </section>
 
@@ -214,7 +259,37 @@
             </div>
         </section>
 
-        <section class="panel request-panel panel-contained">
+        <section class="panel partner-panel">
+            <div class="section-heading align-left">
+                <p class="eyebrow">Partners shipping on Sira</p>
+                <h2>Trusted by talent platforms and GTM tooling.</h2>
+            </div>
+            <div class="partner-grid">
+                {% for partner in partner_highlights %}
+                <article>
+                    <p class="partner-name">{{ partner.name }}</p>
+                    <blockquote>{{ partner.quote }}</blockquote>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="panel changelog-panel">
+            <div class="section-heading align-left">
+                <p class="eyebrow">Changelog</p>
+                <h2>Always improving.</h2>
+            </div>
+            <ul class="changelog-list">
+                {% for item in changelog %}
+                <li>
+                    <span>{{ item.date }}</span>
+                    <p>{{ item.entry }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="panel request-panel panel-contained" id="api-request">
             <div class="request-intro">
                 <div class="request-copy">
                     <p class="eyebrow">Access request</p>
@@ -259,15 +334,5 @@
             </form>
         </section>
     </main>
-
-    <footer class="site-footer">
-        <div>© {% now "Y" %} Sira</div>
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Resources</a>
-        </div>
-        <div>Made with <span>♥</span> by Sira</div>
-    </footer>
 </div>
 {% endblock %}

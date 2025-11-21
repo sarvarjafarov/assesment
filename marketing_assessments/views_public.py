@@ -66,6 +66,41 @@ def api_overview(request):
                     "code": "require 'net/http'\\nuri = URI('https://your-domain/api/marketing-assessment/cand-123/results/')\\nreq = Net::HTTP::Get.new(uri)\\nreq['X-API-Key'] = token\\nres = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }",
                 },
             ],
+            "hero_use_cases": [
+                "Trigger invites from your ATS or onboarding tools.",
+                "Embed live status + scores in manager dashboards.",
+                "Sync completed assignments back to HRIS or CRMs.",
+            ],
+            "environment_details": [
+                {"label": "Prod base URL", "value": "https://api.sira.so"},
+                {"label": "Sandbox URL", "value": "https://sandbox.sira.so"},
+                {"label": "Rate limit", "value": "600 req/min per workspace"},
+                {"label": "Webhook domain", "value": "hooks.sira.so"},
+            ],
+            "architecture_flows": [
+                {
+                    "title": "Create session",
+                    "description": "Your system hits <code>/start</code> with candidate + assessment metadata. Sira returns a secure link.",
+                },
+                {
+                    "title": "Candidate completes",
+                    "description": "Sira handles UX, scoring, and telemetry. Webhooks notify your app when responses arrive.",
+                },
+                {
+                    "title": "Pull scores",
+                    "description": "Fetch score reports or export behavioral traits into interview guides or ATS notes.",
+                },
+            ],
+            "partner_highlights": [
+                {"name": "Northwind ATS", "quote": "Sira's API shaved 4 hours per req by auto-issuing PM assessments."},
+                {"name": "Atlas CRM", "quote": "We embed candidate scorecards right in our enterprise deal rooms."},
+            ],
+            "changelog": [
+                {"date": "May 2025", "entry": "Added behavioral profile endpoint + webhook retries."},
+                {"date": "Apr 2025", "entry": "Released Postman collection and OpenAPI 1.2."},
+                {"date": "Mar 2025", "entry": "Launched sandbox environment + per-workspace API keys."},
+            ],
+            "postman_url": "https://sira-assets.s3.amazonaws.com/api/sira.postman_collection.json",
             "form": form,
         },
     )
