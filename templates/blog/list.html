@@ -4,25 +4,7 @@
 {% block meta_description %}Browse the latest Sira product updates, hiring playbooks, and behavioral interviewing tips.{% endblock %}
 {% block content %}
 <div class="page-shell">
-    <header class="site-header">
-        <nav class="nav">
-            <div class="brand">
-                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
-                <span>Sira</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="{% url 'pages:home' %}#products">Products</a></li>
-                <li><a href="{% url 'pages:home' %}#industries">Industries</a></li>
-                <li><a class="is-active" href="{% url 'blog:list' %}">Blog</a></li>
-                <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
-            </ul>
-            <div class="nav-actions">
-                <a class="btn btn-outline small" href="{% url 'console:login' %}">Customer Login</a>
-                <a class="btn btn-pill" href="{% url 'pages:home' %}#cta">Book a Demo</a>
-            </div>
-        </nav>
-    </header>
-
+    {% include 'includes/site_header.html' with active='blog' %}
     <main>
         <div class="blog-shell">
     <section class="hero-card">
