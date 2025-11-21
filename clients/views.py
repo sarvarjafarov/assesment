@@ -96,6 +96,43 @@ ASSESSMENT_MODEL_MAP = {
 }
 
 
+def build_session_report(session, assessment_type: str):
+    if assessment_type == "behavioral":
+        return {
+            "score": session.eligibility_score,
+            "label": session.eligibility_label,
+            "traits": session.trait_scores or {},
+            "flags": session.risk_flags or [],
+        }
+    recommendations = session.recommendations or {}
+    categories = session.category_breakdown or {}
+    baseline = getattr(settings, "ASSESSMENT_PASSING_SCORE", 70)
+    heatmap = []
+    for label, value in categories.items():
+        try:
+            score = float(value)
+        except (TypeError, ValueError):
+            score = None
+        status = "neutral"
+        if score is not None:
+            if score >= baseline + 5:
+                status = "positive"
+            elif score < baseline - 5:
+                status = "warning"
+        heatmap.append({"label": label, "score": score, "status": status})
+    return {
+        "overall": session.overall_score,
+        "hard": getattr(session, "hard_skill_score", None),
+        "soft": getattr(session, "soft_skill_score", None),
+        "categories": categories,
+        "category_heatmap": heatmap,
+        "fit_scores": recommendations.get("fit_scores", {}),
+        "strengths": recommendations.get("strengths", []),
+        "development": recommendations.get("development", []),
+        "seniority": recommendations.get("seniority"),
+    }
+
+
 def _default_project_health(project=None):
     return {
         "project": project,
@@ -1021,7 +1058,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = getattr(self, "session_obj", None)
-        report = self._build_report(session)
+        report = build_session_report(session, self.assessment_type)
         decision_summary = list(
             ClientSessionNote.objects.filter(
                 client=self.account,
@@ -1290,42 +1327,6 @@ class ClientProjectPipelineStageView(ClientProjectAccessMixin, View):
             f"Moved {session.candidate_id} to {PIPELINE_STAGE_LABELS[next_stage]}.",
         )
         return redirect(f"{reverse('clients:project-detail', args=[project.uuid])}#pipeline")
-
-    def _build_report(self, session):
-        if self.assessment_type == "behavioral":
-            return {
-                "score": session.eligibility_score,
-                "label": session.eligibility_label,
-                "traits": session.trait_scores or {},
-                "flags": session.risk_flags or [],
-            }
-        recommendations = session.recommendations or {}
-        categories = session.category_breakdown or {}
-        baseline = getattr(settings, "ASSESSMENT_PASSING_SCORE", 70)
-        heatmap = []
-        for label, value in categories.items():
-            try:
-                score = float(value)
-            except (TypeError, ValueError):
-                score = None
-            status = "neutral"
-            if score is not None:
-                if score >= baseline + 5:
-                    status = "positive"
-                elif score < baseline - 5:
-                    status = "warning"
-            heatmap.append({"label": label, "score": score, "status": status})
-        return {
-            "overall": session.overall_score,
-            "hard": getattr(session, "hard_skill_score", None),
-            "soft": getattr(session, "soft_skill_score", None),
-            "categories": categories,
-            "category_heatmap": heatmap,
-            "fit_scores": recommendations.get("fit_scores", {}),
-            "strengths": recommendations.get("strengths", []),
-            "development": recommendations.get("development", []),
-            "seniority": recommendations.get("seniority"),
-        }
 
     def form_valid(self, form):
         session = getattr(self, "session_obj", None)
