@@ -7,6 +7,7 @@
     <meta name="description" content="{% block meta_description %}Sira helps recruitment teams design, deliver, and score behavioral assessments.{% endblock %}">
     {% block extra_meta %}{% endblock %}
     {% load static %}
+    {% load url_extras %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +34,9 @@
         {% block content %}{% endblock %}
     </main>
     {% block site_footer %}
-        {% include 'includes/site_footer.html' %}
+        {% if not (request.path|startswith:"/clients" or request.path|startswith:"/console" or request.path|startswith:"/candidate") %}
+            {% include 'includes/site_footer.html' %}
+        {% endif %}
     {% endblock %}
     <script src="{% static 'js/main.js' %}" defer></script>
 </body>
