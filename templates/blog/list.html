@@ -180,13 +180,15 @@
                 <p>Join thousands of recruiters getting early access to playbooks, event invites, and the quarterly Sira hiring kit.</p>
                 <a class="btn btn-pill" href="#newsletter-form">Join newsletter</a>
             </article>
-            {% for quote in proof_quotes %}
-            <article>
-                <p class="quote">{{ quote.quote }}</p>
-                <p class="person">{{ quote.person }} · {{ quote.role }}</p>
-                <span class="company">{{ quote.company }}</span>
-            </article>
-            {% endfor %}
+            <div class="testimonial-grid">
+                {% for quote in proof_quotes %}
+                <article class="testimonial-card">
+                    <p class="quote">{{ quote.quote }}</p>
+                    <p class="person">{{ quote.person }} · {{ quote.role }}</p>
+                    <span class="company">{{ quote.company }}</span>
+                </article>
+                {% endfor %}
+            </div>
         </div>
     </section>
     {% endif %}
