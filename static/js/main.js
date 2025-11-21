@@ -383,4 +383,129 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         revealItems.forEach((el) => el.classList.add("is-visible"));
     }
+
+    const spyNavs = document.querySelectorAll("[data-spy-nav]");
+    spyNavs.forEach((nav) => {
+        const links = Array.from(nav.querySelectorAll("a[href^='#']"));
+        if (!links.length) {
+            return;
+        }
+        const sections = links
+            .map((link) => {
+                const id = link.getAttribute("href").slice(1);
+                const section = document.getElementById(id);
+                return section ? { link, section } : null;
+            })
+            .filter(Boolean);
+        if (!sections.length) {
+            return;
+        }
+        let ticking = false;
+        const activateCurrent = () => {
+            const offset = 140;
+            let activeEntry = sections[0];
+            sections.forEach((entry) => {
+                const rect = entry.section.getBoundingClientRect();
+                if (rect.top - offset <= 0) {
+                    activeEntry = entry;
+                }
+            });
+            sections.forEach((entry) => {
+                entry.link.classList.toggle("is-active", entry === activeEntry);
+            });
+        };
+        const handleScroll = () => {
+            if (ticking) {
+                return;
+            }
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                activateCurrent();
+                ticking = false;
+            });
+        };
+        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("resize", handleScroll);
+        activateCurrent();
+    });
+
+    const playgroundDataElem = document.getElementById("playground-data");
+    const playgroundContainer = document.querySelector("[data-playground]");
+    if (playgroundDataElem && playgroundContainer) {
+        let examples;
+        try {
+            examples = JSON.parse(playgroundDataElem.textContent);
+        } catch (err) {
+            examples = [];
+        }
+        if (examples.length) {
+            const exampleMap = new Map(examples.map((example) => [example.slug, example]));
+            const tabs = playgroundContainer.querySelectorAll("[data-playground-tab]");
+            const methodEl = playgroundContainer.querySelector("[data-playground-method]");
+            const pathEl = playgroundContainer.querySelector("[data-playground-path]");
+            const headerEl = playgroundContainer.querySelector("[data-playground-headers]");
+            const requestEl = playgroundContainer.querySelector("[data-playground-request]");
+            const responseEl = playgroundContainer.querySelector("[data-playground-response]");
+            const statusEl = playgroundContainer.querySelector("[data-playground-status]");
+            const runButton = playgroundContainer.querySelector("[data-playground-run]");
+            const responseCard = responseEl?.closest(".playground-card");
+            const formatJson = (value) => {
+                if (value === null || typeof value === "undefined") {
+                    return "—";
+                }
+                if (typeof value === "string") {
+                    return value;
+                }
+                return JSON.stringify(value, null, 2);
+            };
+            let activeSlug = examples[0].slug;
+            const renderExample = (slug) => {
+                const example = exampleMap.get(slug);
+                if (!example) {
+                    return;
+                }
+                activeSlug = slug;
+                if (methodEl) {
+                    methodEl.textContent = example.method;
+                }
+                if (pathEl) {
+                    pathEl.textContent = example.path;
+                }
+                if (headerEl) {
+                    headerEl.textContent = formatJson(example.request.headers);
+                }
+                if (requestEl) {
+                    requestEl.textContent = formatJson(example.request.body);
+                }
+                if (responseEl) {
+                    responseEl.textContent = formatJson(example.response.body);
+                }
+                if (statusEl) {
+                    statusEl.textContent = example.response.status;
+                }
+                tabs.forEach((tab) => {
+                    const isActive = tab.dataset.playgroundTab === slug;
+                    tab.classList.toggle("is-active", isActive);
+                    tab.setAttribute("aria-selected", isActive ? "true" : "false");
+                });
+            };
+            tabs.forEach((tab) => {
+                tab.addEventListener("click", () => renderExample(tab.dataset.playgroundTab));
+            });
+            if (runButton && responseCard) {
+                runButton.addEventListener("click", () => {
+                    runButton.disabled = true;
+                    runButton.textContent = "Running…";
+                    responseCard.classList.add("is-running");
+                    setTimeout(() => {
+                        renderExample(activeSlug);
+                        runButton.disabled = false;
+                        runButton.textContent = "Run mock call";
+                        responseCard.classList.remove("is-running");
+                    }, 700);
+                });
+            }
+            renderExample(activeSlug);
+        }
+    }
 });

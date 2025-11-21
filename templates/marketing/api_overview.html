@@ -21,9 +21,116 @@
                 <a class="btn btn-pill" href="#api-request">Request API access</a>
                 <a class="btn btn-outline" href="{{ postman_url }}" target="_blank" rel="noopener">Download Postman collection</a>
             </div>
+            <div class="api-hero-metrics">
+                {% for metric in hero_metrics %}
+                <article>
+                    <strong>{{ metric.value }}</strong>
+                    <span>{{ metric.label }}</span>
+                </article>
+                {% endfor %}
+            </div>
         </section>
 
-        <section class="panel env-panel">
+        <section class="panel hero-loop-panel">
+            <div class="loop-grid">
+                <div class="loop-copy">
+                    <p class="eyebrow">See the loop</p>
+                    <h2>Invite → complete → sync in 30 seconds.</h2>
+                    <p class="lede">Share this clip with your engineers or vendor managers when you need to explain how Sira fits into your hiring stack.</p>
+                    <ul class="loop-steps">
+                        {% for step in loop_steps %}
+                        <li>
+                            <span class="step-index">0{{ forloop.counter }}</span>
+                            <div>
+                                <strong>{{ step.title }}</strong>
+                                <p>{{ step.detail }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="loop-visual">
+                    <div class="loop-visual-header">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <p>Live flow preview</p>
+                    </div>
+                    <div class="loop-track">
+                        <div class="loop-node is-invite">
+                            <strong>Invite API</strong>
+                            <small>POST /start</small>
+                        </div>
+                        <div class="loop-arrow"></div>
+                        <div class="loop-node is-session">
+                            <strong>Candidate UX</strong>
+                            <small>Mobile & desktop</small>
+                        </div>
+                        <div class="loop-arrow"></div>
+                        <div class="loop-node is-webhook">
+                            <strong>Webhook</strong>
+                            <small>Score payload</small>
+                        </div>
+                    </div>
+                    <div class="loop-video">
+                        <div class="loop-video-screen">
+                            <div class="loop-video-header">
+                                <span>POST /start</span>
+                                <span>→</span>
+                                <span>Candidate completes</span>
+                                <span>→</span>
+                                <span>Webhook delivered</span>
+                            </div>
+                            <div class="loop-video-wave">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="loop-video-footer">
+                                <p>Telemetry captured · scoring completed · payload sent</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <nav class="api-mini-nav" aria-label="API page navigation" data-spy-nav>
+            <ul>
+                <li><a href="#section-downloads">Resources</a></li>
+                <li><a href="#section-environment">Environment</a></li>
+                <li><a href="#section-endpoints">Endpoints</a></li>
+                <li><a href="#section-playground">Playground</a></li>
+                <li><a href="#section-auth">Authentication</a></li>
+                <li><a href="#section-architecture">Flow</a></li>
+                <li><a href="#section-sdks">SDKs & samples</a></li>
+                <li><a href="#section-partners">Partners</a></li>
+                <li><a href="#api-request">Access</a></li>
+            </ul>
+        </nav>
+
+        <section class="panel download-panel" id="section-downloads">
+            <div class="download-card">
+                <div class="download-copy">
+                    <p class="eyebrow">Your starter kit</p>
+                    <h2>{{ download_bundle.headline }}</h2>
+                    <p class="lede">{{ download_bundle.description }}</p>
+                </div>
+                <ul class="download-list">
+                    {% for resource in download_bundle.resources %}
+                    <li>
+                        <div>
+                            <strong>{{ resource.label }}</strong>
+                            <p>{{ resource.description }}</p>
+                        </div>
+                        <a class="btn btn-pill" href="{{ resource.href }}" target="_blank" rel="noopener">Download</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+
+        <section class="panel env-panel" id="section-environment">
             <header class="panel-heading">
                 <div>
                     <p class="eyebrow">Environment & security</p>
@@ -41,7 +148,7 @@
             </div>
         </section>
 
-        <section class="panel endpoint-panel">
+        <section class="panel endpoint-panel" id="section-endpoints">
             <header class="panel-heading">
                 <div>
                     <p class="eyebrow">Endpoints</p>
@@ -55,12 +162,80 @@
                     <div class="method">{{ endpoint.method }}</div>
                     <div class="path">{{ endpoint.path }}</div>
                     <p>{{ endpoint.description }}</p>
+                    {% if endpoint.request_schema_pretty %}
+                    <details class="endpoint-schema">
+                        <summary>Request schema</summary>
+                        <pre>{{ endpoint.request_schema_pretty }}</pre>
+                    </details>
+                    {% endif %}
+                    {% if endpoint.response_schema_pretty %}
+                    <details class="endpoint-schema">
+                        <summary>Response schema</summary>
+                        <pre>{{ endpoint.response_schema_pretty }}</pre>
+                    </details>
+                    {% endif %}
                 </article>
                 {% endfor %}
             </div>
         </section>
 
-        <section class="panel token-panel">
+        <section class="panel playground-panel" id="section-playground">
+            <div class="section-heading align-left">
+                <div>
+                    <p class="eyebrow">Interactive docs</p>
+                    <h2>Test the flow without leaving the page.</h2>
+                </div>
+                <p class="lede">Switch between common calls and preview the headers, payloads, and responses teams use most often.</p>
+            </div>
+            <div class="playground-shell" data-playground>
+                <aside class="playground-sidebar" role="tablist" aria-label="Playground examples">
+                    {% for example in playground_examples %}
+                    <button
+                        class="playground-tab {% if forloop.first %}is-active{% endif %}"
+                        type="button"
+                        data-playground-tab="{{ example.slug }}"
+                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                    >
+                        <span class="method">{{ example.method }}</span>
+                        <span class="path">{{ example.path }}</span>
+                        <p>{{ example.description }}</p>
+                    </button>
+                    {% endfor %}
+                </aside>
+                <div class="playground-body">
+                    <div class="playground-card">
+                        <header>
+                            <p class="label">Request</p>
+                            <span data-playground-method></span>
+                            <code data-playground-path></code>
+                        </header>
+                        <div class="playground-meta">
+                            <strong>Headers</strong>
+                            <pre data-playground-headers></pre>
+                        </div>
+                        <div class="playground-meta">
+                            <strong>Body</strong>
+                            <pre data-playground-request></pre>
+                        </div>
+                    </div>
+                    <div class="playground-card">
+                        <header>
+                            <p class="label">Response</p>
+                            <span>Status <strong data-playground-status></strong></span>
+                        </header>
+                        <div class="playground-meta">
+                            <strong>Body</strong>
+                            <pre data-playground-response></pre>
+                        </div>
+                        <button class="btn btn-pill playground-run" type="button" data-playground-run>Run mock call</button>
+                        <p class="playground-tip">We animate the payload to show how fast responses arrive.</p>
+                    </div>
+                </div>
+            </div>
+            {{ playground_examples|json_script:"playground-data" }}
+        </section>
+
+        <section class="panel token-panel" id="section-auth">
             <div class="section-heading align-left">
                 <h2>Authentication & tokens</h2>
                 <p class="lede">Use the API key we issue per workspace. Rotate tokens anytime.</p>
@@ -77,7 +252,7 @@
             </div>
         </section>
 
-        <section class="panel architecture-panel">
+        <section class="panel architecture-panel" id="section-architecture">
             <div class="section-heading align-left">
                 <p class="eyebrow">How it fits</p>
                 <h2>Simple three-step flow.</h2>
@@ -94,7 +269,7 @@
         </section>
 
 {% with samples=language_examples %}
-        <section class="panel language-info-panel">
+        <section class="panel language-info-panel" id="section-sdks">
             <div class="language-flex">
                 <div class="language-copy">
                     <p class="eyebrow">Language examples</p>
@@ -200,7 +375,7 @@
             </div>
         </section>
 
-        <section class="panel sample-panel panel-contained section-tight">
+        <section class="panel sample-panel panel-contained section-tight" id="section-samples">
             <div class="sample-intro">
                 <div class="sample-copy">
                     <p class="eyebrow">Sample requests & responses</p>
@@ -259,7 +434,7 @@
             </div>
         </section>
 
-        <section class="panel partner-panel">
+        <section class="panel partner-panel" id="section-partners">
             <div class="section-heading align-left">
                 <p class="eyebrow">Partners shipping on Sira</p>
                 <h2>Trusted by talent platforms and GTM tooling.</h2>

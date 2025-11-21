@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -37,17 +39,77 @@ def api_overview(request):
             "Thanks! Our team will review your request and share credentials shortly.",
         )
         return redirect("marketing-assessment:api")
+    postman_url = "https://sira-assets.s3.amazonaws.com/api/sira.postman_collection.json"
+    openapi_url = "https://sira-assets.s3.amazonaws.com/api/sira-openapi.yaml"
+    schema_url = "https://sira-assets.s3.amazonaws.com/api/sira-webhook-schema.json"
+    rest_endpoints = [
+        {
+            "method": "POST",
+            "path": "/api/marketing-assessment/start/",
+            "description": "Create digital marketing session",
+            "request_schema": {"candidate_id": "string", "assessment": "marketing|pm|behavioral"},
+            "response_schema": {
+                "session_uuid": "UUID",
+                "launch_url": "https://session-link",
+                "expires_at": "ISO8601 timestamp",
+            },
+        },
+        {
+            "method": "GET",
+            "path": "/api/marketing-assessment/<candidate_id>/questions/",
+            "description": "Retrieve question bundle",
+            "request_schema": {"headers": {"X-API-Key": "token"}},
+            "response_schema": {
+                "questions": [
+                    {"id": 42, "type": "multiple_choice", "category": "strategy", "prompt": "text", "options": ["A", "B", "C"]},
+                ],
+                "time_limit_minutes": 45,
+            },
+        },
+        {
+            "method": "POST",
+            "path": "/api/marketing-assessment/<candidate_id>/submit/",
+            "description": "Submit responses",
+            "request_schema": [
+                {"question_id": 42, "answer": "A"},
+                {"question_id": 51, "selected": "most"},
+            ],
+            "response_schema": {"detail": "Assessment submitted", "session_uuid": "UUID"},
+        },
+        {
+            "method": "GET",
+            "path": "/api/marketing-assessment/<candidate_id>/results/",
+            "description": "Fetch scores + fit summary",
+            "request_schema": {"headers": {"X-API-Key": "token"}},
+            "response_schema": {
+                "overall_score": 84.2,
+                "category_breakdown": {"strategy": 86, "execution": 82},
+                "fit_recommendation": "text",
+            },
+        },
+        {
+            "method": "GET",
+            "path": "/api/assessments/sessions/<uuid>/responses/",
+            "description": "Behavioral profile + score breakdown",
+            "request_schema": {"headers": {"X-API-Key": "token"}},
+            "response_schema": {
+                "session_uuid": "UUID",
+                "insights": [{"trait": "Adaptability", "score": 78}],
+                "raw_responses": [{"block": 1, "most": "A", "least": "C"}],
+            },
+        },
+    ]
+    for endpoint in rest_endpoints:
+        for key in ("request_schema", "response_schema"):
+            value = endpoint.get(key)
+            if value is not None:
+                endpoint[f"{key}_pretty"] = json.dumps(value, indent=2)
+
     return render(
         request,
         "marketing/api_overview.html",
         {
-            "rest_endpoints": [
-                {"method": "POST", "path": "/api/marketing-assessment/start/", "description": "Create digital marketing session"},
-                {"method": "GET", "path": "/api/marketing-assessment/<candidate_id>/questions/", "description": "Retrieve question bundle"},
-                {"method": "POST", "path": "/api/marketing-assessment/<candidate_id>/submit/", "description": "Submit responses"},
-                {"method": "GET", "path": "/api/marketing-assessment/<candidate_id>/results/", "description": "Fetch scores + fit summary"},
-                {"method": "GET", "path": "/api/assessments/sessions/<uuid>/responses/", "description": "Behavioral profile + score breakdown"},
-            ],
+            "rest_endpoints": rest_endpoints,
             "language_examples": [
                 {
                     "title": "Python requests",
@@ -70,6 +132,16 @@ def api_overview(request):
                 "Trigger invites from your ATS or onboarding tools.",
                 "Embed live status + scores in manager dashboards.",
                 "Sync completed assignments back to HRIS or CRMs.",
+            ],
+            "hero_metrics": [
+                {"value": "99.98%", "label": "Uptime across regions"},
+                {"value": "120 ms", "label": "Median response time"},
+                {"value": "180+", "label": "Active partner teams"},
+            ],
+            "loop_steps": [
+                {"title": "Issue invite", "detail": "Call /start with candidate metadata and assessment type to receive a secure session link."},
+                {"title": "Candidate completes", "detail": "Sira hosts the UX on mobile or desktop, saves progress, and scores responses in real time."},
+                {"title": "Sync outcomes", "detail": "Webhooks push scores + breakdowns back to your ATS/CRM, and you can pull the JSON results anytime."},
             ],
             "environment_details": [
                 {"label": "Prod base URL", "value": "https://api.sira.so"},
@@ -100,7 +172,75 @@ def api_overview(request):
                 {"date": "Apr 2025", "entry": "Released Postman collection and OpenAPI 1.2."},
                 {"date": "Mar 2025", "entry": "Launched sandbox environment + per-workspace API keys."},
             ],
-            "postman_url": "https://sira-assets.s3.amazonaws.com/api/sira.postman_collection.json",
+            "postman_url": postman_url,
+            "openapi_url": openapi_url,
+            "schema_url": schema_url,
+            "download_bundle": {
+                "headline": "Download everything",
+                "description": "Keep a copy of our Postman collection, OpenAPI spec, and webhook schemas so you can work offline or share with your team.",
+                "resources": [
+                    {"label": "Postman collection", "description": "Pre-built requests for every endpoint.", "href": postman_url},
+                    {"label": "OpenAPI spec", "description": "Full contract with parameters + responses.", "href": openapi_url},
+                    {"label": "Webhook schema", "description": "JSON schema for score callbacks.", "href": schema_url},
+                ],
+            },
+            "playground_examples": [
+                {
+                    "slug": "start",
+                    "title": "Create marketing assessment session",
+                    "method": "POST",
+                    "path": "/api/marketing-assessment/start/",
+                    "description": "Provision a secure invite link for your candidate.",
+                    "request": {
+                        "headers": {"X-API-Key": "sk_live_***", "Content-Type": "application/json"},
+                        "body": {"candidate_id": "cand-123", "assessment": "marketing"},
+                    },
+                    "response": {
+                        "status": 201,
+                        "body": {"session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e", "expires_at": "2025-06-20T19:04:00Z"},
+                    },
+                },
+                {
+                    "slug": "results",
+                    "title": "Fetch completed results",
+                    "method": "GET",
+                    "path": "/api/marketing-assessment/cand-123/results/",
+                    "description": "Retrieve the overall score and category-level insights.",
+                    "request": {
+                        "headers": {"X-API-Key": "sk_live_***"},
+                        "body": None,
+                    },
+                    "response": {
+                        "status": 200,
+                        "body": {
+                            "overall_score": 84.2,
+                            "category_breakdown": {"strategy": 86, "execution": 82, "analytics": 80},
+                            "fit_recommendation": "Great fit for performance marketing lead.",
+                        },
+                    },
+                },
+                {
+                    "slug": "webhook",
+                    "title": "Receive webhook payload",
+                    "method": "POST",
+                    "path": "https://your-app.com/webhooks/sira",
+                    "description": "Example JSON body delivered when a candidate finishes.",
+                    "request": {
+                        "headers": {"X-Sira-Signature": "sha256=***"},
+                        "body": {
+                            "event": "assessment.completed",
+                            "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
+                            "candidate_id": "cand-123",
+                            "overall_score": 84.2,
+                            "completed_at": "2025-06-11T08:42:22Z",
+                        },
+                    },
+                    "response": {
+                        "status": 200,
+                        "body": {"detail": "Webhook received"},
+                    },
+                },
+            ],
             "form": form,
         },
     )
