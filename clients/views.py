@@ -1136,7 +1136,7 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                 "decision_summary": decision_summary,
                 "recommended_decision": recommended_decision,
                 "actionable_summary": build_actionable_summary(report, decision_summary, recommended_decision),
-                "response_drilldown": self._build_response_drilldown(session),
+                "response_drilldown": build_response_drilldown(session),
                 "activity_timeline": self._build_activity_timeline(session),
                 "comparative_insights": self._build_comparative_insights(session),
                 "quick_followups": self._build_followup_links(session, share_link),
@@ -1397,99 +1397,50 @@ class ClientProjectPipelineStageView(ClientProjectAccessMixin, View):
     def get_success_url(self):
         return reverse("clients:assessment-detail", args=[self.assessment_type, self.kwargs.get("session_uuid")])
 
-    def _build_actionable_summary(self, report, decision_summary, recommended_decision):
-        base_score = report.get("overall")
-        if base_score is None:
-            base_score = report.get("score")
-        threshold = getattr(settings, "ASSESSMENT_PASSING_SCORE", 70)
-        flags = len(report.get("flags", [])) if isinstance(report, dict) else 0
-        if recommended_decision:
-            recommendation = recommended_decision["decision"]
-        elif decision_summary:
-            top = max(decision_summary, key=lambda item: item["count"])
-            recommendation = top["decision"]
-        else:
-            if base_score is None:
-                recommendation = "hold"
-            elif base_score >= threshold and flags == 0:
-                recommendation = "advance"
-            elif base_score >= threshold - 5:
-                recommendation = "hold"
-            else:
-                recommendation = "reject"
-        tone_map = {
-            "advance": ("Advance candidate", "Strong score and minimal risk.", "positive"),
-            "hold": ("Gather more signals", "Borderline score or pending follow-up.", "neutral"),
-            "reject": ("Do not advance", "Score or risk indicators fall below expectations.", "warning"),
-        }
-        headline, default_subline, tone = tone_map.get(recommendation, tone_map["hold"])
-        if base_score is not None:
-            subline = f"Score {base_score:.1f} vs. target {threshold}"
-        else:
-            subline = default_subline
-        strengths = report.get("strengths") or report.get("traits", {})
-        strength_focus = ""
-        if isinstance(strengths, list) and strengths:
-            strength_focus = strengths[0].title()
-        elif isinstance(strengths, dict) and strengths:
-            top_trait = max(strengths.items(), key=lambda item: item[1])
-            strength_focus = top_trait[0].replace("_", " ").title()
-        metrics = {
-            "score": f"{base_score:.1f}" if base_score is not None else "—",
-            "flags": f"{flags} risk flag{'s' if flags != 1 else ''}",
-            "strength": strength_focus or "—",
-        }
-        return {
-            "headline": headline,
-            "subline": subline,
-            "tone": tone,
-            "label": recommendation.title(),
-            "metrics": metrics,
-        }
 
-    def _build_response_drilldown(self, session):
-        questions = session.question_set or []
-        responses = session.responses or []
-        breakdown = []
-        for idx, question in enumerate(questions):
-            resp = responses[idx] if idx < len(responses) else None
-            if isinstance(resp, dict):
-                answer = resp.get("answer") or resp.get("value") or resp.get("selection")
-                is_correct = resp.get("is_correct")
-                elapsed = resp.get("elapsed_seconds") or resp.get("time_spent")
-            else:
-                answer = resp
-                is_correct = None
-                elapsed = None
-            prompt = question.get("question_text") if isinstance(question, dict) else None
-            if not prompt and isinstance(question, dict):
-                prompt = question.get("prompt") or question.get("title")
-            if not prompt:
-                prompt = f"Question {idx + 1}"
-            category = question.get("category") if isinstance(question, dict) else ""
-            outcome = "n/a"
-            outcome_class = "neutral"
-            if is_correct is True:
-                outcome = "Correct"
-                outcome_class = "positive"
-            elif is_correct is False:
-                outcome = "Incorrect"
-                outcome_class = "warning"
-            elif isinstance(resp, dict) and resp.get("score") is not None:
-                outcome = f"Score {resp.get('score')}"
-            if elapsed:
-                elapsed = f"{float(elapsed):.1f}s"
-            breakdown.append(
-                {
-                    "prompt": prompt,
-                    "answer": answer or "—",
-                    "category": category,
-                    "elapsed": elapsed or "—",
-                    "outcome": outcome,
-                    "outcome_class": outcome_class,
-                }
-            )
-        return breakdown
+def build_response_drilldown(session):
+    questions = session.question_set or []
+    responses = session.responses or []
+    breakdown = []
+    for idx, question in enumerate(questions):
+        resp = responses[idx] if idx < len(responses) else None
+        if isinstance(resp, dict):
+            answer = resp.get("answer") or resp.get("value") or resp.get("selection")
+            is_correct = resp.get("is_correct")
+            elapsed = resp.get("elapsed_seconds") or resp.get("time_spent")
+        else:
+            answer = resp
+            is_correct = None
+            elapsed = None
+        prompt = question.get("question_text") if isinstance(question, dict) else None
+        if not prompt and isinstance(question, dict):
+            prompt = question.get("prompt") or question.get("title")
+        if not prompt:
+            prompt = f"Question {idx + 1}"
+        category = question.get("category") if isinstance(question, dict) else ""
+        outcome = "n/a"
+        outcome_class = "neutral"
+        if is_correct is True:
+            outcome = "Correct"
+            outcome_class = "positive"
+        elif is_correct is False:
+            outcome = "Incorrect"
+            outcome_class = "warning"
+        elif isinstance(resp, dict) and resp.get("score") is not None:
+            outcome = f"Score {resp.get('score')}"
+        if elapsed:
+            elapsed = f"{float(elapsed):.1f}s"
+        breakdown.append(
+            {
+                "prompt": prompt,
+                "answer": answer or "—",
+                "category": category,
+                "elapsed": elapsed or "—",
+                "outcome": outcome,
+                "outcome_class": outcome_class,
+            }
+        )
+    return breakdown
 
     def _build_activity_timeline(self, session):
         events = []
