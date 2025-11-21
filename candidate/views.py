@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import json
 
+from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -13,8 +16,13 @@ from assessments.behavioral import get_behavioral_blocks
 from assessments.models import AssessmentSession, Question
 from assessments.services import record_responses
 from .constants import DEFAULT_HELP_TOPICS, PRACTICE_QUESTIONS
-from .forms import QuestionStepForm
-from .utils import send_switch_device_email, update_session_telemetry
+from .forms import QuestionStepForm, CandidateSupportRequestForm
+from .models import CandidateSupportRequest
+from .utils import (
+    notify_support_team,
+    send_switch_device_email,
+    update_session_telemetry,
+)
 
 
 DEFAULT_PREVIEW_MIN_CHARS = 120
@@ -62,6 +70,7 @@ class SessionMixin:
             ),
             uuid=kwargs["session_uuid"],
         )
+        self.support_form_storage_key = f"support_form_data:{self.session.uuid}"
 
     def base_context(self):
         return {
@@ -271,6 +280,27 @@ class SessionAssessmentView(SessionMixin, FormView):
             self.current_question.question_type in LONGFORM_PREVIEW_TYPES
         )
         context["preview_min_length"] = DEFAULT_PREVIEW_MIN_CHARS
+        support_initial = {
+            "contact_method": "email",
+            "contact_value": self.session.candidate.email or "",
+        }
+        stored_support_data = self.request.session.pop(
+            getattr(self, "support_form_storage_key", ""), None
+        )
+        if stored_support_data:
+            support_form = CandidateSupportRequestForm(data=stored_support_data)
+        else:
+            support_form = CandidateSupportRequestForm(initial=support_initial)
+        context["support_form"] = support_form
+        context["support_contact_email"] = getattr(
+            settings, "SUPPORT_CONTACT_EMAIL", "support@sira.so"
+        )
+        context["support_contact_phone"] = getattr(
+            settings, "SUPPORT_CONTACT_PHONE", "+1 (555) 123-4567"
+        )
+        context["support_request_url"] = reverse(
+            "candidate:session-support-request", args=[self.session.uuid]
+        )
         return context
 
     def form_valid(self, form):
@@ -329,8 +359,17 @@ class SessionSendLinkView(SessionMixin, View):
         resume_link = request.build_absolute_uri(
             reverse("candidate:session-entry", args=[self.session.uuid])
         )
+        email_input = (request.POST.get("email") or candidate.email or "").strip()
+        if not email_input:
+            messages.error(request, "Enter an email address to send your secure link.")
+            return redirect("candidate:session-start", session_uuid=self.session.uuid)
+        try:
+            validate_email(email_input)
+        except ValidationError:
+            messages.error(request, "That email looks invalid. Please double-check and try again.")
+            return redirect("candidate:session-start", session_uuid=self.session.uuid)
         success, error = send_switch_device_email(
-            email=candidate.email,
+            email=email_input,
             candidate_name=candidate.first_name,
             resume_link=resume_link,
             assessment_label=self.session.assessment.title,
@@ -338,10 +377,60 @@ class SessionSendLinkView(SessionMixin, View):
         if success:
             messages.success(
                 request,
-                f"We emailed the secure link to {candidate.email}.",
+                f"We emailed the secure link to {email_input}.",
             )
         else:
             messages.error(request, error or "We could not send the link right now.")
+        return redirect("candidate:session-start", session_uuid=self.session.uuid)
+
+
+class SessionSupportRequestView(SessionMixin, View):
+    """Capture urgent support notes + contact info from candidates."""
+
+    def post(self, request, *args, **kwargs):
+        self.load_session(**kwargs)
+        form = CandidateSupportRequestForm(request.POST)
+        storage_key = getattr(self, "support_form_storage_key", "")
+        if not form.is_valid():
+            request.session[storage_key] = request.POST.dict()
+            messages.error(
+                request, "Share a quick note and how we can reach you so we can help."
+            )
+            return redirect("candidate:session-start", session_uuid=self.session.uuid)
+        data = form.cleaned_data
+        candidate_obj = self.session.candidate
+        candidate_name = " ".join(
+            part
+            for part in [getattr(candidate_obj, "first_name", ""), getattr(candidate_obj, "last_name", "")]
+            if part
+        ).strip()
+        support_request = CandidateSupportRequest.objects.create(
+            session=self.session,
+            topic=data["topic"],
+            message=data["message"],
+            contact_method=data["contact_method"],
+            contact_value=data["contact_value"],
+            candidate_name=candidate_name,
+            candidate_email=getattr(candidate_obj, "email", "") or "",
+        )
+        subject = f"Candidate support needed ({support_request.get_topic_display()})"
+        resume_link = request.build_absolute_uri(
+            reverse("candidate:session-entry", args=[self.session.uuid])
+        )
+        body = (
+            f"Session: {self.session.uuid}\n"
+            f"Candidate: {support_request.candidate_name or 'N/A'} ({support_request.candidate_email or 'n/a'})\n"
+            f"Contact ({support_request.contact_method}): {support_request.contact_value}\n\n"
+            f"Message:\n{support_request.message}\n\n"
+            f"Resume link: {resume_link}"
+        )
+        notify_support_team(subject, body)
+        messages.success(
+            request,
+            "Thanks—we’ve routed this to support. Keep an eye on your email/phone for a response.",
+        )
+        if storage_key in request.session:
+            del request.session[storage_key]
         return redirect("candidate:session-start", session_uuid=self.session.uuid)
 
 

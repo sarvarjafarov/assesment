@@ -4,6 +4,7 @@ import json
 from django import forms
 
 from assessments.models import Question
+from .models import CandidateSupportRequest
 
 
 class QuestionStepForm(forms.Form):
@@ -164,3 +165,40 @@ class CandidateFeedbackForm(forms.Form):
         label="The recruiting team may contact me about this feedback.",
         required=False,
     )
+
+
+class CandidateSupportRequestForm(forms.Form):
+    topic = forms.ChoiceField(
+        label="What do you need help with?",
+        choices=CandidateSupportRequest.TOPIC_CHOICES,
+        required=True,
+    )
+    message = forms.CharField(
+        label="Describe the issue",
+        widget=forms.Textarea(
+            attrs={"rows": 3, "placeholder": "Tell us what you’re seeing or any blockers."}
+        ),
+        required=True,
+    )
+    contact_method = forms.ChoiceField(
+        label="Preferred contact method",
+        choices=CandidateSupportRequest.CONTACT_METHOD_CHOICES,
+        required=True,
+    )
+    contact_value = forms.CharField(
+        label="Where can we reach you?",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "you@example.com or +1 555 123 4567"}),
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        contact_value = cleaned.get("contact_value", "").strip()
+        if not contact_value:
+            self.add_error(
+                "contact_value",
+                "Share an email, phone, or handle so we can reply.",
+            )
+        else:
+            cleaned["contact_value"] = contact_value
+        return cleaned

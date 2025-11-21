@@ -14,6 +14,9 @@
         </div>
         <div class="portal-actions">
             <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Back to projects</a>
+            {% if request.user.client_account.role == 'manager' %}
+            <a class="btn btn-pill small" href="{% url 'clients:project-clone' project.uuid %}">Duplicate project</a>
+            {% endif %}
         </div>
     </section>
 
@@ -32,6 +35,114 @@
             <p class="label">Description</p>
             <p class="muted">{{ project.description|default:"No description yet." }}</p>
         </article>
+    </section>
+
+    {% with health=project_health %}
+    <section class="portal-card-grid project-health-grid">
+        <article class="portal-card">
+            <p class="label">Active invites</p>
+            <h2>{{ health.active_invites }}</h2>
+            <p class="muted">Draft, paused, or in progress</p>
+        </article>
+        <article class="portal-card">
+            <p class="label">Completion rate</p>
+            <h2>{% if health.completion_rate is not None %}{{ health.completion_rate|floatformat:0 }}%{% else %}—{% endif %}</h2>
+            <p class="muted">{{ health.submitted }}/{{ health.total }} submitted</p>
+        </article>
+        <article class="portal-card">
+            <p class="label">Avg. completion time</p>
+            <h2>{% if health.avg_completion_minutes %}{{ health.avg_completion_minutes|floatformat:0 }} min{% else %}—{% endif %}</h2>
+            <p class="muted">From start to submission</p>
+        </article>
+        <article class="portal-card">
+            <p class="label">Avg. time to fill</p>
+            <h2>{% if health.avg_time_to_fill_days %}{{ health.avg_time_to_fill_days|floatformat:1 }} days{% else %}—{% endif %}</h2>
+            <p class="muted">Invite creation to completion</p>
+        </article>
+    </section>
+    {% if health.top_candidates %}
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">Top candidates</p>
+                <h2>Best-performing submissions</h2>
+            </div>
+        </header>
+        <div class="top-candidate-list">
+            {% for candidate in health.top_candidates %}
+            <article class="top-candidate-card">
+                <div>
+                    <p class="label">{{ candidate.candidate }}</p>
+                    <p class="muted">{{ candidate.assessment }}</p>
+                </div>
+                <div class="spotlight-score">
+                    <strong>{{ candidate.score|floatformat:0 }}</strong>
+                    <span>score</span>
+                </div>
+                {% if candidate.detail_url %}
+                <a class="pill subtle" href="{{ candidate.detail_url }}">Report</a>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+
+    <section class="pipeline-board" id="pipeline">
+        <header class="pipeline-head">
+            <div>
+                <p class="eyebrow">Pipeline</p>
+                <h2>Stage-by-stage visibility</h2>
+            </div>
+            <p class="muted">Drag-and-drop coming soon; for now update stages inline.</p>
+        </header>
+        <div class="pipeline-columns">
+            {% for column in pipeline_columns %}
+            <article class="pipeline-column">
+                <div class="pipeline-column-head">
+                    <h3>{{ column.label }}</h3>
+                    <span class="micro-pill">{{ column.count }} candidate{{ column.count|pluralize }}</span>
+                </div>
+                {% if column.sessions %}
+                <ul class="pipeline-card-list">
+                    {% for card in column.sessions %}
+                    <li class="pipeline-card">
+                        <div class="pipeline-card-main">
+                            <p class="label">{{ card.candidate }}</p>
+                            <p class="muted">{{ card.assessment }}</p>
+                        </div>
+                        <div class="pipeline-card-meta">
+                            <span class="status-pill">{{ card.status }}</span>
+                            {% if card.score %}
+                            <span class="score-pill">{{ card.score|floatformat:0 }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="muted tiny">Updated {{ card.updated_at|naturaltime }}</p>
+                        <div class="pipeline-card-actions">
+                            {% if card.detail_url %}
+                            <a class="pill subtle" href="{{ card.detail_url }}">Report</a>
+                            {% endif %}
+                            {% if can_edit_pipeline %}
+                            <form method="post" action="{{ card.stage_url }}" class="pipeline-stage-form">
+                                {% csrf_token %}
+                                <select name="stage" class="pipeline-stage-select" aria-label="Update stage for {{ card.candidate }}" onchange="this.form.submit()">
+                                    {% for value,label in pipeline_stage_choices %}
+                                    <option value="{{ value }}" {% if value == card.stage %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="empty-state">No candidates in this stage.</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
     </section>
 
     <section class="panel portal-panel">

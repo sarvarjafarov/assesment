@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body data-page-theme="{% block page_theme %}light{% endblock %}">
+<body class="{% block body_class %}{% endblock %}" data-page-theme="{% block page_theme %}light{% endblock %}">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <div class="accessibility-toggles">
         <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">
@@ -32,7 +32,9 @@
     <main id="main-content" tabindex="-1">
         {% block content %}{% endblock %}
     </main>
-    {% include 'includes/site_footer.html' %}
+    {% block site_footer %}
+        {% include 'includes/site_footer.html' %}
+    {% endblock %}
     <script src="{% static 'js/main.js' %}" defer></script>
 </body>
 </html>

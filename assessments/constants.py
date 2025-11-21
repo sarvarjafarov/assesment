@@ -10,6 +10,16 @@ BEHAVIORAL_TRAITS = [
     "integrity",
 ]
 
+PIPELINE_STAGE_CHOICES = [
+    ("invited", "Invited"),
+    ("in_progress", "In progress"),
+    ("submitted", "Assessment submitted"),
+    ("interview", "Interview"),
+    ("offer", "Offer extended"),
+    ("hired", "Hired / onboarded"),
+    ("rejected", "Not moving forward"),
+]
+
 
 def sanitize_behavioral_focus(values: Iterable[str] | None) -> list[str]:
     """

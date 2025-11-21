@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% block body_class %}candidate-experience{% endblock %}
 {% block content %}
 <div class="candidate-shell single-column">
+    <a class="candidate-skip-link" href="#questionForm">Skip to question content</a>
     <section class="candidate-panel response-panel question-step">
-        <div class="question-progress">
+        <div class="question-progress" role="status" aria-live="polite" aria-label="Assessment progress">
             <div class="progress-meta">
                 <span class="status-chip">
                     <span class="chip-dot"></span>
                     Assessment in progress
                 </span>
             </div>
-            <div class="progress-meter">
+            <div class="progress-meter" role="img" aria-label="{{ progress_percent }}% complete">
                 <div class="progress-bar">
-                    <span style="width: {{ progress_percent }}%"></span>
+                    <span style="width: {{ progress_percent }}%" aria-hidden="true"></span>
                 </div>
             </div>
             <div class="progress-stats">
@@ -37,7 +39,7 @@
                 {% endif %}
             </div>
         </div>
-        <div class="session-utility-bar">
+        <div class="session-utility-bar" role="status" aria-live="polite">
             <div>
                 <p class="eyebrow">Progress saved</p>
                 <strong>
@@ -53,15 +55,22 @@
                 <button type="submit" class="btn btn-outline">Pause &amp; resume later</button>
             </form>
         </div>
-        <div class="device-support">
+        <div class="device-support" aria-labelledby="switchDeviceTitle" aria-describedby="switchHelp">
             <div>
-                <p class="eyebrow">Switch device</p>
+                <p class="eyebrow" id="switchDeviceTitle">Switch device</p>
                 <p>Need to continue on another laptop or tablet? We will email the secure link to <strong>{{ candidate.email }}</strong>.</p>
             </div>
             <form method="post" action="{{ switch_device_url }}">
                 {% csrf_token %}
+                <label class="sr-only" for="switch-email">Destination email</label>
+                <input type="email" name="email" id="switch-email" value="{{ candidate.email }}" autocomplete="email" inputmode="email" required>
                 <button type="submit" class="btn btn-ghost">Send link</button>
             </form>
+        </div>
+        <p class="input-hint" id="switchHelp">Enter a company or personal email to instantly receive your session link.</p>
+        <div class="accessibility-hint" role="note">
+            <strong>Keyboard &amp; contrast tips:</strong>
+            <p>Use the Tab key to move between inputs, Shift + Tab to move backwards, and press the space bar to select options. Toggle dark or high-contrast mode at the top-right of the page if you need more visual separation.</p>
         </div>
         {% if help_topics %}
         <details class="help-drawer">
@@ -80,6 +89,56 @@
             </div>
         </details>
         {% endif %}
+        <section class="support-center" aria-labelledby="supportCenterTitle">
+            <div class="support-center-head">
+                <div>
+                    <p class="eyebrow" id="supportCenterTitle">Need more help?</p>
+                    <h2>Contact our team without leaving the page.</h2>
+                </div>
+                <div class="support-actions">
+                    <a class="pill" href="mailto:{{ support_contact_email }}">Email support</a>
+                    <a class="pill subtle" href="tel:{{ support_contact_phone|cut:' ' }}">{{ support_contact_phone }}</a>
+                </div>
+            </div>
+            <form method="post" action="{{ support_request_url }}" class="support-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="support_request">
+                <div class="support-form-grid">
+                    <div class="form-field">
+                        {{ support_form.topic.label_tag }}
+                        {{ support_form.topic }}
+                        {% for error in support_form.topic.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        {{ support_form.contact_method.label_tag }}
+                        {{ support_form.contact_method }}
+                        {% for error in support_form.contact_method.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        {{ support_form.contact_value.label_tag }}
+                        {{ support_form.contact_value }}
+                        {% for error in support_form.contact_value.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-field">
+                    {{ support_form.message.label_tag }}
+                    {{ support_form.message }}
+                    {% for error in support_form.message.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="support-submit">
+                    <button class="btn btn-ghost" type="submit">Send help request</button>
+                    <p class="muted tiny">We’ll reply using your preferred channel within a few minutes.</p>
+                </div>
+            </form>
+        </section>
         {% if instructions %}
         <div class="question-instructions">
             <p>{{ instructions }}</p>
@@ -90,7 +149,7 @@
             <p><span>Behavioral focus:</span> {{ behavioral_focus_label }}</p>
         </div>
         {% endif %}
-        <form method="post" class="question-form">
+        <form method="post" class="question-form" id="questionForm">
             {% csrf_token %}
             <input type="hidden" name="telemetry_payload" data-telemetry-field>
             {% if form.non_field_errors %}

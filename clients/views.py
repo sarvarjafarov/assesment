@@ -17,7 +17,9 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import FormView, TemplateView
 from django.db import models
+from django.forms.models import model_to_dict
 
+from assessments.constants import PIPELINE_STAGE_CHOICES
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from pm_assessments.models import ProductAssessmentSession
 from behavioral_assessments.models import BehavioralAssessmentSession
@@ -68,6 +70,143 @@ def build_dataset_map(account: ClientAccount):
         "product": ProductAssessmentSession.objects.filter(client=account).select_related("project"),
         "behavioral": BehavioralAssessmentSession.objects.filter(client=account).select_related("project"),
     }
+
+
+PIPELINE_STAGE_LABELS = dict(PIPELINE_STAGE_CHOICES)
+PIPELINE_STAGE_KEYS = [choice[0] for choice in PIPELINE_STAGE_CHOICES]
+PIPELINE_STAGE_DEFAULT = PIPELINE_STAGE_KEYS[0]
+
+
+def normalize_pipeline_stage(session) -> str:
+    stage = getattr(session, "pipeline_stage", None) or PIPELINE_STAGE_DEFAULT
+    if stage not in PIPELINE_STAGE_LABELS:
+        stage = PIPELINE_STAGE_DEFAULT
+    status = getattr(session, "status", "")
+    if status == "submitted" and stage in {"invited", "in_progress"}:
+        return "submitted"
+    if status == "in_progress" and stage == "invited":
+        return "in_progress"
+    return stage
+
+
+ASSESSMENT_MODEL_MAP = {
+    "marketing": DigitalMarketingAssessmentSession,
+    "product": ProductAssessmentSession,
+    "behavioral": BehavioralAssessmentSession,
+}
+
+
+def _default_project_health(project=None):
+    return {
+        "project": project,
+        "total": 0,
+        "submitted": 0,
+        "in_progress": 0,
+        "draft": 0,
+        "paused": 0,
+        "active_invites": 0,
+        "completion_rate": None,
+        "avg_completion_minutes": None,
+        "avg_time_to_fill_days": None,
+        "top_candidates": [],
+        "spotlight_candidate": None,
+    }
+
+
+def build_project_health_map(account: ClientAccount, dataset_map: dict | None = None) -> dict[int, dict]:
+    dataset_map = dataset_map or build_dataset_map(account)
+    stats: dict[int, dict] = {}
+    for code, queryset in dataset_map.items():
+        label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
+        # Only consider sessions tied to a project
+        for session in queryset.filter(project__isnull=False):
+            project = session.project
+            if not project:
+                continue
+            entry = stats.get(project.id)
+            if not entry:
+                entry = {
+                    "project": project,
+                    "total": 0,
+                    "submitted": 0,
+                    "in_progress": 0,
+                    "draft": 0,
+                    "paused": 0,
+                    "active_invites": 0,
+                    "completion_rate": None,
+                    "avg_completion_minutes": None,
+                    "avg_time_to_fill_days": None,
+                    "top_candidates": [],
+                    "spotlight_candidate": None,
+                    "_completion_minutes_sum": 0,
+                    "_completion_minutes_count": 0,
+                    "_time_to_fill_days_sum": 0,
+                    "_time_to_fill_days_count": 0,
+                }
+                stats[project.id] = entry
+
+            entry["total"] += 1
+            status = session.status
+            if status == "submitted":
+                entry["submitted"] += 1
+            elif status == "in_progress":
+                entry["in_progress"] += 1
+            elif status == "draft":
+                entry["draft"] += 1
+            elif status == "paused":
+                entry["paused"] += 1
+
+            if status == "submitted":
+                start_ts = session.started_at or session.created_at
+                submitted_ts = session.submitted_at or session.updated_at
+                if start_ts and submitted_ts:
+                    runtime_minutes = (submitted_ts - start_ts).total_seconds() / 60
+                else:
+                    runtime_minutes = session.duration_minutes or None
+                if runtime_minutes:
+                    entry["_completion_minutes_sum"] += runtime_minutes
+                    entry["_completion_minutes_count"] += 1
+                if session.created_at and submitted_ts:
+                    days_to_complete = (submitted_ts - session.created_at).total_seconds() / 86400
+                    if days_to_complete >= 0:
+                        entry["_time_to_fill_days_sum"] += days_to_complete
+                        entry["_time_to_fill_days_count"] += 1
+
+                score = getattr(session, "overall_score", None)
+                if score is None:
+                    score = getattr(session, "eligibility_score", None)
+                try:
+                    numeric_score = float(score) if score is not None else None
+                except (TypeError, ValueError):
+                    numeric_score = None
+                if numeric_score is not None:
+                    entry["top_candidates"].append(
+                        {
+                            "candidate": session.candidate_id,
+                            "score": numeric_score,
+                            "score_display": numeric_score,
+                            "assessment": label,
+                            "detail_url": reverse("clients:assessment-detail", args=[code, session.uuid]),
+                            "submitted_at": submitted_ts,
+                        }
+                    )
+
+    for entry in stats.values():
+        entry["active_invites"] = max(entry["total"] - entry["submitted"], 0)
+        if entry["total"]:
+            entry["completion_rate"] = round((entry["submitted"] / entry["total"]) * 100)
+        if entry.get("_completion_minutes_count"):
+            entry["avg_completion_minutes"] = entry["_completion_minutes_sum"] / entry["_completion_minutes_count"]
+        if entry.get("_time_to_fill_days_count"):
+            entry["avg_time_to_fill_days"] = entry["_time_to_fill_days_sum"] / entry["_time_to_fill_days_count"]
+        entry["top_candidates"].sort(key=lambda item: (item.get("score") or 0), reverse=True)
+        entry["top_candidates"] = entry["top_candidates"][:3]
+        entry["spotlight_candidate"] = entry["top_candidates"][0] if entry["top_candidates"] else None
+        entry.pop("_completion_minutes_sum", None)
+        entry.pop("_completion_minutes_count", None)
+        entry.pop("_time_to_fill_days_sum", None)
+        entry.pop("_time_to_fill_days_count", None)
+    return stats
 
 
 ALL_ROLE_CODES = {code for code, _ in ClientAccount.ROLE_CHOICES}
@@ -951,7 +1090,13 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["projects"] = self.account.projects.order_by("-created_at")
+        dataset_map = build_dataset_map(self.account)
+        project_health = build_project_health_map(self.account, dataset_map)
+        projects = list(self.account.projects.order_by("-created_at"))
+        for project in projects:
+            project.health = project_health.get(project.id, _default_project_health(project))
+        context["projects"] = projects
+        context["project_health_map"] = project_health
         context["form"] = getattr(self, "form", self.form_class(client=self.account))
         context["is_manager"] = self.account.role == "manager"
         return context
@@ -983,8 +1128,15 @@ class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         project = self.get_project()
         dataset_map = build_dataset_map(self.account)
+        project_health_map = build_project_health_map(self.account, dataset_map)
+        project_health = project_health_map.get(project.id, _default_project_health(project))
         assessment_details = []
         recent_sessions = []
+        pipeline_columns = [
+            {"key": key, "label": PIPELINE_STAGE_LABELS.get(key, key.title()), "sessions": []}
+            for key in PIPELINE_STAGE_KEYS
+        ]
+        pipeline_lookup = {column["key"]: column["sessions"] for column in pipeline_columns}
         for code, queryset in dataset_map.items():
             label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
             qs = queryset.filter(project=project)
@@ -1000,6 +1152,29 @@ class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
                     }
                 )
             for session in qs.order_by("-updated_at")[:50]:
+                stage = normalize_pipeline_stage(session)
+                score = getattr(session, "overall_score", None)
+                if score is None:
+                    score = getattr(session, "eligibility_score", None)
+                card = {
+                    "candidate": session.candidate_id,
+                    "assessment": label,
+                    "assessment_code": code,
+                    "stage": stage,
+                    "status": session.get_status_display(),
+                    "status_slug": session.status,
+                    "score": score,
+                    "updated_at": session.pipeline_stage_updated_at
+                    or session.updated_at
+                    or session.created_at,
+                    "detail_url": reverse("clients:assessment-detail", args=[code, session.uuid])
+                    if session.status == "submitted"
+                    else None,
+                    "stage_url": reverse(
+                        "clients:project-pipeline-update", args=[project.uuid, code, session.uuid]
+                    ),
+                }
+                pipeline_lookup.get(stage, pipeline_columns[0]["sessions"]).append(card)
                 recent_sessions.append(
                     {
                         "candidate": session.candidate_id,
@@ -1012,14 +1187,109 @@ class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
                     }
                 )
         recent_sessions.sort(key=lambda item: item["updated_at"], reverse=True)
+        for column in pipeline_columns:
+            column["count"] = len(column["sessions"])
         context.update(
             {
                 "project": project,
+                "project_health": project_health,
+                "pipeline_columns": pipeline_columns,
+                "pipeline_stage_choices": PIPELINE_STAGE_CHOICES,
+                "can_edit_pipeline": self.account.role in ROLE_INVITE_ACCESS,
                 "assessment_details": assessment_details,
                 "recent_sessions": recent_sessions[:20],
             }
         )
         return context
+
+
+class ClientProjectCloneView(ClientProjectAccessMixin, FormView):
+    template_name = "clients/projects/clone.html"
+    form_class = ClientProjectForm
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.account.role != "manager":
+            messages.error(request, "Only managers can duplicate projects.")
+            return redirect("clients:project-list")
+        self.source_project = get_object_or_404(
+            self.account.projects, uuid=kwargs.get("project_uuid")
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        data = model_to_dict(
+            self.source_project,
+            fields=[
+                "title",
+                "role_level",
+                "department",
+                "location",
+                "priority",
+                "status",
+                "open_roles",
+                "target_start_date",
+                "description",
+            ],
+        )
+        data["title"] = f"{self.source_project.title} copy"
+        return data
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["client"] = self.account
+        return kwargs
+
+    def form_valid(self, form):
+        project = form.save()
+        messages.success(
+            self.request,
+            f"Created '{project.title}' based on {self.source_project.title}.",
+        )
+        return redirect("clients:project-detail", project_uuid=project.uuid)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dataset_map = build_dataset_map(self.account)
+        project_health = build_project_health_map(self.account, dataset_map).get(
+            self.source_project.id, _default_project_health(self.source_project)
+        )
+        context.update(
+            {
+                "source_project": self.source_project,
+                "project_health": project_health,
+            }
+        )
+        return context
+
+
+class ClientProjectPipelineStageView(ClientProjectAccessMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        if self.account.role not in ROLE_INVITE_ACCESS:
+            messages.error(request, "Only managers or recruiters can update stages.")
+            return redirect("clients:project-detail", project_uuid=kwargs.get("project_uuid"))
+        project = get_object_or_404(self.account.projects, uuid=kwargs.get("project_uuid"))
+        assessment_type = kwargs.get("assessment_type")
+        session_uuid = kwargs.get("session_uuid")
+        model = ASSESSMENT_MODEL_MAP.get(assessment_type)
+        if model is None:
+            raise Http404("Unknown assessment.")
+        session = get_object_or_404(
+            model.objects.filter(client=self.account, project=project), uuid=session_uuid
+        )
+        next_stage = request.POST.get("stage")
+        if next_stage not in PIPELINE_STAGE_LABELS:
+            messages.error(request, "Invalid pipeline stage.")
+            return redirect("clients:project-detail", project_uuid=project.uuid)
+        session.pipeline_stage = next_stage
+        session.pipeline_stage_updated_at = timezone.now()
+        session.save(update_fields=["pipeline_stage", "pipeline_stage_updated_at"])
+        messages.success(
+            request,
+            f"Moved {session.candidate_id} to {PIPELINE_STAGE_LABELS[next_stage]}.",
+        )
+        return redirect(f"{reverse('clients:project-detail', args=[project.uuid])}#pipeline")
 
     def _build_report(self, session):
         if self.assessment_type == "behavioral":

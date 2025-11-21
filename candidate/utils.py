@@ -111,3 +111,26 @@ def send_switch_device_email(
     except Exception as exc:  # pragma: no cover - network configuration/runtime dependent
         return False, str(exc)
     return True, None
+
+
+def notify_support_team(subject: str, body: str) -> bool:
+    """Best-effort email notification for urgent candidate support requests."""
+    recipient = getattr(
+        settings,
+        "SUPPORT_CONTACT_EMAIL",
+        getattr(settings, "SUPPORT_INBOX", None),
+    )
+    if not recipient:
+        return False
+    if not getattr(settings, "EMAIL_ENABLED", False):
+        return False
+    try:
+        send_mail(
+            subject,
+            body,
+            getattr(settings, "DEFAULT_FROM_EMAIL", None),
+            [recipient],
+        )
+    except Exception:  # pragma: no cover - email backend dependent
+        return False
+    return True

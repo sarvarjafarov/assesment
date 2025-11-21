@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="portal-shell">
+    <section class="portal-hero compact">
+        <div>
+            <p class="eyebrow">Duplicate project</p>
+            <h1>Copy settings from {{ source_project.title }}</h1>
+            <p class="muted">Start with the same role details, priorities, and context—then adjust anything unique for this new opening.</p>
+        </div>
+        <div class="portal-actions">
+            <a class="btn btn-outline small" href="{% url 'clients:project-detail' source_project.uuid %}">Cancel</a>
+        </div>
+    </section>
+
+    <section class="portal-card-grid project-health-grid">
+        <article class="portal-card">
+            <p class="label">Current priority</p>
+            <h2>{{ source_project.get_priority_display }}</h2>
+            <p class="muted">{{ source_project.get_status_display }}</p>
+        </article>
+        <article class="portal-card">
+            <p class="label">Active invites</p>
+            <h2>{{ project_health.active_invites }}</h2>
+            <p class="muted">{{ project_health.total }} total invites</p>
+        </article>
+        <article class="portal-card">
+            <p class="label">Top performer</p>
+            {% if project_health.spotlight_candidate %}
+            <h2>{{ project_health.spotlight_candidate.candidate }}</h2>
+            <p class="muted">{{ project_health.spotlight_candidate.assessment }} · {{ project_health.spotlight_candidate.score|floatformat:0 }} score</p>
+            {% else %}
+            <h2>—</h2>
+            <p class="muted">No completed submissions yet</p>
+            {% endif %}
+        </article>
+    </section>
+
+    <section class="panel portal-panel">
+        <header>
+            <div>
+                <p class="eyebrow">New project details</p>
+                <h2>Adjust anything before launching</h2>
+            </div>
+        </header>
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button class="btn btn-pill" type="submit">Create duplicate</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

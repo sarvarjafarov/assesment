@@ -28,4 +28,10 @@ urlpatterns = [
     ),
     path("dashboard/projects/", views.ClientProjectListView.as_view(), name="project-list"),
     path("dashboard/projects/<uuid:project_uuid>/", views.ClientProjectDetailView.as_view(), name="project-detail"),
+    path("dashboard/projects/<uuid:project_uuid>/clone/", views.ClientProjectCloneView.as_view(), name="project-clone"),
+    path(
+        "dashboard/projects/<uuid:project_uuid>/pipeline/<slug:assessment_type>/<uuid:session_uuid>/",
+        views.ClientProjectPipelineStageView.as_view(),
+        name="project-pipeline-update",
+    ),
 ]

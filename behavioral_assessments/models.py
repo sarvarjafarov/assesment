@@ -5,6 +5,8 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
+from assessments.constants import PIPELINE_STAGE_CHOICES
+
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -87,6 +89,12 @@ class BehavioralAssessmentSession(TimeStampedModel):
         on_delete=models.SET_NULL,
         related_name="behavioral_sessions",
     )
+    pipeline_stage = models.CharField(
+        max_length=32,
+        choices=PIPELINE_STAGE_CHOICES,
+        default="invited",
+    )
+    pipeline_stage_updated_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ("-created_at",)
@@ -95,3 +103,9 @@ class BehavioralAssessmentSession(TimeStampedModel):
     def mark_submitted(self):
         self.status = "submitted"
         self.submitted_at = timezone.now()
+        if self.pipeline_stage in (None, "", "invited", "in_progress"):
+            self.pipeline_stage = "submitted"
+            self.pipeline_stage_updated_at = timezone.now()
+        self.save(
+            update_fields=["status", "submitted_at", "pipeline_stage", "pipeline_stage_updated_at"]
+        )

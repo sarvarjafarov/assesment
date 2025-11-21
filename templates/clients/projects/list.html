@@ -45,15 +45,67 @@
             </div>
         </header>
         {% if projects %}
-        <div class="portal-card-grid metric-snapshot">
+        <div class="portal-card-grid metric-snapshot project-card-grid">
             {% for project in projects %}
-            <article class="portal-card">
-                <p class="label">{{ project.get_status_display }}</p>
-                <h2>{{ project.title }}</h2>
-                <p class="muted">{{ project.department }}{% if project.location %} · {{ project.location }}{% endif %}</p>
-                <p class="muted">{{ project.open_roles }} open role{{ project.open_roles|pluralize }}</p>
-                <p class="muted">Assessments: {{ project.total_sessions }}</p>
-                <a class="btn btn-outline small" href="{% url 'clients:project-detail' project.uuid %}">View project</a>
+            <article class="portal-card project-card">
+                <header class="project-card-head">
+                    <div>
+                        <p class="label">{{ project.get_status_display }}</p>
+                        <h2>{{ project.title }}</h2>
+                        <p class="muted">
+                            {% if project.department %}{{ project.department }}{% endif %}
+                            {% if project.department and project.location %} · {% endif %}
+                            {% if project.location %}{{ project.location }}{% endif %}
+                        </p>
+                    </div>
+                    <div class="project-card-meta">
+                        <span class="micro-pill">{{ project.get_priority_display }} priority</span>
+                        <span class="micro-pill">{{ project.open_roles }} role{{ project.open_roles|pluralize }}</span>
+                    </div>
+                </header>
+                {% with health=project.health %}
+                <div class="project-kpi-row">
+                    <div>
+                        <p class="micro-label">Completion rate</p>
+                        <strong>{% if health.completion_rate is not None %}{{ health.completion_rate|floatformat:0 }}%{% else %}—{% endif %}</strong>
+                    </div>
+                    <div>
+                        <p class="micro-label">Active invites</p>
+                        <strong>{{ health.active_invites }}</strong>
+                    </div>
+                    <div>
+                        <p class="micro-label">Avg. time to fill</p>
+                        <strong>{% if health.avg_time_to_fill_days %}{{ health.avg_time_to_fill_days|floatformat:1 }}d{% else %}—{% endif %}</strong>
+                    </div>
+                </div>
+                {% if health.spotlight_candidate %}
+                <div class="project-spotlight-card">
+                    <div>
+                        <p class="micro-label">Top candidate</p>
+                        <p class="spotlight-name">{{ health.spotlight_candidate.candidate }}</p>
+                        <p class="muted">{{ health.spotlight_candidate.assessment }}</p>
+                    </div>
+                    <div class="spotlight-score">
+                        <strong>{{ health.spotlight_candidate.score|floatformat:0 }}</strong>
+                        <span>score</span>
+                        {% if health.spotlight_candidate.detail_url %}
+                        <a class="pill subtle" href="{{ health.spotlight_candidate.detail_url }}">Report</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% endwith %}
+                <div class="project-card-actions">
+                    <div class="project-card-links">
+                        <p class="muted">Assessments: {{ project.total_sessions }}</p>
+                        {% if is_manager %}
+                        <a class="pill subtle" href="{% url 'clients:project-clone' project.uuid %}">Duplicate</a>
+                        {% endif %}
+                    </div>
+                    <a class="btn btn-outline small" href="{% url 'clients:project-detail' project.uuid %}">
+                        View project
+                    </a>
+                </div>
             </article>
             {% endfor %}
         </div>

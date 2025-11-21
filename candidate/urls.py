@@ -45,6 +45,11 @@ urlpatterns = [
         name="session-send-link",
     ),
     path(
+        "<uuid:session_uuid>/support/",
+        views.SessionSupportRequestView.as_view(),
+        name="session-support-request",
+    ),
+    path(
         "<uuid:session_uuid>/practice/",
         views.SessionPracticeView.as_view(),
         name="session-practice",
