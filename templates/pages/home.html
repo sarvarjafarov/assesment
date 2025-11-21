@@ -93,6 +93,13 @@
                             <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
                             <h3>{{ item.title }}</h3>
                             <p>{{ item.summary }}</p>
+                            {% if item.focus %}
+                            <ul class="suite-focus">
+                                {% for focus in item.focus %}
+                                <li>{{ focus }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         </button>
                         {% endfor %}
                     </div>
@@ -100,9 +107,12 @@
                         {% for item in suite %}
                         <article class="suite-panel {% if forloop.first %}is-active{% endif %}" data-suite-panel="{{ item.slug }}">
                             <h4>{{ item.label }}</h4>
-                            <ul>
+                            <ul class="suite-metrics">
                                 {% for stat in item.stats %}
-                                <li>{{ stat }}</li>
+                                <li>
+                                    <span>{{ stat.label }}</span>
+                                    <strong>{{ stat.value }}</strong>
+                                </li>
                                 {% endfor %}
                             </ul>
                             <a class="btn btn-outline small" href="mailto:hello@sira.so?subject={{ item.label|urlencode }}%20rubric">Download {{ item.title }} rubric</a>
@@ -516,13 +526,59 @@
     </main>
 
     <footer class="site-footer">
-        <div>© {% now "Y" %} Sira</div>
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Resources</a>
+        <div class="footer-shell">
+            <div class="footer-brand">
+                <div class="brand">
+                    <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
+                    <span>Sira</span>
+                </div>
+                <p>Assess marketing, product, and behavioral talent with a guided console for teams and candidates.</p>
+                <a class="btn btn-outline small" href="#cta">Book a walkthrough</a>
+            </div>
+            <div class="footer-nav">
+                <div>
+                    <p class="footer-heading">Platform</p>
+                    <ul>
+                        <li><a href="#suite">Assessment suite</a></li>
+                        <li><a href="#workflow">How it works</a></li>
+                        <li><a href="#journey">Candidate experience</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer-heading">Resources</p>
+                    <ul>
+                        <li><a href="#resources">Blog &amp; insights</a></li>
+                        <li><a href="#caseStories">Customer stories</a></li>
+                        <li><a href="{% url 'marketing_assessments:api' %}">API docs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer-heading">Company</p>
+                    <ul>
+                        <li><a href="#cta">Contact us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-newsletter">
+                <p class="footer-heading">Stay in the loop</p>
+                <p>Monthly updates on product releases and interview best practices.</p>
+                <form class="footer-form">
+                    <input type="email" placeholder="you@company.com" aria-label="Email address">
+                    <button type="button">Subscribe</button>
+                </form>
+            </div>
         </div>
-        <div>Made with <span>♥</span> by Sira</div>
+        <div class="footer-bottom">
+            <span>© {% now "Y" %} Sira</span>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#resources">Resources</a>
+            </div>
+            <span>Made with <span class="heart">♥</span> by Sira</span>
+        </div>
     </footer>
 {{ live_events|json_script:"live-events-data" }}
 </div>

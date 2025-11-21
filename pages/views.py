@@ -15,10 +15,11 @@ def home(request):
             "label": "Marketing IQ",
             "title": "Digital marketing",
             "summary": "Scenario-based prompts spanning paid media, SEO, analytics, and GTM strategy.",
+            "focus": ["Paid media", "SEO", "Analytics"],
             "stats": [
-                "40-scene curated bank",
-                "32 min avg completion",
-                "Role-based benchmarks",
+                {"label": "Question bank", "value": "40 curated scenes"},
+                {"label": "Avg completion", "value": "32 min"},
+                {"label": "Benchmarks", "value": "Role-based"},
             ],
         },
         {
@@ -26,10 +27,11 @@ def home(request):
             "label": "Product Sense",
             "title": "Product management",
             "summary": "Reasoning, estimation, prioritization, and UX critiques calibrated for ICs and leads.",
+            "focus": ["Prioritization", "Estimation", "UX critique"],
             "stats": [
-                "Blend of open response + scoring rubrics",
-                "Difficulty ladders by seniority",
-                "Power-user vs broad PM profiles",
+                {"label": "Prompts", "value": "Reasoning + scenario mix"},
+                {"label": "Difficulty", "value": "Ladders by seniority"},
+                {"label": "Profile views", "value": "Power-user vs broad"},
             ],
         },
         {
@@ -37,10 +39,11 @@ def home(request):
             "label": "Behavioral DNA",
             "title": "Leadership & soft skills",
             "summary": "Adaptive block inventory highlighting collaboration style, risk posture, and coaching needs.",
+            "focus": ["Collaboration", "Risk posture", "Coaching"],
             "stats": [
-                "15-minute inventory",
-                "Integrity + engagement flags",
-                "Guided debrief talking points",
+                {"label": "Duration", "value": "15 minutes"},
+                {"label": "Signals", "value": "Integrity + engagement"},
+                {"label": "Deliverable", "value": "Guided debrief points"},
             ],
         },
     ]
