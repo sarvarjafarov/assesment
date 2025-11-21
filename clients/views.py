@@ -972,18 +972,22 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
 class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
     template_name = "clients/projects/detail.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.project = get_object_or_404(self.account.projects, uuid=kwargs.get("project_uuid"))
-        return super().dispatch(request, *args, **kwargs)
+    def get_project(self):
+        if not hasattr(self, "_project"):
+            self._project = get_object_or_404(
+                self.account.projects, uuid=self.kwargs.get("project_uuid")
+            )
+        return self._project
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        project = self.get_project()
         dataset_map = build_dataset_map(self.account)
         assessment_details = []
         recent_sessions = []
         for code, queryset in dataset_map.items():
             label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
-            qs = queryset.filter(project=self.project)
+            qs = queryset.filter(project=project)
             total = qs.count()
             if total:
                 assessment_details.append(
@@ -1010,7 +1014,7 @@ class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
         recent_sessions.sort(key=lambda item: item["updated_at"], reverse=True)
         context.update(
             {
-                "project": self.project,
+                "project": project,
                 "assessment_details": assessment_details,
                 "recent_sessions": recent_sessions[:20],
             }
