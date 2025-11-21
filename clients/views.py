@@ -1138,15 +1138,15 @@ class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):
                 "actionable_summary": build_actionable_summary(report, decision_summary, recommended_decision),
                 "response_drilldown": build_response_drilldown(session),
                 "activity_timeline": build_activity_timeline(session),
-                "comparative_insights": self._build_comparative_insights(session),
-                "quick_followups": self._build_followup_links(session, share_link),
-                "candidate_feedback": self._candidate_feedback(session),
-                "integrity_signals": self._integrity_signals(session),
+                "comparative_insights": build_comparative_insights(session),
+                "quick_followups": build_followup_links(session, share_link),
+                "candidate_feedback": build_candidate_feedback(session),
+                "integrity_signals": build_integrity_signals(session),
                 "pdf_export_url": reverse(
                     "clients:assessment-export",
                     args=[self.assessment_type, session.uuid],
                 ),
-                "audit_log": self._build_audit_log(session),
+                "audit_log": build_audit_log(session, self.account),
             }
         )
         return context
@@ -1487,175 +1487,140 @@ def build_activity_timeline(session):
         )
     return events
 
-    def _build_activity_timeline(self, session):
-        events = []
-        if session.created_at:
-            events.append(
-                {"label": "Invite created", "timestamp": session.created_at, "description": "Assessment invite issued."}
-            )
-        if session.scheduled_for:
-            events.append(
-                {
-                    "label": "Scheduled",
-                    "timestamp": session.scheduled_for,
-                    "description": "Invite scheduled to send automatically.",
-                }
-            )
-        if session.started_at:
-            events.append(
-                {"label": "Candidate started", "timestamp": session.started_at, "description": "Candidate opened the assessment."}
-            )
-        if session.last_reminder_at:
-            events.append(
-                {
-                    "label": "Reminder sent",
-                    "timestamp": session.last_reminder_at,
-                    "description": f"{session.reminder_count} reminder{'s' if (session.reminder_count or 0) != 1 else ''} issued.",
-                }
-            )
-        if session.submitted_at:
-            duration = None
-            if session.started_at:
-                delta = session.submitted_at - session.started_at
-                minutes = max(round(delta.total_seconds() / 60), 1)
-                duration = f"Took {minutes} min"
-            events.append(
-                {
-                    "label": "Assessment submitted",
-                    "timestamp": session.submitted_at,
-                    "description": duration or "Candidate completed the assessment.",
-                }
-            )
-        return events
 
-    def _build_comparative_insights(self, session):
-        if not session.client or not session.client.approved_assessments:
-            return {}
-        queryset = session.__class__.objects.filter(status="submitted")
-        total_assessment = queryset.count()
-        recent = queryset.filter(created_at__gte=timezone.now() - timedelta(days=30)).count()
-        score_field = "overall_score"
-        if not hasattr(session, "overall_score") or session.overall_score is None:
-            if hasattr(session, "eligibility_score"):
-                score_field = "eligibility_score"
-        top_score = queryset.aggregate(models.Max(score_field)).get(f"{score_field}__max")
-        cohort_score = queryset.aggregate(models.Avg(score_field)).get(f"{score_field}__avg")
-        percentile = None
-        candidate_score = getattr(session, score_field, None)
-        if candidate_score is not None and total_assessment:
-            better = queryset.filter(**{f"{score_field}__gt": candidate_score}).count()
-            equal = queryset.filter(**{f"{score_field}": candidate_score}).count()
-            cumulative = better + equal
-            percentile = max(0, 100 - round((cumulative / total_assessment) * 100))
-        return {
-            "cohort_total": total_assessment,
-            "cohort_recent": recent,
-            "cohort_avg": cohort_score,
-            "top_score": top_score,
-            "candidate_score": candidate_score,
-            "percentile": percentile,
+def build_comparative_insights(session):
+    if not session.client or not session.client.approved_assessments:
+        return {}
+    queryset = session.__class__.objects.filter(status="submitted")
+    total_assessment = queryset.count()
+    recent = queryset.filter(created_at__gte=timezone.now() - timedelta(days=30)).count()
+    score_field = "overall_score"
+    if not hasattr(session, "overall_score") or session.overall_score is None:
+        if hasattr(session, "eligibility_score"):
+            score_field = "eligibility_score"
+    top_score = queryset.aggregate(models.Max(score_field)).get(f"{score_field}__max")
+    cohort_score = queryset.aggregate(models.Avg(score_field)).get(f"{score_field}__avg")
+    percentile = None
+    candidate_score = getattr(session, score_field, None)
+    if candidate_score is not None and total_assessment:
+        better = queryset.filter(**{f"{score_field}__gt": candidate_score}).count()
+        equal = queryset.filter(**{f"{score_field}": candidate_score}).count()
+        cumulative = better + equal
+        percentile = max(0, 100 - round((cumulative / total_assessment) * 100))
+    return {
+        "cohort_total": total_assessment,
+        "cohort_recent": recent,
+        "cohort_avg": cohort_score,
+        "top_score": top_score,
+        "candidate_score": candidate_score,
+        "percentile": percentile,
+    }
+
+
+def build_followup_links(session, share_link):
+    candidate = session.candidate_id
+    subject = f"Next steps for {candidate}"
+    base_body = f"Candidate report: {share_link}"
+    return [
+        {
+            "label": "Schedule interview",
+            "description": "Draft an email to schedule the next round.",
+            "href": f"mailto:?subject={subject}%20-%20Interview&body={base_body}",
+            "external": True,
+        },
+        {
+            "label": "Request more info",
+            "description": "Send candidate a follow-up questionnaire.",
+            "href": share_link,
+            "external": True,
+        },
+        {
+            "label": "Share report",
+            "description": "Copy the report link for your ATS or manager.",
+            "href": share_link,
+            "external": True,
+        },
+    ]
+
+
+def build_candidate_feedback(session):
+    if not session.candidate_feedback_score and not session.candidate_feedback_comment:
+        return {}
+    labels = {5: "Excellent", 4: "Good", 3: "Neutral", 2: "Challenging", 1: "Poor"}
+    return {
+        "score": session.candidate_feedback_score,
+        "label": labels.get(session.candidate_feedback_score),
+        "comment": session.candidate_feedback_comment,
+        "submitted_at": session.candidate_feedback_submitted_at,
+        "contact_email": session.candidate_feedback_email,
+        "contact_phone": session.candidate_feedback_phone,
+        "allow_follow_up": session.candidate_feedback_opt_in,
+    }
+
+
+def build_integrity_signals(session):
+    telemetry = session.telemetry_log or {}
+    if not telemetry:
+        return {}
+    device = telemetry.get("device_info") or {}
+    hints = telemetry.get("device_hints") or {}
+    events = telemetry.get("events") or []
+    return {
+        "ip_address": device.get("ip"),
+        "ip_switches": max(0, len(telemetry.get("ip_history") or []) - 1),
+        "user_agent": device.get("user_agent") or hints.get("userAgent"),
+        "paste_count": telemetry.get("paste_count", 0),
+        "last_event": events[-1] if events else None,
+        "timezone": hints.get("timezone"),
+    }
+
+
+def build_audit_log(session, client_account):
+    events = []
+    events.append(
+        {
+            "label": "Assessment created",
+            "timestamp": session.created_at,
+            "description": f"Invite issued for {session.candidate_id}",
         }
-
-    def _build_followup_links(self, session, share_link):
-        candidate = session.candidate_id
-        subject = f"Next steps for {candidate}"
-        base_body = f"Candidate report: {share_link}"
-        return [
-            {
-                "label": "Schedule interview",
-                "description": "Draft an email to schedule the next round.",
-                "href": f"mailto:?subject={subject}%20-%20Interview&body={base_body}",
-                "external": True,
-            },
-            {
-                "label": "Request more info",
-                "description": "Send candidate a follow-up questionnaire.",
-                "href": share_link,
-                "external": True,
-            },
-            {
-                "label": "Share report",
-                "description": "Copy the report link for your ATS or manager.",
-                "href": share_link,
-                "external": True,
-            },
-        ]
-
-    def _candidate_feedback(self, session):
-        if not session.candidate_feedback_score and not session.candidate_feedback_comment:
-            return {}
-        labels = {5: "Excellent", 4: "Good", 3: "Neutral", 2: "Challenging", 1: "Poor"}
-        return {
-            "score": session.candidate_feedback_score,
-            "label": labels.get(session.candidate_feedback_score),
-            "comment": session.candidate_feedback_comment,
-            "submitted_at": session.candidate_feedback_submitted_at,
-            "contact_email": session.candidate_feedback_email,
-            "contact_phone": session.candidate_feedback_phone,
-            "allow_follow_up": session.candidate_feedback_opt_in,
-        }
-
-    def _integrity_signals(self, session):
-        telemetry = session.telemetry_log or {}
-        if not telemetry:
-            return {}
-        device = telemetry.get("device_info") or {}
-        hints = telemetry.get("device_hints") or {}
-        events = telemetry.get("events") or []
-        return {
-            "ip_address": device.get("ip"),
-            "ip_switches": max(0, len(telemetry.get("ip_history") or []) - 1),
-            "user_agent": device.get("user_agent") or hints.get("userAgent"),
-            "paste_count": telemetry.get("paste_count", 0),
-            "last_event": events[-1] if events else None,
-            "timezone": hints.get("timezone"),
-        }
-
-    def _build_audit_log(self, session):
-        events = []
+    )
+    if session.started_at:
         events.append(
             {
-                "label": "Assessment created",
-                "timestamp": session.created_at,
-                "description": f"Invite issued for {session.candidate_id}",
+                "label": "Candidate started",
+                "timestamp": session.started_at,
+                "description": "Candidate opened the assessment link.",
             }
         )
-        if session.started_at:
-            events.append(
-                {
-                    "label": "Candidate started",
-                    "timestamp": session.started_at,
-                    "description": "Candidate opened the assessment link.",
-                }
-            )
-        if session.submitted_at:
-            events.append(
-                {
-                    "label": "Candidate submitted",
-                    "timestamp": session.submitted_at,
-                    "description": "Responses were finalized.",
-                }
-            )
-        if session.candidate_feedback_submitted_at:
-            events.append(
-                {
-                    "label": "Feedback captured",
-                    "timestamp": session.candidate_feedback_submitted_at,
-                    "description": f"Rated {session.candidate_feedback_score}/5",
-                }
-            )
-        note_events = ClientSessionNote.objects.filter(
-            client=self.account, session_uuid=session.uuid
-        ).order_by("-created_at")[:10]
-        for note in note_events:
-            events.append(
-                {
-                    "label": "Reviewer note",
-                    "timestamp": note.created_at,
-                    "description": note.note[:120] + ("..." if note.note and len(note.note) > 120 else ""),
-                }
-            )
-        return sorted(events, key=lambda entry: entry["timestamp"] or timezone.now(), reverse=True)
+    if session.submitted_at:
+        events.append(
+            {
+                "label": "Candidate submitted",
+                "timestamp": session.submitted_at,
+                "description": "Responses were finalized.",
+            }
+        )
+    if session.candidate_feedback_submitted_at:
+        events.append(
+            {
+                "label": "Feedback captured",
+                "timestamp": session.candidate_feedback_submitted_at,
+                "description": f"Rated {session.candidate_feedback_score}/5",
+            }
+        )
+    note_events = ClientSessionNote.objects.filter(
+        client=client_account, session_uuid=session.uuid
+    ).order_by("-created_at")[:10]
+    for note in note_events:
+        events.append(
+            {
+                "label": "Reviewer note",
+                "timestamp": note.created_at,
+                "description": note.note[:120] + ("..." if note.note and len(note.note) > 120 else ""),
+            }
+        )
+    return sorted(events, key=lambda entry: entry["timestamp"] or timezone.now(), reverse=True)
+
 
 
 class ClientAssessmentExportView(ClientAssessmentMixin, View):
