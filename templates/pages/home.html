@@ -86,10 +86,14 @@
                     <h2>Pick the right instrument for every role.</h2>
                     <p class="lede">Three calibrated banks cover GTM, product, and leadership signals—each with fresh questions, scoring rubrics, and reporting templates.</p>
                 </div>
+                <div class="suite-instructions">
+                    <p class="pill subtle">Compare the banks</p>
+                    <span>Select a card to see scoring metrics &amp; download the rubric.</span>
+                </div>
                 <div class="suite-map">
-                    <div class="suite-list">
+                    <div class="suite-list" role="tablist" aria-label="Assessment suite">
                         {% for item in suite %}
-                        <button class="suite-card {% if forloop.first %}is-active{% endif %}" data-suite-button data-target="{{ item.slug }}">
+                        <button class="suite-card {% if forloop.first %}is-active{% endif %}" data-suite-button data-target="{{ item.slug }}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
                             <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
                             <h3>{{ item.title }}</h3>
                             <p>{{ item.summary }}</p>
@@ -100,6 +104,7 @@
                                 {% endfor %}
                             </ul>
                             {% endif %}
+                            <span class="suite-action">View details →</span>
                         </button>
                         {% endfor %}
                     </div>
@@ -525,61 +530,6 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="footer-shell">
-            <div class="footer-brand">
-                <div class="brand">
-                    <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
-                    <span>Sira</span>
-                </div>
-                <p>Assess marketing, product, and behavioral talent with a guided console for teams and candidates.</p>
-                <a class="btn btn-outline small" href="#cta">Book a walkthrough</a>
-            </div>
-            <div class="footer-nav">
-                <div>
-                    <p class="footer-heading">Platform</p>
-                    <ul>
-                        <li><a href="#suite">Assessment suite</a></li>
-                        <li><a href="#workflow">How it works</a></li>
-                        <li><a href="#journey">Candidate experience</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-heading">Resources</p>
-                    <ul>
-                        <li><a href="#resources">Blog &amp; insights</a></li>
-                        <li><a href="#caseStories">Customer stories</a></li>
-                        <li><a href="{% url 'marketing_assessments:api' %}">API docs</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-heading">Company</p>
-                    <ul>
-                        <li><a href="#cta">Contact us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Security</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-newsletter">
-                <p class="footer-heading">Stay in the loop</p>
-                <p>Monthly updates on product releases and interview best practices.</p>
-                <form class="footer-form">
-                    <input type="email" placeholder="you@company.com" aria-label="Email address">
-                    <button type="button">Subscribe</button>
-                </form>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <span>© {% now "Y" %} Sira</span>
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#resources">Resources</a>
-            </div>
-            <span>Made with <span class="heart">♥</span> by Sira</span>
-        </div>
-    </footer>
 {{ live_events|json_script:"live-events-data" }}
 </div>
 {% endblock %}

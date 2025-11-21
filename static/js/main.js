@@ -321,6 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
             suiteButtons.forEach((btn) => btn.classList.remove("is-active"));
             suitePanels.forEach((panel) => panel.classList.remove("is-active"));
             button.classList.add("is-active");
+            suiteButtons.forEach((btn) => btn.setAttribute("aria-selected", "false"));
+            button.setAttribute("aria-selected", "true");
             const target = button.dataset.target;
             const nextPanel = document.querySelector(`[data-suite-panel=\"${target}\"]`);
             if (nextPanel) {
