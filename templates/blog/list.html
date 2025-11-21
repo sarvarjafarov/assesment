@@ -6,286 +6,37 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='blog' %}
     <main>
-        <div class="blog-shell">
-    <section class="hero-card blog-hero-card">
-        <div class="hero-copy">
-            <p class="eyebrow">Insights</p>
-            <h1>Hiring ideas, playbooks, and product news.</h1>
-            <p class="lede">Practical guides for recruiters modernizing behavioral assessments.</p>
-            {% if taxonomy %}
-            <div class="hero-filters">
-                <div class="filter-heading">
-                    <span>Browse by pillar</span>
-                    {% if active_pillar %}
-                    <a class="clear-filter" href="{% url 'blog:list' %}">Clear filter</a>
-                    {% endif %}
-                </div>
-                <div class="filter-chip-row" role="tablist">
-                    <a class="filter-chip {% if not active_pillar %}is-active{% endif %}" href="{% url 'blog:list' %}">
-                        <span>All topics</span>
-                    </a>
-                    {% for pillar in taxonomy %}
-                    <a
-                        class="filter-chip {% if pillar.is_active %}is-active{% endif %}"
-                        href="?pillar={{ pillar.label|urlencode }}"
-                        role="tab"
-                        aria-selected="{% if pillar.is_active %}true{% else %}false{% endif %}"
-                        title="{{ pillar.description }}"
-                    >
-                        <span>{{ pillar.label }}</span>
-                        <small>{{ pillar.count }}</small>
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        <div class="hero-note hero-note-latest">
-            <p class="label">Latest from</p>
-            {% if latest_from_pillars %}
-            <ul class="latest-list">
-                {% for post in latest_from_pillars %}
-                <li>
-                    <div>
+        <div class="blog-shell simple">
+            <section class="blog-simple-hero">
+                <p class="eyebrow">Insights</p>
+                <h1>Hiring ideas, playbooks, and product news.</h1>
+                <p class="lede">A straight-forward grid of our latest articles — no filters, no widgets, just cards.</p>
+            </section>
+
+            <section class="blog-grid simple-grid" id="grid">
+                {% for post in posts %}
+                <article class="blog-card simple-card">
+                    <div class="meta-row">
                         <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
-                        <p class="latest-title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></p>
+                        <span class="date">{{ post.published_at|date:"M j, Y" }}</span>
+                        <span class="read-time">{{ post.estimated_read_minutes }} min read</span>
                     </div>
-                    <span class="latest-meta">{{ post.published_at|date:"M j" }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p>Follow Sira’s product team, researchers, and customers to learn how behavioral assessments unlock better hiring decisions.</p>
-            {% endif %}
-            <a class="btn btn-pill" href="#grid">Browse articles</a>
-        </div>
-    </section>
-
-    <section class="blog-filter-bar" data-blog-filter>
-        <form method="get" class="filter-form" data-blog-filter-form>
-            {% if active_pillar %}
-            <input type="hidden" name="pillar" value="{{ active_pillar }}">
-            {% endif %}
-            {% if active_tag %}
-            <input type="hidden" name="tag" value="{{ active_tag }}">
-            {% endif %}
-            <div class="search-field">
-                <span class="filter-icon">⌕</span>
-                <input type="search" name="q" placeholder="Search articles or authors" value="{{ search_query }}" data-blog-search-input>
-                <button class="clear-search {% if not search_query %}is-hidden{% endif %}" type="button" data-clear-search>Clear</button>
-            </div>
-            <button class="btn btn-pill secondary" type="submit">Search</button>
-        </form>
-        {% if tag_cloud %}
-        <div class="tag-row">
-            <span class="tag-label">Popular tags:</span>
-            <div class="tag-chip-row">
-                <a class="tag-chip {% if not active_tag %}is-active{% endif %}" href="?{% if active_pillar %}pillar={{ active_pillar|urlencode }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}">
-                    All tags
-                </a>
-                {% for tag in tag_cloud %}
-                <a
-                    class="tag-chip {% if tag.is_active %}is-active{% endif %}"
-                    href="?{% if active_pillar %}pillar={{ active_pillar|urlencode }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}tag={{ tag.label|urlencode }}"
-                >
-                    {{ tag.label }}
-                    <span>{{ tag.count }}</span>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-    </section>
-
-    {% if featured_posts %}
-    <section class="featured-slider-panel" data-featured-slider>
-        <div class="slider-heading">
-            <div>
-                <p class="eyebrow">Featured stories</p>
-                <h2>What teams are reading this week.</h2>
-            </div>
-            <div class="slider-controls">
-                <button class="slider-btn" type="button" data-slider-prev aria-label="Previous featured story">←</button>
-                <button class="slider-btn" type="button" data-slider-next aria-label="Next featured story">→</button>
-            </div>
-        </div>
-        <div class="featured-slider">
-            <div class="slider-track" data-slider-track>
-                {% for post in featured_posts %}
-                <article
-                    class="featured-slide"
-                    data-slider-slide
-                    style="--slide-image: {% if post.hero_image %}url('{{ post.hero_image }}'){% else %}none{% endif %};"
-                >
-                    <div class="slide-content">
-                        <div class="slide-meta">
-                            <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
-                            <span class="date">{{ post.published_at|date:"M j, Y" }}</span>
-                            <span class="read-time">{{ post.estimated_read_minutes }} min read</span>
-                        </div>
-                        <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-                        <p>{{ post.excerpt }}</p>
-                        <div class="slide-author">
-                            <span class="avatar">{{ post.author_name|slice:":1"|upper }}</span>
-                            <div>
-                                <strong>{{ post.author_name }}</strong>
-                                {% if post.author_title %}<span>{{ post.author_title }}</span>{% endif %}
-                            </div>
-                        </div>
-                        <div class="slide-cta">
-                            <a class="btn btn-pill" href="{{ post.get_absolute_url }}">Read article</a>
-                            <a class="btn btn-outline" href="?pillar={{ post.pill_label|urlencode }}">See more {{ post.pill_label }}</a>
-                        </div>
-                    </div>
+                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                    <p>{{ post.excerpt }}</p>
+                    <div class="author">By {{ post.display_author }}</div>
+                    <a class="outline-link" href="{{ post.get_absolute_url }}">Read article</a>
                 </article>
+                {% empty %}
+                <p class="empty-state">Fresh content is on the way.</p>
                 {% endfor %}
-            </div>
-            <div class="slider-indicators">
-                {% for post in featured_posts %}
-                <button
-                    type="button"
-                    class="indicator"
-                    data-slider-indicator="{{ forloop.counter0 }}"
-                    aria-label="Go to featured slide {{ forloop.counter }}"
-                ></button>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
+            </section>
 
-    {% if top_reads %}
-    <section class="proof-panel">
-        <div class="proof-card">
-            <div>
-                <p class="eyebrow">Top reads this week</p>
-                <h2>What talent teams are sharing.</h2>
+            {% if is_paginated and page_obj.has_next %}
+            <div class="blog-load-more">
+                <a class="btn btn-pill secondary" href="?page={{ page_obj.next_page_number }}">Load more</a>
             </div>
-            <ol class="top-reads">
-                {% for post in top_reads %}
-                <li>
-                    <span class="rank">0{{ forloop.counter }}</span>
-                    <div class="top-read-content">
-                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-                        <span>{{ post.estimated_read_minutes }} min · {{ post.pill_label }}</span>
-                    </div>
-                </li>
-                {% endfor %}
-            </ol>
-        </div>
-        <div class="testimonial-stack">
-            <article class="subscribe-card">
-                <p class="eyebrow">Subscribe & get resources</p>
-                <h3>Stay ahead on talent assessment.</h3>
-                <p>Join thousands of recruiters getting early access to playbooks, event invites, and the quarterly Sira hiring kit.</p>
-                <a class="btn btn-pill" href="#newsletter-form">Join newsletter</a>
-            </article>
-            <div class="testimonial-grid">
-                {% for quote in proof_quotes %}
-                <article class="testimonial-card">
-                    <p class="quote">{{ quote.quote }}</p>
-                    <p class="person">{{ quote.person }} · {{ quote.role }}</p>
-                    <span class="company">{{ quote.company }}</span>
-                </article>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
-    {% if reading_lists %}
-    <section class="reading-list-panel">
-        <div class="section-heading align-left">
-            <p class="eyebrow">Reading lists</p>
-            <h2>Curated playlists for your team.</h2>
-        </div>
-        <div class="reading-list-grid">
-            {% for block in reading_lists %}
-            <article class="reading-card" style="background: {{ block.bg }};">
-                <div class="reading-card-header">
-                    <h3>{{ block.title }}</h3>
-                    <p>{{ block.description }}</p>
-                </div>
-                <ul class="reading-card-list">
-                    {% for post in block.posts %}
-                    <li>
-                        <div>
-                            <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
-                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-                        </div>
-                        <span>{{ post.published_at|date:"M j" }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                <div class="reading-card-actions">
-                    <a class="btn btn-pill" href="?pillar={{ block.pillar|urlencode }}">Explore pillar</a>
-                    <a class="btn btn-outline" href="{{ block.posts.0.get_absolute_url }}">Start reading</a>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
-    <section class="blog-grid" id="grid">
-        {% for post in posts %}
-        <article class="blog-card">
-            <header>
-                <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
-                <span class="date">{{ post.published_at|date:"M j, Y" }}</span>
-                <span class="read-time">{{ post.estimated_read_minutes }} min read</span>
-            </header>
-            <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-            <p>{{ post.excerpt }}</p>
-            <div class="author">
-                <div class="author-avatar">{{ post.author_name|slice:":1"|upper }}</div>
-                <div>
-                    <strong>{{ post.author_name }}</strong>
-                    <span>{{ post.author_title }}</span>
-                </div>
-            </div>
-            <a class="outline-link" href="{{ post.get_absolute_url }}">Read article</a>
-        </article>
-        {% empty %}
-        <p class="empty-state">Fresh content is on the way.</p>
-        {% endfor %}
-    </section>
-
-    {% if is_paginated and page_obj.has_next %}
-    <div class="blog-load-more">
-        <a
-            class="btn btn-pill secondary"
-            href="?{% if active_pillar %}pillar={{ active_pillar|urlencode }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}{% if active_tag %}tag={{ active_tag|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}"
-        >Load more</a>
-    </div>
-    {% endif %}
+            {% endif %}
         </div>
     </main>
 </div>
 {% endblock %}
-    <section class="newsletter-panel" id="newsletter-form">
-        <div class="section-heading align-left">
-            <p class="eyebrow">Newsletter</p>
-            <h2>Get the quarterly hiring kit + invites to live sessions.</h2>
-        </div>
-        <form class="newsletter-form">
-            <div class="form-grid">
-                <label>
-                    <span>Full name</span>
-                    <input type="text" placeholder="Sasha Morgan">
-                </label>
-                <label>
-                    <span>Work email</span>
-                    <input type="email" placeholder="you@company.com">
-                </label>
-                <label>
-                    <span>Company</span>
-                    <input type="text" placeholder="Northwind Talent">
-                </label>
-            </div>
-            <div class="newsletter-actions">
-                <button class="btn btn-pill" type="submit">Subscribe</button>
-                <p>We’ll send practical guides, product updates, and a quarterly assessment scorecard template.</p>
-            </div>
-        </form>
-    </section>
