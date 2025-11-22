@@ -3,6 +3,8 @@ from __future__ import annotations
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
+from datetime import datetime
 import uuid
 
 User = get_user_model()
@@ -29,12 +31,44 @@ class ClientAccountQuerySet(models.QuerySet):
 
 
 class ClientAccount(TimeStampedModel):
+    PLAN_CONFIG = {
+        "starter": {
+            "label": "Starter",
+            "project_quota": 2,
+            "invite_quota": 20,
+            "description": "Free plan for pilots",
+        },
+        "pro": {
+            "label": "Pro",
+            "project_quota": 10,
+            "invite_quota": 250,
+            "description": "Unlimited reviewers + branding",
+        },
+        "growth": {
+            "label": "Growth",
+            "project_quota": 25,
+            "invite_quota": 750,
+            "description": "Advanced analytics and API access",
+        },
+        "enterprise": {
+            "label": "Enterprise",
+            "project_quota": 0,
+            "invite_quota": 0,
+            "description": "Custom limits and SLAs",
+        },
+    }
     EMPLOYEE_SIZE_CHOICES = [
         ("1-10", "1-10"),
         ("11-50", "11-50"),
         ("51-200", "51-200"),
         ("201-500", "201-500"),
         ("500+", "500+"),
+    ]
+    PLAN_CHOICES = [
+        ("starter", "Starter"),
+        ("pro", "Pro"),
+        ("growth", "Growth"),
+        ("enterprise", "Enterprise"),
     ]
     ASSESSMENT_DETAILS = {
         "marketing": {
@@ -82,6 +116,10 @@ class ClientAccount(TimeStampedModel):
     receive_weekly_summary = models.BooleanField(default=False)
     logo = models.FileField(upload_to="client_logos/", null=True, blank=True)
     data_retention_days = models.PositiveIntegerField(default=365)
+    plan_slug = models.CharField(max_length=32, choices=PLAN_CHOICES, default="starter")
+    invite_quota = models.PositiveIntegerField(default=20)
+    project_quota = models.PositiveIntegerField(default=2)
+    invite_quota_reset = models.DateField(null=True, blank=True)
 
     objects = ClientAccountQuerySet.as_manager()
 
@@ -102,13 +140,82 @@ class ClientAccount(TimeStampedModel):
         catalog = self.ASSESSMENT_DETAILS
         return [catalog.get(code, {}).get("label", code.title()) for code in self.requested_assessments or []]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_plan_slug = self.plan_slug
+
     def save(self, *args, **kwargs):
+        self._apply_plan_defaults()
         # Auto-sync the linked user's active flag with client approval status.
         should_activate = self.status == "approved"
         if self.user and self.user.is_active != should_activate:
             self.user.is_active = should_activate
             self.user.save(update_fields=["is_active"])
         super().save(*args, **kwargs)
+        self._original_plan_slug = self.plan_slug
+
+    def _apply_plan_defaults(self):
+        config = self.PLAN_CONFIG.get(self.plan_slug)
+        if not config:
+            return
+        plan_project = config.get("project_quota")
+        plan_invite = config.get("invite_quota")
+        if plan_project is not None:
+            self.project_quota = plan_project
+        if plan_invite is not None:
+            self.invite_quota = plan_invite
+
+    # Plan helpers
+    def plan_details(self):
+        return self.PLAN_CONFIG.get(self.plan_slug, self.PLAN_CONFIG["starter"])
+
+    def project_limit(self) -> int | None:
+        limit = self.project_quota
+        if limit in (0, None):
+            return None
+        return limit
+
+    def invite_limit(self) -> int | None:
+        limit = self.invite_quota
+        if limit in (0, None):
+            return None
+        return limit
+
+    def active_project_count(self) -> int:
+        return self.projects.exclude(status=ClientProject.STATUS_ARCHIVED).count()
+
+    def remaining_projects(self) -> int | None:
+        limit = self.project_limit()
+        if limit is None:
+            return None
+        remaining = limit - self.active_project_count()
+        return max(remaining, 0)
+
+    def _invite_window_start(self):
+        now = timezone.localtime()
+        current_month_start = now.replace(day=1).date()
+        if not self.invite_quota_reset or self.invite_quota_reset < current_month_start:
+            if self.pk:
+                type(self).objects.filter(pk=self.pk).update(invite_quota_reset=current_month_start)
+            self.invite_quota_reset = current_month_start
+        return self.invite_quota_reset
+
+    def invites_used(self) -> int:
+        window_start = self._invite_window_start()
+        tz = timezone.get_current_timezone()
+        start_dt = timezone.make_aware(datetime.combine(window_start, datetime.min.time()), tz)
+        return (
+            self.marketing_sessions.filter(created_at__gte=start_dt).count()
+            + self.product_sessions.filter(created_at__gte=start_dt).count()
+            + self.behavioral_sessions.filter(created_at__gte=start_dt).count()
+        )
+
+    def invites_remaining(self) -> int | None:
+        limit = self.invite_limit()
+        if limit is None:
+            return None
+        remaining = limit - self.invites_used()
+        return max(remaining, 0)
 
 
 class ClientNotification(TimeStampedModel):

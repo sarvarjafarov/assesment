@@ -513,6 +513,31 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "project_count": account.projects.count(),
             }
         )
+        plan_details = account.plan_details()
+        invite_limit = account.invite_limit()
+        invites_used = account.invites_used()
+        invite_percent = None
+        if invite_limit:
+            invite_percent = min(100, round((invites_used / invite_limit) * 100)) if invite_limit else None
+        project_limit = account.project_limit()
+        project_used = account.active_project_count()
+        project_percent = None
+        if project_limit:
+            project_percent = min(100, round((project_used / project_limit) * 100))
+        context["plan_overview"] = {
+            "name": plan_details.get("label", account.plan_slug.title()),
+            "slug": account.plan_slug,
+            "description": plan_details.get("description", ""),
+            "invite_limit": invite_limit,
+            "invites_used": invites_used,
+            "invite_percent": invite_percent,
+            "invite_remaining": account.invites_remaining(),
+            "project_limit": project_limit,
+            "project_used": project_used,
+            "project_percent": project_percent,
+            "project_remaining": account.remaining_projects(),
+            "upgrade_url": f"{reverse('pages:home')}#pricing",
+        }
         return context
 
     def _quick_actions(self, account: ClientAccount) -> list[dict]:
@@ -1002,7 +1027,13 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
         decoded = io.TextIOWrapper(csv_file.file, encoding="utf-8")
         reader = csv.DictReader(decoded)
         default_duration = self.get_form_class().base_fields["duration_minutes"].initial or 30
+        remaining = self.account.invites_remaining()
+        if remaining is not None and remaining <= 0:
+            return 0, ["Invite quota reached. Upgrade your plan or wait for the next cycle."]
         for idx, row in enumerate(reader, start=1):
+            if remaining is not None and remaining <= 0:
+                errors.append("Invite quota reached. Remaining rows were skipped.")
+                break
             candidate = row.get("candidate_id") or row.get("candidate_identifier") or row.get("email")
             if not candidate:
                 errors.append(f"row {idx}: missing candidate_id")
@@ -1017,8 +1048,13 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
             }
             form = self.get_form_class()(data=form_data, client=self.account)
             if form.is_valid():
+                if remaining is not None and remaining <= 0:
+                    errors.append("Invite quota reached. Remaining rows were skipped.")
+                    break
                 form.save()
                 created += 1
+                if remaining is not None:
+                    remaining -= 1
             else:
                 error_text = "; ".join(
                     [msg for messages in form.errors.values() for msg in messages]
@@ -1183,6 +1219,13 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        remaining = self.account.remaining_projects()
+        if remaining is not None and remaining <= 0:
+            messages.error(
+                request,
+                "Your current plan reached the active project limit. Archive a project or upgrade to add more roles.",
+            )
+            return redirect("clients:project-list")
         if self.account.role != "manager":
             messages.error(request, "Only managers can create projects.")
             return redirect("clients:project-list")

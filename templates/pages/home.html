@@ -196,6 +196,45 @@
             </div>
         </section>
 
+        <section class="pricing reveal" id="pricing">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Pricing</p>
+                    <h2>{{ pricing_helper.headline }}</h2>
+                    <p class="lede">{{ pricing_helper.subline }}</p>
+                </div>
+                <div class="pricing-grid">
+                    {% for tier in pricing_tiers %}
+                    <article class="pricing-card {% if tier.highlighted %}is-highlighted{% endif %}">
+                        <div class="pricing-card-head">
+                            <p class="pill subtle">{% if tier.badge %}{{ tier.badge }}{% else %}&nbsp;{% endif %}</p>
+                            <h3>{{ tier.name }}</h3>
+                            <p class="muted">{{ tier.description }}</p>
+                        </div>
+                        <div class="pricing-price">
+                            <span class="amount">{{ tier.price }}</span>
+                            <span class="frequency">{{ tier.frequency }}</span>
+                        </div>
+                        <ul class="pricing-meta">
+                            <li><strong>{{ tier.projects }}</strong></li>
+                            <li><strong>{{ tier.invites }}</strong></li>
+                            {% if tier.overage %}
+                            <li>{{ tier.overage }}</li>
+                            {% endif %}
+                        </ul>
+                        <ul class="pricing-feature-list">
+                            {% for feature in tier.features %}
+                            <li>{{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                        <a class="btn {% if tier.highlighted %}btn-pill{% else %}btn-outline{% endif %}" href="{{ tier.cta_url }}">{{ tier.cta_label }}</a>
+                    </article>
+                    {% endfor %}
+                </div>
+                <p class="pricing-footnote">{{ pricing_helper.footnote }}</p>
+            </div>
+        </section>
+
         <section class="workflow reveal" id="workflow">
             <div class="section-heading">
                 <p class="eyebrow">How it works</p>

@@ -50,6 +50,59 @@
         </div>
     </header>
 
+    <section class="plan-overview-panel">
+        <article class="portal-card plan-card">
+            <div class="plan-card-head">
+                <p class="label">{{ plan_overview.name }} plan</p>
+                <h2>{{ plan_overview.description }}</h2>
+            </div>
+            <div class="plan-usage">
+                <div>
+                    <div class="usage-label">
+                        <p>Invites</p>
+                        <span>
+                            {{ plan_overview.invites_used }}
+                            /
+                            {% if plan_overview.invite_limit %}{{ plan_overview.invite_limit }}{% else %}Unlimited{% endif %}
+                        </span>
+                    </div>
+                    {% if plan_overview.invite_percent %}
+                    <div class="usage-bar">
+                        <span style="width: {{ plan_overview.invite_percent }}%;"></span>
+                    </div>
+                    {% else %}
+                    <p class="muted small">Unlimited invites</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="usage-label">
+                        <p>Active projects</p>
+                        <span>
+                            {{ plan_overview.project_used }}
+                            /
+                            {% if plan_overview.project_limit %}{{ plan_overview.project_limit }}{% else %}Unlimited{% endif %}
+                        </span>
+                    </div>
+                    {% if plan_overview.project_percent %}
+                    <div class="usage-bar">
+                        <span style="width: {{ plan_overview.project_percent }}%;"></span>
+                    </div>
+                    {% else %}
+                    <p class="muted small">Unlimited projects</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="plan-actions">
+                <a class="btn btn-outline small" href="{{ plan_overview.upgrade_url }}" target="_blank">View pricing</a>
+                {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 5 %}
+                <p class="muted tiny">Only {{ plan_overview.invite_remaining }} invites left this month.</p>
+                {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 1 %}
+                <p class="muted tiny">Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left.</p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
     {% if notifications %}
     <section class="notification-row">
         {% for note in notifications %}

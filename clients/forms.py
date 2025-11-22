@@ -199,6 +199,11 @@ class BaseClientInviteForm(forms.Form):
         if not question_set:
             raise forms.ValidationError("No questions are active right now.")
         self.question_set = question_set
+        remaining = self.client.invites_remaining()
+        if remaining is not None and remaining <= 0:
+            raise forms.ValidationError(
+                "You've reached your monthly invite quota. Upgrade your plan to send more invites."
+            )
         return cleaned
 
     def clean_send_at(self):

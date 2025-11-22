@@ -175,6 +175,91 @@ def home(request):
         },
     ]
 
+    pricing_tiers = [
+        {
+            "slug": "starter",
+            "badge": "Free",
+            "name": "Starter",
+            "price": "$0",
+            "frequency": "Forever",
+            "description": "Test Sira with two active roles and a handful of candidates.",
+            "projects": "2 active projects",
+            "invites": "20 invites / month",
+            "overage": None,
+            "cta_label": "Create free account",
+            "cta_url": reverse("clients:signup"),
+            "highlighted": False,
+            "features": [
+                "Marketing, PM, and behavioral banks",
+                "Basic reports & CSV export",
+                "Email support",
+            ],
+        },
+        {
+            "slug": "pro",
+            "badge": "Most popular",
+            "name": "Pro",
+            "price": "$59",
+            "frequency": "per month",
+            "description": "Run multiple searches with richer reporting and branding.",
+            "projects": "10 active projects",
+            "invites": "250 invites / month",
+            "overage": "$0.40 per additional invite",
+            "cta_label": "Start Pro trial",
+            "cta_url": reverse("clients:signup"),
+            "highlighted": True,
+            "features": [
+                "Pipeline kanban & top-candidate spotlights",
+                "Custom branding + shareable reports",
+                "Priority chat + email support",
+            ],
+        },
+        {
+            "slug": "growth",
+            "badge": "Scale teams",
+            "name": "Growth",
+            "price": "$149",
+            "frequency": "per month",
+            "description": "For in-house talent teams rolling assessments across departments.",
+            "projects": "25 active projects",
+            "invites": "750 invites / month",
+            "overage": "$0.30 per additional invite",
+            "cta_label": "Talk to sales",
+            "cta_url": "#cta",
+            "highlighted": False,
+            "features": [
+                "Advanced analytics & integrity signals",
+                "API access + multi-role permissions",
+                "Dedicated onboarding specialist",
+            ],
+        },
+        {
+            "slug": "enterprise",
+            "badge": "Custom",
+            "name": "Enterprise",
+            "price": "Custom",
+            "frequency": "contact us",
+            "description": "Unlimited projects and invites, bespoke assessments, SSO, and white-glove rollout.",
+            "projects": "Unlimited projects",
+            "invites": "Unlimited invites",
+            "overage": None,
+            "cta_label": "Request a quote",
+            "cta_url": reverse("pages:contact"),
+            "highlighted": False,
+            "features": [
+                "Dedicated CSM + success playbooks",
+                "Bespoke assessments & security reviews",
+                "SLA, SSO/SAML, and SOC 2 readiness",
+            ],
+        },
+    ]
+
+    pricing_helper = {
+        "headline": "Simple pricing that scales with your searches.",
+        "subline": "Plans anchor around active projects and included invites. Upgrade any time or add extra invites in-product.",
+        "footnote": "All paid plans include unlimited reviewers. Save 20% with annual billing on Pro and Growth.",
+    }
+
     # Apply CMS overrides if blocks exist
     hero_block = (
         SiteContentBlock.objects.filter(
@@ -300,6 +385,8 @@ def home(request):
             "suite_heading": suite_heading,
             "articles": articles,
             "testimonials": testimonials,
+            "pricing_tiers": pricing_tiers,
+            "pricing_helper": pricing_helper,
             "hero_content": hero_content,
             "invite_form": form,
             "live_events": live_events,
