@@ -205,7 +205,7 @@
                 </div>
                 <div class="pricing-grid">
                     {% for tier in pricing_tiers %}
-                    <article class="pricing-card {% if tier.highlighted %}is-highlighted{% endif %}">
+                    <article class="pricing-card theme-{{ tier.slug }} {% if tier.highlighted %}is-highlighted{% endif %}">
                         <div class="pricing-card-head">
                             <div class="plan-badge">
                                 <span>{{ tier.badge }}</span>

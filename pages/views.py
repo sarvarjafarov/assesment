@@ -215,25 +215,6 @@ def home(request):
             ],
         },
         {
-            "slug": "growth",
-            "badge": "Scale teams",
-            "name": "Growth",
-            "price": "$149",
-            "frequency": "per month",
-            "description": "For in-house talent teams rolling assessments across departments.",
-            "projects": "25 active projects",
-            "invites": "750 invites / month",
-            "overage": "$0.30 per additional invite",
-            "cta_label": "Talk to sales",
-            "cta_url": "#cta",
-            "highlighted": False,
-            "features": [
-                "Advanced analytics & integrity signals",
-                "API access + multi-role permissions",
-                "Dedicated onboarding specialist",
-            ],
-        },
-        {
             "slug": "enterprise",
             "badge": "Custom",
             "name": "Enterprise",
@@ -257,7 +238,7 @@ def home(request):
     pricing_helper = {
         "headline": "Simple pricing that scales with your searches.",
         "subline": "Plans anchor around active projects and included invites. Upgrade any time or add extra invites in-product.",
-        "footnote": "All paid plans include unlimited reviewers. Save 20% with annual billing on Pro and Growth.",
+        "footnote": "All paid plans include unlimited reviewers. Save 20% with annual billing on Pro.",
     }
 
     # Apply CMS overrides if blocks exist

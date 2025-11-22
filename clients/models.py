@@ -44,12 +44,6 @@ class ClientAccount(TimeStampedModel):
             "invite_quota": 250,
             "description": "Unlimited reviewers + branding",
         },
-        "growth": {
-            "label": "Growth",
-            "project_quota": 25,
-            "invite_quota": 750,
-            "description": "Advanced analytics and API access",
-        },
         "enterprise": {
             "label": "Enterprise",
             "project_quota": 0,
@@ -67,7 +61,6 @@ class ClientAccount(TimeStampedModel):
     PLAN_CHOICES = [
         ("starter", "Starter"),
         ("pro", "Pro"),
-        ("growth", "Growth"),
         ("enterprise", "Enterprise"),
     ]
     ASSESSMENT_DETAILS = {
