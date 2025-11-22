@@ -15,14 +15,6 @@
 </head>
 <body class="{% block body_class %}{% endblock %}" data-page-theme="{% block page_theme %}light{% endblock %}">
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <div class="accessibility-toggles">
-        <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">
-            Dark mode
-        </button>
-        <button type="button" class="contrast-toggle" id="contrastToggle" aria-pressed="false">
-            High contrast
-        </button>
-    </div>
     {% if messages %}
     <div class="flash-container">
         {% for message in messages %}

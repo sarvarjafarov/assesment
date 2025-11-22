@@ -207,7 +207,9 @@
                     {% for tier in pricing_tiers %}
                     <article class="pricing-card {% if tier.highlighted %}is-highlighted{% endif %}">
                         <div class="pricing-card-head">
-                            <p class="pill subtle">{% if tier.badge %}{{ tier.badge }}{% else %}&nbsp;{% endif %}</p>
+                            <div class="plan-badge">
+                                <span>{{ tier.badge }}</span>
+                            </div>
                             <h3>{{ tier.name }}</h3>
                             <p class="muted">{{ tier.description }}</p>
                         </div>
@@ -215,19 +217,26 @@
                             <span class="amount">{{ tier.price }}</span>
                             <span class="frequency">{{ tier.frequency }}</span>
                         </div>
-                        <ul class="pricing-meta">
-                            <li><strong>{{ tier.projects }}</strong></li>
-                            <li><strong>{{ tier.invites }}</strong></li>
+                        <div class="pricing-meta">
+                            <p><strong>{{ tier.projects }}</strong></p>
+                            <p><strong>{{ tier.invites }}</strong></p>
                             {% if tier.overage %}
-                            <li>{{ tier.overage }}</li>
+                            <p>{{ tier.overage }}</p>
                             {% endif %}
-                        </ul>
+                        </div>
                         <ul class="pricing-feature-list">
                             {% for feature in tier.features %}
-                            <li>{{ feature }}</li>
+                            <li>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                <span>{{ feature }}</span>
+                            </li>
                             {% endfor %}
                         </ul>
-                        <a class="btn {% if tier.highlighted %}btn-pill{% else %}btn-outline{% endif %}" href="{{ tier.cta_url }}">{{ tier.cta_label }}</a>
+                        <div class="pricing-cta">
+                            <a class="btn {% if tier.highlighted %}btn-pill{% else %}btn-outline{% endif %}" href="{{ tier.cta_url }}">{{ tier.cta_label }}</a>
+                        </div>
                     </article>
                     {% endfor %}
                 </div>

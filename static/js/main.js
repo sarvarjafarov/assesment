@@ -192,27 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const body = document.body;
-    const contrastToggle = document.getElementById("contrastToggle");
-    const applyContrastPreference = (enabled) => {
-        body.classList.toggle("contrast-mode", enabled);
-        if (contrastToggle) {
-            contrastToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
-            contrastToggle.textContent = enabled ? "Standard contrast" : "High contrast";
-        }
-    };
-    const storedPreference = localStorage.getItem("contrast-mode");
-    if (storedPreference) {
-        applyContrastPreference(storedPreference === "true");
-    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        applyContrastPreference(true);
-    }
-    if (contrastToggle) {
-        contrastToggle.addEventListener("click", () => {
-            const enabled = !body.classList.contains("contrast-mode");
-            applyContrastPreference(enabled);
-            localStorage.setItem("contrast-mode", enabled ? "true" : "false");
-        });
-    }
 
     const telemetryState = {
         pasteCount: 0,
@@ -382,29 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
         revealItems.forEach((el) => observer.observe(el));
     } else {
         revealItems.forEach((el) => el.classList.add("is-visible"));
-    }
-
-    const themeToggle = document.getElementById("themeToggle");
-    const applyThemePreference = (theme) => {
-        const body = document.body;
-        const dark = theme === "dark";
-        body.dataset.pageTheme = dark ? "dark" : "light";
-        if (themeToggle) {
-            themeToggle.setAttribute("aria-pressed", dark ? "true" : "false");
-            themeToggle.textContent = dark ? "Light mode" : "Dark mode";
-        }
-        localStorage.setItem("sira-theme", theme);
-    };
-    if (themeToggle) {
-        const savedTheme = localStorage.getItem("sira-theme");
-        if (savedTheme) {
-            applyThemePreference(savedTheme);
-        }
-        themeToggle.addEventListener("click", () => {
-            const current = document.body.dataset.pageTheme || "light";
-            const next = current === "dark" ? "light" : "dark";
-            applyThemePreference(next);
-        });
     }
 
     const featuredSliders = document.querySelectorAll("[data-featured-slider]");
