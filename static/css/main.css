@@ -442,15 +442,6 @@ img {
     gap: 0.4rem;
 }
 
-.hero-tagline span {
-    display: inline-flex;
-}
-
-.hero-rotating {
-    color: var(--orange);
-    min-width: 7ch;
-    text-transform: lowercase;
-}
 
 .hero h1 .highlight {
     color: var(--orange);

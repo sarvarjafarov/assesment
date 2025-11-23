@@ -723,12 +723,3 @@ document.addEventListener('DOMContentLoaded', () => {
         blogCards.forEach((card) => card.classList.add("is-visible"));
     }
 });
-    const heroRotator = document.querySelector('[data-hero-rotating]');
-    if (heroRotator) {
-        const heroWords = ['marketing', 'product', 'behavioral'];
-        let heroIndex = 0;
-        setInterval(() => {
-            heroIndex = (heroIndex + 1) % heroWords.length;
-            heroRotator.textContent = heroWords[heroIndex];
-        }, 2500);
-    }
