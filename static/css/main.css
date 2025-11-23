@@ -6497,7 +6497,6 @@ main {
 .checkbox-pill {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 0.65rem;
     padding: 0.65rem 1rem;
     border-radius: 20px;
@@ -6506,9 +6505,9 @@ main {
     font-weight: 600;
     color: var(--navy);
     cursor: pointer;
-    transition: border 0.2s ease, box-shadow 0.2s ease;
+    transition: border 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
-.checkbox-pill__box input[type="checkbox"] {
+.checkbox-pill input[type="checkbox"] {
     accent-color: var(--orange);
     width: 18px;
     height: 18px;
@@ -6516,6 +6515,10 @@ main {
 .checkbox-pill:hover {
     border-color: rgba(83, 55, 239, 0.4);
     box-shadow: 0 8px 20px rgba(14, 20, 40, 0.08);
+    transform: translateY(-1px);
+}
+.checkbox-pill span:last-child {
+    flex: 1;
 }
 .apply-page {
     background: linear-gradient(180deg, #f4f6ff 0%, #fef7f1 100%);
