@@ -59,7 +59,6 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 DEFAULT_ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    ".evalon.so",
     ".evalon.tech",
 ]
 ALLOWED_HOSTS = [
@@ -71,8 +70,6 @@ if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = DEFAULT_ALLOWED_HOSTS
 
 DEFAULT_CSRF_TRUSTED_ORIGINS = [
-    "https://evalon.so",
-    "https://www.evalon.so",
     "https://evalon.tech",
     "https://www.evalon.tech",
 ]
