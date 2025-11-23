@@ -199,7 +199,7 @@ class ClientAccount(TimeStampedModel):
         start_dt = timezone.make_aware(datetime.combine(window_start, datetime.min.time()), tz)
         return (
             self.marketing_sessions.filter(created_at__gte=start_dt).count()
-            + self.product_sessions.filter(created_at__gte=start_dt).count()
+            + getattr(self, "pm_sessions").filter(created_at__gte=start_dt).count()
             + self.behavioral_sessions.filter(created_at__gte=start_dt).count()
         )
 
@@ -302,6 +302,6 @@ class ClientProject(TimeStampedModel):
     def total_sessions(self):
         return (
             self.marketing_sessions.count()
-            + self.product_sessions.count()
+            + getattr(self, "pm_sessions").count()
             + self.behavioral_sessions.count()
         )

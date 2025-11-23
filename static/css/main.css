@@ -6488,6 +6488,32 @@ main {
 .request-form .form-row.single {
     grid-template-columns: 1fr;
 }
+.option-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.7rem 1rem;
+    margin: 0.5rem 0 0.35rem;
+}
+.checkbox-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 16px;
+    border: 1px solid rgba(14, 20, 40, 0.12);
+    background: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    color: var(--navy);
+    cursor: pointer;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+.checkbox-pill input[type="checkbox"] {
+    accent-color: var(--orange);
+}
+.checkbox-pill:hover {
+    border-color: rgba(83, 55, 239, 0.4);
+    box-shadow: 0 8px 20px rgba(14, 20, 40, 0.08);
+}
 .apply-page {
     background: linear-gradient(180deg, #f4f6ff 0%, #fef7f1 100%);
 }

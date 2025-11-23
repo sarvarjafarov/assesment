@@ -2,24 +2,6 @@
 {% load static client_tags %}
 {% block content %}
 <div class="page-shell apply-page">
-    <header class="site-header">
-        <nav class="nav">
-            <div class="brand">
-                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
-                <span>Sira Assessments</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/#products">Products</a></li>
-                <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
-            </ul>
-            <div class="nav-actions">
-                <a class="btn-outline small" href="{% url 'clients:login' %}">Login</a>
-                <a class="btn small" href="{% url 'clients:signup' %}">Apply</a>
-            </div>
-        </nav>
-    </header>
-
     <main class="apply-main">
     <section class="panel request-panel request-panel--glass panel-contained">
         <div class="request-intro">
@@ -126,7 +108,14 @@
             <div class="form-row single">
                 <div class="form-field">
                     {{ form.talent_stack.label_tag }}
-                    {{ form.talent_stack }}
+                    <div class="option-grid">
+                        {% for checkbox in form.talent_stack %}
+                        <label class="checkbox-pill">
+                            {{ checkbox.tag }}
+                            <span>{{ checkbox.choice_label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
                     {% if form.talent_stack.help_text %}<small>{{ form.talent_stack.help_text }}</small>{% endif %}
                     {% for error in form.talent_stack.errors %}
                     <span class="field-error">{{ error }}</span>
@@ -178,3 +167,4 @@
     </footer>
 </div>
 {% endblock %}
+{% block site_footer %}{% endblock %}
