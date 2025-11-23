@@ -54,6 +54,23 @@
             {% endif %}
         </div>
     </header>
+    <section class="portal-steps">
+        <article>
+            <span class="step-tag">Step 1</span>
+            <h3>Pick an assessment</h3>
+            <p>Use the catalog below to invite candidates to a live assignment.</p>
+        </article>
+        <article>
+            <span class="step-tag">Step 2</span>
+            <h3>Organize projects</h3>
+            <p>Track active roles, invites, and hiring pods in one view.</p>
+        </article>
+        <article>
+            <span class="step-tag">Step 3</span>
+            <h3>Monitor progress</h3>
+            <p>Review activity, completion stats, and plan usage at a glance.</p>
+        </article>
+    </section>
     {% if can_manage_branding or is_manager %}
     <div class="logo-edit-modal" data-logo-edit-modal>
         <div class="logo-edit-card">
@@ -88,6 +105,7 @@
     <section class="panel portal-panel assignment-highlight">
         <header>
             <div>
+                <span class="step-tag subtle">Step 1</span>
                 <p class="eyebrow">Assessment catalog</p>
                 <h2>Invite candidates in seconds</h2>
                 <p class="muted">Pick a licensed assessment below to create invites or review progress.</p>
@@ -128,6 +146,7 @@
     <section class="portal-card project-preview">
         <header class="project-preview-head">
             <div>
+                <span class="step-tag subtle">Step 2</span>
                 <p class="eyebrow">Projects</p>
                 <h2>Active roles</h2>
             </div>
@@ -172,6 +191,13 @@
     {% endif %}
 
     <section class="quick-action-row">
+        <header class="quick-action-head">
+            <div>
+                <span class="step-tag subtle">Step 3</span>
+                <p class="eyebrow">Quick actions</p>
+                <h2>Common follow-ups</h2>
+            </div>
+        </header>
         {% if quick_actions %}
         {% for action in quick_actions %}
         <a class="quick-action-card" href="{{ action.href }}" {% if action.external %}target="_blank" rel="noreferrer"{% endif %}>
