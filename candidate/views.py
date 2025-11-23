@@ -293,7 +293,7 @@ class SessionAssessmentView(SessionMixin, FormView):
             support_form = CandidateSupportRequestForm(initial=support_initial)
         context["support_form"] = support_form
         context["support_contact_email"] = getattr(
-            settings, "SUPPORT_CONTACT_EMAIL", "support@sira.so"
+            settings, "SUPPORT_CONTACT_EMAIL", "support@evalon.so"
         )
         context["support_contact_phone"] = getattr(
             settings, "SUPPORT_CONTACT_PHONE", "+1 (555) 123-4567"

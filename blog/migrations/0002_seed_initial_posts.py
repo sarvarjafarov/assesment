@@ -18,11 +18,11 @@ def seed_posts(apps, schema_editor):
                 "development areas, and suggested interview focus areas. When recruiters drop this into the hiring packet, "
                 "panelists know exactly how to pressure-test fit.\n\n"
                 "### Close the loop with candidates\n"
-                "Use Sira's behavioral profile to craft feedback snippets. Candidates appreciate specific examples of what "
+                "Use Evalon's behavioral profile to craft feedback snippets. Candidates appreciate specific examples of what "
                 "went well and how they can keep improving."
             ),
             "author_name": "Maya Thompson",
-            "author_title": "VP People, Sira",
+            "author_title": "VP People, Evalon",
             "status": "published",
             "published_at": timezone.now(),
         },
@@ -32,7 +32,7 @@ def seed_posts(apps, schema_editor):
             "hero_image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
             "pill_label": "Digital Marketing",
             "pill_style": "neutral",
-            "excerpt": "What top brands learned after rolling out Sira's digital marketing module across paid, lifecycle, and analytics squads.",
+            "excerpt": "What top brands learned after rolling out Evalon's digital marketing module across paid, lifecycle, and analytics squads.",
             "body": (
                 "### Checklist for marketing leaders\n"
                 "1. Align on scoring weights per role—performance marketing, SEO, or analytics require different emphasis.\n"
@@ -43,17 +43,17 @@ def seed_posts(apps, schema_editor):
                 "time is left thanks to built-in timers."
             ),
             "author_name": "Ibrahim Solak",
-            "author_title": "Head of Growth, Sira",
+            "author_title": "Head of Growth, Evalon",
             "status": "published",
             "published_at": timezone.now(),
         },
         {
-            "title": "Your API Handbook for Integrating Sira Assessments",
+            "title": "Your API Handbook for Integrating Evalon Assessments",
             "slug": "api-handbook",
             "hero_image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
             "pill_label": "Platform",
             "pill_style": "success",
-            "excerpt": "We walk through authentication, sample payloads, and how to sync Sira with ATS or internal workflow tools.",
+            "excerpt": "We walk through authentication, sample payloads, and how to sync Evalon with ATS or internal workflow tools.",
             "body": (
                 "### Why teams integrate via API\n"
                 "Automation means recruiters never leave their system of record. Start sessions, retrieve questions, and pull "
@@ -65,7 +65,7 @@ def seed_posts(apps, schema_editor):
                 "Need help? The platform team can share Postman collections and webhooks for completed assessments."
             ),
             "author_name": "Lena Ortiz",
-            "author_title": "Director of Platform, Sira",
+            "author_title": "Director of Platform, Evalon",
             "status": "published",
             "published_at": timezone.now(),
         },

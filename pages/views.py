@@ -14,7 +14,7 @@ def home(request):
     hero_content = {
         "badge": "Purpose-built for <span>B2B hiring</span>",
         "title": "Launch <span class=\"highlight\">marketing, PM, and behavioral</span> assessments from one console.",
-        "subtitle": "Sira calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour.",
+        "subtitle": "Evalon calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour.",
         "primary_label": "Book a walkthrough",
         "primary_url": "#cta",
         "secondary_label": "See reporting tour",
@@ -164,7 +164,7 @@ def home(request):
         {
             "name": "Marcus",
             "role": "VP People, Copper Build",
-            "quote": "Sira gave our hiring pods one console to scope assignments, tag reviewers, and advance reliable operators—we ship offers faster than ever.",
+            "quote": "Evalon gave our hiring pods one console to scope assignments, tag reviewers, and advance reliable operators—we ship offers faster than ever.",
             "avatar": "img/avatar-lauren.svg",
         },
         {
@@ -182,7 +182,7 @@ def home(request):
             "name": "Starter",
             "price": "$0",
             "frequency": "Forever",
-            "description": "Test Sira with two active roles and a handful of candidates.",
+            "description": "Test Evalon with two active roles and a handful of candidates.",
             "projects": "2 active projects",
             "invites": "20 invites / month",
             "overage": None,
@@ -381,12 +381,12 @@ def contact(request):
         "hero": {
             "eyebrow": "Contact us",
             "title": "We respond faster than most ticket portals.",
-            "lede": "Whether you’re evaluating Sira, onboarding a team, or requesting a security review, we’ll route you to the right humans.",
+            "lede": "Whether you’re evaluating Evalon, onboarding a team, or requesting a security review, we’ll route you to the right humans.",
         },
         "sections": [
             {
                 "badge": "Sales & demos",
-                "title": "hello@sira.so",
+                "title": "hello@evalon.so",
                 "body": "Replies within 1 business day.",
                 "list": [
                     "Live product walkthroughs",
@@ -396,7 +396,7 @@ def contact(request):
             },
             {
                 "badge": "Support",
-                "title": "support@sira.so",
+                "title": "support@evalon.so",
                 "body": "Replies within 4 business hours.",
                 "list": [
                     "Assessment troubleshooting",
@@ -406,7 +406,7 @@ def contact(request):
             },
             {
                 "badge": "Partnerships",
-                "title": "partners@sira.so",
+                "title": "partners@evalon.so",
                 "body": "Replies within 2 business days.",
                 "list": [
                     "ATS & HRIS integrations",
@@ -506,8 +506,8 @@ def security(request):
             },
             {
                 "badge": "Need to report something?",
-                "title": "security@sira.so",
-                "body": "Visit https://status.sira.so for live uptime. Email us for questionnaires or penetration test reports.",
+                "title": "security@evalon.so",
+                "body": "Visit https://status.evalon.so for live uptime. Email us for questionnaires or penetration test reports.",
             },
         ],
     }
@@ -523,7 +523,7 @@ def privacy(request):
         "hero": {
             "eyebrow": "Privacy Policy",
             "title": "Your data belongs to you.",
-            "lede": "Sira handles candidate responses and hiring notes with care. Here’s how we collect, use, and protect your information.",
+            "lede": "Evalon handles candidate responses and hiring notes with care. Here’s how we collect, use, and protect your information.",
         },
         "sections": [
             {
@@ -537,7 +537,7 @@ def privacy(request):
             },
             {
                 "badge": "How we use data",
-                "title": "Operate & improve Sira",
+                "title": "Operate & improve Evalon",
                 "list": [
                     "Deliver assessment experiences and share results with authorized users.",
                     "Improve scoring models and product workflows.",
@@ -548,7 +548,7 @@ def privacy(request):
                 "badge": "Your rights",
                 "title": "Control your data",
                 "list": [
-                    "Customers can export, modify, or delete data via the admin console or by contacting privacy@sira.so.",
+                    "Customers can export, modify, or delete data via the admin console or by contacting privacy@evalon.so.",
                     "We enter DPAs and SCCs upon request.",
                     "Data residency options are available for enterprise plans.",
                 ],
@@ -567,13 +567,13 @@ def terms(request):
         "hero": {
             "eyebrow": "Terms of Service",
             "title": "The legal bits, written for humans.",
-            "lede": "By using Sira, you agree to the principles below. Reach out if you need a signed copy or custom language.",
+            "lede": "By using Evalon, you agree to the principles below. Reach out if you need a signed copy or custom language.",
         },
         "sections": [
             {
                 "badge": "Use of the service",
                 "title": "License",
-                "body": "Sira grants you a non-exclusive, revocable license to use the platform for internal hiring purposes. You agree to safeguard candidate data and comply with all applicable laws.",
+                "body": "Evalon grants you a non-exclusive, revocable license to use the platform for internal hiring purposes. You agree to safeguard candidate data and comply with all applicable laws.",
             },
             {
                 "badge": "Payment & renewal",

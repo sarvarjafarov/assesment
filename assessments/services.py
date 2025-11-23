@@ -133,7 +133,7 @@ def send_invite_email(
         "session": session,
         "session_link": intro_link,
         "start_link": start_link,
-        "invited_by": invited_by or "The Sira Team",
+        "invited_by": invited_by or "The Evalon Team",
         "due_at": due_at or session.due_at,
         "notes": notes or session.notes,
     }

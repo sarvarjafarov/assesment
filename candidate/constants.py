@@ -13,7 +13,7 @@ DEFAULT_HELP_TOPICS = [
     },
     {
         "question": "Need technical help?",
-        "answer": "Email support at support@sira.so or reply directly to the invitation message. Attach screenshots if you notice something unexpected.",
+        "answer": "Email support at support@evalon.so or reply directly to the invitation message. Attach screenshots if you notice something unexpected.",
     },
 ]
 

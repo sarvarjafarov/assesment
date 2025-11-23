@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize static %}
-{% block title %}{{ post.meta_title|default:post.title }} · Sira{% endblock %}
+{% block title %}{{ post.meta_title|default:post.title }} · Evalon{% endblock %}
 {% block meta_description %}{{ post.meta_description|default:post.excerpt }}{% endblock %}
 {% block extra_meta %}
     {% if post.meta_keywords %}<meta name="keywords" content="{{ post.meta_keywords }}">{% endif %}
@@ -56,7 +56,7 @@
     <section class="blog-related">
         <div class="section-heading align-left">
             <h2>Keep reading</h2>
-            <p class="lede">More ideas from teams building with Sira.</p>
+            <p class="lede">More ideas from teams building with Evalon.</p>
         </div>
         <div class="reading-carousel" data-related-slider>
             <div class="reading-track" data-related-track>

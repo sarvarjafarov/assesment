@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Careers · Sira{% endblock %}
+{% block title %}Careers · Evalon{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' %}
@@ -44,7 +44,7 @@
                                 <p>{{ role.tag }}</p>
                             </div>
                             <p class="role-meta">{{ role.location }} · {{ role.type }}</p>
-                            <a class="btn btn-pill" href="mailto:careers@sira.so?subject={{ role.title|urlencode }}">Apply</a>
+                            <a class="btn btn-pill" href="mailto:careers@evalon.so?subject={{ role.title|urlencode }}">Apply</a>
                         </article>
                         {% endfor %}
                     </div>

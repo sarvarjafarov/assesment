@@ -39,7 +39,7 @@ class SuperAdminRequiredMixin(LoginRequiredMixin):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if request.user.username != self.superadmin_username:
-            messages.error(request, "This console is restricted to the Sira superadmin.")
+            messages.error(request, "This console is restricted to the Evalon superadmin.")
             if hasattr(request.user, "client_account"):
                 return redirect("clients:dashboard")
             return redirect("clients:login")
@@ -355,7 +355,7 @@ class ConsoleLoginView(FormView):
     def form_valid(self, form):
         user = form.get_user()
         if user.username != SUPERADMIN_USERNAME:
-            form.add_error(None, "Only the Sira superadmin can access this console.")
+            form.add_error(None, "Only the Evalon superadmin can access this console.")
             return self.form_invalid(form)
         login(self.request, user)
         return super().form_valid(form)

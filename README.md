@@ -1,4 +1,4 @@
-# Sira Assessments
+# Evalon Assessments
 
 Marketing site + hiring console + candidate experience for running role-based diagnostics.
 
@@ -51,7 +51,7 @@ export EMAIL_PORT=1025
 export EMAIL_USE_TLS=0
 export EMAIL_HOST_USER=""
 export EMAIL_HOST_PASSWORD=""
-export DEFAULT_FROM_EMAIL="Sira Hiring <talent@sira.com>"
+export DEFAULT_FROM_EMAIL="Evalon Hiring <talent@evalon.com>"
 ```
 
 For Heroku, set config vars once (replace values with your provider/API key):
@@ -65,7 +65,7 @@ heroku config:set \
   EMAIL_HOST_PASSWORD=YOUR_SENDGRID_KEY \
   EMAIL_USE_TLS=1 \
   EMAIL_USE_SSL=0 \
-  DEFAULT_FROM_EMAIL="Sira Hiring <talent@sira.com>"
+  DEFAULT_FROM_EMAIL="Evalon Hiring <talent@evalon.com>"
 ```
 
 After configuring, every invite (marketing CTA, console, API) automatically emails the candidate with their unique assessment link.

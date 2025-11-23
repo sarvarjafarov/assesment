@@ -223,7 +223,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "1") == "1"
 EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "0") == "1"
 DEFAULT_FROM_EMAIL = os.environ.get(
-    "DEFAULT_FROM_EMAIL", "Sira Hiring <talent@sira.com>"
+    "DEFAULT_FROM_EMAIL", "Evalon Hiring <talent@evalon.com>"
 )
 EMAIL_ENABLED = EMAIL_BACKEND != "django.core.mail.backends.console.EmailBackend"
 ASSESSMENT_PASSING_SCORE = float(os.environ.get("ASSESSMENT_PASSING_SCORE", "70"))

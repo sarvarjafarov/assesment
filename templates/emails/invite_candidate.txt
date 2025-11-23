@@ -1,6 +1,6 @@
 Hi {{ candidate.first_name }},
 
-{{ invited_by }} invited you to complete the {{ assessment.title }} assessment on Sira.
+{{ invited_by }} invited you to complete the {{ assessment.title }} assessment on Evalon.
 
 {% if due_at %}Please submit your responses by {{ due_at|date:"M d, Y · h:i A" }}.{% endif %}
 Review instructions and start here:
@@ -17,4 +17,4 @@ Notes from the team:
 If you have questions, reply to this email and the team will help.
 
 Thanks,
-The Sira Team
+The Evalon Team

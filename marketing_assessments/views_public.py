@@ -39,9 +39,9 @@ def api_overview(request):
             "Thanks! Our team will review your request and share credentials shortly.",
         )
         return redirect("marketing-assessment:api")
-    postman_url = "https://sira-assets.s3.amazonaws.com/api/sira.postman_collection.json"
-    openapi_url = "https://sira-assets.s3.amazonaws.com/api/sira-openapi.yaml"
-    schema_url = "https://sira-assets.s3.amazonaws.com/api/sira-webhook-schema.json"
+    postman_url = "https://evalon-assets.s3.amazonaws.com/api/evalon.postman_collection.json"
+    openapi_url = "https://evalon-assets.s3.amazonaws.com/api/evalon-openapi.yaml"
+    schema_url = "https://evalon-assets.s3.amazonaws.com/api/evalon-webhook-schema.json"
     rest_endpoints = [
         {
             "method": "POST",
@@ -140,23 +140,23 @@ def api_overview(request):
             ],
             "loop_steps": [
                 {"title": "Issue invite", "detail": "Call /start with candidate metadata and assessment type to receive a secure session link."},
-                {"title": "Candidate completes", "detail": "Sira hosts the UX on mobile or desktop, saves progress, and scores responses in real time."},
+                {"title": "Candidate completes", "detail": "Evalon hosts the UX on mobile or desktop, saves progress, and scores responses in real time."},
                 {"title": "Sync outcomes", "detail": "Webhooks push scores + breakdowns back to your ATS/CRM, and you can pull the JSON results anytime."},
             ],
             "environment_details": [
-                {"label": "Prod base URL", "value": "https://api.sira.so"},
-                {"label": "Sandbox URL", "value": "https://sandbox.sira.so"},
+                {"label": "Prod base URL", "value": "https://api.evalon.so"},
+                {"label": "Sandbox URL", "value": "https://sandbox.evalon.so"},
                 {"label": "Rate limit", "value": "600 req/min per workspace"},
-                {"label": "Webhook domain", "value": "hooks.sira.so"},
+                {"label": "Webhook domain", "value": "hooks.evalon.so"},
             ],
             "architecture_flows": [
                 {
                     "title": "Create session",
-                    "description": "Your system hits <code>/start</code> with candidate + assessment metadata. Sira returns a secure link.",
+                    "description": "Your system hits <code>/start</code> with candidate + assessment metadata. Evalon returns a secure link.",
                 },
                 {
                     "title": "Candidate completes",
-                    "description": "Sira handles UX, scoring, and telemetry. Webhooks notify your app when responses arrive.",
+                    "description": "Evalon handles UX, scoring, and telemetry. Webhooks notify your app when responses arrive.",
                 },
                 {
                     "title": "Pull scores",
@@ -164,7 +164,7 @@ def api_overview(request):
                 },
             ],
             "partner_highlights": [
-                {"name": "Northwind ATS", "quote": "Sira's API shaved 4 hours per req by auto-issuing PM assessments."},
+                {"name": "Northwind ATS", "quote": "Evalon's API shaved 4 hours per req by auto-issuing PM assessments."},
                 {"name": "Atlas CRM", "quote": "We embed candidate scorecards right in our enterprise deal rooms."},
             ],
             "changelog": [
@@ -223,10 +223,10 @@ def api_overview(request):
                     "slug": "webhook",
                     "title": "Receive webhook payload",
                     "method": "POST",
-                    "path": "https://your-app.com/webhooks/sira",
+                    "path": "https://your-app.com/webhooks/evalon",
                     "description": "Example JSON body delivered when a candidate finishes.",
                     "request": {
-                        "headers": {"X-Sira-Signature": "sha256=***"},
+                        "headers": {"X-Evalon-Signature": "sha256=***"},
                         "body": {
                             "event": "assessment.completed",
                             "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",

@@ -564,7 +564,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             {
                 "label": "Support",
                 "description": "Email account management",
-                "href": "mailto:support@sira.app",
+                "href": "mailto:support@evalon.app",
                 "external": True,
             }
         )

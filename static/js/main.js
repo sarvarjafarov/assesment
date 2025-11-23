@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let eventIndex = 0;
         const renderEvent = () => {
             if (!events.length) {
-                liveFeedSlot.textContent = "Teams worldwide are currently assessing with Sira.";
+                liveFeedSlot.textContent = "Teams worldwide are currently assessing with Evalon.";
                 return;
             }
             const current = events[eventIndex];

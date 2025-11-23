@@ -98,7 +98,7 @@ def send_switch_device_email(
         "You asked us to send your secure assessment link so you can continue on another device.\n"
         f"Open the link below from your preferred browser:\n\n{resume_link}\n\n"
         "If you did not request this email, you can safely ignore it.\n\n"
-        "— Sira Assessments"
+        "— Evalon Assessments"
     )
 
     try:
