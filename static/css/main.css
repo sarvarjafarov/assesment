@@ -223,6 +223,12 @@ img {
     flex-shrink: 0;
 }
 
+.brand img {
+    height: 36px;
+    width: auto;
+    display: block;
+}
+
 .nav-links {
     list-style: none;
     display: flex;

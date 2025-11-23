@@ -3,9 +3,9 @@
     <nav class="nav">
         <div class="brand">
             <a href="{% url 'pages:home' %}">
-                <img src="{% static 'img/logo-glyph.svg' %}" alt="Evalon logo" />
+                <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
             </a>
-            <span>Evalon</span>
+            <span class="sr-only">Evalon</span>
         </div>
         <ul class="nav-links">
             <li><a class="{% if active == 'products' %}is-active{% endif %}" href="{% url 'pages:home' %}#suite">For talent teams</a></li>
