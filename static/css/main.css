@@ -2130,6 +2130,103 @@ main {
     color: var(--orange);
 }
 
+@media (max-width: 900px) {
+    body {
+        font-size: 1.02rem;
+    }
+
+    .site-header {
+        padding: 0.6rem 0;
+    }
+
+    .nav {
+        padding: 0 1.25rem;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .brand img {
+        height: 80px;
+    }
+
+    .nav-links {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .nav-actions {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .hero {
+        padding: 5rem 1.25rem 4.5rem;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.4rem, 6vw, 3.6rem);
+    }
+
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+
+    .hero-persona-toggle,
+    .hero-cta {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .section-heading {
+        padding: 0 0.25rem;
+        max-width: 640px;
+    }
+
+    .suite,
+    .feature-suite,
+    .pillars,
+    .workflow,
+    .journey-hero,
+    .journey-board,
+    .resources,
+    .testimonial,
+    .case-slider,
+    .outcomes,
+    .pricing,
+    .cta {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    .pillar-grid,
+    .workflow-steps,
+    .feature-body,
+    .journey-board-grid,
+    .catalog-grid,
+    .outcome-grid,
+    .pricing-grid,
+    .resource-grid,
+    .cta-highlights,
+    .cta-checks {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .journey-hero {
+        gap: 1.5rem;
+    }
+
+    .cta {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .footer-shell {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+}
+
 @media (max-width: 640px) {
     body {
         font-size: 1rem;
