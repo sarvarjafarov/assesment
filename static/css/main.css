@@ -6497,18 +6497,21 @@ main {
 .checkbox-pill {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 0.85rem;
-    border-radius: 16px;
+    justify-content: space-between;
+    gap: 0.65rem;
+    padding: 0.65rem 1rem;
+    border-radius: 20px;
     border: 1px solid rgba(14, 20, 40, 0.12);
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     font-weight: 600;
     color: var(--navy);
     cursor: pointer;
     transition: border 0.2s ease, box-shadow 0.2s ease;
 }
-.checkbox-pill input[type="checkbox"] {
+.checkbox-pill__box input[type="checkbox"] {
     accent-color: var(--orange);
+    width: 18px;
+    height: 18px;
 }
 .checkbox-pill:hover {
     border-color: rgba(83, 55, 239, 0.4);

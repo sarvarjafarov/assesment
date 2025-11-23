@@ -2,6 +2,7 @@
 {% load static client_tags %}
 {% block content %}
 <div class="page-shell apply-page">
+    {% include 'includes/site_header.html' %}
     <main class="apply-main">
     <section class="panel request-panel request-panel--glass panel-contained">
         <div class="request-intro">
@@ -111,7 +112,7 @@
                     <div class="option-grid">
                         {% for checkbox in form.talent_stack %}
                         <label class="checkbox-pill">
-                            {{ checkbox.tag }}
+                            <span class="checkbox-pill__box">{{ checkbox.tag }}</span>
                             <span>{{ checkbox.choice_label }}</span>
                         </label>
                         {% endfor %}
@@ -167,4 +168,4 @@
     </footer>
 </div>
 {% endblock %}
-{% block site_footer %}{% endblock %}
+{% block site_footer %}{% include 'includes/site_footer.html' %}{% endblock %}
