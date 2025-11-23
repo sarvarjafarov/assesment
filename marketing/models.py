@@ -57,15 +57,15 @@ class MarketingSettings(models.Model):
         mime_field = f"{field_name}_mime"
         if not field:
             return
-        file_obj = getattr(field, "file", None)
-        if not file_obj:
+        uploaded_file = getattr(field, "_file", None)
+        if uploaded_file is None:
+            # No new upload; keep existing binary data untouched.
             return
-        file_obj.open("rb")
-        data = file_obj.read()
-        file_obj.close()
+        uploaded_file.seek(0)
+        data = uploaded_file.read()
         if not data:
             return
-        mime_type = mimetypes.guess_type(field.name)[0] or "image/png"
+        mime_type = mimetypes.guess_type(getattr(uploaded_file, "name", ""))[0] or "image/png"
         setattr(self, storage_field, data)
         setattr(self, mime_field, mime_type)
         field.delete(save=False)
