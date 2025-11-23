@@ -103,6 +103,70 @@
         </article>
     </section>
 
+    <section class="panel portal-panel assignment-highlight">
+        <header>
+            <div>
+                <p class="eyebrow">Assessment catalog</p>
+                <h2>Invite candidates in seconds</h2>
+                <p class="muted">Pick a licensed assessment below to create invites or review progress.</p>
+            </div>
+        </header>
+        {% if allowed_assessments %}
+        <div class="portal-assessment-grid">
+            {% for item in allowed_assessments %}
+            <article class="portal-assessment-card enhanced">
+                <div class="pill subtle">Active</div>
+                <h3>{{ item.label }}</h3>
+                <p>{{ item.description|default:"Active license" }}</p>
+                <dl class="assessment-metrics">
+                    <div>
+                        <dt>Invites</dt>
+                        <dd>{{ item.metrics.invites|default:0 }}</dd>
+                    </div>
+                    <div>
+                        <dt>In progress</dt>
+                        <dd>{{ item.metrics.in_progress|default:0 }}</dd>
+                    </div>
+                    <div>
+                        <dt>Completed</dt>
+                        <dd>{{ item.metrics.completed|default:0 }}</dd>
+                    </div>
+                </dl>
+                <div class="portal-assessment-actions">
+                    <a class="btn btn-pill small" href="{{ item.manage_url }}">Invite candidates</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No assessments approved yet. We will notify you when your licenses are ready.</p>
+        {% endif %}
+    </section>
+
+    <section class="portal-card project-preview">
+        <header class="project-preview-head">
+            <div>
+                <p class="eyebrow">Projects</p>
+                <h2>Active roles</h2>
+            </div>
+            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Manage projects</a>
+        </header>
+        {% if project_preview %}
+        <div class="project-preview-grid">
+            {% for project in project_preview %}
+            <article>
+                <p class="label">{{ project.status }}</p>
+                <h3>{{ project.title }}</h3>
+                <p class="muted">{{ project.open_roles }} open · {{ project.sessions }} invites</p>
+                <a class="pill subtle" href="{{ project.href }}">View</a>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No projects yet. Create one to organize invites.</p>
+        {% endif %}
+    </section>
+
     {% if notifications %}
     <section class="notification-row">
         {% for note in notifications %}
@@ -138,29 +202,6 @@
         {% endfor %}
         {% else %}
         <p class="empty-state">No quick actions available.</p>
-        {% endif %}
-    </section>
-    <section class="portal-card project-preview">
-        <header class="project-preview-head">
-            <div>
-                <p class="eyebrow">Projects</p>
-                <h2>Active roles</h2>
-            </div>
-            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Manage projects</a>
-        </header>
-        {% if project_preview %}
-        <div class="project-preview-grid">
-            {% for project in project_preview %}
-            <article>
-                <p class="label">{{ project.status }}</p>
-                <h3>{{ project.title }}</h3>
-                <p class="muted">{{ project.open_roles }} open · {{ project.sessions }} invites</p>
-                <a class="pill subtle" href="{{ project.href }}">View</a>
-            </article>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="empty-state">No projects yet. Create one to organize invites.</p>
         {% endif %}
     </section>
     {% if can_manage_branding %}
@@ -350,44 +391,6 @@
             </article>
         </section>
 
-        <section class="panel portal-panel">
-            <header>
-                <div>
-                    <p class="eyebrow">Assessment catalog</p>
-                    <h2>Live licenses</h2>
-                </div>
-            </header>
-            {% if allowed_assessments %}
-            <div class="portal-assessment-grid">
-                {% for item in allowed_assessments %}
-                <article class="portal-assessment-card enhanced">
-                    <div class="pill subtle">Active</div>
-                    <h3>{{ item.label }}</h3>
-                    <p>{{ item.description|default:"Active license" }}</p>
-                    <dl class="assessment-metrics">
-                        <div>
-                            <dt>Invites</dt>
-                            <dd>{{ item.metrics.invites|default:0 }}</dd>
-                        </div>
-                        <div>
-                            <dt>In progress</dt>
-                            <dd>{{ item.metrics.in_progress|default:0 }}</dd>
-                        </div>
-                        <div>
-                            <dt>Completed</dt>
-                            <dd>{{ item.metrics.completed|default:0 }}</dd>
-                        </div>
-                    </dl>
-                    <div class="portal-assessment-actions">
-                        <a class="btn btn-outline small" href="{{ item.manage_url }}">Manage invites</a>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="empty-state">No assessments approved yet. We will notify you when your licenses are ready.</p>
-            {% endif %}
-        </section>
     </main>
 </div>
 {% if chart_payload %}
