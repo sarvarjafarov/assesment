@@ -18,12 +18,12 @@
     {% if marketing_settings and marketing_settings.meta_keywords %}
     <meta name="keywords" content="{{ marketing_settings.meta_keywords }}">
     {% endif %}
-    {% if marketing_settings and marketing_settings.meta_image %}
-    <meta property="og:image" content="{{ marketing_settings.meta_image.url }}">
-    <meta name="twitter:image" content="{{ marketing_settings.meta_image.url }}">
+    {% if marketing_meta_image_url %}
+    <meta property="og:image" content="{{ marketing_meta_image_url }}">
+    <meta name="twitter:image" content="{{ marketing_meta_image_url }}">
     {% endif %}
-    {% if marketing_settings and marketing_settings.favicon %}
-    <link rel="icon" href="{{ marketing_settings.favicon.url }}">
+    {% if marketing_settings and marketing_settings.favicon_data_url %}
+    <link rel="icon" href="{{ marketing_settings.favicon_data_url }}">
     {% else %}
     <link rel="icon" href="{% static 'img/logo-glyph.svg' %}">
     {% endif %}
