@@ -1,13 +1,33 @@
+{% load static %}
+{% load url_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}Evalon Assessments{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Evalon helps recruitment teams design, deliver, and score behavioral assessments.{% endblock %}">
+    {% with default_title=marketing_settings.meta_title|default:"Evalon Assessments" default_description=marketing_settings.meta_description|default:"Evalon helps recruitment teams design, deliver, and score behavioral assessments." %}
+    <title>{% block title %}{{ default_title }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ default_description }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ default_title }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ default_description }}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ default_title }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ default_description }}{% endblock %}">
+    {% endwith %}
+    {% if marketing_settings and marketing_settings.meta_keywords %}
+    <meta name="keywords" content="{{ marketing_settings.meta_keywords }}">
+    {% endif %}
+    {% if marketing_settings and marketing_settings.meta_image %}
+    <meta property="og:image" content="{{ marketing_settings.meta_image.url }}">
+    <meta name="twitter:image" content="{{ marketing_settings.meta_image.url }}">
+    {% endif %}
+    {% if marketing_settings and marketing_settings.favicon %}
+    <link rel="icon" href="{{ marketing_settings.favicon.url }}">
+    {% else %}
+    <link rel="icon" href="{% static 'img/logo-glyph.svg' %}">
+    {% endif %}
     {% block extra_meta %}{% endblock %}
-    {% load static %}
-    {% load url_extras %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
