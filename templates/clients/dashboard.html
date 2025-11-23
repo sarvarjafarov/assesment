@@ -5,9 +5,9 @@
 <div class="portal-shell">
     <header class="portal-hero expanded">
         <div class="portal-hero-main">
-            <div class="portal-hero-icon{% if account.logo %} logo{% endif %}">
-                {% if account.logo %}
-                <img src="{{ account.logo.url }}" alt="{{ account.company_name }} logo">
+            <div class="portal-hero-icon{% if account.has_logo %} logo{% endif %}">
+                {% if account.logo_data_url %}
+                <img src="{{ account.logo_data_url }}" alt="{{ account.company_name }} logo">
                 {% else %}
                 <span>⚡</span>
                 {% endif %}
@@ -91,7 +91,7 @@
                 </div>
                 <button class="btn btn-pill" type="submit">Upload logo</button>
             </form>
-            {% if account.logo %}
+            {% if account.has_logo %}
             <form method="post" class="remove-logo-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="remove_logo">

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import base64
+import mimetypes
+from datetime import datetime
+import uuid
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
-from datetime import datetime
-import uuid
 
 User = get_user_model()
 
@@ -108,6 +111,8 @@ class ClientAccount(TimeStampedModel):
     notes = models.TextField(blank=True)
     receive_weekly_summary = models.BooleanField(default=False)
     logo = models.FileField(upload_to="client_logos/", null=True, blank=True)
+    logo_data = models.BinaryField(blank=True, null=True, editable=False)
+    logo_mime = models.CharField(max_length=100, blank=True, editable=False)
     data_retention_days = models.PositiveIntegerField(default=365)
     plan_slug = models.CharField(max_length=32, choices=PLAN_CHOICES, default="starter")
     invite_quota = models.PositiveIntegerField(default=20)
@@ -139,6 +144,7 @@ class ClientAccount(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self._apply_plan_defaults()
+        self._process_logo_upload()
         # Auto-sync the linked user's active flag with client approval status.
         should_activate = self.status == "approved"
         if self.user and self.user.is_active != should_activate:
@@ -158,9 +164,49 @@ class ClientAccount(TimeStampedModel):
         if plan_invite is not None:
             self.invite_quota = plan_invite
 
+    def _process_logo_upload(self):
+        field = getattr(self, "logo")
+        if not field:
+            return
+        uploaded = getattr(field, "_file", None)
+        if not uploaded:
+            return
+        uploaded.seek(0)
+        data = uploaded.read()
+        if not data:
+            return
+        mime_type = mimetypes.guess_type(getattr(uploaded, "name", ""))[0] or "image/png"
+        self.logo_data = data
+        self.logo_mime = mime_type
+        field.delete(save=False)
+        self.logo = None
+
     # Plan helpers
     def plan_details(self):
         return self.PLAN_CONFIG.get(self.plan_slug, self.PLAN_CONFIG["starter"])
+
+    def clear_logo(self):
+        if self.logo:
+            self.logo.delete(save=False)
+        self.logo = None
+        self.logo_data = None
+        self.logo_mime = ""
+
+    @property
+    def logo_data_url(self):
+        if self.logo_data and self.logo_mime:
+            encoded = base64.b64encode(self.logo_data).decode("ascii")
+            return f"data:{self.logo_mime};base64,{encoded}"
+        if self.logo:
+            try:
+                return self.logo.url
+            except ValueError:
+                return None
+        return None
+
+    @property
+    def has_logo(self):
+        return bool(self.logo_data_url)
 
     def project_limit(self) -> int | None:
         limit = self.project_quota

@@ -413,7 +413,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             form = self.logo_form_class(request.POST, request.FILES)
             if form.is_valid():
                 account.logo = form.cleaned_data["logo"]
-                account.save(update_fields=["logo"])
+                account.save()
                 messages.success(request, "Logo updated.")
                 return redirect("clients:dashboard")
             self.logo_form = form
@@ -424,10 +424,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             if account.role not in ROLE_BRANDING_ACCESS:
                 messages.error(request, "Only managers can update branding.")
                 return redirect("clients:dashboard")
-            if account.logo:
-                account.logo.delete(save=False)
-                account.logo = None
-                account.save(update_fields=["logo"])
+            if account.has_logo:
+                account.clear_logo()
+                account.save(update_fields=["logo", "logo_data", "logo_mime"])
             messages.info(request, "Logo removed.")
         return redirect("clients:dashboard")
 
