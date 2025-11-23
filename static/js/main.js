@@ -49,6 +49,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const navBreakpoint = 900;
+    const siteNavs = document.querySelectorAll('.site-header .nav');
+    siteNavs.forEach((nav) => {
+        const toggle = nav.querySelector('[data-nav-toggle]');
+        const menu = nav.querySelector('[data-nav-menu]');
+        if (!toggle || !menu) {
+            return;
+        }
+        const closeMenu = () => {
+            nav.classList.remove('is-open');
+            toggle.classList.remove('is-active');
+            toggle.setAttribute('aria-expanded', 'false');
+        };
+        toggle.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('is-open');
+            toggle.classList.toggle('is-active', isOpen);
+            toggle.setAttribute('aria-expanded', String(isOpen));
+        });
+        menu.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= navBreakpoint && nav.classList.contains('is-open')) {
+                    closeMenu();
+                }
+            });
+        });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > navBreakpoint && nav.classList.contains('is-open')) {
+                closeMenu();
+            }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+                closeMenu();
+            }
+        });
+    });
+
     const journeyStages = document.querySelectorAll('.journey-stage');
     if (journeyStages.length) {
         let stageIndex = 0;
