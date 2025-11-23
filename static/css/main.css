@@ -221,10 +221,15 @@ img {
     font-size: 1.1rem;
     color: var(--navy);
     flex-shrink: 0;
+    text-decoration: none;
+}
+
+.brand:visited {
+    color: var(--navy);
 }
 
 .brand img {
-    height: 36px;
+    height: 100px;
     width: auto;
     display: block;
 }

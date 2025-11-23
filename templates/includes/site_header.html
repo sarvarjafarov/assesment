@@ -1,12 +1,10 @@
 {% load static %}
 <header class="site-header">
     <nav class="nav">
-        <div class="brand">
-            <a href="{% url 'pages:home' %}">
-                <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
-            </a>
+        <a class="brand" href="{% url 'pages:home' %}">
+            <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
             <span class="sr-only">Evalon</span>
-        </div>
+        </a>
         <ul class="nav-links">
             <li><a class="{% if active == 'products' %}is-active{% endif %}" href="{% url 'pages:home' %}#suite">For talent teams</a></li>
             <li><a class="{% if active == 'journey' %}is-active{% endif %}" href="{% url 'pages:home' %}#journey">For candidates</a></li>
