@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Evalon · Workforce OS{% endblock %}
+{% block title %}{{ marketing_settings.meta_title|default:"Evalon · Workforce OS" }}{% endblock %}
 {% block content %}
 <div class="page-shell">
     <header class="site-header">
