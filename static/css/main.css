@@ -7051,6 +7051,7 @@ main {
     display: grid;
     place-items: center;
     font-size: 2rem;
+    position: relative;
 }
 .portal-hero-icon.logo {
     background: #fff;
@@ -7060,6 +7061,54 @@ main {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+}
+.logo-edit-trigger {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--navy);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(14, 20, 40, 0.25);
+}
+.logo-edit-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 11, 25, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+.logo-edit-modal.is-visible {
+    display: flex;
+}
+.logo-edit-card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 2rem;
+    width: min(520px, 100%);
+    position: relative;
+    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.25);
+}
+.logo-edit-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
 }
 .portal-actions {
     justify-self: end;

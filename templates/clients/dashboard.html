@@ -11,6 +11,11 @@
                 {% else %}
                 <span>⚡</span>
                 {% endif %}
+                {% if can_manage_branding or is_manager %}
+                <button class="logo-edit-trigger" type="button" aria-label="Change logo" data-logo-edit-trigger>
+                    ✏️
+                </button>
+                {% endif %}
             </div>
             <div>
                 <p class="eyebrow">Client workspace</p>
@@ -49,59 +54,36 @@
             {% endif %}
         </div>
     </header>
-
-    <section class="plan-overview-panel">
-        <article class="portal-card plan-card">
-            <div class="plan-card-head">
-                <p class="label">{{ plan_overview.name }} plan</p>
-                <h2>{{ plan_overview.description }}</h2>
-            </div>
-            <div class="plan-usage">
-                <div>
-                    <div class="usage-label">
-                        <p>Invites</p>
-                        <span>
-                            {{ plan_overview.invites_used }}
-                            /
-                            {% if plan_overview.invite_limit %}{{ plan_overview.invite_limit }}{% else %}Unlimited{% endif %}
-                        </span>
-                    </div>
-                    {% if plan_overview.invite_percent %}
-                    <div class="usage-bar">
-                        <span style="width: {{ plan_overview.invite_percent }}%;"></span>
-                    </div>
-                    {% else %}
-                    <p class="muted small">Unlimited invites</p>
-                    {% endif %}
+    {% if can_manage_branding or is_manager %}
+    <div class="logo-edit-modal" data-logo-edit-modal>
+        <div class="logo-edit-card">
+            <button class="logo-edit-close" type="button" aria-label="Close" data-logo-edit-close>×</button>
+            <p class="label">Branding</p>
+            <h2>Update workspace logo</h2>
+            <p class="muted">Upload a square PNG/JPG/SVG for the hero badge.</p>
+            <form method="post" enctype="multipart/form-data" class="logo-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="upload_logo">
+                {{ logo_form.non_field_errors }}
+                <div class="form-field">
+                    {{ logo_form.logo.label_tag }}
+                    {{ logo_form.logo }}
+                    {% for error in logo_form.logo.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
                 </div>
-                <div>
-                    <div class="usage-label">
-                        <p>Active projects</p>
-                        <span>
-                            {{ plan_overview.project_used }}
-                            /
-                            {% if plan_overview.project_limit %}{{ plan_overview.project_limit }}{% else %}Unlimited{% endif %}
-                        </span>
-                    </div>
-                    {% if plan_overview.project_percent %}
-                    <div class="usage-bar">
-                        <span style="width: {{ plan_overview.project_percent }}%;"></span>
-                    </div>
-                    {% else %}
-                    <p class="muted small">Unlimited projects</p>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="plan-actions">
-                <a class="btn btn-outline small" href="{{ plan_overview.upgrade_url }}" target="_blank">View pricing</a>
-                {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 5 %}
-                <p class="muted tiny">Only {{ plan_overview.invite_remaining }} invites left this month.</p>
-                {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 1 %}
-                <p class="muted tiny">Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left.</p>
-                {% endif %}
-            </div>
-        </article>
-    </section>
+                <button class="btn btn-pill" type="submit">Upload logo</button>
+            </form>
+            {% if account.logo %}
+            <form method="post" class="remove-logo-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove_logo">
+                <button class="btn btn-ghost small" type="submit">Remove current logo</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 
     <section class="panel portal-panel assignment-highlight">
         <header>
@@ -204,36 +186,59 @@
         <p class="empty-state">No quick actions available.</p>
         {% endif %}
     </section>
-    {% if can_manage_branding %}
-    <section class="branding-section">
-        <article class="portal-card branding-card">
-            <p class="label">Branding</p>
-            <h2>Workspace logo</h2>
-            <p class="muted">Upload a square PNG/JPG/SVG for the hero badge.</p>
-            <form method="post" enctype="multipart/form-data" class="logo-form">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="upload_logo">
-                {{ logo_form.non_field_errors }}
-                <div class="form-field">
-                    {{ logo_form.logo.label_tag }}
-                    {{ logo_form.logo }}
-                    {% for error in logo_form.logo.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
+
+    <section class="plan-overview-panel">
+        <article class="portal-card plan-card">
+            <div class="plan-card-head">
+                <p class="label">{{ plan_overview.name }} plan</p>
+                <h2>{{ plan_overview.description }}</h2>
+            </div>
+            <div class="plan-usage">
+                <div>
+                    <div class="usage-label">
+                        <p>Invites</p>
+                        <span>
+                            {{ plan_overview.invites_used }}
+                            /
+                            {% if plan_overview.invite_limit %}{{ plan_overview.invite_limit }}{% else %}Unlimited{% endif %}
+                        </span>
+                    </div>
+                    {% if plan_overview.invite_percent %}
+                    <div class="usage-bar">
+                        <span style="width: {{ plan_overview.invite_percent }}%;"></span>
+                    </div>
+                    {% else %}
+                    <p class="muted small">Unlimited invites</p>
+                    {% endif %}
                 </div>
-                <button class="btn btn-outline small" type="submit">Upload logo</button>
-            </form>
-            {% if account.logo %}
-            <form method="post" class="remove-logo-form">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="remove_logo">
-                <button class="btn btn-ghost small" type="submit">Remove current logo</button>
-            </form>
-            {% endif %}
+                <div>
+                    <div class="usage-label">
+                        <p>Active projects</p>
+                        <span>
+                            {{ plan_overview.project_used }}
+                            /
+                            {% if plan_overview.project_limit %}{{ plan_overview.project_limit }}{% else %}Unlimited{% endif %}
+                        </span>
+                    </div>
+                    {% if plan_overview.project_percent %}
+                    <div class="usage-bar">
+                        <span style="width: {{ plan_overview.project_percent }}%;"></span>
+                    </div>
+                    {% else %}
+                    <p class="muted small">Unlimited projects</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="plan-actions">
+                <a class="btn btn-outline small" href="{{ plan_overview.upgrade_url }}" target="_blank">View pricing</a>
+                {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 5 %}
+                <p class="muted tiny">Only {{ plan_overview.invite_remaining }} invites left this month.</p>
+                {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 1 %}
+                <p class="muted tiny">Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left.</p>
+                {% endif %}
+            </div>
         </article>
     </section>
-    {% endif %}
-
     <main>
         <section class="portal-card-grid metric-snapshot">
             <article class="portal-card">

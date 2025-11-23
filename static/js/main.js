@@ -86,6 +86,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    const logoTrigger = document.querySelector('[data-logo-edit-trigger]');
+    const logoModal = document.querySelector('[data-logo-edit-modal]');
+    if (logoTrigger && logoModal) {
+        const closeButtons = logoModal.querySelectorAll('[data-logo-edit-close]');
+        const toggleModal = (show) => {
+            logoModal.classList.toggle('is-visible', show);
+        };
+        logoTrigger.addEventListener('click', () => toggleModal(true));
+        closeButtons.forEach((btn) => btn.addEventListener('click', () => toggleModal(false)));
+        logoModal.addEventListener('click', (event) => {
+            if (event.target === logoModal) {
+                toggleModal(false);
+            }
+        });
+    }
+
     const journeyStages = document.querySelectorAll('.journey-stage');
     if (journeyStages.length) {
         let stageIndex = 0;
