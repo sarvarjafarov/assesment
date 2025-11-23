@@ -300,8 +300,6 @@ class ClientProject(TimeStampedModel):
         return f"{self.title} ({self.client.company_name})"
 
     def total_sessions(self):
-        return (
-            self.marketing_sessions.count()
-            + getattr(self, "pm_sessions").count()
-            + self.behavioral_sessions.count()
-        )
+        pm_qs = getattr(self, "pm_sessions", None)
+        pm_count = pm_qs.count() if pm_qs is not None else 0
+        return self.marketing_sessions.count() + pm_count + self.behavioral_sessions.count()
