@@ -2,22 +2,7 @@
 {% load static %}
 {% block content %}
 <div class="page-shell apply-page">
-    <header class="site-header">
-        <nav class="nav">
-            <div class="brand">
-                <img src="{% static 'img/logo-glyph.svg' %}" alt="Sira logo" />
-                <span>Sira Assessments</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/#products">Products</a></li>
-                <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
-            </ul>
-            <div class="nav-actions">
-                <a class="btn-outline small" href="{% url 'clients:signup' %}">Apply</a>
-            </div>
-        </nav>
-    </header>
+    {% include 'includes/site_header.html' %}
 
     <main class="apply-main auth-main">
         <section class="panel auth-panel">
@@ -50,4 +35,3 @@
 
 </div>
 {% endblock %}
-{% block site_footer %}{% endblock %}
