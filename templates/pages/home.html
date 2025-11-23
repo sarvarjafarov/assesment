@@ -36,8 +36,12 @@
         <section class="hero" data-persona="talent">
             <div class="hero-inner">
                 <div class="hero-badge">{{ hero_content.badge|safe }}</div>
-                <h1>{{ hero_content.title|safe }}</h1>
-                <div class="hero-persona-toggle">
+                <p class="hero-tagline">
+                    <span>Run</span>
+                    <span class="hero-rotating" data-hero-rotating>marketing</span>
+                    <span>assessments in one simple workspace.</span>
+                </p>
+            <div class="hero-persona-toggle">
                     <button class="persona-btn is-active"
                         data-persona="talent"
                         data-subtitle="Evalon calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour."
