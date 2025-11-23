@@ -232,6 +232,7 @@ img {
     height: 100px;
     width: auto;
     display: block;
+    max-width: 100%;
 }
 
 .nav-links {
@@ -2127,6 +2128,310 @@ main {
 }
 .site-footer .heart {
     color: var(--orange);
+}
+
+@media (max-width: 640px) {
+    body {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .site-header {
+        padding: 0.5rem 0;
+    }
+
+    .nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0 1rem;
+        width: 100%;
+    }
+
+    .brand {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .brand img {
+        height: 64px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.35rem;
+    }
+
+    .nav-links li {
+        width: 100%;
+    }
+
+    .nav-links a {
+        width: 100%;
+        padding: 0.35rem 0;
+    }
+
+    .nav-actions {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.65rem;
+        align-items: stretch;
+    }
+
+    .nav-actions .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .hero {
+        padding: 4.5rem 1rem 3.5rem;
+        text-align: left;
+    }
+
+    .hero-inner {
+        max-width: 100%;
+    }
+
+    .hero-badge {
+        margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-persona-toggle,
+    .hero-cta {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-persona-toggle .persona-btn,
+    .hero-cta .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .section-heading {
+        text-align: left;
+    }
+
+    .section-heading h2 {
+        font-size: 2rem;
+        line-height: 1.25;
+    }
+
+    .section-shell {
+        padding: 0 1rem;
+    }
+
+    .suite {
+        padding: 3rem 0.5rem 2.5rem;
+    }
+
+    .suite-map {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .suite-instructions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+        font-size: 0.9rem;
+    }
+
+    .suite-card,
+    .suite-detail,
+    .pillar-card,
+    .workflow-steps li,
+    .feature-card,
+    .catalog-card,
+    .journey-hero-detail,
+    .journey-card,
+    .metric-card,
+    .pricing-card,
+    .resource-grid article,
+    .cta-card,
+    .cta-form-card {
+        padding: 1.25rem;
+    }
+
+    .suite-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .suite-detail .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .workflow-steps,
+    .pillar-grid,
+    .feature-body,
+    .journey-board-grid,
+    .outcome-grid,
+    .pricing-grid,
+    .resource-grid,
+    .cta-highlights,
+    .cta-checks,
+    .cta-form .form-row,
+    .catalog-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .journey-hero {
+        flex-direction: column;
+        padding: 3rem 1rem 0;
+    }
+
+    .journey-hero-content,
+    .journey-hero-detail {
+        min-width: auto;
+    }
+
+    .journey-board {
+        padding: 2rem 1rem 3rem;
+    }
+
+    .journey-legend {
+        flex-wrap: wrap;
+    }
+
+    .feature-suite,
+    .pillars,
+    .workflow,
+    .journey-board,
+    .resources,
+    .testimonial,
+    .case-slider,
+    .outcomes,
+    .pricing,
+    .cta {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .feature-body {
+        gap: 1.5rem;
+    }
+
+    .feature-accordion {
+        position: static;
+    }
+
+    .feature-accordion .accent-bar {
+        display: none;
+    }
+
+    .feature-card {
+        min-height: auto;
+    }
+
+    .case-slider {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .case-panels {
+        min-height: 0;
+    }
+
+    .case-panel {
+        position: relative;
+        opacity: 1;
+        transform: none;
+        margin-bottom: 1rem;
+    }
+
+    .case-panel:not(.is-active) {
+        display: none;
+    }
+
+    .testimonial {
+        padding: 4rem 1rem;
+    }
+
+    .testimonial-grid {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+    }
+
+    .testimonial-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .testimonial-slider {
+        min-height: 0;
+    }
+
+    .testimonial-panel {
+        position: relative;
+        padding: 0;
+    }
+
+    .testimonial-panel:not(.is-active) {
+        display: none;
+    }
+
+    .outcomes {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .metric-card {
+        gap: 0.5rem;
+    }
+
+    .pricing-card {
+        min-height: auto;
+    }
+
+    .cta {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 3rem 1rem 4rem;
+    }
+
+    .cta-form button {
+        width: 100%;
+    }
+
+    .site-footer {
+        margin-top: 2rem;
+    }
+
+    .footer-shell {
+        grid-template-columns: 1fr;
+        padding: 2.5rem 1rem;
+    }
+
+    .footer-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-form {
+        flex-direction: column;
+    }
+
+    .footer-form input,
+    .footer-form button {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .footer-bottom-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .console-shell {
