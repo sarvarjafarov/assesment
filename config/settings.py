@@ -61,11 +61,12 @@ DEFAULT_ALLOWED_HOSTS = [
     "127.0.0.1",
     ".evalon.tech",
 ]
-ALLOWED_HOSTS = [
+env_allowed_hosts = [
     host.strip()
-    for host in os.environ.get("ALLOWED_HOSTS", ",".join(DEFAULT_ALLOWED_HOSTS)).split(",")
+    for host in os.environ.get("ALLOWED_HOSTS", "").split(",")
     if host.strip()
 ]
+ALLOWED_HOSTS = list({*DEFAULT_ALLOWED_HOSTS, *env_allowed_hosts})
 if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = DEFAULT_ALLOWED_HOSTS
 
@@ -73,14 +74,12 @@ DEFAULT_CSRF_TRUSTED_ORIGINS = [
     "https://evalon.tech",
     "https://www.evalon.tech",
 ]
-CSRF_TRUSTED_ORIGINS = [
+env_csrf_origins = [
     origin.strip()
-    for origin in os.environ.get(
-        "CSRF_TRUSTED_ORIGINS",
-        ",".join(DEFAULT_CSRF_TRUSTED_ORIGINS),
-    ).split(",")
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+CSRF_TRUSTED_ORIGINS = list({*DEFAULT_CSRF_TRUSTED_ORIGINS, *env_csrf_origins})
 
 
 # Application definition
