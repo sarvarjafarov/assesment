@@ -13,9 +13,13 @@ class MarketingConfig(AppConfig):
         from .models import MarketingSettings
 
         def _apply(instance: MarketingSettings):
-            if not instance or not instance.has_smtp_credentials():
+            has_creds = getattr(instance, "has_smtp_credentials", None)
+            if not instance or not callable(has_creds) or not has_creds():
                 return
-            config = instance.smtp_config()
+            smtp_config = getattr(instance, "smtp_config", None)
+            if not callable(smtp_config):
+                return
+            config = smtp_config()
             for key, value in config.items():
                 setattr(settings, key, value)
 
