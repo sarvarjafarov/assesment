@@ -3,7 +3,11 @@
 {% block title %}Client Login · Evalon{% endblock %}
 {% block meta_description %}Sign in to your Evalon client workspace to invite candidates, review projects, and manage assessments.{% endblock %}
 {% block content %}
-<div class="page-shell apply-page">
+<div class="page-shell apply-page"
+     data-gtag-load="login_view"
+     data-gtag-category="lifecycle"
+     data-gtag-label="client_portal_login"
+     data-gtag-params='{"stage":"form_view"}'>
     {% include 'includes/site_header.html' %}
 
     <main class="apply-main auth-main">
@@ -11,7 +15,12 @@
             <p class="eyebrow">Client portal</p>
             <h1>Sign in to your workspace</h1>
             <p class="lede">Use the email associated with your approved Evalon account.</p>
-            <form method="post" class="form-stack">
+            <form method="post"
+                  class="form-stack"
+                  data-gtag-submit="login"
+                  data-gtag-category="engagement"
+                  data-gtag-label="client_portal_login"
+                  data-gtag-params='{"method":"client_portal"}'>
                 {% csrf_token %}
                 {% if form.non_field_errors %}
                 <div class="form-error">

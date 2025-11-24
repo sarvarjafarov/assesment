@@ -3,7 +3,11 @@
 {% block title %}Signup Complete · Evalon{% endblock %}
 {% block meta_description %}We received your Evalon workspace application. Check your inbox to verify your email so we can finish review.{% endblock %}
 {% block content %}
-<div class="page-shell apply-page">
+<div class="page-shell apply-page"
+     data-gtag-load="sign_up_complete"
+     data-gtag-category="lifecycle"
+     data-gtag-label="client_signup_flow"
+     data-gtag-params='{"stage":"application_received","method":"client_portal"}'>
     {% include 'includes/site_header.html' with active='home' %}
 
     <main class="apply-main">

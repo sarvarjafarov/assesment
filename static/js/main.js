@@ -1,4 +1,88 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const trackEvent = (name, params = {}) => {
+        if (typeof window.gtag === 'function' && name) {
+            window.gtag('event', name, params);
+        }
+    };
+    window.evalonTrackEvent = trackEvent;
+
+    const parseJson = (value) => {
+        if (!value) {
+            return {};
+        }
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.warn('Invalid data-gtag-params value', error);
+            return {};
+        }
+    };
+
+    const buildPayload = (target, defaults = {}) => {
+        const payload = { ...defaults };
+        if (!target || !target.dataset) {
+            return payload;
+        }
+        const { dataset } = target;
+        if (dataset.gtagCategory) {
+            payload.event_category = dataset.gtagCategory;
+        }
+        if (dataset.gtagLabel) {
+            payload.event_label = dataset.gtagLabel;
+        }
+        if (dataset.gtagValue && !Number.isNaN(Number(dataset.gtagValue))) {
+            payload.value = Number(dataset.gtagValue);
+        }
+        if (dataset.gtagCurrency) {
+            payload.currency = dataset.gtagCurrency;
+        }
+        if (dataset.gtagItemName) {
+            const item = { item_name: dataset.gtagItemName };
+            if (dataset.gtagItemCategory) {
+                item.item_category = dataset.gtagItemCategory;
+            }
+            if (dataset.gtagItemId) {
+                item.item_id = dataset.gtagItemId;
+            }
+            payload.items = [...(payload.items || []), item];
+        }
+        if (dataset.gtagParams) {
+            Object.assign(payload, parseJson(dataset.gtagParams));
+        }
+        return payload;
+    };
+
+    document.querySelectorAll('[data-gtag-load]').forEach((node) => {
+        const payload = buildPayload(node, {
+            event_category: node.dataset.gtagCategory || 'engagement',
+            event_label: node.dataset.gtagLabel || window.location.pathname,
+        });
+        trackEvent(node.dataset.gtagLoad, payload);
+    });
+
+    document.querySelectorAll('[data-gtag-click]').forEach((el) => {
+        el.addEventListener('click', () => {
+            const payload = buildPayload(el, {
+                event_category: el.dataset.gtagCategory || 'interaction',
+                event_label: el.dataset.gtagLabel || el.textContent.trim(),
+            });
+            trackEvent(el.dataset.gtagClick, payload);
+        });
+    });
+
+    document.querySelectorAll('[data-gtag-submit]').forEach((form) => {
+        form.addEventListener('submit', () => {
+            const payload = buildPayload(form, {
+                event_category: form.dataset.gtagCategory || 'form',
+                event_label:
+                    form.dataset.gtagLabel ||
+                    form.getAttribute('action') ||
+                    window.location.pathname,
+            });
+            trackEvent(form.dataset.gtagSubmit, payload);
+        });
+    });
+
     const accordion = document.querySelector('#featureAccordion');
     const panelsContainer = document.querySelector('.feature-panels');
     const panels = panelsContainer

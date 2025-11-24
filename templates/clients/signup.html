@@ -3,7 +3,11 @@
 {% block title %}Client Signup · Evalon{% endblock %}
 {% block meta_description %}Apply for an Evalon client workspace and request marketing, product, or behavioral assessments for your team.{% endblock %}
 {% block content %}
-<div class="page-shell apply-page">
+<div class="page-shell apply-page"
+     data-gtag-load="sign_up_start"
+     data-gtag-category="lifecycle"
+     data-gtag-label="client_signup_flow"
+     data-gtag-params='{"stage":"form_view","method":"client_portal"}'>
     {% include 'includes/site_header.html' %}
     <main class="apply-main">
     <section class="panel request-panel request-panel--glass panel-contained">
@@ -22,7 +26,13 @@
                 </ul>
             </div>
         </div>
-        <form method="post" enctype="multipart/form-data" class="request-form">
+        <form method="post"
+              enctype="multipart/form-data"
+              class="request-form"
+              data-gtag-submit="sign_up"
+              data-gtag-category="engagement"
+              data-gtag-label="client_portal_signup"
+              data-gtag-params='{"method":"client_portal","form_name":"client_signup"}'>
             {% csrf_token %}
             <div class="form-row">
                 <div class="form-field">

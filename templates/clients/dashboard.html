@@ -258,7 +258,15 @@
                 </div>
             </div>
             <div class="plan-actions">
-                <a class="btn btn-outline small" href="{{ plan_overview.upgrade_url }}" target="_blank">View pricing</a>
+                <a class="btn btn-outline small"
+                   href="{{ plan_overview.upgrade_url }}"
+                   target="_blank"
+                   data-gtag-click="purchase"
+                   data-gtag-category="billing"
+                   data-gtag-label="plan_upgrade"
+                   data-gtag-item-name="{{ plan_overview.name|escape }} plan"
+                   data-gtag-item-category="client_plan"
+                   data-gtag-params='{"transaction_id":"account-{{ account.id }}-preview","plan":"{{ plan_overview.name|escapejs }}","value":0,"currency":"USD"}'>View pricing</a>
                 {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 5 %}
                 <p class="muted tiny">Only {{ plan_overview.invite_remaining }} invites left this month.</p>
                 {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 1 %}

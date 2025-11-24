@@ -3,7 +3,11 @@
 {% block title %}Verify Email · Evalon{% endblock %}
 {% block meta_description %}Confirm your Evalon client workspace email to finish the signup process and access the dashboard.{% endblock %}
 {% block content %}
-<div class="page-shell apply-page">
+<div class="page-shell apply-page"{% if status == "verified" %}
+     data-gtag-load="email_verification"
+     data-gtag-category="lifecycle"
+     data-gtag-label="client_email_verified"
+     data-gtag-params='{"stage":"email_verified","method":"client_portal"}'{% endif %}>
     {% include 'includes/site_header.html' with active='home' %}
     <main class="apply-main">
         <section class="panel confirmation-panel">

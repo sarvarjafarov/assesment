@@ -26,7 +26,7 @@
                 </ul>
             <div class="nav-actions">
                 <a class="btn btn-outline small" href="{% url 'clients:login' %}">Login</a>
-                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}">Get Started</a>
+                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Get Started</a>
             </div>
             </div>
         </nav>
@@ -42,7 +42,7 @@
                         data-persona="talent"
                         data-subtitle="Evalon calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour."
                         data-primary="Get started"
-                        data-primary-link="#cta"
+                        data-primary-link="{% url 'clients:signup' %}"
                         data-secondary="See reporting tour"
                         data-secondary-link="#suite">
                         For talent teams
@@ -61,7 +61,7 @@
                     {{ hero_content.subtitle }}
                 </p>
                 <div class="hero-cta">
-                    <a class="btn btn-pill" id="heroPrimaryCta" href="{% url 'clients:signup' %}">{{ hero_content.primary_label }}</a>
+                    <a class="btn btn-pill" id="heroPrimaryCta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
                     <a class="btn btn-outline" id="heroSecondaryCta" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
                 </div>
             </div>
@@ -542,7 +542,13 @@
                 </div>
             </div>
             <div class="cta-form-card">
-                <form class="cta-form" method="post" action="{% url 'pages:home' %}#cta">
+                <form class="cta-form"
+                      method="post"
+                      action="{% url 'pages:home' %}#cta"
+                      data-gtag-submit="generate_lead"
+                      data-gtag-category="lead"
+                      data-gtag-label="home_demo_request"
+                      data-gtag-params='{"form_name":"home_demo_request"}'>
                     {% csrf_token %}
                     <label>We'd love to hear from you!</label>
                     {% if invite_form.non_field_errors %}

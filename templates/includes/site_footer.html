@@ -7,7 +7,7 @@
                 <span class="sr-only">Evalon</span>
             </a>
             <p>Assess marketing, product, and behavioral talent with a guided console for teams and candidates.</p>
-            <a class="btn btn-outline small" href="{% url 'clients:signup' %}">Get Started</a>
+            <a class="btn btn-outline small" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Get Started</a>
         </div>
         <div class="footer-nav">
             <div>
@@ -40,7 +40,11 @@
             <p>Monthly updates on product releases and interview best practices.</p>
             <form class="footer-form">
                 <input type="email" placeholder="you@company.com" aria-label="Email address">
-                <button type="button">Subscribe</button>
+                <button type="button"
+                        data-gtag-click="generate_lead"
+                        data-gtag-category="lead"
+                        data-gtag-label="footer_subscribe"
+                        data-gtag-params='{"form_name":"footer_subscribe"}'>Subscribe</button>
             </form>
         </div>
     </div>

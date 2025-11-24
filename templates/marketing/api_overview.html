@@ -482,7 +482,12 @@
                     </ul>
                 </div>
             </div>
-            <form method="post" class="form-stack request-form">
+            <form method="post"
+                  class="form-stack request-form"
+                  data-gtag-submit="generate_lead"
+                  data-gtag-category="lead"
+                  data-gtag-label="api_access_request"
+                  data-gtag-params='{"form_name":"api_access_request"}'>
                 {% csrf_token %}
                 <div class="form-row">
                     <div class="form-field">

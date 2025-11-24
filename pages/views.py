@@ -16,7 +16,7 @@ def home(request):
         "title": "Run <span class=\"highlight\">marketing, product, and behavioral</span> assessments in one simple workspace.",
         "subtitle": "Evalon gives recruiting teams ready-made skill tests, live progress tracking, and plain-language scorecards so everyone understands each candidate.",
         "primary_label": "Get started",
-        "primary_url": "#cta",
+        "primary_url": reverse("clients:signup"),
         "secondary_label": "See platform tour",
         "secondary_url": "#suite",
     }
