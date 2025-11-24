@@ -11,6 +11,8 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.forms.models import model_to_dict
@@ -71,7 +73,7 @@ def parse_activity_filters(params):
 def send_client_verification_email(account: ClientAccount, request):
     try:
         token = account.generate_verification_token()
-        verify_url = request.build_absolute_uri(reverse("clients:verify-email", args=[token]))
+        verify_url = request.build_absolute_uri(reverse("clients:verify-email", args=[account.pk, token]))
         subject = "Confirm your Evalon workspace email"
         message = (
             f"Hi {account.full_name},\n\n"
@@ -378,9 +380,12 @@ class ClientVerifyEmailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         token = kwargs.get("token")
+        account_id = kwargs.get("account_id")
         status = "invalid"
         account = None
-        if token:
+        if token and account_id:
+            account = ClientAccount.objects.filter(pk=account_id, verification_token=token).first()
+        if not account and token:
             account = ClientAccount.objects.filter(verification_token=token).first()
             if account:
                 if account.is_email_verified:
@@ -910,6 +915,7 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             session.scheduled_for = None
             session.started_at = None
             session.save(update_fields=["status", "scheduled_for", "started_at"])
+            self._dispatch_candidate_invite_email(session)
 
     def get_selected_project(self):
         if hasattr(self, "_selected_project"):
@@ -924,6 +930,61 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         self._selected_project = project
         return project
 
+    def _candidate_email_from_identifier(self, identifier: str | None) -> str | None:
+        if not identifier:
+            return None
+        identifier = identifier.strip()
+        try:
+            validate_email(identifier)
+        except ValidationError:
+            return None
+        return identifier.lower()
+
+    def _dispatch_candidate_invite_email(self, session):
+        email = self._candidate_email_from_identifier(getattr(session, "candidate_id", ""))
+        if not email:
+            return "invalid"
+        if not getattr(settings, "EMAIL_ENABLED", False):
+            return "disabled"
+        route = self.assessment_config.get("candidate_route")
+        if not route:
+            return "no_route"
+        start_link = self.request.build_absolute_uri(reverse(route, args=[session.uuid]))
+        subject = f"{self.account.company_name} invited you to the {self.assessment_config['label']}"
+        body = (
+            f"Hi there,\n\n"
+            f"{self.account.company_name} invited you to complete the {self.assessment_config['label']} on Evalon.\n"
+            f"Start your assessment here:\n{start_link}\n\n"
+            "If you were not expecting this invite, reply to this email or contact the hiring team.\n\n"
+            "— Evalon Assessments"
+        )
+        try:
+            send_mail(
+                subject,
+                body,
+                getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                [email],
+            )
+            return "sent"
+        except Exception as exc:  # pragma: no cover
+            logger.warning("Failed to email invite for session %s: %s", session.uuid, exc)
+            return "error"
+
+    def _invite_feedback_message(self, session, email_status: str) -> str:
+        if email_status == "sent":
+            return f"Invite emailed to {session.candidate_id}."
+        if email_status == "invalid":
+            return f"Invite ready. Share the secure link with {session.candidate_id}."
+        if email_status == "disabled":
+            return (
+                "Invite ready, but email delivery is disabled. Configure email settings or share the link manually."
+            )
+        if email_status == "error":
+            return f"Invite ready, but we could not email {session.candidate_id}. Share the link manually."
+        if email_status == "scheduled":
+            return "Invite scheduled. We'll email the candidate when it launches."
+        return f"Invite ready. Share the secure link with {session.candidate_id}."
+
 
 class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
     template_name = "clients/assessments/manage.html"
@@ -935,7 +996,13 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
             messages.error(self.request, "You do not have permission to create invites.")
             return redirect(self.get_success_url())
         session = form.save()
-        messages.success(self.request, f"Invite ready. Share the link with {session.candidate_id}.")
+        if session.status == "in_progress":
+            email_status = self._dispatch_candidate_invite_email(session)
+        elif session.status == "draft" and session.scheduled_for:
+            email_status = "scheduled"
+        else:
+            email_status = "invalid"
+        messages.success(self.request, self._invite_feedback_message(session, email_status))
         return super().form_valid(form)
 
     def post(self, request, *args, **kwargs):
@@ -1096,7 +1163,9 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
                 if remaining is not None and remaining <= 0:
                     errors.append("Invite quota reached. Remaining rows were skipped.")
                     break
-                form.save()
+                session = form.save()
+                if session.status == "in_progress":
+                    self._dispatch_candidate_invite_email(session)
                 created += 1
                 if remaining is not None:
                     remaining -= 1
@@ -1129,7 +1198,8 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
         session.status = "in_progress"
         session.scheduled_for = None
         session.save(update_fields=["status", "scheduled_for"])
-        messages.success(self.request, f"Invite for {session.candidate_id} is now live.")
+        email_status = self._dispatch_candidate_invite_email(session)
+        messages.success(self.request, self._invite_feedback_message(session, email_status))
 
 
 class ClientAssessmentDetailView(ClientAssessmentMixin, FormView):

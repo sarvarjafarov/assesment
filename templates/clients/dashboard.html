@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% block title %}Client Dashboard · Evalon{% endblock %}
+{% block meta_description %}Track invites, projects, and candidate progress inside your Evalon client console.{% endblock %}
 {% block content %}
 <div class="portal-shell">
     <header class="portal-hero expanded">
@@ -371,10 +373,12 @@
                         {% endfor %}
                     </select>
                 </label>
-                <button class="btn btn-outline small" type="submit">Apply</button>
-                {% if activity_querystring %}
-                <a class="link reset-link" href="{% url 'clients:dashboard' %}">Reset</a>
-                {% endif %}
+                <div class="activity-filter-actions">
+                    <button class="btn btn-pill" type="submit">Apply filters</button>
+                    {% if activity_querystring %}
+                    <a class="btn btn-ghost small" href="{% url 'clients:dashboard' %}">Reset</a>
+                    {% endif %}
+                </div>
             </form>
             <a class="pill" href="{{ activity_export_url }}">Export CSV</a>
         </section>

@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% block title %}{{ hero.title }} · Evalon{% endblock %}
+{% block meta_description %}{{ hero.lede|default:hero.title }}{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' %}

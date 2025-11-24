@@ -1,20 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block title %}Verify Email · Evalon{% endblock %}
+{% block meta_description %}Confirm your Evalon client workspace email to finish the signup process and access the dashboard.{% endblock %}
 {% block content %}
 <div class="page-shell apply-page">
-    <header class="site-header">
-        <nav class="nav">
-            <div class="nav-header">
-                <a class="brand" href="{% url 'pages:home' %}">
-                    <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
-                    <span class="sr-only">Evalon Assessments</span>
-                </a>
-            </div>
-            <div class="nav-actions">
-                <a class="btn-outline small" href="{% url 'clients:login' %}">Client login</a>
-            </div>
-        </nav>
-    </header>
+    {% include 'includes/site_header.html' with active='home' %}
     <main class="apply-main">
         <section class="panel confirmation-panel">
             {% if status == "verified" %}
@@ -39,5 +29,6 @@
             </div>
         </section>
     </main>
+    {% include 'includes/site_footer.html' %}
 </div>
 {% endblock %}

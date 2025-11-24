@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% block title %}{{ assessment_label }} · Manage Invites{% endblock %}
+{% block meta_description %}Create candidate invites, bulk upload, and monitor {{ assessment_label|lower }} sessions in your Evalon console.{% endblock %}
 {% block content %}
 <div class="portal-shell">
     <section class="portal-hero compact">
