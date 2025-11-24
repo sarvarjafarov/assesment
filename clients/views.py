@@ -1,30 +1,34 @@
 from __future__ import annotations
 
+import csv
+import io
+import json
+import logging
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib import messages
-import csv
-import json
-from datetime import timedelta
-import io
-
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
+from django.forms.models import model_to_dict
 from django.http import Http404, HttpResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 from django.views.generic import FormView, TemplateView
-from django.db import models
-from django.forms.models import model_to_dict
 
 from assessments.constants import PIPELINE_STAGE_CHOICES
+from behavioral_assessments.models import BehavioralAssessmentSession
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from pm_assessments.models import ProductAssessmentSession
-from behavioral_assessments.models import BehavioralAssessmentSession
 
 from .forms import (
+    ClientLogoForm,
+    ClientProjectForm,
     ClientBehavioralInviteForm,
     ClientBulkInviteForm,
     ClientLoginForm,
@@ -32,10 +36,10 @@ from .forms import (
     ClientProductInviteForm,
     ClientSignupForm,
     ClientSessionNoteForm,
-    ClientLogoForm,
-    ClientProjectForm,
 )
-from .models import ClientAccount, ClientNotification, ClientSessionNote, ClientProject
+from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote
+
+logger = logging.getLogger(__name__)
 
 ACTIVITY_STATUS_CHOICES = {"all", "draft", "in_progress", "submitted"}
 ACTIVITY_ASSESSMENT_CHOICES = {"all"} | {choice[0] for choice in ClientAccount.ASSESSMENT_CHOICES}
@@ -62,6 +66,22 @@ def parse_activity_filters(params):
         result.update(ACTIVITY_PRESETS[preset])
         result["preset"] = preset
     return result
+
+
+def send_client_verification_email(account: ClientAccount, request):
+    try:
+        token = account.generate_verification_token()
+        verify_url = request.build_absolute_uri(reverse("clients:verify-email", args=[token]))
+        subject = "Confirm your Evalon workspace email"
+        message = (
+            f"Hi {account.full_name},\n\n"
+            "Thanks for requesting an Evalon workspace. Please confirm your email so we can finish reviewing your request:\n"
+            f"{verify_url}\n\n"
+            "Once you're verified, our team will notify you as soon as your workspace is approved."
+        )
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [account.email])
+    except Exception as exc:  # pragma: no cover - fallback logging
+        logger.warning("Failed to send verification email to %s: %s", account.email, exc)
 
 
 def build_dataset_map(account: ClientAccount):
@@ -334,7 +354,12 @@ class ClientSignupView(FormView):
     success_url = reverse_lazy("clients:signup-complete")
 
     def form_valid(self, form):
-        form.save()
+        account = form.save()
+        send_client_verification_email(account, self.request)
+        messages.info(
+            self.request,
+            "Thanks for signing up! Please check your inbox to confirm your email address.",
+        )
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -345,6 +370,27 @@ class ClientSignupView(FormView):
 
 class ClientSignupCompleteView(TemplateView):
     template_name = "clients/signup_complete.html"
+
+
+class ClientVerifyEmailView(TemplateView):
+    template_name = "clients/verify_email.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        token = kwargs.get("token")
+        status = "invalid"
+        account = None
+        if token:
+            account = ClientAccount.objects.filter(verification_token=token).first()
+            if account:
+                if account.is_email_verified:
+                    status = "already"
+                else:
+                    account.mark_email_verified()
+                    status = "verified"
+        context["status"] = status
+        context["account"] = account
+        return context
 
 
 class ClientLoginView(FormView):

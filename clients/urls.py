@@ -7,6 +7,7 @@ app_name = "clients"
 urlpatterns = [
     path("signup/", views.ClientSignupView.as_view(), name="signup"),
     path("signup/complete/", views.ClientSignupCompleteView.as_view(), name="signup-complete"),
+    path("verify/<slug:token>/", views.ClientVerifyEmailView.as_view(), name="verify-email"),
     path("login/", views.ClientLoginView.as_view(), name="login"),
     path("logout/", views.ClientLogoutView.as_view(), name="logout"),
     path("dashboard/", views.ClientDashboardView.as_view(), name="dashboard"),

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="page-shell apply-page">
+    <header class="site-header">
+        <nav class="nav">
+            <div class="nav-header">
+                <a class="brand" href="{% url 'pages:home' %}">
+                    <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
+                    <span class="sr-only">Evalon Assessments</span>
+                </a>
+            </div>
+            <div class="nav-actions">
+                <a class="btn-outline small" href="{% url 'clients:login' %}">Client login</a>
+            </div>
+        </nav>
+    </header>
+    <main class="apply-main">
+        <section class="panel confirmation-panel">
+            {% if status == "verified" %}
+            <div class="confirmation-icon">✓</div>
+            <p class="eyebrow">Email confirmed</p>
+            <h1>Thanks, {{ account.full_name }}</h1>
+            <p class="lede">We've confirmed your email. Our team will review your workspace request and we'll notify you as soon as it's approved.</p>
+            {% elif status == "already" %}
+            <div class="confirmation-icon">✓</div>
+            <p class="eyebrow">Already verified</p>
+            <h1>You're all set</h1>
+            <p class="lede">This email was already confirmed. We'll reach out once your workspace is live.</p>
+            {% else %}
+            <div class="confirmation-icon error">!</div>
+            <p class="eyebrow">Link invalid</p>
+            <h1>Verification link expired</h1>
+            <p class="lede">We couldn't confirm this token. Please request a new verification email or contact support.</p>
+            {% endif %}
+            <div class="confirmation-actions">
+                <a class="btn btn-pill" href="{% url 'pages:home' %}">Return home</a>
+                <a class="btn btn-outline" href="mailto:info@evalon.tech">Contact support</a>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

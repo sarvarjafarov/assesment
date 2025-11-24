@@ -113,6 +113,9 @@ class ClientAccount(TimeStampedModel):
     logo = models.FileField(upload_to="client_logos/", null=True, blank=True)
     logo_data = models.BinaryField(blank=True, null=True, editable=False)
     logo_mime = models.CharField(max_length=100, blank=True, editable=False)
+    email_verified_at = models.DateTimeField(null=True, blank=True)
+    verification_token = models.CharField(max_length=64, blank=True)
+    verification_sent_at = models.DateTimeField(null=True, blank=True)
     data_retention_days = models.PositiveIntegerField(default=365)
     plan_slug = models.CharField(max_length=32, choices=PLAN_CHOICES, default="starter")
     invite_quota = models.PositiveIntegerField(default=20)
@@ -137,6 +140,22 @@ class ClientAccount(TimeStampedModel):
     def requested_labels(self) -> list[str]:
         catalog = self.ASSESSMENT_DETAILS
         return [catalog.get(code, {}).get("label", code.title()) for code in self.requested_assessments or []]
+
+    def generate_verification_token(self) -> str:
+        token = uuid.uuid4().hex
+        self.verification_token = token
+        self.verification_sent_at = timezone.now()
+        self.save(update_fields=["verification_token", "verification_sent_at"])
+        return token
+
+    def mark_email_verified(self):
+        self.email_verified_at = timezone.now()
+        self.verification_token = ""
+        self.save(update_fields=["email_verified_at", "verification_token"])
+
+    @property
+    def is_email_verified(self) -> bool:
+        return bool(self.email_verified_at)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
