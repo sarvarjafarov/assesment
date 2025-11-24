@@ -43,6 +43,32 @@ class MarketingSettings(models.Model):
     )
     favicon_data = models.BinaryField(blank=True, null=True, editable=False)
     favicon_mime = models.CharField(max_length=100, blank=True, editable=False)
+    email_host = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="SMTP host provided by your email provider (e.g., smtp-relay.brevo.com).",
+    )
+    email_port = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text="SMTP port, usually 587 for TLS.",
+    )
+    email_username = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="SMTP login/username.",
+    )
+    email_password = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="SMTP password or API key.",
+    )
+    email_use_tls = models.BooleanField(default=True)
+    default_from_email = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Default From header for transactional messages.",
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -96,3 +122,33 @@ class MarketingSettings(models.Model):
         if not self.has_meta_image:
             return None, None
         return self.meta_image_data, self.meta_image_mime or "image/png"
+
+    def has_smtp_credentials(self):
+        return all(
+            [
+                self.email_host.strip(),
+                self.email_port,
+                self.email_username.strip(),
+                self.email_password.strip(),
+                self.default_from_email.strip(),
+            ]
+        )
+
+    def smtp_config(self):
+        if not self.has_smtp_credentials():
+            return {}
+        return {
+            "EMAIL_HOST": self.email_host.strip(),
+            "EMAIL_PORT": self.email_port,
+            "EMAIL_HOST_USER": self.email_username.strip(),
+            "EMAIL_HOST_PASSWORD": self.email_password.strip(),
+            "EMAIL_USE_TLS": self.email_use_tls,
+            "DEFAULT_FROM_EMAIL": self.default_from_email.strip(),
+        }
+
+
+class MarketingEmailSettings(MarketingSettings):
+    class Meta:
+        proxy = True
+        verbose_name = "Email Settings"
+        verbose_name_plural = "Email Settings"
