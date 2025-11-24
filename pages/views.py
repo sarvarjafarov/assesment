@@ -15,7 +15,7 @@ def home(request):
         "badge": "Built for modern hiring teams",
         "title": "Run <span class=\"highlight\">marketing, product, and behavioral</span> assessments in one simple workspace.",
         "subtitle": "Evalon gives recruiting teams ready-made skill tests, live progress tracking, and plain-language scorecards so everyone understands each candidate.",
-        "primary_label": "Book a walkthrough",
+        "primary_label": "Get started",
         "primary_url": "#cta",
         "secondary_label": "See platform tour",
         "secondary_url": "#suite",

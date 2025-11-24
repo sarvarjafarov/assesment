@@ -5,6 +5,15 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D0V5NWPH3W"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-D0V5NWPH3W');
+    </script>
     {% with default_title=marketing_settings.meta_title|default:"Evalon Assessments" default_description=marketing_settings.meta_description|default:"Evalon helps recruitment teams design, deliver, and score behavioral assessments." %}
     <title>{% block title %}{{ default_title }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}{{ default_description }}{% endblock %}">

@@ -24,10 +24,10 @@
                     <li><a href="#resources">Resources</a></li>
                     <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
                 </ul>
-                <div class="nav-actions">
-                    <a class="btn btn-outline small" href="{% url 'clients:login' %}">Customer Login</a>
-                    <a class="btn btn-pill nav-primary-cta" href="#cta">Book a walkthrough</a>
-                </div>
+            <div class="nav-actions">
+                <a class="btn btn-outline small" href="{% url 'clients:login' %}">Login</a>
+                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}">Get Started</a>
+            </div>
             </div>
         </nav>
     </header>
@@ -41,7 +41,7 @@
                     <button class="persona-btn is-active"
                         data-persona="talent"
                         data-subtitle="Evalon calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour."
-                        data-primary="Book a walkthrough"
+                        data-primary="Get started"
                         data-primary-link="#cta"
                         data-secondary="See reporting tour"
                         data-secondary-link="#suite">
