@@ -61,7 +61,7 @@
                     {{ hero_content.subtitle }}
                 </p>
                 <div class="hero-cta">
-                    <a class="btn btn-pill" id="heroPrimaryCta" href="{{ hero_content.primary_url }}">{{ hero_content.primary_label }}</a>
+                    <a class="btn btn-pill" id="heroPrimaryCta" href="{% url 'clients:signup' %}">{{ hero_content.primary_label }}</a>
                     <a class="btn btn-outline" id="heroSecondaryCta" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
                 </div>
             </div>
