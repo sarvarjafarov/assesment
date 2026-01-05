@@ -1,28 +1,18 @@
 {% extends 'portal_base.html' %}
 {% load static %}
 {% load humanize %}
-{% block title %}Client Dashboard · Evalon{% endblock %}
-{% block meta_description %}Track invites, projects, and candidate progress inside your Evalon client console.{% endblock %}
+{% block title %}Dashboard · Evalon{% endblock %}
+{% block meta_description %}Your Evalon dashboard - track assessments, projects, and candidate progress.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
     <header class="dashboard-page-header">
         <div>
-            <h1>Dashboard</h1>
-            <p class="muted">Welcome back to your Evalon workspace</p>
+            <h1>Welcome back, {{ account.company_name }}</h1>
+            <p class="muted">{{ "now"|date:"l, F j, Y" }} · {{ role_label }}</p>
         </div>
-        {% if can_manage_branding or is_manager %}
-        <form method="post" class="summary-toggle">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="toggle_summary">
-            <label class="toggle-control">
-                <input type="checkbox" name="weekly_summary" {% if weekly_summary_enabled %}checked{% endif %} onchange="this.form.submit()">
-                <span>Weekly summary emails</span>
-            </label>
-        </form>
-        {% endif %}
     </header>
 
-    {# Key Metrics Section #}
+    {# Key Metrics - Only 3 most important #}
     <section class="portal-card-grid three-up key-metrics">
         <article class="portal-card metric-card">
             <p class="label">Completion rate</p>
@@ -40,393 +30,177 @@
             <p class="muted">Across finished sessions</p>
         </article>
     </section>
-    {% if can_manage_branding or is_manager %}
-    <div class="logo-edit-modal" data-logo-edit-modal>
-        <div class="logo-edit-card">
-            <button class="logo-edit-close" type="button" aria-label="Close" data-logo-edit-close>×</button>
-            <p class="label">Branding</p>
-            <h2>Update workspace logo</h2>
-            <p class="muted">Upload a square PNG/JPG/SVG for the hero badge.</p>
-            <form method="post" enctype="multipart/form-data" class="logo-form">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="upload_logo">
-                {{ logo_form.non_field_errors }}
-                <div class="form-field">
-                    {{ logo_form.logo.label_tag }}
-                    {{ logo_form.logo }}
-                    {% for error in logo_form.logo.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <button class="btn btn-pill" type="submit">Upload logo</button>
-            </form>
-            {% if account.has_logo %}
-            <form method="post" class="remove-logo-form">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="remove_logo">
-                <button class="btn btn-ghost small" type="submit">Remove current logo</button>
-            </form>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
 
-    <section class="panel portal-panel assignment-highlight">
-        <header>
+    {# Attention Items - Things that need action #}
+    {% if attention_items %}
+    <section class="portal-card attention-banner">
+        <div class="attention-header">
             <div>
-                <p class="eyebrow">Assessment catalog</p>
-                <h2>Invite candidates in seconds</h2>
-                <p class="muted">Pick a licensed assessment below to create invites or review progress.</p>
+                <h3>⚠️ Requires Attention</h3>
+                <p class="muted">{{ attention_items|length }} item{{ attention_items|length|pluralize }} need{{ attention_items|length|pluralize:"s," }} your review</p>
             </div>
-        </header>
-        {% if allowed_assessments %}
-        <div class="portal-assessment-grid">
-            {% for item in allowed_assessments %}
-            <article class="portal-assessment-card enhanced">
-                <h3>{{ item.label }}</h3>
-                <p>{{ item.description|default:"Active license" }}</p>
-                <div class="assessment-stats-compact">
-                    <span>{{ item.metrics.invites|default:0 }} invites</span>
-                    <span>·</span>
-                    <span>{{ item.metrics.completed|default:0 }} completed</span>
-                </div>
-                <div class="portal-assessment-actions">
-                    <a class="btn btn-pill" href="{{ item.manage_url }}">Invite candidates</a>
-                </div>
-            </article>
-            {% endfor %}
         </div>
-        {% else %}
-        <p class="empty-state">No assessments approved yet. We will notify you when your licenses are ready.</p>
-        {% endif %}
-    </section>
-
-    <section class="portal-card project-preview">
-        <header class="project-preview-head">
-            <div>
-                <p class="eyebrow">Projects</p>
-                <h2>Active roles</h2>
-            </div>
-            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Manage projects</a>
-        </header>
-        {% if project_preview %}
-        <div class="project-preview-grid">
-            {% for project in project_preview %}
-            <article>
-                <p class="label">{{ project.status }}</p>
-                <h3>{{ project.title }}</h3>
-                <p class="muted">{{ project.open_roles }} open · {{ project.sessions }} invites</p>
-                <a class="pill subtle" href="{{ project.href }}">View</a>
-            </article>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="empty-state">No projects yet. Create one to organize invites.</p>
-        {% endif %}
-    </section>
-
-    {% if notifications %}
-    <section class="notification-row">
-        {% for note in notifications %}
-        <article class="notification-card notification-{{ note.level }}">
-            <div>
-                <p class="label">{{ note.title }}</p>
-                <p>{{ note.message }}</p>
-                {% if note.link_url %}
-                <a class="link" href="{{ note.link_url }}" target="_blank" rel="noreferrer">Open link</a>
+        <ul class="attention-list">
+            {% for item in attention_items|slice:":5" %}
+            <li>
+                <div class="attention-content">
+                    <strong>{{ item.label }}</strong>
+                    <p class="muted">{{ item.detail }}</p>
+                </div>
+                {% if item.action_url %}
+                <a href="{{ item.action_url }}" class="btn btn-outline small">Review</a>
                 {% endif %}
-            </div>
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="dismiss_notification">
-                <input type="hidden" name="notification_id" value="{{ note.id }}">
-                <button class="pill subtle" type="submit">Dismiss</button>
-            </form>
-        </article>
-        {% endfor %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% if attention_items|length > 5 %}
+        <p class="attention-footer">
+            <a href="{% url 'clients:dashboard' %}#activity">View all {{ attention_items|length }} items →</a>
+        </p>
+        {% endif %}
     </section>
     {% endif %}
 
-    <section class="quick-action-row">
-        <header class="quick-action-head">
-            <div>
-                <p class="eyebrow">Quick actions</p>
-                <h2>Common follow-ups</h2>
+    {# Primary Action - Invite Candidates #}
+    <section class="primary-action-section">
+        <div class="primary-action-card">
+            <div class="action-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
             </div>
-        </header>
-        {% if quick_actions %}
-        {% for action in quick_actions %}
-        <a class="quick-action-card" href="{{ action.href }}" {% if action.external %}target="_blank" rel="noreferrer"{% endif %}>
-            <div>
-                <p class="label">{{ action.label }}</p>
-                <p class="muted">{{ action.description }}</p>
+            <div class="action-content">
+                <h3>Ready to invite candidates?</h3>
+                <p>Choose an assessment and send invites to your candidates in seconds.</p>
             </div>
-            <span aria-hidden="true">→</span>
-        </a>
-        {% endfor %}
-        {% else %}
-        <p class="empty-state">No quick actions available.</p>
-        {% endif %}
+            <a href="{% url 'clients:assessments' %}" class="btn btn-pill btn-large">
+                <span>Invite Candidates</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+        </div>
     </section>
 
-    <section class="portal-card plan-card-compact">
-        <div class="plan-compact-header">
-            <div>
-                <p class="label">{{ plan_overview.name }} plan</p>
-                <p class="muted small">{{ plan_overview.description }}</p>
-            </div>
-            <a class="btn btn-outline small"
-               href="{{ plan_overview.upgrade_url }}"
-               target="_blank"
-               data-gtag-click="purchase"
-               data-gtag-category="billing"
-               data-gtag-label="plan_upgrade"
-               data-gtag-item-name="{{ plan_overview.name|escape }} plan"
-               data-gtag-item-category="client_plan"
-               data-gtag-params='{"transaction_id":"account-{{ account.id }}-preview","plan":"{{ plan_overview.name|escapejs }}","value":0,"currency":"USD"}'>View pricing</a>
-        </div>
-        <div class="plan-usage-compact">
-            <div class="usage-item">
-                <span class="usage-label">Invites: {{ plan_overview.invites_used }} / {% if plan_overview.invite_limit %}{{ plan_overview.invite_limit }}{% else %}∞{% endif %}</span>
-                {% if plan_overview.invite_percent %}
-                <div class="usage-bar-mini">
-                    <span style="width: {{ plan_overview.invite_percent }}%;"></span>
-                </div>
-                {% endif %}
-            </div>
-            <div class="usage-item">
-                <span class="usage-label">Projects: {{ plan_overview.project_used }} / {% if plan_overview.project_limit %}{{ plan_overview.project_limit }}{% else %}∞{% endif %}</span>
-                {% if plan_overview.project_percent %}
-                <div class="usage-bar-mini">
-                    <span style="width: {{ plan_overview.project_percent }}%;"></span>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 5 %}
-        <p class="muted tiny plan-warning">⚠️ Only {{ plan_overview.invite_remaining }} invites left this month.</p>
-        {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 1 %}
-        <p class="muted tiny plan-warning">⚠️ Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left.</p>
-        {% endif %}
-    </section>
-    <main>
-        <section class="portal-card status-overview-card">
-            <div class="status-overview-header">
+    {# Quick Links #}
+    <section class="quick-links-section">
+        <h3>Quick Actions</h3>
+        <div class="quick-links-grid">
+            <a href="{% url 'clients:assessments' %}" class="quick-link-card">
+                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
                 <div>
-                    <p class="label">Account Overview</p>
-                    <h3>{{ account.get_status_display }}</h3>
-                    <p class="muted small">Point of contact: {{ account.full_name }}</p>
+                    <h4>Assessments</h4>
+                    <p class="muted">View all {{ allowed_assessments|length }} assessment{{ allowed_assessments|length|pluralize }}</p>
                 </div>
-            </div>
-            <div class="status-overview-stats">
-                <div class="stat-item">
-                    <span class="stat-value">{{ portal_stats.total_candidates }}</span>
-                    <span class="stat-label">Total invites</span>
+            </a>
+            <a href="{% url 'clients:project-list' %}" class="quick-link-card">
+                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <div>
+                    <h4>Projects</h4>
+                    <p class="muted">Manage {{ project_preview|length|default:0 }} active project{{ project_preview|length|default:0|pluralize }}</p>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-value">{{ portal_stats.in_progress_count }}</span>
-                    <span class="stat-label">In progress</span>
+            </a>
+            <a href="{% url 'clients:analytics' %}" class="quick-link-card">
+                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="20" x2="12" y2="10"></line>
+                    <line x1="18" y1="20" x2="18" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="16"></line>
+                </svg>
+                <div>
+                    <h4>Analytics</h4>
+                    <p class="muted">View performance reports</p>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-value">{{ portal_stats.draft_count }}</span>
-                    <span class="stat-label">Drafts</span>
+            </a>
+            <a href="{{ activity_export_url }}" class="quick-link-card">
+                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <div>
+                    <h4>Export Data</h4>
+                    <p class="muted">Download activity CSV</p>
                 </div>
-            </div>
-        </section>
+            </a>
+        </div>
+    </section>
 
-        {% if benchmark %}
-        <section class="portal-card-grid two-up benchmark-row">
-            <article class="portal-card benchmark-card">
-                <p class="label">Benchmark comparison <span class="info-badge" title="{{ benchmark_helper }}">i</span></p>
-                <h2>{{ portal_stats.completion_rate|floatformat:0 }}% vs {{ benchmark.completion_rate|floatformat:0 }}%</h2>
-                <p class="muted">Client completion rate vs. network average.</p>
-            </article>
-            <article class="portal-card benchmark-card">
-                <p class="label">Avg. duration <span class="info-badge" title="{{ benchmark_helper }}">i</span></p>
-                <h2>
-                    {% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}
-                    /
-                    {% if benchmark.average_duration %}{{ benchmark.average_duration|floatformat:0 }}m{% else %}—{% endif %}
-                </h2>
-                <p class="muted">Your candidates vs. industry peers.</p>
-            </article>
-        </section>
-        {% endif %}
-
-        {% if chart_payload %}
-        <section class="portal-card-grid two-up charts-row">
-            <article class="portal-card chart-card">
-                <p class="label">Assessment mix</p>
-                <h2>Invites vs. completions</h2>
-                <canvas id="inviteChart"></canvas>
-                <div class="mini-funnel">
-                    <div>
-                        <span>Invited</span>
-                        <strong>{{ portal_stats.funnel.invited }}</strong>
-                    </div>
-                    <div>
-                        <span>Started</span>
-                        <strong>{{ portal_stats.funnel.started }}</strong>
-                    </div>
-                    <div>
-                        <span>Completed</span>
-                        <strong>{{ portal_stats.funnel.completed }}</strong>
-                    </div>
-                </div>
-            </article>
-            <article class="portal-card chart-card">
-                <p class="label">Performance trend</p>
-                <h2>Latest submissions</h2>
-                <canvas id="trendChart"></canvas>
-            </article>
-        </section>
-        {% endif %}
-
-        <section class="activity-filter-section">
-            <div class="activity-filter-header">
-                <h3>Activity & Reports</h3>
-                <a class="btn btn-outline small" href="{{ activity_export_url }}">Export CSV</a>
-            </div>
-            <form method="get" class="activity-filter-form-compact">
-                <div class="filter-inputs">
-                    <select name="assessment">
-                        {% for value, label in activity_filter_options.assessments %}
-                        <option value="{{ value }}" {% if activity_filters.assessment == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name="status">
-                        {% for value, label in activity_filter_options.statuses %}
-                        <option value="{{ value }}" {% if activity_filters.status == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name="window">
-                        {% for value, label in activity_filter_options.windows %}
-                        <option value="{{ value }}" {% if activity_filters.window == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                    <button class="btn btn-pill small" type="submit">Apply</button>
-                    {% if activity_querystring %}
-                    <a class="btn btn-ghost small" href="{% url 'clients:dashboard' %}">Clear</a>
-                    {% endif %}
-                </div>
-            </form>
-        </section>
-
-        <section class="portal-card-grid two-up activity-row">
-            <article class="portal-card attention-card">
-                <p class="label">Attention</p>
-                {% if attention_items %}
-                <ul>
-                    {% for item in attention_items %}
-                    <li>
-                        <strong>{{ item.label }}</strong>
-                        <p>{{ item.detail }}</p>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="muted">Everything looks good. No outstanding actions.</p>
-                {% endif %}
-            </article>
-            <article class="portal-card activity-card">
-                <p class="label">Recent activity</p>
-                {% if activity_feed %}
-                <ul>
-                    {% for entry in activity_feed %}
-                    <li>
-                        <div>
+    {# Recent Activity Feed #}
+    <section class="recent-activity-section">
+        <div class="section-header">
+            <h3>Recent Activity</h3>
+            <a href="#activity" class="link-subtle">View all activity →</a>
+        </div>
+        {% if activity_feed %}
+        <div class="portal-card">
+            <ul class="activity-feed">
+                {% for entry in activity_feed|slice:":10" %}
+                <li class="activity-item">
+                    <div class="activity-main">
+                        <div class="activity-avatar">
+                            <span>{{ entry.candidate|slice:":1"|upper }}</span>
+                        </div>
+                        <div class="activity-details">
                             <p class="activity-name">{{ entry.candidate }}</p>
-                            <span class="muted">{{ entry.assessment }} · {{ entry.status }}</span>
+                            <p class="activity-meta">{{ entry.assessment }} · {{ entry.status }}</p>
                         </div>
-                        <div class="activity-meta">
-                            <span class="muted">{{ entry.timestamp|naturaltime }}</span>
-                            {% if entry.detail_url %}
-                            <a class="pill subtle" href="{{ entry.detail_url }}">View report</a>
-                            {% else %}
-                            <a class="pill subtle" href="{{ entry.manage_url }}">Manage</a>
-                            {% endif %}
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="muted">No candidate activity for this filter set.</p>
-                {% endif %}
-            </article>
-        </section>
+                    </div>
+                    <div class="activity-actions">
+                        <span class="activity-time">{{ entry.timestamp|naturaltime }}</span>
+                        {% if entry.detail_url %}
+                        <a href="{{ entry.detail_url }}" class="btn btn-ghost small">View</a>
+                        {% else %}
+                        <a href="{{ entry.manage_url }}" class="btn btn-ghost small">Manage</a>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <div class="portal-card empty-state-card">
+            <p class="muted">No recent activity. Invite candidates to get started.</p>
+        </div>
+        {% endif %}
+    </section>
 
-    </main>
+    {# Plan Usage - Compact #}
+    {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 or plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
+    <section class="plan-alert">
+        <div class="portal-card plan-warning-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <div>
+                {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 %}
+                <strong>Plan limit approaching</strong>
+                <p class="muted">Only {{ plan_overview.invite_remaining }} invite{{ plan_overview.invite_remaining|pluralize }} remaining this month.</p>
+                {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
+                <strong>Project limit approaching</strong>
+                <p class="muted">Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} remaining.</p>
+                {% endif %}
+            </div>
+            <a href="{{ plan_overview.upgrade_url }}" target="_blank" class="btn btn-outline small">View Plans</a>
+        </div>
+    </section>
+    {% endif %}
+
 </div>
-{% if chart_payload %}
-{{ chart_payload|json_script:"client-chart-data" }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-(function() {
-    const payload = JSON.parse(document.getElementById("client-chart-data").textContent);
-    const breakdown = payload.breakdown || [];
-    const trend = payload.trend || [];
-    const inviteCtx = document.getElementById("inviteChart");
-    const trendCtx = document.getElementById("trendChart");
-    if (inviteCtx && breakdown.length) {
-        new Chart(inviteCtx, {
-            type: "bar",
-            data: {
-                labels: breakdown.map((b) => b.label),
-                datasets: [
-                    {
-                        label: "Invites",
-                        data: breakdown.map((b) => b.invites),
-                        backgroundColor: "rgba(255,138,0,0.35)",
-                        borderRadius: 12,
-                    },
-                    {
-                        label: "Completed",
-                        data: breakdown.map((b) => b.completed),
-                        backgroundColor: "rgba(14,20,40,0.8)",
-                        borderRadius: 12,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: "bottom" },
-                },
-                scales: {
-                    y: { beginAtZero: true },
-                },
-            },
-        });
-    }
-    if (trendCtx && trend.length) {
-        new Chart(trendCtx, {
-            type: "line",
-            data: {
-                labels: trend.map((t) => t.label),
-                datasets: [
-                    {
-                        label: "Score",
-                        data: trend.map((t) => t.score),
-                        borderColor: "rgba(14,20,40,0.9)",
-                        backgroundColor: "rgba(14,20,40,0.1)",
-                        tension: 0.35,
-                        fill: true,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                },
-                scales: {
-                    y: { beginAtZero: true, suggestedMax: 100 },
-                },
-            },
-        });
-    }
-})();
-</script>
-{% endif %}
-</div>
+
+{# Anchor sections for temporary navigation #}
+<div id="assessments" style="scroll-margin-top: 2rem;"></div>
+<div id="analytics" style="scroll-margin-top: 2rem;"></div>
+<div id="activity" style="scroll-margin-top: 2rem;"></div>
+
 {% endblock %}
