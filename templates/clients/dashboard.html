@@ -5,7 +5,7 @@
 {% block meta_description %}Track invites, projects, and candidate progress inside your Evalon client console.{% endblock %}
 {% block content %}
 <div class="portal-shell">
-    <header class="portal-hero expanded">
+    <header class="portal-hero compact">
         <div class="portal-hero-main">
             <div class="portal-hero-icon{% if account.has_logo %} logo{% endif %}">
                 {% if account.logo_data_url %}
@@ -20,30 +20,11 @@
                 {% endif %}
             </div>
             <div>
-                <p class="eyebrow">Client workspace</p>
                 <h1>{{ account.company_name }}</h1>
-                <p class="lede">Access to {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }} · {{ account.get_employee_size_display }} org size · {{ role_label }} role</p>
+                <p class="lede">{{ role_label }} · {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }}</p>
             </div>
         </div>
-        <div class="portal-hero-stats">
-            <div>
-                <p class="hero-stat-label">Completion rate</p>
-                <p class="hero-stat-value">{{ portal_stats.completion_rate|floatformat:0 }}%</p>
-                <p class="hero-stat-helper">{{ portal_stats.completed_count }} completed invites</p>
-            </div>
-            <div>
-                <p class="hero-stat-label">Avg. duration</p>
-                <p class="hero-stat-value">{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}</p>
-                <p class="hero-stat-helper">Start to submission</p>
-            </div>
-            <div>
-                <p class="hero-stat-label">Avg. score</p>
-                <p class="hero-stat-value">{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</p>
-                <p class="hero-stat-helper">Across finished sessions</p>
-            </div>
-        </div>
-        <div class="portal-actions stacked">
-            <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
+        <div class="portal-actions">
             {% if can_manage_branding or is_manager %}
             <form method="post" class="summary-toggle">
                 {% csrf_token %}
@@ -54,23 +35,26 @@
                 </label>
             </form>
             {% endif %}
+            <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
         </div>
     </header>
-    <section class="portal-steps">
-        <article>
-            <span class="step-tag">Step 1</span>
-            <h3>Pick an assessment</h3>
-            <p>Use the catalog below to invite candidates to a live assignment.</p>
+
+    {# Key Metrics Section #}
+    <section class="portal-card-grid three-up key-metrics">
+        <article class="portal-card metric-card">
+            <p class="label">Completion rate</p>
+            <h2 class="metric-value">{{ portal_stats.completion_rate|floatformat:0 }}%</h2>
+            <p class="muted">{{ portal_stats.completed_count }} completed invites</p>
         </article>
-        <article>
-            <span class="step-tag">Step 2</span>
-            <h3>Organize projects</h3>
-            <p>Track active roles, invites, and hiring pods in one view.</p>
+        <article class="portal-card metric-card">
+            <p class="label">Avg. duration</p>
+            <h2 class="metric-value">{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}</h2>
+            <p class="muted">Start to submission</p>
         </article>
-        <article>
-            <span class="step-tag">Step 3</span>
-            <h3>Monitor progress</h3>
-            <p>Review activity, completion stats, and plan usage at a glance.</p>
+        <article class="portal-card metric-card">
+            <p class="label">Avg. score</p>
+            <h2 class="metric-value">{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</h2>
+            <p class="muted">Across finished sessions</p>
         </article>
     </section>
     {% if can_manage_branding or is_manager %}
@@ -107,7 +91,6 @@
     <section class="panel portal-panel assignment-highlight">
         <header>
             <div>
-                <span class="step-tag subtle">Step 1</span>
                 <p class="eyebrow">Assessment catalog</p>
                 <h2>Invite candidates in seconds</h2>
                 <p class="muted">Pick a licensed assessment below to create invites or review progress.</p>
@@ -117,25 +100,15 @@
         <div class="portal-assessment-grid">
             {% for item in allowed_assessments %}
             <article class="portal-assessment-card enhanced">
-                <div class="pill subtle">Active</div>
                 <h3>{{ item.label }}</h3>
                 <p>{{ item.description|default:"Active license" }}</p>
-                <dl class="assessment-metrics">
-                    <div>
-                        <dt>Invites</dt>
-                        <dd>{{ item.metrics.invites|default:0 }}</dd>
-                    </div>
-                    <div>
-                        <dt>In progress</dt>
-                        <dd>{{ item.metrics.in_progress|default:0 }}</dd>
-                    </div>
-                    <div>
-                        <dt>Completed</dt>
-                        <dd>{{ item.metrics.completed|default:0 }}</dd>
-                    </div>
-                </dl>
+                <div class="assessment-stats-compact">
+                    <span>{{ item.metrics.invites|default:0 }} invites</span>
+                    <span>·</span>
+                    <span>{{ item.metrics.completed|default:0 }} completed</span>
+                </div>
                 <div class="portal-assessment-actions">
-                    <a class="btn btn-pill small" href="{{ item.manage_url }}">Invite candidates</a>
+                    <a class="btn btn-pill" href="{{ item.manage_url }}">Invite candidates</a>
                 </div>
             </article>
             {% endfor %}
@@ -148,7 +121,6 @@
     <section class="portal-card project-preview">
         <header class="project-preview-head">
             <div>
-                <span class="step-tag subtle">Step 2</span>
                 <p class="eyebrow">Projects</p>
                 <h2>Active roles</h2>
             </div>
@@ -195,7 +167,6 @@
     <section class="quick-action-row">
         <header class="quick-action-head">
             <div>
-                <span class="step-tag subtle">Step 3</span>
                 <p class="eyebrow">Quick actions</p>
                 <h2>Common follow-ups</h2>
             </div>
@@ -215,88 +186,69 @@
         {% endif %}
     </section>
 
-    <section class="plan-overview-panel">
-        <article class="portal-card plan-card">
-            <div class="plan-card-head">
+    <section class="portal-card plan-card-compact">
+        <div class="plan-compact-header">
+            <div>
                 <p class="label">{{ plan_overview.name }} plan</p>
-                <h2>{{ plan_overview.description }}</h2>
+                <p class="muted small">{{ plan_overview.description }}</p>
             </div>
-            <div class="plan-usage">
-                <div>
-                    <div class="usage-label">
-                        <p>Invites</p>
-                        <span>
-                            {{ plan_overview.invites_used }}
-                            /
-                            {% if plan_overview.invite_limit %}{{ plan_overview.invite_limit }}{% else %}Unlimited{% endif %}
-                        </span>
-                    </div>
-                    {% if plan_overview.invite_percent %}
-                    <div class="usage-bar">
-                        <span style="width: {{ plan_overview.invite_percent }}%;"></span>
-                    </div>
-                    {% else %}
-                    <p class="muted small">Unlimited invites</p>
-                    {% endif %}
+            <a class="btn btn-outline small"
+               href="{{ plan_overview.upgrade_url }}"
+               target="_blank"
+               data-gtag-click="purchase"
+               data-gtag-category="billing"
+               data-gtag-label="plan_upgrade"
+               data-gtag-item-name="{{ plan_overview.name|escape }} plan"
+               data-gtag-item-category="client_plan"
+               data-gtag-params='{"transaction_id":"account-{{ account.id }}-preview","plan":"{{ plan_overview.name|escapejs }}","value":0,"currency":"USD"}'>View pricing</a>
+        </div>
+        <div class="plan-usage-compact">
+            <div class="usage-item">
+                <span class="usage-label">Invites: {{ plan_overview.invites_used }} / {% if plan_overview.invite_limit %}{{ plan_overview.invite_limit }}{% else %}∞{% endif %}</span>
+                {% if plan_overview.invite_percent %}
+                <div class="usage-bar-mini">
+                    <span style="width: {{ plan_overview.invite_percent }}%;"></span>
                 </div>
-                <div>
-                    <div class="usage-label">
-                        <p>Active projects</p>
-                        <span>
-                            {{ plan_overview.project_used }}
-                            /
-                            {% if plan_overview.project_limit %}{{ plan_overview.project_limit }}{% else %}Unlimited{% endif %}
-                        </span>
-                    </div>
-                    {% if plan_overview.project_percent %}
-                    <div class="usage-bar">
-                        <span style="width: {{ plan_overview.project_percent }}%;"></span>
-                    </div>
-                    {% else %}
-                    <p class="muted small">Unlimited projects</p>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="plan-actions">
-                <a class="btn btn-outline small"
-                   href="{{ plan_overview.upgrade_url }}"
-                   target="_blank"
-                   data-gtag-click="purchase"
-                   data-gtag-category="billing"
-                   data-gtag-label="plan_upgrade"
-                   data-gtag-item-name="{{ plan_overview.name|escape }} plan"
-                   data-gtag-item-category="client_plan"
-                   data-gtag-params='{"transaction_id":"account-{{ account.id }}-preview","plan":"{{ plan_overview.name|escapejs }}","value":0,"currency":"USD"}'>View pricing</a>
-                {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 5 %}
-                <p class="muted tiny">Only {{ plan_overview.invite_remaining }} invites left this month.</p>
-                {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 1 %}
-                <p class="muted tiny">Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left.</p>
                 {% endif %}
             </div>
-        </article>
+            <div class="usage-item">
+                <span class="usage-label">Projects: {{ plan_overview.project_used }} / {% if plan_overview.project_limit %}{{ plan_overview.project_limit }}{% else %}∞{% endif %}</span>
+                {% if plan_overview.project_percent %}
+                <div class="usage-bar-mini">
+                    <span style="width: {{ plan_overview.project_percent }}%;"></span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 5 %}
+        <p class="muted tiny plan-warning">⚠️ Only {{ plan_overview.invite_remaining }} invites left this month.</p>
+        {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 1 %}
+        <p class="muted tiny plan-warning">⚠️ Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left.</p>
+        {% endif %}
     </section>
     <main>
-        <section class="portal-card-grid metric-snapshot">
-            <article class="portal-card">
-                <p class="label">Account status</p>
-                <h2>{{ account.get_status_display }}</h2>
-                <p class="muted">Point of contact: {{ account.full_name }}</p>
-            </article>
-            <article class="portal-card">
-                <p class="label">Total invites</p>
-                <h2>{{ portal_stats.total_candidates }}</h2>
-                <p class="muted">All assessments combined</p>
-            </article>
-            <article class="portal-card">
-                <p class="label">Active invites</p>
-                <h2>{{ portal_stats.in_progress_count }}</h2>
-                <p class="muted">Currently in progress</p>
-            </article>
-            <article class="portal-card">
-                <p class="label">Draft invites</p>
-                <h2>{{ portal_stats.draft_count }}</h2>
-                <p class="muted">Awaiting launch</p>
-            </article>
+        <section class="portal-card status-overview-card">
+            <div class="status-overview-header">
+                <div>
+                    <p class="label">Account Overview</p>
+                    <h3>{{ account.get_status_display }}</h3>
+                    <p class="muted small">Point of contact: {{ account.full_name }}</p>
+                </div>
+            </div>
+            <div class="status-overview-stats">
+                <div class="stat-item">
+                    <span class="stat-value">{{ portal_stats.total_candidates }}</span>
+                    <span class="stat-label">Total invites</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ portal_stats.in_progress_count }}</span>
+                    <span class="stat-label">In progress</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ portal_stats.draft_count }}</span>
+                    <span class="stat-label">Drafts</span>
+                </div>
+            </div>
         </section>
 
         {% if benchmark %}
@@ -347,48 +299,34 @@
         </section>
         {% endif %}
 
-        <section class="activity-filter-row">
-            <form method="get" class="activity-filter-form">
-                <label>
-                    <span>Assessment</span>
+        <section class="activity-filter-section">
+            <div class="activity-filter-header">
+                <h3>Activity & Reports</h3>
+                <a class="btn btn-outline small" href="{{ activity_export_url }}">Export CSV</a>
+            </div>
+            <form method="get" class="activity-filter-form-compact">
+                <div class="filter-inputs">
                     <select name="assessment">
                         {% for value, label in activity_filter_options.assessments %}
                         <option value="{{ value }}" {% if activity_filters.assessment == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
-                </label>
-                <label>
-                    <span>Status</span>
                     <select name="status">
                         {% for value, label in activity_filter_options.statuses %}
                         <option value="{{ value }}" {% if activity_filters.status == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
-                </label>
-                <label>
-                    <span>Window</span>
                     <select name="window">
                         {% for value, label in activity_filter_options.windows %}
                         <option value="{{ value }}" {% if activity_filters.window == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
-                </label>
-                <label>
-                    <span>Preset</span>
-                    <select name="preset">
-                        {% for value, label in activity_filter_options.presets %}
-                        <option value="{{ value }}" {% if activity_filters.preset == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-                <div class="activity-filter-actions">
-                    <button class="btn btn-pill" type="submit">Apply filters</button>
+                    <button class="btn btn-pill small" type="submit">Apply</button>
                     {% if activity_querystring %}
-                    <a class="btn btn-ghost small" href="{% url 'clients:dashboard' %}">Reset</a>
+                    <a class="btn btn-ghost small" href="{% url 'clients:dashboard' %}">Clear</a>
                     {% endif %}
                 </div>
             </form>
-            <a class="pill" href="{{ activity_export_url }}">Export CSV</a>
         </section>
 
         <section class="portal-card-grid two-up activity-row">

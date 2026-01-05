@@ -7042,6 +7042,12 @@ main {
 }
 .portal-hero.compact {
     padding: 1.5rem 2rem;
+    margin-bottom: 2.5rem;
+}
+.portal-hero.compact .portal-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 .portal-hero-icon {
     width: 72px;
@@ -7171,7 +7177,7 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 .quick-action-card {
     border-radius: 20px;
@@ -7194,13 +7200,36 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 .portal-card-grid.three-up {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .portal-card-grid.two-up {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.key-metrics {
+    margin-bottom: 3.5rem;
+}
+.key-metrics .portal-card {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    min-height: auto;
+}
+.metric-card .metric-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0.5rem 0;
+    color: var(--navy);
+    line-height: 1.1;
+}
+.metric-card .label {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+.metric-card .muted {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
 }
 .portal-card {
     padding: 1.5rem;
@@ -7387,6 +7416,40 @@ main {
 .metric-snapshot .portal-card {
     min-height: auto;
 }
+.status-overview-card {
+    margin-bottom: 3rem;
+}
+.status-overview-header {
+    margin-bottom: 1.5rem;
+}
+.status-overview-header h3 {
+    margin: 0.25rem 0 0.5rem;
+    font-size: 1.5rem;
+}
+.status-overview-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(14, 20, 40, 0.08);
+}
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1;
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
 .portal-card-grid > *:nth-child(3n + 1) {
     grid-column: span 1;
 }
@@ -7441,6 +7504,56 @@ main {
 .plan-actions .tiny {
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+.plan-card-compact {
+    margin-bottom: 3rem;
+}
+.plan-compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+.plan-compact-header .label {
+    margin-bottom: 0.25rem;
+}
+.plan-usage-compact {
+    display: flex;
+    gap: 2rem;
+    padding: 1rem;
+    background: rgba(14, 20, 40, 0.02);
+    border-radius: 12px;
+}
+.usage-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.usage-item .usage-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: block;
+}
+.usage-bar-mini {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(14, 20, 40, 0.08);
+    overflow: hidden;
+}
+.usage-bar-mini span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(120deg, #5337ef, #7c3aed);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+.plan-warning {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+    color: var(--orange);
 }
 .portal-card.card-muted {
     background: rgba(255, 255, 255, 0.6);
@@ -7550,6 +7663,48 @@ main {
     gap: 0.5rem;
     align-items: center;
 }
+.activity-filter-section {
+    margin-bottom: 2rem;
+}
+.activity-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.activity-filter-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.activity-filter-form-compact {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    padding: 1rem;
+    border: 1px solid rgba(14, 20, 40, 0.06);
+}
+.filter-inputs {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.filter-inputs select {
+    border-radius: 12px;
+    border: 1px solid rgba(14, 20, 40, 0.15);
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    background: #fff;
+    font-weight: 500;
+    min-width: 160px;
+    flex: 1 1 auto;
+}
+.filter-inputs select:focus {
+    border-color: var(--orange);
+}
+.filter-inputs button,
+.filter-inputs a {
+    white-space: nowrap;
+}
 
 .chart-card canvas {
     width: 100% !important;
@@ -7577,7 +7732,8 @@ main {
 .assignment-highlight {
     border: 2px solid rgba(255, 138, 0, 0.35);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 239, 217, 0.9));
-    margin-top: 1.75rem;
+    margin-top: 0;
+    margin-bottom: 3rem;
 }
 .assignment-highlight header {
     display: flex;
@@ -7608,13 +7764,37 @@ main {
 }
 .portal-assessment-card {
     border-radius: 18px;
-    padding: 1.25rem;
+    padding: 1.5rem;
     background: #f7f8ff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 .portal-assessment-card.enhanced {
     background: linear-gradient(140deg, rgba(255, 255, 255, 0.85), rgba(237, 240, 255, 0.95));
     border: 1px solid rgba(14, 20, 40, 0.05);
     box-shadow: 0 12px 30px rgba(14, 20, 40, 0.06);
+}
+.portal-assessment-card h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1.25rem;
+}
+.portal-assessment-card > p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    flex-grow: 1;
+}
+.assessment-stats-compact {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: auto;
+}
+.assessment-stats-compact span:nth-child(2) {
+    color: rgba(14, 20, 40, 0.3);
 }
 .assessment-metrics {
     display: flex;
@@ -7710,7 +7890,7 @@ main {
     color: var(--text-muted);
 }
 .project-preview {
-    margin-top: 1.5rem;
+    margin-bottom: 3rem;
 }
 .project-preview-grid {
     display: grid;
@@ -7737,7 +7917,11 @@ main {
     min-height: 360px;
 }
 .portal-assessment-actions {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
+}
+.portal-assessment-actions .btn {
+    width: 100%;
+    font-weight: 600;
 }
 .invite-panel form .btn {
     width: 100%;
