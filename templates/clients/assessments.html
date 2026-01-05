@@ -1,0 +1,239 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Assessments · Evalon{% endblock %}
+{% block meta_description %}Browse and manage your assessment catalog - invite candidates and track progress.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <header class="page-header-with-actions">
+        <div>
+            <h1>Assessments</h1>
+            <p class="muted">{{ allowed_assessments|length }} assessment{{ allowed_assessments|length|pluralize }} available</p>
+        </div>
+        {% if can_manage_invites %}
+        <div class="header-actions">
+            <a href="{{ activity_export_url }}" class="btn btn-outline">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export Data
+            </a>
+        </div>
+        {% endif %}
+    </header>
+
+    {# Search and Filter Bar #}
+    <section class="search-filter-bar">
+        <div class="search-box">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+                type="text"
+                id="assessment-search"
+                placeholder="Search assessments..."
+                class="search-input"
+                autocomplete="off"
+            >
+        </div>
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">
+                All ({{ allowed_assessments|length }})
+            </button>
+            <button class="filter-btn" data-filter="active">
+                Active
+            </button>
+            <button class="filter-btn" data-filter="unused">
+                Unused
+            </button>
+        </div>
+    </section>
+
+    {# Assessment Grid #}
+    {% if allowed_assessments %}
+    <section class="assessment-grid">
+        {% for assessment in allowed_assessments %}
+        <article class="assessment-card"
+                 data-code="{{ assessment.code }}"
+                 data-label="{{ assessment.label|lower }}"
+                 data-has-invites="{% if assessment.metrics.total_invites %}true{% else %}false{% endif %}">
+            <div class="assessment-card-header">
+                <div class="assessment-icon">
+                    {% if assessment.code == 'marketing' %}
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                        </svg>
+                    {% elif assessment.code == 'product' %}
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    {% elif assessment.code == 'behavioral' %}
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    {% else %}
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    {% endif %}
+                </div>
+                <h3 class="assessment-title">{{ assessment.label }}</h3>
+                <p class="assessment-description">{{ assessment.description }}</p>
+            </div>
+
+            <div class="assessment-metrics">
+                <div class="metric-row">
+                    <span class="metric-label">Total invites</span>
+                    <span class="metric-value">{{ assessment.metrics.total_invites|default:0 }}</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Completed</span>
+                    <span class="metric-value">{{ assessment.metrics.completed_invites|default:0 }}</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">In progress</span>
+                    <span class="metric-value">{{ assessment.metrics.in_progress_invites|default:0 }}</span>
+                </div>
+                {% if assessment.metrics.completion_rate is not None %}
+                <div class="metric-row">
+                    <span class="metric-label">Completion rate</span>
+                    <span class="metric-value highlight">{{ assessment.metrics.completion_rate|floatformat:0 }}%</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="assessment-actions">
+                <a href="{{ assessment.manage_url }}" class="btn btn-primary btn-block">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    Invite Candidates
+                </a>
+                <a href="{{ assessment.manage_url }}" class="btn btn-ghost btn-block">
+                    View All Sessions
+                </a>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <div class="portal-card empty-state-card">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 1rem;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        <h3>No assessments available</h3>
+        <p class="muted">Contact support to add assessments to your account.</p>
+    </div>
+    {% endif %}
+
+    {# Help Section #}
+    <section class="help-section">
+        <div class="help-card">
+            <svg class="help-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <div>
+                <h4>Need help choosing an assessment?</h4>
+                <p class="muted">Our team can help you select the right assessments for your hiring needs.</p>
+                <a href="mailto:support@evalon.app" class="link-with-arrow">
+                    Contact Support
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+// Assessment search and filter functionality
+(function() {
+    const searchInput = document.getElementById('assessment-search');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const assessmentCards = document.querySelectorAll('.assessment-card');
+
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    function filterCards() {
+        assessmentCards.forEach(card => {
+            const label = card.dataset.label || '';
+            const code = card.dataset.code || '';
+            const hasInvites = card.dataset.hasInvites === 'true';
+
+            // Check search match
+            const searchMatch = !currentSearch ||
+                label.includes(currentSearch.toLowerCase()) ||
+                code.includes(currentSearch.toLowerCase());
+
+            // Check filter match
+            let filterMatch = true;
+            if (currentFilter === 'active') {
+                filterMatch = hasInvites;
+            } else if (currentFilter === 'unused') {
+                filterMatch = !hasInvites;
+            }
+
+            // Show/hide card
+            if (searchMatch && filterMatch) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Show empty state if no cards visible
+        const visibleCount = Array.from(assessmentCards).filter(c => c.style.display !== 'none').length;
+        const grid = document.querySelector('.assessment-grid');
+        if (grid) {
+            const emptyState = grid.querySelector('.empty-search-state');
+            if (visibleCount === 0 && !emptyState) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-search-state';
+                empty.innerHTML = '<p class="muted">No assessments match your search.</p>';
+                grid.appendChild(empty);
+            } else if (visibleCount > 0 && emptyState) {
+                emptyState.remove();
+            }
+        }
+    }
+
+    // Search input handler
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            filterCards();
+        });
+    }
+
+    // Filter button handlers
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            filterCards();
+        });
+    });
+})();
+</script>
+
+{% endblock %}

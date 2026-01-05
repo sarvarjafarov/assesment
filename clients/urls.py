@@ -12,6 +12,9 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
     path("logout/", views.ClientLogoutView.as_view(), name="logout"),
     path("dashboard/", views.ClientDashboardView.as_view(), name="dashboard"),
     path("dashboard/activity/export/", views.ClientActivityExportView.as_view(), name="activity-export"),
+    path("assessments/", views.ClientAssessmentsView.as_view(), name="assessments"),
+    path("analytics/", views.ClientAnalyticsView.as_view(), name="analytics"),
+    path("settings/", views.ClientSettingsView.as_view(), name="settings"),
     path(
         "dashboard/assessments/<slug:assessment_type>/",
         views.ClientAssessmentManageView.as_view(),

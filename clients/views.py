@@ -774,6 +774,109 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         return list(account.notifications.filter(is_read=False)[:5])
 
 
+class ClientAssessmentsView(LoginRequiredMixin, TemplateView):
+    """Dedicated assessments catalog page."""
+    template_name = "clients/assessments.html"
+    login_url = reverse_lazy("clients:login")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        if request.user.client_account.status != "approved":
+            messages.info(request, "Your account is still pending approval.")
+            return redirect("clients:signup")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        account = self.request.user.client_account
+        catalog = ClientAccount.ASSESSMENT_DETAILS
+        dataset_map = build_dataset_map(account)
+
+        # Calculate metrics for each assessment
+        assessment_stats = {}
+        for code in account.approved_assessments:
+            sessions = dataset_map.get(code, [])
+            total = sessions.count()
+            completed = sessions.filter(status='submitted').count()
+            in_progress = sessions.filter(status='in_progress').count()
+            completion_rate = (completed / total * 100) if total > 0 else None
+
+            assessment_stats[code] = {
+                'total_invites': total,
+                'completed_invites': completed,
+                'in_progress_invites': in_progress,
+                'completion_rate': completion_rate,
+            }
+
+        context.update({
+            'account': account,
+            'is_manager': account.role == 'manager',
+            'can_manage_invites': account.role in ROLE_INVITE_ACCESS,
+            'allowed_assessments': [
+                {
+                    'code': code,
+                    'label': catalog.get(code, {}).get('label', code.title()),
+                    'description': catalog.get(code, {}).get('description', ''),
+                    'manage_url': reverse('clients:assessment-manage', args=[code]),
+                    'metrics': assessment_stats.get(code, {}),
+                }
+                for code in account.approved_assessments
+            ],
+            'activity_export_url': reverse('clients:activity-export'),
+        })
+        return context
+
+
+class ClientAnalyticsView(LoginRequiredMixin, TemplateView):
+    """Analytics and reporting page."""
+    template_name = "clients/analytics.html"
+    login_url = reverse_lazy("clients:login")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        if request.user.client_account.status != "approved":
+            messages.info(request, "Your account is still pending approval.")
+            return redirect("clients:signup")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        account = self.request.user.client_account
+        # This will be populated with analytics data in Phase 3
+        context.update({
+            'account': account,
+            'is_manager': account.role == 'manager',
+        })
+        return context
+
+
+class ClientSettingsView(LoginRequiredMixin, TemplateView):
+    """Account settings and preferences page."""
+    template_name = "clients/settings.html"
+    login_url = reverse_lazy("clients:login")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        if request.user.client_account.status != "approved":
+            messages.info(request, "Your account is still pending approval.")
+            return redirect("clients:signup")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        account = self.request.user.client_account
+        context.update({
+            'account': account,
+            'is_manager': account.role == 'manager',
+            'can_manage_branding': account.role in ROLE_BRANDING_ACCESS,
+            'role_label': dict(ClientAccount.ROLE_CHOICES).get(account.role, account.role.title()),
+        })
+        return context
+
+
 class ClientActivityExportView(LoginRequiredMixin, View):
     login_url = reverse_lazy("clients:login")
 

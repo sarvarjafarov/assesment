@@ -1,0 +1,76 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Analytics · Evalon{% endblock %}
+{% block meta_description %}View detailed analytics and reports for your assessments.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <header class="page-header-with-actions">
+        <div>
+            <h1>Analytics & Reports</h1>
+            <p class="muted">Insights and performance metrics</p>
+        </div>
+    </header>
+
+    {# Coming Soon Section - Will be populated in Phase 3 #}
+    <section class="portal-card coming-soon-section">
+        <div class="coming-soon-content">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 1.5rem; color: var(--orange);">
+                <line x1="12" y1="20" x2="12" y2="10"></line>
+                <line x1="18" y1="20" x2="18" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+            <h2>Advanced Analytics Coming Soon</h2>
+            <p class="muted" style="max-width: 500px; margin: 0 auto 2rem;">
+                We're building powerful analytics dashboards with charts, trends, and insights to help you make data-driven hiring decisions.
+            </p>
+            <div class="coming-soon-features">
+                <div class="feature-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <span>Performance Trends</span>
+                </div>
+                <div class="feature-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Comparative Analysis</span>
+                </div>
+                <div class="feature-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    <span>Custom Reports</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Quick Access to Current Data #}
+    <section class="quick-data-section">
+        <h3>Current Activity</h3>
+        <div class="portal-card-grid two-up">
+            <article class="portal-card">
+                <h4>View Assessments</h4>
+                <p class="muted">Review individual assessment results and candidate performance</p>
+                <a href="{% url 'clients:assessments' %}" class="btn btn-outline" style="margin-top: 1rem;">
+                    Go to Assessments →
+                </a>
+            </article>
+            <article class="portal-card">
+                <h4>Export Data</h4>
+                <p class="muted">Download your assessment data as CSV for custom analysis</p>
+                <a href="{% url 'clients:activity-export' %}" class="btn btn-outline" style="margin-top: 1rem;">
+                    Download CSV →
+                </a>
+            </article>
+        </div>
+    </section>
+</div>
+
+{% endblock %}

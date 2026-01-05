@@ -1,0 +1,185 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% block title %}Settings · Evalon{% endblock %}
+{% block meta_description %}Manage your account settings and preferences.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <header class="page-header-with-actions">
+        <div>
+            <h1>Settings</h1>
+            <p class="muted">Manage your account and preferences</p>
+        </div>
+    </header>
+
+    {# Account Information #}
+    <section class="settings-section">
+        <div class="settings-section-header">
+            <h2>Account Information</h2>
+            <p class="muted">Your workspace details and contact information</p>
+        </div>
+        <div class="portal-card">
+            <div class="settings-row">
+                <div class="setting-info">
+                    <h4>Company Name</h4>
+                    <p class="muted">{{ account.company_name }}</p>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="setting-info">
+                    <h4>Email Address</h4>
+                    <p class="muted">{{ account.email }}</p>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="setting-info">
+                    <h4>Account Role</h4>
+                    <p class="muted">{{ role_label }}</p>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="setting-info">
+                    <h4>Member Since</h4>
+                    <p class="muted">{{ account.created_at|date:"F j, Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Branding Settings - Only for managers and branding managers #}
+    {% if can_manage_branding %}
+    <section class="settings-section">
+        <div class="settings-section-header">
+            <h2>Branding</h2>
+            <p class="muted">Customize assessment invitations with your company logo</p>
+        </div>
+        <div class="portal-card">
+            <div class="branding-preview">
+                <div class="logo-preview">
+                    {% if account.logo_data_url %}
+                    <img src="{{ account.logo_data_url }}" alt="{{ account.company_name }} logo" class="current-logo">
+                    {% else %}
+                    <div class="logo-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <p class="muted">No logo uploaded</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="logo-actions">
+                    <form method="post" action="{% url 'clients:dashboard' %}" enctype="multipart/form-data" class="logo-upload-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="upload_logo">
+                        <div class="form-group">
+                            <label for="id_logo" class="btn btn-primary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                {% if account.logo_data_url %}Update Logo{% else %}Upload Logo{% endif %}
+                            </label>
+                            <input type="file" id="id_logo" name="logo" accept="image/*" style="display: none;" onchange="this.form.submit()">
+                        </div>
+                    </form>
+                    {% if account.logo_data_url %}
+                    <form method="post" action="{% url 'clients:dashboard' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove_logo">
+                        <button type="submit" class="btn btn-ghost" onclick="return confirm('Remove your logo?')">
+                            Remove Logo
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="help-text">
+                Recommended: Square logo (PNG or JPG), minimum 200x200px. Maximum file size: 2MB.
+            </p>
+        </div>
+    </section>
+    {% endif %}
+
+    {# Security & Access - Coming Soon #}
+    <section class="settings-section">
+        <div class="settings-section-header">
+            <h2>Security & Access</h2>
+            <p class="muted">Manage password and login preferences</p>
+        </div>
+        <div class="portal-card coming-soon-card">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <h4>Password Management</h4>
+            <p class="muted">Password reset and security settings coming soon.</p>
+        </div>
+    </section>
+
+    {# Notifications - Coming Soon #}
+    <section class="settings-section">
+        <div class="settings-section-header">
+            <h2>Notifications</h2>
+            <p class="muted">Control how and when you receive updates</p>
+        </div>
+        <div class="portal-card coming-soon-card">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <h4>Email Preferences</h4>
+            <p class="muted">Notification preferences and email settings coming soon.</p>
+        </div>
+    </section>
+
+    {# Help & Support #}
+    <section class="settings-section">
+        <div class="settings-section-header">
+            <h2>Help & Support</h2>
+            <p class="muted">Get assistance with your account</p>
+        </div>
+        <div class="portal-card">
+            <div class="support-options">
+                <div class="support-option">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <div>
+                        <h4>Email Support</h4>
+                        <p class="muted">Get help from our team</p>
+                        <a href="mailto:support@evalon.app" class="link-with-arrow" style="margin-top: 0.5rem;">
+                            support@evalon.app
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="support-option">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <div>
+                        <h4>Documentation</h4>
+                        <p class="muted">Learn how to use Evalon</p>
+                        <a href="mailto:support@evalon.app?subject=Documentation%20Request" class="link-with-arrow" style="margin-top: 0.5rem;">
+                            Request documentation
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock %}

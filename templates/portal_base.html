@@ -30,7 +30,7 @@
                 <span class="nav-label">Dashboard</span>
             </a>
 
-            <a href="{% url 'clients:dashboard' %}#assessments" class="nav-item {% if 'assessment' in request.path %}active{% endif %}">
+            <a href="{% url 'clients:assessments' %}" class="nav-item {% if request.resolver_match.url_name == 'assessments' or request.resolver_match.url_name == 'assessment-manage' or request.resolver_match.url_name == 'assessment-detail' %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -44,7 +44,7 @@
                 {% endif %}
             </a>
 
-            <a href="{% url 'clients:project-list' %}" class="nav-item {% if 'project' in request.path %}active{% endif %}">
+            <a href="{% url 'clients:project-list' %}" class="nav-item {% if 'project-list' in request.resolver_match.url_name or 'project-detail' in request.resolver_match.url_name or 'project-clone' in request.resolver_match.url_name %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
@@ -54,7 +54,7 @@
                 {% endif %}
             </a>
 
-            <a href="{% url 'clients:dashboard' %}#analytics" class="nav-item {% if 'analytic' in request.path %}active{% endif %}">
+            <a href="{% url 'clients:analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="20" x2="12" y2="10"></line>
                     <line x1="18" y1="20" x2="18" y2="4"></line>
@@ -64,7 +64,7 @@
             </a>
 
             {% if is_manager or can_manage_branding %}
-            <a href="{% url 'clients:dashboard' %}#settings" class="nav-item {% if 'setting' in request.path %}active{% endif %}">
+            <a href="{% url 'clients:settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-6.364 0L3.636 8.05m12.728 12.728l-4.243-4.243m-6.364 0L3.636 15.95"></path>
