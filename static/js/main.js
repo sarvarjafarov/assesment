@@ -1012,4 +1012,129 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Notification Center
+    const notificationToggle = document.getElementById("notification-toggle");
+    const notificationDropdown = document.getElementById("notification-dropdown");
+    const notificationBadge = document.getElementById("notification-badge");
+    const notificationList = document.getElementById("notification-list");
+    const markAllRead = document.getElementById("mark-all-read");
+
+    if (notificationToggle && notificationDropdown) {
+        // Mock notification data - in production, this would come from an API
+        let notifications = [
+            {
+                id: 1,
+                title: "Assessment Completed",
+                message: "John Doe completed the Digital Marketing Assessment",
+                time: "5 minutes ago",
+                unread: true,
+                link: "/clients/dashboard/assessments/marketing/",
+            },
+            {
+                id: 2,
+                title: "New Invite Response",
+                message: "Jane Smith started the Product Management Assessment",
+                time: "1 hour ago",
+                unread: true,
+                link: "/clients/dashboard/assessments/product/",
+            },
+            {
+                id: 3,
+                title: "Project Updated",
+                message: "Senior Developer role has 3 new candidates",
+                time: "3 hours ago",
+                unread: false,
+                link: "/clients/dashboard/projects/",
+            },
+        ];
+
+        // Update badge count
+        function updateBadgeCount() {
+            const unreadCount = notifications.filter(n => n.unread).length;
+            if (unreadCount > 0) {
+                notificationBadge.textContent = unreadCount;
+                notificationBadge.style.display = "flex";
+                notificationToggle.classList.add("has-notifications");
+            } else {
+                notificationBadge.style.display = "none";
+                notificationToggle.classList.remove("has-notifications");
+            }
+        }
+
+        // Render notifications
+        function renderNotifications() {
+            if (notifications.length === 0) {
+                notificationList.innerHTML = `
+                    <div class="notification-empty">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 0.5rem; color: var(--navy);">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <p>No new notifications</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = notifications.map(notif => `
+                <div class="notification-item ${notif.unread ? 'unread' : ''}" data-id="${notif.id}">
+                    <div class="notification-content">
+                        <p class="notification-title">${notif.title}</p>
+                        <p class="notification-message">${notif.message}</p>
+                        <p class="notification-time">${notif.time}</p>
+                    </div>
+                </div>
+            `).join("");
+
+            notificationList.innerHTML = html;
+
+            // Add click handlers to notification items
+            document.querySelectorAll(".notification-item").forEach(item => {
+                item.addEventListener("click", () => {
+                    const id = parseInt(item.dataset.id);
+                    const notif = notifications.find(n => n.id === id);
+                    if (notif) {
+                        notif.unread = false;
+                        updateBadgeCount();
+                        renderNotifications();
+                        if (notif.link) {
+                            window.location.href = notif.link;
+                        }
+                    }
+                });
+            });
+
+            updateBadgeCount();
+        }
+
+        // Toggle dropdown
+        notificationToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isVisible = notificationDropdown.style.display === "block";
+            notificationDropdown.style.display = isVisible ? "none" : "block";
+            if (!isVisible) {
+                renderNotifications();
+            }
+        });
+
+        // Mark all as read
+        if (markAllRead) {
+            markAllRead.addEventListener("click", () => {
+                notifications.forEach(n => n.unread = false);
+                updateBadgeCount();
+                renderNotifications();
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!notificationToggle.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.style.display = "none";
+            }
+        });
+
+        // Initialize badge count
+        updateBadgeCount();
+    }
 });

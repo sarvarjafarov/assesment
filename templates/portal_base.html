@@ -112,13 +112,40 @@
                     <p class="user-role">{{ role_label }}</p>
                 </div>
             </div>
-            <a href="{% url 'clients:logout' %}" class="btn-logout" title="Sign out">
+            <div class="sidebar-actions">
+                <button class="btn-notification" id="notification-toggle" title="Notifications" aria-label="Notifications">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                </button>
+                <a href="{% url 'clients:logout' %}" class="btn-logout" title="Sign out">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                     <polyline points="16 17 21 12 16 7"></polyline>
                     <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
             </a>
+            </div>
+        </div>
+
+        {# Notification Dropdown #}
+        <div class="notification-dropdown" id="notification-dropdown" style="display: none;">
+            <div class="notification-header">
+                <h4>Notifications</h4>
+                <button class="mark-all-read" id="mark-all-read">Mark all read</button>
+            </div>
+            <div class="notification-list" id="notification-list">
+                {# Notifications will be loaded here dynamically #}
+                <div class="notification-empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 0.5rem; color: var(--navy);">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <p>No new notifications</p>
+                </div>
+            </div>
         </div>
     </aside>
 
