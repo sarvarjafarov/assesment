@@ -48,7 +48,15 @@
                     <p class="muted">{{ item.detail }}</p>
                 </div>
                 {% if item.action_url %}
-                <a href="{{ item.action_url }}" class="btn btn-outline small">Review</a>
+                <a href="{{ item.action_url }}" class="btn btn-outline small">
+                    {% if "invite" in item.label|lower %}
+                        View Assessments
+                    {% elif "benchmark" in item.label|lower %}
+                        View Analytics
+                    {% else %}
+                        Review
+                    {% endif %}
+                </a>
                 {% endif %}
             </li>
             {% endfor %}

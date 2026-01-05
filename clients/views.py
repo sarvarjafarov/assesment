@@ -496,6 +496,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                     {
                         "label": "Completion rate below benchmark",
                         "detail": f"Your completion rate ({stats['completion_rate']:.0f}%) trails the network average ({benchmarks.get('completion_rate', 0):.0f}%).",
+                        "action_url": reverse("clients:analytics"),
                     }
                 )
         if stats["total_candidates"] < max(3, len(account.approved_assessments) * 2):
@@ -503,6 +504,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 {
                     "label": "Low invite volume",
                     "detail": "Send more invites to keep your pipeline active.",
+                    "action_url": reverse("clients:assessments"),
                 }
             )
         context.update(
