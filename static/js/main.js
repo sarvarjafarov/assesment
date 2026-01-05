@@ -822,4 +822,59 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         blogCards.forEach((card) => card.classList.add("is-visible"));
     }
+
+    // Portal Sidebar Navigation
+    const portalSidebar = document.getElementById("portal-sidebar");
+    const sidebarToggle = document.getElementById("sidebar-toggle");
+    const portalContainer = document.querySelector(".portal-container");
+
+    if (sidebarToggle && portalSidebar && portalContainer) {
+        // Toggle sidebar on mobile
+        sidebarToggle.addEventListener("click", () => {
+            const isOpen = portalSidebar.classList.toggle("is-open");
+            portalContainer.classList.toggle("sidebar-open", isOpen);
+            sidebarToggle.setAttribute("aria-expanded", String(isOpen));
+
+            // Animate toggle button
+            sidebarToggle.classList.toggle("is-active", isOpen);
+        });
+
+        // Close sidebar when clicking overlay (mobile)
+        portalContainer.addEventListener("click", (event) => {
+            if (
+                window.innerWidth <= 1024 &&
+                portalSidebar.classList.contains("is-open") &&
+                event.target === portalContainer
+            ) {
+                portalSidebar.classList.remove("is-open");
+                portalContainer.classList.remove("sidebar-open");
+                sidebarToggle.classList.remove("is-active");
+                sidebarToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        // Close sidebar on ESC key
+        document.addEventListener("keydown", (event) => {
+            if (
+                event.key === "Escape" &&
+                portalSidebar.classList.contains("is-open") &&
+                window.innerWidth <= 1024
+            ) {
+                portalSidebar.classList.remove("is-open");
+                portalContainer.classList.remove("sidebar-open");
+                sidebarToggle.classList.remove("is-active");
+                sidebarToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        // Close sidebar on window resize to desktop
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 1024 && portalSidebar.classList.contains("is-open")) {
+                portalSidebar.classList.remove("is-open");
+                portalContainer.classList.remove("sidebar-open");
+                sidebarToggle.classList.remove("is-active");
+                sidebarToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
 });
