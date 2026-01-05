@@ -8554,6 +8554,28 @@ main {
     padding: 2rem 2rem 4rem;
 }
 
+/* Dashboard Page Header */
+.dashboard-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(14, 20, 40, 0.08);
+}
+
+.dashboard-page-header h1 {
+    margin: 0 0 0.25rem;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.dashboard-page-header .muted {
+    margin: 0;
+    font-size: 1rem;
+}
+
 /* Mobile Responsive */
 @media (max-width: 1024px) {
     .portal-sidebar {

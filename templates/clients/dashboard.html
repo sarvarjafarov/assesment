@@ -1,42 +1,25 @@
-{% extends 'base.html' %}
+{% extends 'portal_base.html' %}
 {% load static %}
 {% load humanize %}
 {% block title %}Client Dashboard · Evalon{% endblock %}
 {% block meta_description %}Track invites, projects, and candidate progress inside your Evalon client console.{% endblock %}
-{% block content %}
+{% block portal_content %}
 <div class="portal-shell">
-    <header class="portal-hero compact">
-        <div class="portal-hero-main">
-            <div class="portal-hero-icon{% if account.has_logo %} logo{% endif %}">
-                {% if account.logo_data_url %}
-                <img src="{{ account.logo_data_url }}" alt="{{ account.company_name }} logo">
-                {% else %}
-                <span>⚡</span>
-                {% endif %}
-                {% if can_manage_branding or is_manager %}
-                <button class="logo-edit-trigger" type="button" aria-label="Change logo" data-logo-edit-trigger>
-                    ✏️
-                </button>
-                {% endif %}
-            </div>
-            <div>
-                <h1>{{ account.company_name }}</h1>
-                <p class="lede">{{ role_label }} · {{ allowed_assessments|length }} assessment{{ allowed_assessments|pluralize }}</p>
-            </div>
+    <header class="dashboard-page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="muted">Welcome back to your Evalon workspace</p>
         </div>
-        <div class="portal-actions">
-            {% if can_manage_branding or is_manager %}
-            <form method="post" class="summary-toggle">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="toggle_summary">
-                <label class="toggle-control">
-                    <input type="checkbox" name="weekly_summary" {% if weekly_summary_enabled %}checked{% endif %} onchange="this.form.submit()">
-                    <span>Weekly summary emails</span>
-                </label>
-            </form>
-            {% endif %}
-            <a class="btn btn-outline small" href="{% url 'clients:logout' %}">Sign out</a>
-        </div>
+        {% if can_manage_branding or is_manager %}
+        <form method="post" class="summary-toggle">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle_summary">
+            <label class="toggle-control">
+                <input type="checkbox" name="weekly_summary" {% if weekly_summary_enabled %}checked{% endif %} onchange="this.form.submit()">
+                <span>Weekly summary emails</span>
+            </label>
+        </form>
+        {% endif %}
     </header>
 
     {# Key Metrics Section #}
@@ -445,10 +428,5 @@
 })();
 </script>
 {% endif %}
+</div>
 {% endblock %}
-            <article class="portal-card">
-                <p class="label">Hiring objectives</p>
-                <h2>Focus</h2>
-                <p class="muted">{% if account_objectives %}{{ account_objectives|linebreaksbr }}{% else %}No objectives provided yet.{% endif %}</p>
-            </article>
-{% block site_footer %}{% endblock %}
