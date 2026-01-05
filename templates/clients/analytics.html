@@ -8,69 +8,309 @@
     <header class="page-header-with-actions">
         <div>
             <h1>Analytics & Reports</h1>
-            <p class="muted">Insights and performance metrics</p>
+            <p class="muted">Performance insights and trends</p>
+        </div>
+        <div class="header-actions">
+            <form method="get" class="period-selector">
+                <select name="period" onchange="this.form.submit()" class="period-select">
+                    <option value="7" {% if selected_period == '7' %}selected{% endif %}>Last 7 days</option>
+                    <option value="30" {% if selected_period == '30' %}selected{% endif %}>Last 30 days</option>
+                    <option value="90" {% if selected_period == '90' %}selected{% endif %}>Last 90 days</option>
+                    <option value="all" {% if selected_period == 'all' %}selected{% endif %}>All time</option>
+                </select>
+            </form>
+            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export CSV
+            </a>
         </div>
     </header>
 
-    {# Coming Soon Section - Will be populated in Phase 3 #}
-    <section class="portal-card coming-soon-section">
-        <div class="coming-soon-content">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 1.5rem; color: var(--orange);">
-                <line x1="12" y1="20" x2="12" y2="10"></line>
-                <line x1="18" y1="20" x2="18" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="16"></line>
-            </svg>
-            <h2>Advanced Analytics Coming Soon</h2>
-            <p class="muted" style="max-width: 500px; margin: 0 auto 2rem;">
-                We're building powerful analytics dashboards with charts, trends, and insights to help you make data-driven hiring decisions.
-            </p>
-            <div class="coming-soon-features">
-                <div class="feature-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                    </svg>
-                    <span>Performance Trends</span>
+    {% if analytics.total_invites > 0 %}
+    {# Key Metrics #}
+    <section class="portal-card-grid three-up key-metrics">
+        <article class="portal-card metric-card">
+            <p class="label">Total Invites</p>
+            <h2 class="metric-value">{{ analytics.total_invites }}</h2>
+            <p class="muted">{{ analytics.in_progress_count }} in progress</p>
+        </article>
+        <article class="portal-card metric-card">
+            <p class="label">Completion Rate</p>
+            <h2 class="metric-value">{{ analytics.completion_rate|floatformat:0 }}%</h2>
+            <p class="muted">{{ analytics.completed_count }} completed</p>
+        </article>
+        <article class="portal-card metric-card">
+            <p class="label">Avg. Score</p>
+            <h2 class="metric-value">{% if analytics.average_score %}{{ analytics.average_score|floatformat:1 }}{% else %}—{% endif %}</h2>
+            <p class="muted">Across finished sessions</p>
+        </article>
+    </section>
+
+    {# Charts Section #}
+    <section class="portal-card-grid two-up chart-section">
+        {# Trend Chart #}
+        <article class="portal-card chart-card">
+            <div class="chart-header">
+                <h3>Activity Trend</h3>
+                <p class="muted">Invites and completions over time</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </article>
+
+        {# Assessment Breakdown Chart #}
+        <article class="portal-card chart-card">
+            <div class="chart-header">
+                <h3>Assessment Breakdown</h3>
+                <p class="muted">Completion rates by assessment type</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="breakdownChart"></canvas>
+            </div>
+        </article>
+    </section>
+
+    {# Funnel Visualization #}
+    <section class="portal-card funnel-section">
+        <div class="chart-header">
+            <h3>Conversion Funnel</h3>
+            <p class="muted">Journey from invite to completion</p>
+        </div>
+        <div class="funnel-container">
+            <div class="funnel-stage">
+                <div class="funnel-bar" style="width: 100%;">
+                    <span class="funnel-label">Invited</span>
+                    <span class="funnel-count">{{ analytics.chart_data.funnel.invited }}</span>
                 </div>
-                <div class="feature-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    <span>Comparative Analysis</span>
+                <span class="funnel-percentage">100%</span>
+            </div>
+            <div class="funnel-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+            </div>
+            <div class="funnel-stage">
+                <div class="funnel-bar" style="width: {% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%;">
+                    <span class="funnel-label">Started</span>
+                    <span class="funnel-count">{{ analytics.chart_data.funnel.started }}</span>
                 </div>
-                <div class="feature-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                    </svg>
-                    <span>Custom Reports</span>
+                <span class="funnel-percentage">{% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%</span>
+            </div>
+            <div class="funnel-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+            </div>
+            <div class="funnel-stage">
+                <div class="funnel-bar" style="width: {% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%;">
+                    <span class="funnel-label">Completed</span>
+                    <span class="funnel-count">{{ analytics.chart_data.funnel.completed }}</span>
                 </div>
+                <span class="funnel-percentage">{% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%</span>
             </div>
         </div>
     </section>
 
-    {# Quick Access to Current Data #}
-    <section class="quick-data-section">
-        <h3>Current Activity</h3>
-        <div class="portal-card-grid two-up">
-            <article class="portal-card">
-                <h4>View Assessments</h4>
-                <p class="muted">Review individual assessment results and candidate performance</p>
-                <a href="{% url 'clients:assessments' %}" class="btn btn-outline" style="margin-top: 1rem;">
-                    Go to Assessments →
-                </a>
-            </article>
-            <article class="portal-card">
-                <h4>Export Data</h4>
-                <p class="muted">Download your assessment data as CSV for custom analysis</p>
-                <a href="{% url 'clients:activity-export' %}" class="btn btn-outline" style="margin-top: 1rem;">
-                    Download CSV →
-                </a>
-            </article>
+    {# Assessment Performance Table #}
+    <section class="portal-card">
+        <div class="chart-header">
+            <h3>Assessment Performance</h3>
+            <p class="muted">Detailed breakdown by assessment type</p>
+        </div>
+        <div class="performance-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Assessment</th>
+                        <th>Total</th>
+                        <th>Completed</th>
+                        <th>Completion Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in analytics.assessment_breakdown %}
+                    <tr>
+                        <td class="assessment-name">{{ item.label }}</td>
+                        <td>{{ item.total }}</td>
+                        <td>{{ item.completed }}</td>
+                        <td>
+                            <div class="completion-bar-cell">
+                                <div class="completion-bar">
+                                    <div class="completion-fill" style="width: {{ item.completion_rate }}%;"></div>
+                                </div>
+                                <span class="completion-text">{{ item.completion_rate|floatformat:0 }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </section>
+
+    {# Score Distribution #}
+    {% if analytics.score_distribution %}
+    <section class="portal-card">
+        <div class="chart-header">
+            <h3>Score Distribution</h3>
+            <p class="muted">Breakdown of candidate scores</p>
+        </div>
+        <div class="score-distribution">
+            {% for range in analytics.score_distribution %}
+            <div class="score-range">
+                <div class="score-range-header">
+                    <span class="score-label">{{ range.label }}</span>
+                    <span class="score-count">{{ range.count }} ({{ range.percentage|floatformat:0 }}%)</span>
+                </div>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: {{ range.percentage }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% else %}
+    {# Empty State #}
+    <section class="portal-card empty-state-card">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 1.5rem; color: var(--orange);">
+            <line x1="12" y1="20" x2="12" y2="10"></line>
+            <line x1="18" y1="20" x2="18" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="16"></line>
+        </svg>
+        <h2>No Data Yet</h2>
+        <p class="muted" style="max-width: 500px; margin: 0 auto 2rem;">
+            Start inviting candidates to see analytics and performance insights.
+        </p>
+        <a href="{% url 'clients:assessments' %}" class="btn btn-primary">
+            Go to Assessments
+        </a>
+    </section>
+    {% endif %}
 </div>
+
+{% if analytics.total_invites > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const chartData = {{ chart_payload|safe }};
+    const colors = {
+        primary: 'rgba(255, 138, 0, 1)',
+        primaryLight: 'rgba(255, 138, 0, 0.1)',
+        secondary: 'rgba(14, 20, 40, 1)',
+        secondaryLight: 'rgba(14, 20, 40, 0.1)',
+        grid: 'rgba(14, 20, 40, 0.08)',
+    };
+
+    // Trend Chart
+    const trendCtx = document.getElementById('trendChart');
+    if (trendCtx && chartData.trend.length > 0) {
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.trend.map(d => d.date),
+                datasets: [
+                    {
+                        label: 'Total Invites',
+                        data: chartData.trend.map(d => d.count),
+                        borderColor: colors.primary,
+                        backgroundColor: colors.primaryLight,
+                        tension: 0.3,
+                        fill: true,
+                    },
+                    {
+                        label: 'Completed',
+                        data: chartData.trend.map(d => d.completed),
+                        borderColor: colors.secondary,
+                        backgroundColor: colors.secondaryLight,
+                        tension: 0.3,
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: colors.grid,
+                        },
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                    },
+                },
+            },
+        });
+    }
+
+    // Assessment Breakdown Chart
+    const breakdownCtx = document.getElementById('breakdownChart');
+    if (breakdownCtx && chartData.breakdown.length > 0) {
+        new Chart(breakdownCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.breakdown.map(d => d.label),
+                datasets: [
+                    {
+                        label: 'Completion Rate (%)',
+                        data: chartData.breakdown.map(d => d.completion_rate),
+                        backgroundColor: colors.primary,
+                        borderColor: colors.primary,
+                        borderWidth: 1,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: colors.grid,
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                    },
+                },
+            },
+        });
+    }
+})();
+</script>
+{% endif %}
 
 {% endblock %}

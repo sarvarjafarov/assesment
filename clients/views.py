@@ -844,12 +844,170 @@ class ClientAnalyticsView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         account = self.request.user.client_account
-        # This will be populated with analytics data in Phase 3
+        dataset_map = build_dataset_map(account)
+
+        # Get time period filter (default to 30 days)
+        period = self.request.GET.get('period', '30')
+        period_days = {'7': 7, '30': 30, '90': 90, 'all': None}.get(period, 30)
+
+        # Calculate analytics data
+        analytics_data = self._calculate_analytics(account, dataset_map, period_days)
+
         context.update({
             'account': account,
             'is_manager': account.role == 'manager',
+            'analytics': analytics_data,
+            'selected_period': period,
+            'chart_payload': json.dumps(analytics_data['chart_data'], cls=DjangoJSONEncoder),
         })
         return context
+
+    def _calculate_analytics(self, account: ClientAccount, dataset_map: dict, period_days: int = None):
+        """Calculate comprehensive analytics data."""
+        from datetime import timedelta
+
+        # Filter by time period if specified
+        cutoff = None
+        if period_days:
+            cutoff = timezone.now() - timedelta(days=period_days)
+
+        # Aggregate all sessions
+        all_sessions = []
+        for assessment_type in ['marketing', 'product', 'behavioral']:
+            qs = dataset_map.get(assessment_type, [])
+            if cutoff:
+                qs = qs.filter(created_at__gte=cutoff)
+            all_sessions.extend(list(qs))
+
+        total_count = len(all_sessions)
+        completed_sessions = [s for s in all_sessions if s.status == 'submitted']
+        in_progress_sessions = [s for s in all_sessions if s.status == 'in_progress']
+
+        # Calculate key metrics
+        completion_rate = (len(completed_sessions) / total_count * 100) if total_count > 0 else 0
+
+        # Score statistics
+        scores = []
+        for s in completed_sessions:
+            score = getattr(s, 'overall_score', None) or getattr(s, 'eligibility_score', None)
+            if score is not None:
+                scores.append(float(score))
+
+        avg_score = sum(scores) / len(scores) if scores else None
+
+        # Duration statistics
+        durations = [s.duration_minutes for s in completed_sessions if s.duration_minutes]
+        avg_duration = sum(durations) / len(durations) if durations else None
+
+        # Assessment breakdown
+        assessment_breakdown = []
+        for code in account.approved_assessments:
+            sessions = dataset_map.get(code, [])
+            if cutoff:
+                sessions = sessions.filter(created_at__gte=cutoff)
+
+            count = sessions.count()
+            completed = sessions.filter(status='submitted').count()
+
+            assessment_breakdown.append({
+                'code': code,
+                'label': ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get('label', code.title()),
+                'total': count,
+                'completed': completed,
+                'completion_rate': (completed / count * 100) if count > 0 else 0,
+            })
+
+        # Trend data (last 7 data points)
+        trend_data = self._calculate_trend(all_sessions, period_days or 30)
+
+        # Funnel data
+        funnel_data = {
+            'invited': total_count,
+            'started': len([s for s in all_sessions if s.status in ['in_progress', 'submitted']]),
+            'completed': len(completed_sessions),
+        }
+
+        return {
+            'total_invites': total_count,
+            'completed_count': len(completed_sessions),
+            'in_progress_count': len(in_progress_sessions),
+            'completion_rate': completion_rate,
+            'average_score': avg_score,
+            'average_duration': avg_duration,
+            'assessment_breakdown': assessment_breakdown,
+            'score_distribution': self._calculate_score_distribution(scores),
+            'chart_data': {
+                'trend': trend_data,
+                'breakdown': assessment_breakdown,
+                'funnel': funnel_data,
+            }
+        }
+
+    def _calculate_trend(self, sessions, days):
+        """Calculate trend data for the specified period."""
+        from datetime import timedelta
+        import math
+
+        if not sessions:
+            return []
+
+        # Group sessions by date
+        data_points = min(days, 14)  # Max 14 data points
+        interval = max(1, math.ceil(days / data_points))
+
+        trend = []
+        now = timezone.now()
+
+        for i in range(data_points):
+            end_date = now - timedelta(days=i * interval)
+            start_date = end_date - timedelta(days=interval)
+
+            period_sessions = [
+                s for s in sessions
+                if s.created_at and start_date <= s.created_at < end_date
+            ]
+
+            completed = [s for s in period_sessions if s.status == 'submitted']
+            scores = []
+            for s in completed:
+                score = getattr(s, 'overall_score', None) or getattr(s, 'eligibility_score', None)
+                if score is not None:
+                    scores.append(float(score))
+
+            avg_score = sum(scores) / len(scores) if scores else 0
+
+            trend.insert(0, {
+                'date': start_date.strftime('%b %d'),
+                'count': len(period_sessions),
+                'completed': len(completed),
+                'avg_score': round(avg_score, 1) if avg_score else 0,
+            })
+
+        return trend
+
+    def _calculate_score_distribution(self, scores):
+        """Calculate score distribution in ranges."""
+        if not scores:
+            return []
+
+        ranges = [
+            (0, 40, 'Below 40'),
+            (40, 60, '40-60'),
+            (60, 75, '60-75'),
+            (75, 85, '75-85'),
+            (85, 100, '85-100'),
+        ]
+
+        distribution = []
+        for min_score, max_score, label in ranges:
+            count = len([s for s in scores if min_score <= s < max_score or (s == 100 and max_score == 100)])
+            distribution.append({
+                'label': label,
+                'count': count,
+                'percentage': (count / len(scores) * 100) if scores else 0,
+            })
+
+        return distribution
 
 
 class ClientSettingsView(LoginRequiredMixin, TemplateView):

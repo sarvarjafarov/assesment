@@ -877,4 +877,139 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Global Search Functionality
+    const globalSearch = document.getElementById("global-search");
+    const searchClear = document.getElementById("search-clear");
+    const searchResults = document.getElementById("search-results");
+
+    if (globalSearch && searchResults) {
+        let searchTimeout;
+
+        // Mock search data - in production, this would be an API call
+        const searchableItems = {
+            assessments: [
+                { title: "Digital Marketing Assessment", type: "assessment", url: "/clients/assessments/" },
+                { title: "Product Management Assessment", type: "assessment", url: "/clients/assessments/" },
+                { title: "Behavioral Assessment", type: "assessment", url: "/clients/assessments/" },
+            ],
+            pages: [
+                { title: "Dashboard", type: "page", url: "/clients/dashboard/" },
+                { title: "Assessments", type: "page", url: "/clients/assessments/" },
+                { title: "Projects", type: "page", url: "/clients/dashboard/projects/" },
+                { title: "Analytics", type: "page", url: "/clients/analytics/" },
+                { title: "Settings", type: "page", url: "/clients/settings/" },
+            ]
+        };
+
+        globalSearch.addEventListener("input", (e) => {
+            const query = e.target.value.trim();
+
+            // Show/hide clear button
+            if (query) {
+                searchClear.style.display = "flex";
+            } else {
+                searchClear.style.display = "none";
+                searchResults.style.display = "none";
+                return;
+            }
+
+            // Debounce search
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                performSearch(query);
+            }, 300);
+        });
+
+        searchClear.addEventListener("click", () => {
+            globalSearch.value = "";
+            searchClear.style.display = "none";
+            searchResults.style.display = "none";
+            globalSearch.focus();
+        });
+
+        function performSearch(query) {
+            const lowercaseQuery = query.toLowerCase();
+            const results = [];
+
+            // Search in all categories
+            Object.entries(searchableItems).forEach(([category, items]) => {
+                items.forEach(item => {
+                    if (item.title.toLowerCase().includes(lowercaseQuery)) {
+                        results.push({ ...item, category });
+                    }
+                });
+            });
+
+            displayResults(results, query);
+        }
+
+        function displayResults(results, query) {
+            if (results.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="search-empty">
+                        No results found for "${query}"
+                    </div>
+                `;
+                searchResults.style.display = "block";
+                return;
+            }
+
+            const html = results.map(item => {
+                const icon = getIcon(item.type);
+                const meta = getMetaLabel(item.type);
+
+                return `
+                    <a href="${item.url}" class="search-result-item">
+                        <div class="search-result-icon">
+                            ${icon}
+                        </div>
+                        <div class="search-result-content">
+                            <p class="search-result-title">${item.title}</p>
+                            <p class="search-result-meta">${meta}</p>
+                        </div>
+                    </a>
+                `;
+            }).join("");
+
+            searchResults.innerHTML = html;
+            searchResults.style.display = "block";
+        }
+
+        function getIcon(type) {
+            const icons = {
+                assessment: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`,
+                page: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+                project: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+            };
+            return icons[type] || icons.page;
+        }
+
+        function getMetaLabel(type) {
+            const labels = {
+                assessment: "Assessment",
+                page: "Page",
+                project: "Project",
+                candidate: "Candidate",
+            };
+            return labels[type] || "Result";
+        }
+
+        // Close search results when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!globalSearch.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = "none";
+            }
+        });
+
+        // Close search results on ESC key
+        globalSearch.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                globalSearch.value = "";
+                searchClear.style.display = "none";
+                searchResults.style.display = "none";
+                globalSearch.blur();
+            }
+        });
+    }
 });
