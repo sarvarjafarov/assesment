@@ -122,6 +122,15 @@ class ClientAccount(TimeStampedModel):
     project_quota = models.PositiveIntegerField(default=2)
     invite_quota_reset = models.DateField(null=True, blank=True)
 
+    # Onboarding tracking
+    has_completed_onboarding = models.BooleanField(default=False)
+    onboarding_completed_at = models.DateTimeField(null=True, blank=True)
+    onboarding_step_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Tracks which steps user has completed: {step_1: true, step_2: false, ...}"
+    )
+
     objects = ClientAccountQuerySet.as_manager()
 
     class Meta:
@@ -156,6 +165,19 @@ class ClientAccount(TimeStampedModel):
     @property
     def is_email_verified(self) -> bool:
         return bool(self.email_verified_at)
+
+    def mark_onboarding_complete(self):
+        """Mark onboarding as completed."""
+        self.has_completed_onboarding = True
+        self.onboarding_completed_at = timezone.now()
+        self.save(update_fields=["has_completed_onboarding", "onboarding_completed_at"])
+
+    def reset_onboarding(self):
+        """Allow user to restart onboarding tour."""
+        self.has_completed_onboarding = False
+        self.onboarding_completed_at = None
+        self.onboarding_step_data = {}
+        self.save(update_fields=["has_completed_onboarding", "onboarding_completed_at", "onboarding_step_data"])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

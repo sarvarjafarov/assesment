@@ -161,3 +161,26 @@
 {% block site_footer %}
 {# Hide footer in portal #}
 {% endblock %}
+
+{% if show_onboarding %}
+<script src="{% static 'js/onboarding-tour.js' %}"></script>
+<script src="{% static 'js/onboarding-steps.js' %}"></script>
+<script>
+    // Auto-start tour for first-time users
+    document.addEventListener('DOMContentLoaded', () => {
+        // Small delay to ensure page is fully rendered
+        setTimeout(() => {
+            const userRole = '{{ account.role }}';
+            const steps = typeof getRoleSteps === 'function'
+                ? getRoleSteps(userRole)
+                : onboardingSteps;
+
+            const tour = new OnboardingTour(steps, {
+                showProgress: true,
+                allowSkip: true,
+                showChecklist: true
+            });
+        }, 1000);
+    });
+</script>
+{% endif %}

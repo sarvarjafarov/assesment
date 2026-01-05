@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.forms.models import model_to_dict
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -588,6 +588,11 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             "project_remaining": account.remaining_projects(),
             "upgrade_url": f"{reverse('pages:home')}#pricing",
         }
+
+        # Add onboarding context
+        context['show_onboarding'] = not account.has_completed_onboarding
+        context['onboarding_steps_completed'] = account.onboarding_step_data
+
         return context
 
     def _quick_actions(self, account: ClientAccount) -> list[dict]:
@@ -2056,3 +2061,36 @@ class ClientAssessmentExportView(ClientAssessmentMixin, View):
             return redirect("clients:assessment-manage", assessment_type=kwargs.get("assessment_type"))
         response = ClientAssessmentDetailView.as_view()(request, *args, **kwargs)
         return response
+
+
+class OnboardingCompleteView(LoginRequiredMixin, View):
+    """AJAX endpoint to mark onboarding steps complete."""
+    login_url = reverse_lazy("clients:login")
+
+    def post(self, request, *args, **kwargs):
+        account = request.user.client_account
+        action = request.POST.get('action')  # 'complete_step' or 'complete_tour'
+
+        if action == 'complete_tour':
+            account.mark_onboarding_complete()
+            return JsonResponse({'success': True, 'message': 'Onboarding completed!'})
+
+        elif action == 'complete_step':
+            step_id = request.POST.get('step_id')
+            if step_id:
+                account.onboarding_step_data[step_id] = True
+                account.save(update_fields=['onboarding_step_data'])
+                return JsonResponse({'success': True, 'step': step_id})
+
+        return JsonResponse({'success': False}, status=400)
+
+
+class OnboardingResetView(LoginRequiredMixin, View):
+    """Allow user to restart onboarding."""
+    login_url = reverse_lazy("clients:login")
+
+    def post(self, request, *args, **kwargs):
+        account = request.user.client_account
+        account.reset_onboarding()
+        messages.success(request, "Onboarding tour has been reset. It will start on your next dashboard visit.")
+        return redirect('clients:dashboard')

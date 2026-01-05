@@ -102,6 +102,26 @@
     </section>
     {% endif %}
 
+    {# Onboarding Tour #}
+    <section class="settings-section">
+        <div class="settings-section-header">
+            <h2>Onboarding Tour</h2>
+            <p class="muted">Review the guided tour anytime</p>
+        </div>
+        <div class="portal-card">
+            <div class="settings-row">
+                <div class="setting-info">
+                    <h4>Restart Tour</h4>
+                    <p class="muted">Replay the onboarding walkthrough to refresh your knowledge</p>
+                </div>
+                <form method="post" action="{% url 'clients:onboarding-reset' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline">Restart Tour</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
     {# Security & Access - Coming Soon #}
     <section class="settings-section">
         <div class="settings-section-header">

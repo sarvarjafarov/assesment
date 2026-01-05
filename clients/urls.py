@@ -38,4 +38,6 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
         views.ClientProjectPipelineStageView.as_view(),
         name="project-pipeline-update",
     ),
+    path("onboarding/complete/", views.OnboardingCompleteView.as_view(), name="onboarding-complete"),
+    path("onboarding/reset/", views.OnboardingResetView.as_view(), name="onboarding-reset"),
 ]
