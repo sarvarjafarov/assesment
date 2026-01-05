@@ -3,6 +3,8 @@
     color: #0e1428;
     background-color: #fffdf8;
     line-height: 1.6;
+
+    /* Brand Colors */
     --orange: #ff8a00;
     --orange-soft: #ffc18a;
     --navy: #0e1428;
@@ -10,6 +12,23 @@
     --border: #e6e7ef;
     --bg-muted: #f7f8fb;
     --body-bg: #fffefc;
+
+    /* Portal System Variables - Performance Optimized */
+    --portal-border-color: rgba(14, 20, 40, 0.08);
+    --portal-border-light: rgba(14, 20, 40, 0.06);
+    --portal-border-medium: rgba(14, 20, 40, 0.12);
+    --portal-bg-hover: rgba(14, 20, 40, 0.04);
+    --portal-bg-active: rgba(14, 20, 40, 0.06);
+    --portal-shadow-sm: 0 2px 8px rgba(6, 11, 25, 0.08);
+    --portal-shadow-md: 0 4px 16px rgba(6, 11, 25, 0.12);
+    --portal-shadow-lg: 0 8px 24px rgba(6, 11, 25, 0.15);
+    --portal-radius-sm: 8px;
+    --portal-radius-md: 12px;
+    --portal-radius-lg: 16px;
+    --portal-transition: 0.2s ease;
+    --portal-transition-slow: 0.3s ease;
+    --orange-light: rgba(255, 138, 0, 0.1);
+    --orange-lighter: rgba(255, 138, 0, 0.06);
 }
 
 *,
@@ -8314,7 +8333,7 @@ main {
 .portal-sidebar {
     width: 260px;
     background: linear-gradient(180deg, #ffffff 0%, #fefefe 100%);
-    border-right: 1px solid rgba(14, 20, 40, 0.08);
+    border-right: 1px solid var(--portal-border-color);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -8322,14 +8341,14 @@ main {
     top: 0;
     height: 100vh;
     z-index: 100;
-    transition: transform 0.3s ease;
-    box-shadow: 2px 0 20px rgba(14, 20, 40, 0.04);
+    transition: transform var(--portal-transition-slow);
+    box-shadow: 2px 0 20px var(--portal-bg-hover);
 }
 
 /* Sidebar Header */
 .sidebar-header {
     padding: 1.5rem 1.25rem;
-    border-bottom: 1px solid rgba(14, 20, 40, 0.06);
+    border-bottom: 1px solid var(--portal-border-light);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -8343,7 +8362,7 @@ main {
     color: var(--navy);
     font-weight: 700;
     font-size: 1.25rem;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--portal-transition);
 }
 
 .sidebar-logo:hover {
@@ -8377,14 +8396,16 @@ main {
     height: 2px;
     background: var(--navy);
     border-radius: 2px;
-    transition: all 0.3s ease;
+    transition: all var(--portal-transition-slow);
+    will-change: transform;
 }
 
 /* Sidebar Search */
 .sidebar-search {
     padding: 0 1rem 1rem;
-    border-bottom: 1px solid rgba(14, 20, 40, 0.08);
+    border-bottom: 1px solid var(--portal-border-color);
     position: relative;
+    contain: layout style;
 }
 
 .search-input-wrapper {
@@ -9847,6 +9868,401 @@ main {
     margin: 0;
 }
 
+/* ========================================================================
+   LOADING STATES & SKELETON SCREENS
+   ======================================================================== */
+
+/* Skeleton Base Animation */
+@keyframes skeleton-loading {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(14, 20, 40, 0.06) 0px,
+        rgba(14, 20, 40, 0.12) 40px,
+        rgba(14, 20, 40, 0.06) 80px
+    );
+    background-size: 200px 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 6px;
+    will-change: background-position;
+    contain: paint;
+}
+
+/* Skeleton Text Lines */
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton-text.large {
+    height: 2rem;
+    margin-bottom: 1rem;
+}
+
+.skeleton-text.small {
+    height: 0.75rem;
+}
+
+.skeleton-text.short {
+    width: 60%;
+}
+
+.skeleton-text.medium {
+    width: 80%;
+}
+
+/* Skeleton Metric Card */
+.skeleton-metric-card {
+    padding: 1.5rem;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.skeleton-metric-card .skeleton-text.large {
+    width: 50%;
+}
+
+.skeleton-metric-card .skeleton-text:last-child {
+    margin-bottom: 0;
+}
+
+/* Skeleton Assessment Card */
+.skeleton-assessment-card {
+    padding: 1.5rem;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.skeleton-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+}
+
+.skeleton-button {
+    height: 42px;
+    border-radius: 21px;
+}
+
+/* Skeleton Chart Container */
+.skeleton-chart {
+    height: 300px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-chart::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(14, 20, 40, 0.1);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Skeleton Table Rows */
+.skeleton-table-row {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(14, 20, 40, 0.06);
+}
+
+.skeleton-table-row .skeleton {
+    flex: 1;
+    height: 1rem;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(14, 20, 40, 0.1);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    will-change: transform;
+    contain: strict;
+}
+
+.loading-spinner.large {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+}
+
+.loading-spinner.small {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: inherit;
+}
+
+.loading-overlay .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+}
+
+/* Chart Loading State */
+.chart-loading {
+    position: relative;
+    min-height: 300px;
+}
+
+.chart-loading canvas {
+    opacity: 0;
+}
+
+.chart-loading .loading-overlay {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.chart-loaded .loading-overlay {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chart-loaded canvas {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* Search Loading State */
+.search-results.loading {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Skeleton Grid Layouts */
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.skeleton-grid.three-up {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.skeleton-grid.two-up {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* Hide content while loading */
+.is-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.is-loaded {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* Notification Loading */
+.notification-list.loading {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fade-in animation for loaded content */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+    will-change: opacity, transform;
+}
+
+.fade-in:not(:hover) {
+    will-change: auto;
+}
+
+/* Skeleton Activity Item */
+.skeleton-activity-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(14, 20, 40, 0.06);
+}
+
+.skeleton-activity-item .skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.skeleton-activity-item .skeleton-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Pulse animation for important loading states */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ========================================================================
+   SMOOTH PAGE TRANSITIONS - Phase 4
+   ======================================================================== */
+
+/* Page Load Animation */
+@keyframes pageLoad {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.portal-shell {
+    animation: pageLoad 0.5s ease-out;
+}
+
+/* Stagger animation for cards */
+.portal-card,
+.metric-card,
+.assessment-card,
+.quick-link-card {
+    animation: fadeIn 0.5s ease-out backwards;
+}
+
+.portal-card:nth-child(1),
+.metric-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.portal-card:nth-child(2),
+.metric-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.portal-card:nth-child(3),
+.metric-card:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.assessment-card:nth-child(1) { animation-delay: 0.05s; }
+.assessment-card:nth-child(2) { animation-delay: 0.1s; }
+.assessment-card:nth-child(3) { animation-delay: 0.15s; }
+.assessment-card:nth-child(4) { animation-delay: 0.2s; }
+.assessment-card:nth-child(5) { animation-delay: 0.25s; }
+.assessment-card:nth-child(6) { animation-delay: 0.3s; }
+
+/* Smooth hover transitions */
+.nav-item,
+.quick-link-card,
+.assessment-card,
+.portal-card {
+    transition: all var(--portal-transition);
+}
+
+/* View transitions for modern browsers */
+@supports (view-transition-name: auto) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 0.3s;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .portal-shell,
+    .portal-card,
+    .metric-card,
+    .assessment-card,
+    .quick-link-card {
+        animation: none !important;
+    }
+}
+
 /* Support Options */
 .support-options {
     display: grid;
@@ -10151,5 +10567,15 @@ main {
     .support-options {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+
+    /* Skeleton screens mobile adjustments */
+    .skeleton-grid.three-up,
+    .skeleton-grid.two-up {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-chart {
+        height: 250px;
     }
 }

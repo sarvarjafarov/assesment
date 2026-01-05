@@ -914,6 +914,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Show loading state
+            searchResults.innerHTML = `
+                <div class="search-results loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            `;
+            searchResults.style.display = "block";
+
             // Debounce search
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
@@ -960,7 +968,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const meta = getMetaLabel(item.type);
 
                 return `
-                    <a href="${item.url}" class="search-result-item">
+                    <a href="${item.url}" class="search-result-item fade-in">
                         <div class="search-result-icon">
                             ${icon}
                         </div>
@@ -974,6 +982,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             searchResults.innerHTML = html;
             searchResults.style.display = "block";
+            searchResults.classList.remove('loading');
         }
 
         function getIcon(type) {
@@ -1064,48 +1073,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render notifications
         function renderNotifications() {
-            if (notifications.length === 0) {
-                notificationList.innerHTML = `
-                    <div class="notification-empty">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 0.5rem; color: var(--navy);">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                        <p>No new notifications</p>
+            // Show loading state
+            notificationList.classList.add('loading');
+            notificationList.innerHTML = `
+                <div class="loading-spinner"></div>
+            `;
+
+            // Simulate brief loading (in production, this would be an actual API call)
+            setTimeout(() => {
+                notificationList.classList.remove('loading');
+
+                if (notifications.length === 0) {
+                    notificationList.innerHTML = `
+                        <div class="notification-empty fade-in">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 0.5rem; color: var(--navy);">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <p>No new notifications</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const html = notifications.map(notif => `
+                    <div class="notification-item fade-in ${notif.unread ? 'unread' : ''}" data-id="${notif.id}">
+                        <div class="notification-content">
+                            <p class="notification-title">${notif.title}</p>
+                            <p class="notification-message">${notif.message}</p>
+                            <p class="notification-time">${notif.time}</p>
+                        </div>
                     </div>
-                `;
-                return;
-            }
+                `).join("");
 
-            const html = notifications.map(notif => `
-                <div class="notification-item ${notif.unread ? 'unread' : ''}" data-id="${notif.id}">
-                    <div class="notification-content">
-                        <p class="notification-title">${notif.title}</p>
-                        <p class="notification-message">${notif.message}</p>
-                        <p class="notification-time">${notif.time}</p>
-                    </div>
-                </div>
-            `).join("");
+                notificationList.innerHTML = html;
 
-            notificationList.innerHTML = html;
-
-            // Add click handlers to notification items
-            document.querySelectorAll(".notification-item").forEach(item => {
-                item.addEventListener("click", () => {
-                    const id = parseInt(item.dataset.id);
-                    const notif = notifications.find(n => n.id === id);
-                    if (notif) {
-                        notif.unread = false;
-                        updateBadgeCount();
-                        renderNotifications();
-                        if (notif.link) {
-                            window.location.href = notif.link;
+                // Add click handlers to notification items
+                document.querySelectorAll(".notification-item").forEach(item => {
+                    item.addEventListener("click", () => {
+                        const id = parseInt(item.dataset.id);
+                        const notif = notifications.find(n => n.id === id);
+                        if (notif) {
+                            notif.unread = false;
+                            updateBadgeCount();
+                            renderNotifications();
+                            if (notif.link) {
+                                window.location.href = notif.link;
+                            }
                         }
-                    }
+                    });
                 });
-            });
 
-            updateBadgeCount();
+                updateBadgeCount();
+            }, 200); // Brief delay to show loading state
         }
 
         // Toggle dropdown
@@ -1136,5 +1156,154 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize badge count
         updateBadgeCount();
+    }
+
+    // ==================================================================
+    // KEYBOARD SHORTCUTS - Phase 4
+    // ==================================================================
+
+    // Global keyboard shortcuts handler
+    document.addEventListener('keydown', (e) => {
+        // Cmd/Ctrl + K: Focus search
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            const globalSearch = document.getElementById('global-search');
+            if (globalSearch) {
+                globalSearch.focus();
+                globalSearch.select();
+            }
+        }
+
+        // Cmd/Ctrl + /: Toggle sidebar on mobile
+        if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+            e.preventDefault();
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            if (sidebarToggle && window.innerWidth <= 1024) {
+                sidebarToggle.click();
+            }
+        }
+
+        // Cmd/Ctrl + B: Open notifications
+        if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+            e.preventDefault();
+            const notificationToggle = document.getElementById('notification-toggle');
+            if (notificationToggle) {
+                notificationToggle.click();
+            }
+        }
+
+        // Cmd/Ctrl + 1-5: Navigate to pages
+        if ((e.metaKey || e.ctrlKey) && e.key >= '1' && e.key <= '5') {
+            e.preventDefault();
+            const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+            const index = parseInt(e.key) - 1;
+            if (navItems[index]) {
+                window.location.href = navItems[index].href;
+            }
+        }
+
+        // Escape: Close all overlays
+        if (e.key === 'Escape') {
+            // Close search results
+            const searchResults = document.getElementById('search-results');
+            if (searchResults && searchResults.style.display === 'block') {
+                searchResults.style.display = 'none';
+                const globalSearch = document.getElementById('global-search');
+                if (globalSearch) {
+                    globalSearch.value = '';
+                    const searchClear = document.getElementById('search-clear');
+                    if (searchClear) searchClear.style.display = 'none';
+                }
+            }
+
+            // Close notification dropdown
+            const notificationDropdown = document.getElementById('notification-dropdown');
+            if (notificationDropdown && notificationDropdown.style.display === 'block') {
+                notificationDropdown.style.display = 'none';
+            }
+        }
+    });
+
+    // Arrow key navigation in search results
+    // Reuse globalSearch and searchResults from above
+    if (globalSearch && searchResults) {
+        let selectedIndex = -1;
+
+        globalSearch.addEventListener('keydown', (e) => {
+            if (searchResults.style.display !== 'block') return;
+
+            const items = searchResults.querySelectorAll('.search-result-item');
+            if (items.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                updateSelectedItem(items, selectedIndex);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, -1);
+                updateSelectedItem(items, selectedIndex);
+            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            }
+        });
+
+        function updateSelectedItem(items, index) {
+            items.forEach((item, i) => {
+                if (i === index) {
+                    item.style.background = 'var(--portal-bg-active)';
+                    item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                } else {
+                    item.style.background = '';
+                }
+            });
+        }
+
+        // Reset selection when closing search
+        globalSearch.addEventListener('input', () => {
+            selectedIndex = -1;
+        });
+    }
+
+    // Show keyboard shortcuts hint on first visit
+    const hasSeenShortcutsHint = localStorage.getItem('hasSeenKeyboardShortcuts');
+    if (!hasSeenShortcutsHint && globalSearch) {
+        setTimeout(() => {
+            const hint = document.createElement('div');
+            hint.style.cssText = `
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                background: var(--navy);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: var(--portal-radius-md);
+                box-shadow: var(--portal-shadow-lg);
+                font-size: 0.9rem;
+                z-index: 1000;
+                animation: fadeIn 0.4s ease-out;
+            `;
+            hint.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div>
+                        <strong>Tip:</strong> Press <kbd style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace;">Cmd+K</kbd> to quickly search
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove(); localStorage.setItem('hasSeenKeyboardShortcuts', 'true');" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.25rem; padding: 0; line-height: 1;">&times;</button>
+                </div>
+            `;
+            document.body.appendChild(hint);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (hint.parentElement) {
+                    hint.style.animation = 'fadeOut 0.4s ease-out';
+                    setTimeout(() => {
+                        hint.remove();
+                        localStorage.setItem('hasSeenKeyboardShortcuts', 'true');
+                    }, 400);
+                }
+            }, 5000);
+        }, 2000);
     }
 });

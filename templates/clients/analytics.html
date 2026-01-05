@@ -58,7 +58,10 @@
                 <h3>Activity Trend</h3>
                 <p class="muted">Invites and completions over time</p>
             </div>
-            <div class="chart-container">
+            <div class="chart-container chart-loading" id="trendChartContainer">
+                <div class="loading-overlay">
+                    <div class="loading-spinner large"></div>
+                </div>
                 <canvas id="trendChart"></canvas>
             </div>
         </article>
@@ -69,7 +72,10 @@
                 <h3>Assessment Breakdown</h3>
                 <p class="muted">Completion rates by assessment type</p>
             </div>
-            <div class="chart-container">
+            <div class="chart-container chart-loading" id="breakdownChartContainer">
+                <div class="loading-overlay">
+                    <div class="loading-spinner large"></div>
+                </div>
                 <canvas id="breakdownChart"></canvas>
             </div>
         </article>
@@ -212,6 +218,8 @@
 
     // Trend Chart
     const trendCtx = document.getElementById('trendChart');
+    const trendContainer = document.getElementById('trendChartContainer');
+
     if (trendCtx && chartData.trend.length > 0) {
         new Chart(trendCtx, {
             type: 'line',
@@ -258,12 +266,26 @@
                         },
                     },
                 },
+                animation: {
+                    onComplete: function() {
+                        // Remove loading state once chart is rendered
+                        if (trendContainer) {
+                            trendContainer.classList.remove('chart-loading');
+                            trendContainer.classList.add('chart-loaded');
+                        }
+                    }
+                }
             },
         });
+    } else if (trendContainer) {
+        // Remove loading if no data
+        trendContainer.classList.remove('chart-loading');
     }
 
     // Assessment Breakdown Chart
     const breakdownCtx = document.getElementById('breakdownChart');
+    const breakdownContainer = document.getElementById('breakdownChartContainer');
+
     if (breakdownCtx && chartData.breakdown.length > 0) {
         new Chart(breakdownCtx, {
             type: 'bar',
@@ -306,8 +328,20 @@
                         },
                     },
                 },
+                animation: {
+                    onComplete: function() {
+                        // Remove loading state once chart is rendered
+                        if (breakdownContainer) {
+                            breakdownContainer.classList.remove('chart-loading');
+                            breakdownContainer.classList.add('chart-loaded');
+                        }
+                    }
+                }
             },
         });
+    } else if (breakdownContainer) {
+        // Remove loading if no data
+        breakdownContainer.classList.remove('chart-loading');
     }
 })();
 </script>
