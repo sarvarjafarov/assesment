@@ -4,165 +4,684 @@
 {% block meta_description %}Create candidate invites, bulk upload, and monitor {{ assessment_label|lower }} sessions in your Evalon console.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <section class="portal-hero compact">
+    <header class="page-header-with-actions">
         <div>
-            <p class="eyebrow">{{ assessment_label }}</p>
-            <h1>Manage invites</h1>
-            <p class="muted">Launch new sessions and monitor your candidates.</p>
+            <div class="breadcrumb-nav">
+                <a href="{% url 'clients:assessments' %}" class="breadcrumb-link">Assessments</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-current">{{ assessment_label }}</span>
+            </div>
+            <h1>Manage Invites</h1>
+            <p class="muted">Launch new sessions and monitor your candidates</p>
         </div>
-        <div class="portal-actions">
-            <a class="btn btn-outline small" href="{% url 'clients:dashboard' %}">Back to dashboard</a>
-        </div>
-    </section>
+    </header>
 
-    <section class="panel portal-panel invite-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Launch new invite</p>
-                <h2>Create candidate link</h2>
+    <div class="portal-card-grid">
+        {# Create Invite Card #}
+        <section class="portal-card invite-card">
+            <div class="section-header">
+                <h3>Create Candidate Link</h3>
+                <p class="muted">Generate a unique invitation link</p>
             </div>
-        </header>
-        {% if not has_projects %}
-        <div class="alert-card">
-            <p>You need at least one project before inviting candidates.</p>
-            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Create project</a>
-        </div>
-        {% endif %}
-        <form method="post" class="form-stack">
-            {% csrf_token %}
-            {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
-            {% for field in form %}
-            <div class="form-field">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-                {% for error in field.errors %}
-                <span class="field-error">{{ error }}</span>
+
+            {% if not has_projects %}
+            <div class="alert-box warning">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                    <p><strong>No projects found</strong></p>
+                    <p>You need at least one project before inviting candidates.</p>
+                    <a class="btn btn-outline" href="{% url 'clients:project-list' %}">Create Project</a>
+                </div>
+            </div>
+            {% else %}
+            <form method="post" class="invite-form">
+                {% csrf_token %}
+                {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
+                {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}<small class="form-help">{{ field.help_text }}</small>{% endif %}
+                    {% for error in field.errors %}
+                    <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
                 {% endfor %}
+                <button class="btn btn-primary btn-block" type="submit">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    Generate Invite
+                </button>
+            </form>
+            {% endif %}
+        </section>
+
+        {# Bulk Upload Card #}
+        <section class="portal-card bulk-card">
+            <div class="section-header">
+                <h3>Bulk Upload</h3>
+                <p class="muted">Upload multiple invites via CSV</p>
             </div>
-            {% endfor %}
-            <button class="btn btn-pill" type="submit">Generate invite</button>
-        </form>
-        <div class="divider"></div>
-        <div class="bulk-upload">
-            <p class="label">Bulk upload</p>
-            <p class="muted">Upload a CSV with headers (candidate_id, duration_minutes, send_at). send_at expects YYYY-MM-DD HH:MM.</p>
-            <form method="post" enctype="multipart/form-data">
+
+            <div class="info-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <p>CSV format: <code>candidate_id, duration_minutes, send_at</code></p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="bulk-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="bulk_upload">
                 {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
-                <div class="form-field">
+
+                <div class="form-group">
                     {{ bulk_form.project.label_tag }}
                     {{ bulk_form.project }}
                     {% for error in bulk_form.project.errors %}
-                    <span class="field-error">{{ error }}</span>
+                    <span class="form-error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <div class="form-field">
+
+                <div class="form-group">
                     {{ bulk_form.csv_file.label_tag }}
                     {{ bulk_form.csv_file }}
                     {% for error in bulk_form.csv_file.errors %}
-                    <span class="field-error">{{ error }}</span>
+                    <span class="form-error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <button class="btn btn-outline small" type="submit">Upload CSV</button>
-            </form>
-        </div>
-    </section>
 
-    <section class="panel portal-panel">
-        <header>
+                <button class="btn btn-outline btn-block" type="submit">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload CSV
+                </button>
+            </form>
+        </section>
+    </div>
+
+    <section class="portal-card sessions-card">
+        <div class="section-header">
             <div>
-                <p class="eyebrow">Active sessions</p>
-                <h2>Track candidates</h2>
+                <h3>Active Sessions</h3>
+                <p class="muted">Track candidate progress</p>
             </div>
-        </header>
-        <form method="get" class="project-filter">
-            <label>
-                <span>Project</span>
-                <select name="project" onchange="this.form.submit()">
+            <form method="get" class="filter-form">
+                <select name="project" onchange="this.form.submit()" class="select-input">
                     <option value="">All projects</option>
                     {% for project in projects %}
                     <option value="{{ project.uuid }}" {% if selected_project and selected_project.uuid == project.uuid %}selected{% endif %}>{{ project.title }}</option>
                     {% endfor %}
                 </select>
-            </label>
-        </form>
+            </form>
+        </div>
+
         {% if sessions %}
-        <div class="table">
-            <div class="table-row table-head">
-                <span>Candidate</span>
-                <span>Project</span>
-                <span>Status</span>
-                <span>Timing</span>
-                <span>Score</span>
-                <span>Notes</span>
-                <span>Updated</span>
-                <span>Actions</span>
-            </div>
-            {% for row in sessions %}
-            <div class="table-row">
-                <span>{{ row.candidate }}</span>
-                <span>
-                    {% if row.project_url %}
-                    <a href="{{ row.project_url }}">{{ row.project_title }}</a>
-                    {% else %}
-                    {{ row.project_title }}
-                    {% endif %}
-                </span>
-                <span>{{ row.status }}</span>
-                <span>
-                    {% if row.scheduled_for %}
-                    Scheduled {{ row.scheduled_for|naturaltime }}
-                    {% elif row.last_reminder_at %}
-                    Reminder sent {{ row.last_reminder_at|naturaltime }} ({{ row.reminder_count }})
-                    {% else %}
-                    —
-                    {% endif %}
-                </span>
-                <span>{% if row.score %}{{ row.score }}{% else %}—{% endif %}</span>
-                <span>
-                    {% if row.needs_review %}
-                    <span class="pill warning">Needs review</span>
-                    {% elif row.notes %}
-                    <span class="muted">{{ row.notes }} note{{ row.notes|pluralize }}</span>
-                    {% else %}
-                    <span class="muted">—</span>
-                    {% endif %}
-                    {% if row.decision_summary %}
-                    <span class="pill subtle decision-pill">{{ row.decision_summary }}</span>
-                    {% endif %}
-                </span>
-                <span>{% if row.submitted_at %}{{ row.submitted_at|naturaltime }}{% else %}—{% endif %}</span>
-                <span class="table-actions">
-                    <a class="pill subtle" href="{{ row.share_link }}" target="_blank">Share</a>
-                    {% if row.detail_url %}
-                    <a class="pill" href="{{ row.detail_url }}">Report</a>
-                    {% endif %}
-                    {% if row.scheduled_for %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="launch_now">
-                        <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
-                        {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
-                        <button class="pill subtle" type="submit">Launch now</button>
-                    </form>
-                    {% elif row.status_code == "in_progress" %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="send_reminder">
-                        <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
-                        {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
-                        <button class="pill subtle" type="submit">Send reminder</button>
-                    </form>
-                    {% endif %}
-                </span>
-            </div>
-            {% endfor %}
+        <div class="sessions-table-wrapper">
+            <table class="sessions-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Project</th>
+                        <th>Status</th>
+                        <th>Timing</th>
+                        <th>Score</th>
+                        <th>Notes</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in sessions %}
+                    <tr>
+                        <td>
+                            <div class="candidate-cell">
+                                <span class="candidate-name">{{ row.candidate }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if row.project_url %}
+                            <a href="{{ row.project_url }}" class="project-link">{{ row.project_title }}</a>
+                            {% else %}
+                            <span class="project-name">{{ row.project_title }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ row.status_code }}">{{ row.status }}</span>
+                        </td>
+                        <td class="timing-cell">
+                            {% if row.scheduled_for %}
+                            <span class="timing-text">Scheduled {{ row.scheduled_for|naturaltime }}</span>
+                            {% elif row.last_reminder_at %}
+                            <span class="timing-text">Reminder sent {{ row.last_reminder_at|naturaltime }} ({{ row.reminder_count }})</span>
+                            {% else %}
+                            <span class="muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.score %}
+                            <span class="score-badge">{{ row.score }}</span>
+                            {% else %}
+                            <span class="muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="notes-cell">
+                                {% if row.needs_review %}
+                                <span class="badge badge-warning">Needs review</span>
+                                {% elif row.notes %}
+                                <span class="notes-text">{{ row.notes }} note{{ row.notes|pluralize }}</span>
+                                {% else %}
+                                <span class="muted">—</span>
+                                {% endif %}
+                                {% if row.decision_summary %}
+                                <span class="badge badge-info">{{ row.decision_summary }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="updated-cell">
+                            {% if row.submitted_at %}
+                            {{ row.submitted_at|naturaltime }}
+                            {% else %}
+                            <span class="muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a class="btn-action" href="{{ row.share_link }}" target="_blank" title="Share link">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="18" cy="5" r="3"></circle>
+                                        <circle cx="6" cy="12" r="3"></circle>
+                                        <circle cx="18" cy="19" r="3"></circle>
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                    </svg>
+                                </a>
+                                {% if row.detail_url %}
+                                <a class="btn-action primary" href="{{ row.detail_url }}" title="View report">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                                {% if row.scheduled_for %}
+                                <form method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="launch_now">
+                                    <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
+                                    {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
+                                    <button class="btn-action success" type="submit" title="Launch now">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                        </svg>
+                                    </button>
+                                </form>
+                                {% elif row.status_code == "in_progress" %}
+                                <form method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="send_reminder">
+                                    <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
+                                    {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
+                                    <button class="btn-action" type="submit" title="Send reminder">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
         {% else %}
-        <p class="empty-state">No invites yet. Use the form above to launch your first candidate experience.</p>
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; color: var(--orange);">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            <h4>No invites yet</h4>
+            <p class="muted">Use the form above to launch your first candidate experience</p>
+        </div>
         {% endif %}
     </section>
 </div>
+
+<style>
+/* ========================================================================
+   ASSESSMENT MANAGE PAGE - CLEAN DESIGN
+   ======================================================================== */
+
+/* Card Grid Layout */
+.portal-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Section Headers */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.25rem;
+}
+
+.section-header .muted {
+    margin: 0;
+}
+
+/* Forms */
+.invite-form,
+.bulk-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--navy);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="datetime-local"],
+.form-group select,
+.form-group input[type="file"] {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: var(--navy);
+    background: #fff;
+    transition: all var(--portal-transition);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.form-help {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.form-error {
+    font-size: 0.85rem;
+    color: #ef4444;
+}
+
+/* Alert and Info Boxes */
+.alert-box {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert-box.warning {
+    background: rgba(245, 158, 11, 0.05);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.alert-box svg {
+    flex-shrink: 0;
+    color: #f59e0b;
+}
+
+.alert-box p {
+    margin: 0 0 0.5rem;
+}
+
+.alert-box .btn {
+    margin-top: 0.5rem;
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.info-box svg {
+    flex-shrink: 0;
+    color: #3b82f6;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-body);
+}
+
+.info-box code {
+    background: rgba(14, 20, 40, 0.06);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+/* Filter Form */
+.filter-form {
+    display: flex;
+    align-items: center;
+}
+
+.select-input {
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--navy);
+    background: #fff;
+    cursor: pointer;
+    transition: all var(--portal-transition);
+}
+
+.select-input:hover {
+    background: var(--portal-bg-hover);
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+/* Sessions Table */
+.sessions-table-wrapper {
+    overflow-x: auto;
+    margin: -1.5rem;
+    margin-top: 0;
+}
+
+.sessions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sessions-table thead {
+    background: var(--portal-bg);
+    border-bottom: 2px solid var(--portal-border-color);
+}
+
+.sessions-table th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sessions-table td {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--portal-border-color);
+    font-size: 0.9rem;
+    color: var(--text-body);
+}
+
+.sessions-table tbody tr {
+    transition: background var(--portal-transition);
+}
+
+.sessions-table tbody tr:hover {
+    background: var(--portal-bg-hover);
+}
+
+/* Table Cells */
+.candidate-name {
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.project-link {
+    color: var(--orange);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity var(--portal-transition);
+}
+
+.project-link:hover {
+    opacity: 0.7;
+}
+
+.project-name {
+    color: var(--text-body);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-badge.status-submitted {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.status-badge.status-in_progress {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+}
+
+.status-badge.status-scheduled {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.timing-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    padding: 0.375rem 0.625rem;
+    background: rgba(255, 138, 0, 0.12);
+    color: var(--orange);
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 6px;
+}
+
+.notes-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.notes-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-warning {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+}
+
+.updated-cell {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--portal-transition);
+}
+
+.btn-action:hover {
+    background: var(--portal-bg-hover);
+    color: var(--navy);
+    transform: translateY(-1px);
+}
+
+.btn-action.primary {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #fff;
+}
+
+.btn-action.primary:hover {
+    background: #e67700;
+    color: #fff;
+}
+
+.btn-action.success {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+}
+
+.btn-action.success:hover {
+    background: #059669;
+    color: #fff;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.empty-state svg {
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.5rem;
+}
+
+.empty-state .muted {
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .portal-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sessions-table {
+        font-size: 0.85rem;
+    }
+
+    .sessions-table th,
+    .sessions-table td {
+        padding: 0.875rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .filter-form {
+        width: 100%;
+    }
+
+    .select-input {
+        width: 100%;
+    }
+
+    .sessions-table-wrapper {
+        margin: -1rem;
+        margin-top: 0;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+
 {% endblock %}
