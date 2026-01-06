@@ -40,4 +40,5 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
     ),
     path("onboarding/complete/", views.OnboardingCompleteView.as_view(), name="onboarding-complete"),
     path("onboarding/reset/", views.OnboardingResetView.as_view(), name="onboarding-reset"),
+    path("billing/", views.ClientBillingView.as_view(), name="billing"),
 ]

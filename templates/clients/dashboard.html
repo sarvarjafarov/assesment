@@ -139,6 +139,18 @@
                     <p class="muted">Download activity CSV</p>
                 </div>
             </a>
+            {% if is_manager %}
+            <a href="{% url 'clients:billing' %}" class="quick-link-card">
+                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                <div>
+                    <h4>Billing & Plans</h4>
+                    <p class="muted">Manage your {{ plan_overview.name }} plan</p>
+                </div>
+            </a>
+            {% endif %}
         </div>
     </section>
 

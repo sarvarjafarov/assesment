@@ -2096,3 +2096,127 @@ class OnboardingResetView(LoginRequiredMixin, View):
         account.reset_onboarding()
         messages.success(request, "Onboarding tour has been reset. It will start on your next dashboard visit.")
         return redirect('clients:dashboard')
+
+
+class ClientBillingView(LoginRequiredMixin, TemplateView):
+    """Display billing and plan management for client accounts."""
+    login_url = reverse_lazy("clients:login")
+    template_name = "clients/billing.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        account = self.request.user.client_account
+        role = account.role
+
+        # Role labels
+        context['is_manager'] = role == "manager"
+        context['role_label'] = dict(ClientAccount.ROLE_CHOICES).get(role, role.title())
+
+        # Get current plan details
+        plan_details = account.plan_details()
+
+        # Calculate usage
+        invite_limit = account.invite_limit()
+        invites_used = account.invites_used()
+        invite_percent = None
+        if invite_limit and invite_limit > 0:
+            invite_percent = min(100, round((invites_used / invite_limit) * 100))
+
+        project_limit = account.project_limit()
+        project_used = account.active_project_count()
+        project_percent = None
+        if project_limit and project_limit > 0:
+            project_percent = min(100, round((project_used / project_limit) * 100))
+
+        # Current plan info
+        context['current_plan'] = {
+            'name': plan_details.get('label', account.plan_slug.title()),
+            'slug': account.plan_slug,
+            'description': plan_details.get('description', ''),
+            'price': plan_details.get('price', 'Free'),
+            'billing_cycle': plan_details.get('billing_cycle', 'Forever'),
+        }
+
+        # Usage stats
+        context['usage'] = {
+            'invites': {
+                'used': invites_used,
+                'limit': invite_limit if invite_limit else 'Unlimited',
+                'remaining': account.invites_remaining() if invite_limit else None,
+                'percent': invite_percent,
+            },
+            'projects': {
+                'used': project_used,
+                'limit': project_limit if project_limit else 'Unlimited',
+                'remaining': account.remaining_projects() if project_limit else None,
+                'percent': project_percent,
+            }
+        }
+
+        # Build available plans from the pricing tiers (matching homepage structure)
+        available_plans = [
+            {
+                'slug': 'starter',
+                'name': 'Starter',
+                'price': '$0',
+                'billing_cycle': 'Forever',
+                'description': 'Try Evalon with two active roles and a small pool of candidates.',
+                'invite_quota': 20,
+                'project_quota': 2,
+                'features': [
+                    'Marketing, PM, and behavioral banks',
+                    'Basic reports & CSV export',
+                    'Email support',
+                ],
+            },
+            {
+                'slug': 'pro',
+                'name': 'Pro',
+                'price': '$59',
+                'billing_cycle': 'per month',
+                'description': 'Run multiple searches with richer reporting and simple branding.',
+                'invite_quota': 250,
+                'project_quota': 10,
+                'features': [
+                    'Pipeline kanban & top-candidate spotlights',
+                    'Custom branding + shareable reports',
+                    'Priority chat + email support',
+                ],
+            },
+            {
+                'slug': 'enterprise',
+                'name': 'Enterprise',
+                'price': 'Custom',
+                'billing_cycle': 'contact us',
+                'description': 'Unlimited projects and invites, tailor-made assessments, SSO, and hands-on rollout.',
+                'invite_quota': None,
+                'project_quota': None,
+                'features': [
+                    'Dedicated CSM + success playbooks',
+                    'Custom assessments & security reviews',
+                    'SLA, SSO/SAML, and SOC 2 readiness',
+                ],
+            },
+        ]
+
+        # Add upgrade/downgrade indicators
+        plan_order = {'starter': 1, 'pro': 2, 'enterprise': 3}
+        current_order = plan_order.get(account.plan_slug, 0)
+
+        for plan in available_plans:
+            plan_order_num = plan_order.get(plan['slug'], 0)
+
+            if plan['slug'] == account.plan_slug:
+                plan['action'] = 'current'
+                plan['is_current'] = True
+            elif plan_order_num > current_order:
+                plan['action'] = 'upgrade'
+                plan['is_current'] = False
+            else:
+                plan['action'] = 'downgrade'
+                plan['is_current'] = False
+
+        context['available_plans'] = available_plans
+        context['contact_email'] = 'support@evalon.app'
+
+        return context
