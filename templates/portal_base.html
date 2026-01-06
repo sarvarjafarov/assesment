@@ -87,7 +87,6 @@
                 <span class="nav-label">Analytics</span>
             </a>
 
-            {% if is_manager %}
             <a href="{% url 'clients:billing' %}" class="nav-item {% if request.resolver_match.url_name == 'billing' %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="2" y="5" width="20" height="14" rx="2"></rect>
@@ -95,9 +94,7 @@
                 </svg>
                 <span class="nav-label">Billing</span>
             </a>
-            {% endif %}
 
-            {% if is_manager or can_manage_branding %}
             <a href="{% url 'clients:settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
@@ -105,7 +102,6 @@
                 </svg>
                 <span class="nav-label">Settings</span>
             </a>
-            {% endif %}
         </nav>
 
         <div class="sidebar-footer">
