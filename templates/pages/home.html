@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}{{ marketing_settings.meta_title|default:"Evalon · Workforce OS" }}{% endblock %}
+{% block title %}{{ marketing_settings.meta_title|default:"Evalon · Structured Hiring Assessments" }}{% endblock %}
 {% block content %}
 <div class="page-shell">
     <header class="site-header">
@@ -19,193 +19,173 @@
             </div>
             <div class="nav-menu" id="siteNavMenu" data-nav-menu>
                 <ul class="nav-links">
-                    <li><a href="#suite">For talent teams</a></li>
-                    <li><a href="#journey">For candidates</a></li>
-                    <li><a href="#resources">Resources</a></li>
+                    <li><a href="#how-it-works">How it works</a></li>
+                    <li><a href="#assessments">Assessments</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
                     <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
                 </ul>
             <div class="nav-actions">
                 <a class="btn btn-outline small" href="{% url 'clients:login' %}">Login</a>
-                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Get Started</a>
+                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Start Free Trial</a>
             </div>
             </div>
         </nav>
     </header>
 
     <main>
-        <section class="hero" data-persona="talent">
-            <div class="hero-inner">
-                <div class="hero-badge">{{ hero_content.badge|safe }}</div>
-                <p class="hero-tagline">All your assessments, one seamless workspace.</p>
-            <div class="hero-persona-toggle">
-                    <button class="persona-btn is-active"
-                        data-persona="talent"
-                        data-subtitle="Evalon calibrates every assignment for B2B hiring—scope roles, benchmark real work, and share a defensible report with stakeholders in under an hour."
-                        data-primary="Get started"
-                        data-primary-link="{% url 'clients:signup' %}"
-                        data-secondary="See reporting tour"
-                        data-secondary-link="#suite">
-                        For talent teams
-                    </button>
-                    <button class="persona-btn"
-                        data-persona="candidate"
-                        data-subtitle="Candidates get a guided, mobile-ready workspace with practice prompts, pause/resume, and instant status updates."
-                        data-primary="Preview candidate flow"
-                        data-primary-link="#journey"
-                        data-secondary="Explore practice mode"
-                        data-secondary-link="#resources">
-                        For candidates
-                    </button>
-                </div>
-                <p class="hero-subtitle" id="heroSubtitle">
-                    {{ hero_content.subtitle }}
-                </p>
+        {# HERO SECTION - Simplified #}
+        <section class="hero-v2 reveal">
+            <div class="hero-v2-inner">
+                <div class="hero-badge">{{ hero_content.badge }}</div>
+                <h1 class="hero-title">{{ hero_content.title }}</h1>
+                <p class="hero-subtitle">{{ hero_content.subtitle }}</p>
                 <div class="hero-cta">
-                    <a class="btn btn-pill" id="heroPrimaryCta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
-                    <a class="btn btn-outline" id="heroSecondaryCta" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
+                    <a class="btn btn-pill" href="{{ hero_content.primary_url }}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
+                    <a class="btn btn-outline" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
+                </div>
+                <div class="hero-trust">
+                    <p class="muted small">Trusted by hiring teams at</p>
+                    <div class="trust-logos">
+                        <span>Stripe</span>
+                        <span>Lattice</span>
+                        <span>Notion</span>
+                        <span>Atlassian</span>
+                    </div>
                 </div>
             </div>
             <div class="hero-grid"></div>
             <div class="hero-orb orb-one"></div>
             <div class="hero-orb orb-two"></div>
         </section>
-        <section class="trusted-strip reveal">
-            <div class="section-shell">
-                <p class="eyebrow">Trusted by modern hiring teams</p>
-                <div class="logo-row">
-                    <span>Stripe</span>
-                    <span>Bench</span>
-                    <span>Northwind</span>
-                    <span>GoRecruit</span>
-                </div>
-                <blockquote>“Evalon helped us cut marketing and product hiring time by 37% while keeping every candidate informed.” <cite>— VP Talent, Series B SaaS</cite></blockquote>
-            </div>
-        </section>
 
-        <section class="live-feed reveal">
-            <div class="section-shell live-feed-shell">
-                <div class="feed-label">Live on Evalon</div>
-                <div class="feed-slot" id="liveFeedSlot">Monitoring recent activity…</div>
-            </div>
-        </section>
-
-        <section class="suite reveal" id="suite">
+        {# HOW IT WORKS - New simplified section #}
+        <section class="how-it-works reveal" id="how-it-works">
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
-                    <p class="eyebrow">Assessment suite</p>
+                    <p class="eyebrow">Simple Process</p>
+                    <h2>Four steps from candidate invite to hire decision</h2>
+                    <p class="lede">Evalon handles the heavy lifting so you can focus on finding great candidates.</p>
+                </div>
+                <div class="how-grid">
+                    {% for feature in features %}
+                    <article class="how-card">
+                        <div class="how-number">{{ forloop.counter }}</div>
+                        <h3>{{ feature.title }}</h3>
+                        <p class="how-description">{{ feature.description }}</p>
+                        <p class="how-benefit">{{ feature.benefit }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        {# ASSESSMENT SUITE #}
+        <section class="suite-v2 reveal" id="assessments">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Assessment Library</p>
                     <h2>{{ suite_heading.title }}</h2>
                     <p class="lede">{{ suite_heading.subtitle }}</p>
                 </div>
-                <div class="suite-instructions">
-                    <p class="pill subtle">Compare the banks</p>
-                    <span>{{ suite_heading.instructions }}</span>
-                </div>
-                <div class="suite-map">
-                    <div class="suite-list" role="tablist" aria-label="Assessment suite">
-                        {% for item in suite %}
-                        <button class="suite-card {% if forloop.first %}is-active{% endif %}" data-suite-button data-target="{{ item.slug }}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
-                            <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
-                            <h3>{{ item.title }}</h3>
-                            <p>{{ item.summary }}</p>
-                            {% if item.focus %}
-                            <ul class="suite-focus">
-                                {% for focus in item.focus %}
-                                <li>{{ focus }}</li>
-                                {% endfor %}
-                            </ul>
+                <div class="suite-grid-v2">
+                    {% for item in suite %}
+                    <article class="suite-card-v2">
+                        <div class="suite-card-icon accent-{{ item.slug }}">
+                            {% if item.slug == 'marketing' %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5"></path>
+                                <path d="M2 12l10 5 10-5"></path>
+                            </svg>
+                            {% elif item.slug == 'product' %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            {% else %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
                             {% endif %}
-                            <span class="suite-action">View details →</span>
-                        </button>
-                        {% endfor %}
-                    </div>
-                    <div class="suite-detail">
-                        {% for item in suite %}
-                        <article class="suite-panel {% if forloop.first %}is-active{% endif %}" data-suite-panel="{{ item.slug }}">
-                            <h4>{{ item.label }}</h4>
-                            <ul class="suite-metrics">
-                                {% for stat in item.stats %}
-                                <li>
-                                    <span>{{ stat.label }}</span>
-                                    <strong>{{ stat.value }}</strong>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                            <a class="btn btn-outline small" href="mailto:hello@evalon.so?subject={{ item.label|urlencode }}%20rubric">Download {{ item.title }} rubric</a>
-                        </article>
-                        {% endfor %}
-                    </div>
+                        </div>
+                        <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
+                        <h3>{{ item.title }}</h3>
+                        <p class="suite-summary">{{ item.summary }}</p>
+                        {% if item.focus %}
+                        <ul class="suite-focus-list">
+                            {% for focus in item.focus %}
+                            <li>{{ focus }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        <div class="suite-stats-compact">
+                            {% for stat in item.stats %}
+                            <div class="stat-item">
+                                <span class="stat-label">{{ stat.label }}</span>
+                                <span class="stat-value">{{ stat.value }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <a class="btn btn-outline small" href="mailto:hello@evalon.so?subject={{ item.label|urlencode }}%20rubric">Download rubric</a>
+                    </article>
+                    {% endfor %}
                 </div>
             </div>
         </section>
 
-        <section class="pillars reveal">
-            <div class="section-heading section-heading-tight">
-                <p class="eyebrow">Two-sided platform</p>
-                <h2>One workspace for recruiters and candidates.</h2>
-                <p class="lede">
-                    Evalon keeps the hiring team on schedule and gives every applicant a clear plan in plain language.
-                </p>
-            </div>
-            <div class="pillar-grid">
-                <article class="pillar-card">
-                    <p class="pill subtle">Company workspace</p>
-                    <h3>Run the whole pipeline</h3>
-                    <p>Send invites, watch progress, remind reviewers, and share reports from one dashboard.</p>
-                    <ul>
-                        <li>Send invites straight from the assessment library</li>
-                        <li>See live scores and auto-built shortlists</li>
-                        <li>Keep notes, next steps, and approvals in one log</li>
-                        <li>Share updates with your ATS or hiring managers</li>
-                    </ul>
-                </article>
-                <article class="pillar-card">
-                    <p class="pill subtle">Candidate experience</p>
-                    <h3>Clear candidate workspace</h3>
-                    <p>Every invite opens a friendly page that explains what to do and when.</p>
-                    <ul>
-                        <li>Plain-language timeline and expectations</li>
-                        <li>Mobile-ready workspace for every assignment</li>
-                        <li>Auto-save, confirmation emails, and reminders</li>
-                        <li>Feedback sent as soon as decisions go out</li>
-                    </ul>
-                </article>
-            </div>
-        </section>
-
-        <section class="outcomes" id="sample-report">
+        {# OUTCOMES + SOCIAL PROOF - Combined #}
+        <section class="outcomes-v2" id="results">
             <div class="section-shell">
                 <div class="section-heading">
-                    <p class="eyebrow">Outcomes that matter</p>
-                    <h2>Results hiring teams can show.</h2>
-                    <p class="lede">Share data on speed, candidate happiness, and clean audit trails with every stakeholder.</p>
+                    <p class="eyebrow">Proven Results</p>
+                    <h2>Better hires, faster decisions, happier candidates</h2>
+                    <p class="lede">Teams using Evalon see measurable improvements across their hiring process.</p>
                 </div>
-                <div class="outcome-grid">
-                    <article class="metric-card large">
-                        <p class="metric-label">Avg. time-to-offer</p>
-                        <p class="metric-value">-37%</p>
-                        <p class="muted">Marketing and product teams saved days after moving projects into Evalon.</p>
-                        <canvas id="velocityChart" width="200" height="100"></canvas>
+                <div class="outcome-grid-v2">
+                    <article class="metric-card-v2">
+                        <p class="metric-value">37%</p>
+                        <p class="metric-label">Faster time-to-hire</p>
+                        <p class="muted small">Automated scoring cuts review time from days to minutes</p>
                     </article>
-                    <article class="metric-card">
-                        <p class="metric-label">Candidate CSAT</p>
-                        <p class="metric-value">4.8 / 5</p>
-                        <p class="muted">Guided portals and progress updates keep satisfaction scores high.</p>
+                    <article class="metric-card-v2">
+                        <p class="metric-value">4.8/5</p>
+                        <p class="metric-label">Candidate satisfaction</p>
+                        <p class="muted small">Clear instructions and progress tracking improve experience</p>
                     </article>
-                    <article class="metric-card">
-                        <p class="metric-label">Hiring manager confidence</p>
+                    <article class="metric-card-v2">
                         <p class="metric-value">2x</p>
-                        <p class="muted">Side-by-side scoring doubles manager confidence in the shortlist.</p>
+                        <p class="metric-label">Better hiring confidence</p>
+                        <p class="muted small">Structured scoring helps teams make data-driven decisions</p>
                     </article>
-                    <article class="metric-card">
-                        <p class="metric-label">Audit-ready reports</p>
-                        <p class="metric-value">Under 5 min</p>
-                        <p class="muted">Download a ready-to-share report for execs or clients.</p>
-                        <a class="btn btn-outline small" href="mailto:hello@evalon.so?subject=Evalon%20sample%20report">Request sample report</a>
+                </div>
+
+                {# Customer Testimonials #}
+                <div class="testimonials-v2">
+                    {% for testimonial in testimonials %}
+                    <article class="testimonial-card-v2">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">
+                                <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
+                            </div>
+                            <div>
+                                <p class="testimonial-name">{{ testimonial.name }}</p>
+                                <p class="testimonial-role">{{ testimonial.role }}</p>
+                            </div>
+                            <div class="testimonial-metric">
+                                <span class="pill subtle">{{ testimonial.metric }}</span>
+                            </div>
+                        </div>
+                        <blockquote class="testimonial-quote">"{{ testimonial.quote }}"</blockquote>
                     </article>
+                    {% endfor %}
                 </div>
             </div>
         </section>
 
+        {# PRICING #}
         <section class="pricing reveal" id="pricing">
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
@@ -254,290 +234,36 @@
             </div>
         </section>
 
-        <section class="workflow reveal" id="workflow">
-            <div class="section-heading">
-                <p class="eyebrow">How it works</p>
-                <h2>Evalon runs each search in four simple steps.</h2>
-            </div>
-            <ol class="workflow-steps">
-                <li>
-                    <div class="step-header">
-                        <span class="step-number">1</span>
-                        <div>
-                            <p class="step-label">Intake</p>
-                            <h3>Plan &amp; scope</h3>
-                        </div>
-                    </div>
-                    <p>Pick a catalog assessment or clone your own rubric. Set deadlines, reviewers, and notes in minutes.</p>
-                </li>
-                <li>
-                    <div class="step-header">
-                        <span class="step-number">2</span>
-                        <div>
-                            <p class="step-label">Invite</p>
-                            <h3>Invite talent</h3>
-                        </div>
-                    </div>
-                    <p>Evalon emails every candidate a friendly briefing page with rules, a timeline, and the start link.</p>
-                </li>
-                <li>
-                    <div class="step-header">
-                        <span class="step-number">3</span>
-                        <div>
-                            <p class="step-label">Score</p>
-                            <h3>Auto score &amp; review</h3>
-                        </div>
-                    </div>
-                    <p>Evalon scores every response instantly. Recruiters see benchmarks, notes, and audit trails.</p>
-                </li>
-                <li>
-                    <div class="step-header">
-                        <span class="step-number">4</span>
-                        <div>
-                            <p class="step-label">Decide</p>
-                            <h3>Advance with confidence</h3>
-                        </div>
-                    </div>
-                    <p>Push finalists to interviews or offers and keep candidates informed automatically.</p>
-                </li>
-            </ol>
-            <div class="workflow-cta">
-                <p>Need a ready-to-use assessment?</p>
-                <a class="btn btn-pill" href="#cta">Talk with us</a>
-            </div>
-        </section>
-
-        <section class="feature-suite" id="products">
-            <div class="section-heading">
-                <p class="eyebrow">Hiring Console</p>
-                <h2>Every action for the talent team in one view.</h2>
-            </div>
-            <div class="feature-body">
-                <div class="feature-accordion" id="featureAccordion">
-                    {% for feature in features %}
-                    <button
-                        class="accordion-item {% if forloop.first %}is-active{% endif %}"
-                        data-feature-button
-                        data-feature="{{ feature.slug }}"
-                    >
-                        <span class="item-title">{{ feature.title }}</span>
-                        <span class="chevron"></span>
-                        <small>{{ feature.description }}</small>
-                    </button>
-                    {% endfor %}
-                    <div class="accent-bar"></div>
-                </div>
-                <div class="feature-panels">
-                    {% for feature in features %}
-                    <article
-                        class="feature-card {% if forloop.first %}is-active{% endif %}"
-                        data-feature-panel="{{ feature.slug }}"
-                    >
-                        <p class="pill subtle">{{ feature.title }}</p>
-                        <h3>{{ feature.panel_title }}</h3>
-                        <p>{{ feature.panel_subtitle }}</p>
-                        <ul class="feature-points">
-                            {% for point in feature.panel_points %}
-                            <li>{{ point }}</li>
-                            {% endfor %}
-                        </ul>
-                    </article>
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
-
-        <section class="journey-hero reveal" id="journey">
-            <div class="journey-hero-content">
-                <p class="eyebrow">Candidate Journey</p>
-                <h2>Show every step from invite to offer.</h2>
-                <p class="lede">Recruiters stay in control while candidates always know what comes next.</p>
-            </div>
-            <div class="journey-hero-detail">
-                <div class="journey-legend">
-                    <span class="tag company">Company console</span>
-                    <span class="tag candidate">Candidate view</span>
-                </div>
-                <ul class="journey-benefits">
-                    <li>Recruiters see live status across every stage.</li>
-                    <li>Candidates receive guided milestones and reminders.</li>
-                    <li>Auto scoring lifts the best performers instantly.</li>
-                </ul>
-            </div>
-        </section>
-
-        <section class="journey-board reveal">
-            <div class="journey-board-grid">
-                <article class="journey-card company">
-                    <p class="label">Recruiter sends invite</p>
-                    <p class="title">Briefing sent to Maya</p>
-                    <p class="meta">Due in 3 days · Voice, video, files</p>
-                </article>
-                <article class="journey-card candidate">
-                    <p class="label">Candidate sees timeline</p>
-                    <p class="title">“Thanks! Deadline Friday.”</p>
-                    <p class="meta">Maya reviews notes + expectations.</p>
-                </article>
-                <article class="journey-card company">
-                    <p class="label">Evidence captured</p>
-                    <p class="title">Uploads received</p>
-                    <p class="meta">Case study · Loom video · Doc</p>
-                </article>
-                <article class="journey-card candidate">
-                    <p class="label">Progress tracker</p>
-                    <p class="title">“Files uploaded ✔️”</p>
-                    <p class="meta">Auto save + confirmation email.</p>
-                </article>
-                <article class="journey-card company">
-                    <p class="label">Auto score &amp; shortlist</p>
-                    <p class="title">82% · Ready to advance</p>
-                    <p class="meta">Evalon suggests interviews with Eli + Ada.</p>
-                </article>
-                <article class="journey-card candidate">
-                    <p class="label">Status update</p>
-                    <p class="title">“Score received. Hang tight.”</p>
-                    <p class="meta">Maya sees that responses are under review.</p>
-                </article>
-                <article class="journey-card company">
-                    <p class="label">Decision workspace</p>
-                    <p class="title">Advance to onsite</p>
-                    <p class="meta">Auto email + ATS sync triggered.</p>
-                </article>
-                <article class="journey-card candidate">
-                    <p class="label">Outcome delivered</p>
-                    <p class="title">“Great news! Interview confirmed.”</p>
-                    <p class="meta">Candidate receives next steps instantly.</p>
-                </article>
-            </div>
-        </section>
-
-        <section class="resources reveal" id="resources">
-            <div class="section-heading section-heading-tight">
-                <p class="eyebrow">Resources &amp; Insights</p>
-                <h2>Helpful hiring guides and templates.</h2>
-                <p class="lede">
-                    We share the same checklists and playbooks we use with recruiting teams every week.
-                </p>
-            </div>
-            <div class="resource-grid">
-                {% for article in articles %}
-                <article class="resource-card">
-                    <header>
-                        <span class="pill {{ article.pill_style }}">{{ article.pill_label }}</span>
-                        <span class="date">{{ article.published_at|date:"M j, Y" }}</span>
-                    </header>
-                    <h3>{{ article.title }}</h3>
-                    <p>{{ article.excerpt }}</p>
-                    <div class="author">By {{ article.display_author }}</div>
-                    <a class="outline-link" href="{{ article.get_absolute_url }}">Read article</a>
-                    <div class="card-shade"></div>
-                </article>
-                {% empty %}
-                <p class="empty-state">Fresh resources are coming soon.</p>
-                {% endfor %}
-            </div>
-            <div class="blog-load-more">
-                <a class="btn btn-pill secondary" href="{% url 'blog:list' %}">View All Articles</a>
-            </div>
-        </section>
-
-        <section class="testimonial reveal">
-            <div class="testimonial-grid">
-                <div class="testimonial-copy">
-                    <p class="eyebrow">Customer stories</p>
-                    <h2>Teams hire faster from kickoff to offer.</h2>
-                    <p class="lede">Evalon keeps recruiters, interviewers, and candidates on the same page with simple tools and clear updates.</p>
-                    <ul class="testimonial-points">
-                        <li>One shared console for recruiters, hiring managers, and interviewers.</li>
-                        <li>Automatic nudges keep candidates and reviewers aligned.</li>
-                        <li>Behavioral insights make debriefs quick and fair.</li>
-                    </ul>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-slider">
-                        {% for testimonial in testimonials %}
-                        <article
-                            class="testimonial-panel {% if forloop.first %}is-active{% endif %}"
-                            data-testimonial-panel="{{ forloop.counter0 }}"
-                        >
-                            <div class="testimonial-avatar">
-                                <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
-                            </div>
-                            <p class="person">{{ testimonial.name }}</p>
-                            <p class="role">{{ testimonial.role }}</p>
-                            <blockquote>“{{ testimonial.quote }}”</blockquote>
-                        </article>
-                        {% endfor %}
-                    </div>
-                    <div class="dots">
-                        {% for testimonial in testimonials %}
-                        <button
-                            class="{% if forloop.first %}is-active{% endif %}"
-                            data-testimonial-button="{{ forloop.counter0 }}"
-                            aria-label="View testimonial {{ forloop.counter }}"
-                        ></button>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="case-slider reveal" id="caseStories">
-            <div class="section-heading">
-                <p class="eyebrow">Customer proof</p>
-                <h2>See the impact in real teams.</h2>
-            </div>
-            <div class="case-slider-body">
-                <div class="case-panels">
-                    {% for case in case_studies %}
-                    <article class="case-panel {% if forloop.first %}is-active{% endif %}" data-case-panel="{{ forloop.counter0 }}">
-                        <p class="pill subtle">{{ case.company }}</p>
-                        <h3>{{ case.headline }}</h3>
-                        <p class="muted">{{ case.result }}</p>
-                        <div class="case-metric">
-                            <span>{{ case.metric_label }}</span>
-                            <strong>{{ case.metric_value }}</strong>
-                        </div>
-                    </article>
-                    {% endfor %}
-                </div>
-                <div class="case-dots">
-                    {% for case in case_studies %}
-                    <button class="{% if forloop.first %}is-active{% endif %}" data-case-button="{{ forloop.counter0 }}" aria-label="View case study {{ forloop.counter }}"></button>
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
-
+        {# FINAL CTA #}
         <section class="cta panel-contained reveal" id="cta">
             <div class="cta-card">
-                <p class="eyebrow">Ready to partner?</p>
-                <h2>Get started with Evalon.</h2>
-                <p>We help talent teams roll out assessments, train reviewers, and keep candidates happy.</p>
+                <p class="eyebrow">Ready to improve your hiring?</p>
+                <h2>Start using Evalon today</h2>
+                <p>Get started with our free plan or schedule a demo to see how Evalon can transform your hiring process.</p>
                 <div class="cta-highlights">
                     <article>
                         <p class="highlight-value">4.9/5</p>
-                        <p class="highlight-label">Admin satisfaction</p>
+                        <p class="highlight-label">Customer satisfaction</p>
                     </article>
                     <article>
-                        <p class="highlight-value">30 hrs</p>
-                        <p class="highlight-label">Saved per search</p>
+                        <p class="highlight-value">10 min</p>
+                        <p class="highlight-label">Setup time</p>
                     </article>
                     <article>
-                        <p class="highlight-value">2x</p>
-                        <p class="highlight-label">Faster shortlist</p>
+                        <p class="highlight-value">37%</p>
+                        <p class="highlight-label">Faster hiring</p>
                     </article>
                 </div>
                 <div class="cta-checks">
                     <ul>
-                        <li>Works for remote or in-office teams</li>
-                        <li>Easy for recruiters and interviewers to follow</li>
-                        <li>Friendly support whenever you need it</li>
+                        <li>Free plan available, no credit card required</li>
+                        <li>All assessment types included</li>
+                        <li>Unlimited team members</li>
                     </ul>
                     <ul>
-                        <li>Guided onboarding sessions</li>
-                        <li>Dedicated success partner</li>
-                        <li>Straightforward pricing with no surprises</li>
+                        <li>Automated scoring and reports</li>
+                        <li>Dedicated support team</li>
+                        <li>Cancel anytime</li>
                     </ul>
                 </div>
             </div>
@@ -550,7 +276,7 @@
                       data-gtag-label="home_demo_request"
                       data-gtag-params='{"form_name":"home_demo_request"}'>
                     {% csrf_token %}
-                    <label>We'd love to hear from you!</label>
+                    <label>Request a demo</label>
                     {% if invite_form.non_field_errors %}
                     <div class="form-error">
                         {% for error in invite_form.non_field_errors %}
@@ -593,7 +319,390 @@
             </div>
         </section>
     </main>
-
-{{ live_events|json_script:"live-events-data" }}
 </div>
+
+<style>
+/* ========================================================================
+   HOMEPAGE V2 - SIMPLIFIED & IMPROVED
+   ======================================================================== */
+
+/* Hero V2 - Clean, focused */
+.hero-v2 {
+    position: relative;
+    padding: 8rem 2rem 6rem;
+    background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+    overflow: hidden;
+    text-align: center;
+}
+
+.hero-v2-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 138, 0, 0.15);
+    border: 1px solid rgba(255, 138, 0, 0.3);
+    border-radius: 20px;
+    color: var(--orange);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 1.5rem;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 2.5rem;
+    line-height: 1.6;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+}
+
+.hero-trust {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.hero-trust .muted {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+}
+
+.trust-logos {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* How It Works */
+.how-it-works {
+    padding: 6rem 2rem;
+    background: #f8f9fa;
+}
+
+.how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.how-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.how-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.how-number {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--orange) 0%, #ff6b00 100%);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.how-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.75rem;
+}
+
+.how-description {
+    color: var(--text-muted);
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+}
+
+.how-benefit {
+    color: var(--text-body);
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Suite V2 - Simplified */
+.suite-v2 {
+    padding: 6rem 2rem;
+}
+
+.suite-grid-v2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.suite-card-v2 {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8eaed;
+    transition: all 0.3s ease;
+}
+
+.suite-card-v2:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.suite-card-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 138, 0, 0.08);
+    border-radius: 12px;
+    color: var(--orange);
+    margin-bottom: 1.5rem;
+}
+
+.suite-card-v2 h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0.75rem 0 1rem;
+}
+
+.suite-summary {
+    color: var(--text-body);
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+}
+
+.suite-focus-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.suite-focus-list li {
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 138, 0, 0.08);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: var(--orange);
+    font-weight: 500;
+}
+
+.suite-stats-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    border-top: 1px solid #e8eaed;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+}
+
+/* Outcomes V2 */
+.outcomes-v2 {
+    padding: 6rem 2rem;
+    background: #f8f9fa;
+}
+
+.outcome-grid-v2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    margin-bottom: 4rem;
+}
+
+.metric-card-v2 {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.metric-card-v2 .metric-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--orange);
+    margin: 0 0 0.5rem;
+    line-height: 1;
+}
+
+.metric-card-v2 .metric-label {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.75rem;
+}
+
+.metric-card-v2 .muted {
+    margin: 0;
+}
+
+/* Testimonials V2 */
+.testimonials-v2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.testimonial-card-v2 {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid var(--orange);
+}
+
+.testimonial-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.testimonial-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.testimonial-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.testimonial-name {
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.25rem;
+}
+
+.testimonial-role {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.testimonial-metric {
+    margin-left: auto;
+}
+
+.testimonial-quote {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--text-body);
+    margin: 0;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-v2 {
+        padding: 5rem 1.5rem 4rem;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.125rem;
+    }
+
+    .how-grid,
+    .suite-grid-v2 {
+        grid-template-columns: 1fr;
+    }
+
+    .testimonials-v2 {
+        grid-template-columns: 1fr;
+    }
+
+    .trust-logos {
+        gap: 1rem;
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+// Reveal animations
+document.addEventListener('DOMContentLoaded', () => {
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(reveal => observer.observe(reveal));
+});
+</script>
 {% endblock %}

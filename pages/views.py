@@ -12,19 +12,19 @@ from console.models import SiteContentBlock, ResourceAsset
 def home(request):
     """Render the marketing landing page."""
     hero_content = {
-        "badge": "Built for modern hiring teams",
-        "title": "Run <span class=\"highlight\">marketing, product, and behavioral</span> assessments in one simple workspace.",
-        "subtitle": "Evalon gives recruiting teams ready-made skill tests, live progress tracking, and plain-language scorecards so everyone understands each candidate.",
-        "primary_label": "Get started",
+        "badge": "Hiring Assessment Platform",
+        "title": "Hire better candidates with structured skill assessments",
+        "subtitle": "Pre-built tests for marketing, product, and behavioral roles with automated scoring, progress tracking, and clear reports your team can trust.",
+        "primary_label": "Start free trial",
         "primary_url": reverse("clients:signup"),
-        "secondary_label": "See platform tour",
-        "secondary_url": "#suite",
+        "secondary_label": "See how it works",
+        "secondary_url": "#how-it-works",
     }
 
     suite_heading = {
-        "title": "Choose the right assessment for every role.",
-        "subtitle": "Curated banks cover marketing, product, and leadership roles with fresh prompts, scoring guides, and downloadable rubrics.",
-        "instructions": "Tap a card to check the metrics or grab the rubric.",
+        "title": "Ready-made assessments for key roles",
+        "subtitle": "Pre-built question banks covering marketing, product management, and behavioral skills. Each includes scoring rubrics and real-world scenarios.",
+        "instructions": "Click any assessment to see sample questions and download the scoring rubric.",
     }
 
     assessment_suite = [
@@ -68,59 +68,29 @@ def home(request):
 
     features = [
         {
-            "slug": "scope",
-            "title": "Plan each assignment",
-            "description": "Match a role to a template or create your own in minutes.",
-            "panel_title": "Assessment designer",
-            "panel_subtitle": "Pick the skills, attach examples, and set due dates before sending invites.",
-            "panel_points": [
-                "Start from 25+ ready-made templates or copy the ones you love.",
-                "Choose reviewers, reminders, and file requirements in a friendly form.",
-                "Collect uploads, screen recordings, or written answers in one place.",
-            ],
+            "slug": "create",
+            "title": "1. Create project",
+            "description": "Choose an assessment and configure your project",
+            "benefit": "Pick from pre-built assessments for marketing, product, or behavioral roles. Set deadlines and customize instructions in minutes.",
         },
         {
             "slug": "invite",
-            "title": "Invite & align",
-            "description": "Send a clear briefing to every candidate and collaborator.",
-            "panel_title": "Branded candidate briefing",
-            "panel_subtitle": "Each invite includes a branded page with rules, a timeline, and a start button.",
-            "panel_points": [
-                "Personalized landing page with recruiter notes and FAQs.",
-                "Live status signals show when invites are opened, started, or submitted.",
-                "Secure share links for hiring panels, agencies, or hiring managers.",
-            ],
+            "title": "2. Invite candidates",
+            "description": "Send assessment invitations to your candidates",
+            "benefit": "Candidates receive a clear email with instructions, timeline, and a link to start. They can work at their own pace with auto-save.",
         },
         {
-            "slug": "score",
-            "title": "Score automatically",
-            "description": "Translate responses into ranked shortlists with zero spreadsheets.",
-            "panel_title": "Scoring console",
-            "panel_subtitle": "Structured rubrics and bias controls show how each person performed.",
-            "panel_points": [
-                "Score per question with calibration tips everyone can follow.",
-                "Set auto-advance rules when someone hits a standout score.",
-                "Share summary packs with hiring managers instantly.",
-            ],
+            "slug": "review",
+            "title": "3. Auto-score & review",
+            "description": "See scored results with detailed breakdowns",
+            "benefit": "Evalon automatically scores submissions using structured rubrics. Review side-by-side comparisons and see who performed best.",
         },
         {
             "slug": "decide",
-            "title": "Decide & hand off",
-            "description": "Advance winners to interviews or offers with context for the team.",
-            "panel_title": "Decision workspace",
-            "panel_subtitle": "Log the why, notify candidates, and sync everything to your ATS without copy-paste.",
-            "panel_points": [
-                "Advance or decline with pre-written, editable messages.",
-                "Share highlight reels and prep notes for interviewers.",
-                "Automatic audit trail keeps every reviewer action documented.",
-            ],
+            "title": "4. Make decisions",
+            "description": "Advance top candidates or share reports",
+            "benefit": "Download clean reports for hiring managers. Track all decisions in one place with full audit trails.",
         },
-    ]
-
-    live_events = [
-        {"company": "Latitude Labs", "assessment": "PM scope challenge", "ago": "2 min ago"},
-        {"company": "Northwind", "assessment": "Behavioral inventory", "ago": "7 min ago"},
-        {"company": "Copper Build", "assessment": "Growth marketing scenario", "ago": "12 min ago"},
     ]
 
     case_studies = [
@@ -150,27 +120,21 @@ def home(request):
         },
     ]
 
-    articles = list(
-        BlogPost.objects.published().order_by("-is_featured", "-published_at")[:3]
-    )
-
     testimonials = [
         {
-            "name": "Savannah",
-            "role": "Founder, Hailo",
-            "quote": "Evalon replaced messy docs with one calm workspace. Every teammate knows what a great submission looks like.",
-            "avatar": "img/avatar-savannah.svg",
-        },
-        {
-            "name": "Marcus",
-            "role": "VP People, Copper Build",
-            "quote": "Our pods scope projects, invite candidates, and move finalists without leaving Evalon. Offers now go out days faster.",
+            "name": "Marcus Chen",
+            "role": "VP of People, Copper Build",
+            "company": "Copper Build",
+            "quote": "Evalon cut our marketing hiring cycle from 3 weeks to 12 days. The automated scoring meant we could focus on top candidates instead of reviewing every submission manually.",
+            "metric": "60% faster hiring",
             "avatar": "img/avatar-lauren.svg",
         },
         {
-            "name": "Priya",
+            "name": "Priya Sharma",
             "role": "Head of Talent, Aster Care",
-            "quote": "Auto scoring shaved days off each search. Candidates stay informed while our team sees a clear shortlist we can trust.",
+            "company": "Aster Care",
+            "quote": "Our candidates actually enjoy the process now. The clear instructions and progress tracking reduced our drop-off rate by half.",
+            "metric": "50% better completion",
             "avatar": "img/avatar-savannah.svg",
         },
     ]
@@ -236,9 +200,9 @@ def home(request):
     ]
 
     pricing_helper = {
-        "headline": "Clear pricing for every hiring plan.",
-        "subline": "Each plan includes the assessments and invites you need. Upgrade or add invites whenever your team grows.",
-        "footnote": "All paid plans include unlimited reviewers. Save 20% with annual billing on Pro.",
+        "headline": "Simple, transparent pricing",
+        "subline": "Start free, upgrade when you need more projects and invites. All plans include all three assessment types.",
+        "footnote": "All plans include unlimited team members. Annual billing saves 20% on Pro plan.",
     }
 
     # Apply CMS overrides if blocks exist
@@ -364,13 +328,11 @@ def home(request):
             "features": features,
             "suite": assessment_suite,
             "suite_heading": suite_heading,
-            "articles": articles,
             "testimonials": testimonials,
             "pricing_tiers": pricing_tiers,
             "pricing_helper": pricing_helper,
             "hero_content": hero_content,
             "invite_form": form,
-            "live_events": live_events,
             "case_studies": case_studies,
         },
     )
