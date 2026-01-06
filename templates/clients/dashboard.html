@@ -31,6 +31,47 @@
         </article>
     </section>
 
+    {# Product Tour Video #}
+    <section class="portal-card video-tour-section">
+        <div class="video-tour-header">
+            <div>
+                <h3>🎬 How Evalon Works</h3>
+                <p class="muted">Watch a quick 2-minute overview of the platform</p>
+            </div>
+        </div>
+        <div class="video-container">
+            {# Replace VIDEO_URL_HERE with your actual video URL #}
+            {# Supports YouTube, Vimeo, or direct video files #}
+
+            {# Option 1: YouTube embed #}
+            {# <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> #}
+
+            {# Option 2: Vimeo embed #}
+            {# <iframe src="https://player.vimeo.com/video/YOUR_VIDEO_ID" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe> #}
+
+            {# Option 3: Direct video file #}
+            {# <video controls>
+                <source src="{% static 'videos/product-tour.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video> #}
+
+            {# Placeholder until you add your video #}
+            <div class="video-placeholder">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <h4>Product Demo Video</h4>
+                <p class="muted">Replace this placeholder with your video URL</p>
+                <p class="video-help">
+                    <strong>To add your video:</strong><br>
+                    1. Create your demo video using Loom, Tango, or similar tools<br>
+                    2. Upload to YouTube or Vimeo<br>
+                    3. Update the iframe src in this template
+                </p>
+            </div>
+        </div>
+    </section>
+
     {# Attention Items - Things that need action #}
     {% if attention_items %}
     <section class="portal-card attention-banner">
@@ -222,5 +263,119 @@
 <div id="assessments" style="scroll-margin-top: 2rem;"></div>
 <div id="analytics" style="scroll-margin-top: 2rem;"></div>
 <div id="activity" style="scroll-margin-top: 2rem;"></div>
+
+<style>
+/* ========================================================================
+   VIDEO TOUR SECTION
+   ======================================================================== */
+
+.video-tour-section {
+    margin-bottom: 2rem;
+}
+
+.video-tour-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.video-tour-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.25rem;
+}
+
+.video-tour-header .muted {
+    margin: 0;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background: var(--portal-bg);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-container iframe,
+.video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+.video-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.05) 0%, rgba(14, 20, 40, 0.03) 100%);
+}
+
+.video-placeholder svg {
+    color: var(--orange);
+    opacity: 0.6;
+    margin-bottom: 1rem;
+}
+
+.video-placeholder h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.5rem;
+}
+
+.video-placeholder .muted {
+    margin-bottom: 1.5rem;
+}
+
+.video-help {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 400px;
+    margin-top: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border: 1px solid var(--portal-border-color);
+}
+
+.video-help strong {
+    color: var(--navy);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .video-placeholder {
+        padding: 1.5rem;
+    }
+
+    .video-placeholder svg {
+        width: 60px;
+        height: 60px;
+    }
+
+    .video-help {
+        font-size: 0.8rem;
+        padding: 0.875rem 1.25rem;
+    }
+}
+</style>
 
 {% endblock %}
