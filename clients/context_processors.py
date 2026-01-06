@@ -13,12 +13,16 @@ def portal_navigation(request):
     - project_badge_count: Number of active projects
     - is_manager: Boolean indicating if user has manager role
     - can_manage_branding: Boolean for branding permissions
+    - account: The client account object for sidebar display
+    - role_label: Human-readable role name
     """
     context = {
         'assessment_badge_count': None,
         'project_badge_count': None,
         'is_manager': False,
         'can_manage_branding': False,
+        'account': None,
+        'role_label': None,
     }
 
     # Only add navigation data for authenticated client users
@@ -36,6 +40,10 @@ def portal_navigation(request):
         from behavioral_assessments.models import BehavioralAssessmentSession
 
         account = request.user.clientaccount
+
+        # Add account and role to context for sidebar footer
+        context['account'] = account
+        context['role_label'] = dict(ClientAccount.ROLE_CHOICES).get(account.role, account.role.title())
 
         # Get role information
         context['is_manager'] = account.role == 'manager'
