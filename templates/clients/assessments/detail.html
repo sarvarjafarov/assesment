@@ -1,523 +1,1320 @@
-{% extends 'base.html' %}
+{% extends 'portal_base.html' %}
+{% load static %}
 {% load humanize %}
-{% block content %}
+{% block title %}{{ session_obj.candidate_id }} · {{ assessment_label }} · Evalon{% endblock %}
+{% block meta_description %}Assessment report for {{ session_obj.candidate_id }}.{% endblock %}
+{% block portal_content %}
 <div class="portal-shell">
-    <section class="portal-hero compact">
+    {# Report Header #}
+    <header class="page-header-with-actions">
         <div>
-            <p class="eyebrow">{{ assessment_label }}</p>
+            <div class="breadcrumb-nav">
+                <a href="{% url 'clients:assessments' %}" class="breadcrumb-link">Assessments</a>
+                <span class="breadcrumb-separator">›</span>
+                <a href="{% url 'clients:assessment-manage' assessment_type %}" class="breadcrumb-link">{{ assessment_label }}</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-current">{{ session_obj.candidate_id }}</span>
+            </div>
             <h1>{{ session_obj.candidate_id }}</h1>
-            <p class="muted">Status: {{ session_obj.get_status_display }}</p>
+            <div class="report-meta">
+                <span class="status-badge status-{{ session_obj.status }}">{{ session_obj.get_status_display }}</span>
+                {% if session_obj.submitted_at %}
+                <span class="meta-text">Submitted {{ session_obj.submitted_at|naturaltime }}</span>
+                {% endif %}
+            </div>
         </div>
-        <div class="portal-actions">
-            <a class="btn btn-outline small" href="{% url 'clients:assessment-manage' assessment_type %}">Back to sessions</a>
+        <div class="header-actions">
+            {% if share_link %}
+            <a href="{{ share_link }}" target="_blank" class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+                Share Report
+            </a>
+            {% endif %}
         </div>
-    </section>
+    </header>
 
+    {# Recommendation Banner - Only if actionable summary exists #}
     {% if actionable_summary %}
-    <section class="panel portal-panel summary-callout tone-{{ actionable_summary.tone }}">
-        <div class="summary-callout-responsive">
-            <div class="summary-callout-main">
-                <span class="pill">{{ actionable_summary.label }}</span>
+    <section class="portal-card recommendation-banner tone-{{ actionable_summary.tone }}">
+        <div class="recommendation-content">
+            <div class="recommendation-header">
+                <span class="recommendation-badge">{{ actionable_summary.label }}</span>
                 <h2>{{ actionable_summary.headline }}</h2>
                 <p>{{ actionable_summary.subline }}</p>
             </div>
-            <div class="summary-callout-metrics">
-                <article class="metric-chip">
-                    <p class="label">Score</p>
-                    <strong>{{ actionable_summary.metrics.score }}</strong>
-                </article>
-                <article class="metric-chip">
-                    <p class="label">Risk</p>
-                    <strong>{{ actionable_summary.metrics.flags }}</strong>
-                </article>
-                <article class="metric-chip">
-                    <p class="label">Highlight</p>
-                    <strong>{{ actionable_summary.metrics.strength }}</strong>
-                </article>
+            <div class="recommendation-metrics">
+                <div class="metric-chip">
+                    <span class="chip-label">Score</span>
+                    <span class="chip-value">{{ actionable_summary.metrics.score }}</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="chip-label">Risk</span>
+                    <span class="chip-value">{{ actionable_summary.metrics.flags }}</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="chip-label">Highlight</span>
+                    <span class="chip-value">{{ actionable_summary.metrics.strength }}</span>
+                </div>
             </div>
         </div>
     </section>
     {% endif %}
 
+    {# Key Performance Metrics - 3 cards #}
+    <section class="portal-card-grid three-up key-metrics">
+        <article class="portal-card metric-card">
+            <p class="label">Overall score</p>
+            <h2 class="metric-value">
+                {% if report.score %}{{ report.score|floatformat:1 }}{% elif report.overall %}{{ report.overall|floatformat:1 }}{% else %}—{% endif %}
+            </h2>
+            <p class="muted">
+                {% if comparative_insights.cohort_total %}
+                    vs. avg {{ comparative_insights.cohort_avg|floatformat:1 }}
+                {% else %}
+                    Final assessment score
+                {% endif %}
+            </p>
+        </article>
+        <article class="portal-card metric-card">
+            <p class="label">Recommendation</p>
+            <h2 class="metric-value metric-text">
+                {% if report.seniority %}
+                    {{ report.seniority }}
+                {% elif report.label %}
+                    {{ report.label }}
+                {% else %}
+                    —
+                {% endif %}
+            </h2>
+            <p class="muted">Suggested seniority level</p>
+        </article>
+        <article class="portal-card metric-card">
+            <p class="label">Ranking</p>
+            <h2 class="metric-value metric-text">
+                {% if comparative_insights.percentile %}
+                    Top {{ comparative_insights.percentile|floatformat:0 }}%
+                {% else %}
+                    —
+                {% endif %}
+            </h2>
+            <p class="muted">
+                {% if comparative_insights.cohort_total %}
+                    Among {{ comparative_insights.cohort_total }} candidates
+                {% else %}
+                    No comparison data
+                {% endif %}
+            </p>
+        </article>
+    </section>
+
+    {# Take Action Section - Only if can record decision #}
     {% if can_record_decision %}
-    <section class="panel portal-panel decision-cta-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Next steps</p>
-                <h2>Take action</h2>
-            </div>
-        </header>
-        <form method="post" class="decision-cta-form">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="quick_decision">
-            <div class="decision-tabs">
-                <button type="submit" name="decision" value="advance" class="decision-tab positive">
-                    <span class="tab-title">Advance</span>
-                    <span class="tab-helper">Move to next stage</span>
-                </button>
-                <button type="submit" name="decision" value="hold" class="decision-tab neutral">
-                    <span class="tab-title">Hold</span>
-                    <span class="tab-helper">Need more signals</span>
-                </button>
-                <button type="submit" name="decision" value="reject" class="decision-tab warning">
-                    <span class="tab-title">Reject</span>
-                    <span class="tab-helper">Send decline note</span>
-                </button>
-            </div>
-            <label class="decision-note">
-                <span>Add context (optional)</span>
-                <textarea name="note" rows="2" placeholder="Add next steps or notes for the candidate"></textarea>
-            </label>
-        </form>
-        {% if quick_followups %}
-        <div class="followup-grid">
-            {% for link in quick_followups %}
-            <article class="followup-card">
-                <div>
-                    <p class="card-title">{{ link.label }}</p>
-                    <p class="muted">{{ link.description }}</p>
-                </div>
-                <a class="pill subtle" href="{{ link.href }}" {% if link.external %}target="_blank" rel="noreferrer"{% endif %}>
-                    Open
-                </a>
-            </article>
-            {% endfor %}
+    <section class="take-action-section">
+        <div class="section-header">
+            <h3>Take Action</h3>
+            <p class="muted">Record your hiring decision</p>
         </div>
-        {% endif %}
-    </section>
-    {% endif %}
-
-    {% if response_drilldown %}
-    <section class="panel portal-panel drilldown-panel exportable" id="report-body">
-        <header>
-            <div>
-                <p class="eyebrow">Scenario drill-down</p>
-                <h2>Responses & timing</h2>
-            </div>
-        </header>
-        <div class="drilldown-list">
-            {% for item in response_drilldown %}
-            <details>
-                <summary>
-                    <div>
-                        <strong>{{ item.prompt }}</strong>
-                        {% if item.category %}<span class="muted">{{ item.category|title }}</span>{% endif %}
-                    </div>
-                    <span class="drilldown-status {{ item.outcome_class }}">{{ item.outcome }}</span>
-                </summary>
-                <div class="drilldown-body">
-                    <p><strong>Candidate response:</strong> {{ item.answer }}</p>
-                    <p><strong>Time spent:</strong> {{ item.elapsed }}</p>
+        <div class="portal-card">
+            <form method="post" class="action-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="quick_decision">
+                <div class="action-buttons">
+                    <button type="submit" name="decision" value="advance" class="action-button action-advance">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                        <div>
+                            <span class="action-label">Advance</span>
+                            <span class="action-hint">Move to next stage</span>
+                        </div>
+                    </button>
+                    <button type="submit" name="decision" value="hold" class="action-button action-hold">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div>
+                            <span class="action-label">Hold</span>
+                            <span class="action-hint">Need more signals</span>
+                        </div>
+                    </button>
+                    <button type="submit" name="decision" value="reject" class="action-button action-reject">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        <div>
+                            <span class="action-label">Reject</span>
+                            <span class="action-hint">Send decline note</span>
+                        </div>
+                    </button>
                 </div>
-            </details>
-            {% endfor %}
+                <div class="action-note">
+                    <label for="decision-note">Add context (optional)</label>
+                    <textarea id="decision-note" name="note" rows="2" placeholder="Add next steps or notes for the candidate"></textarea>
+                </div>
+            </form>
         </div>
     </section>
     {% endif %}
 
+    {# Candidate Journey Timeline #}
     {% if activity_timeline %}
-    <section class="panel portal-panel timeline-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Candidate journey</p>
-                <h2>Timeline</h2>
-            </div>
-        </header>
-        <ol class="timeline-list">
-            {% for event in activity_timeline %}
-            <li>
-                <div class="timeline-dot"></div>
-                <div>
-                    <div class="timeline-header">
-                        <p class="timeline-label">{{ event.label }}</p>
-                        <span class="timeline-meta">{{ event.timestamp|naturaltime }}</span>
+    <section class="timeline-section">
+        <div class="section-header">
+            <h3>Candidate Journey</h3>
+            <p class="muted">Key milestones and events</p>
+        </div>
+        <div class="portal-card">
+            <div class="journey-timeline">
+                {% for event in activity_timeline %}
+                <div class="timeline-event">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <strong>{{ event.label }}</strong>
+                            <span class="timeline-time">{{ event.timestamp|naturaltime }}</span>
+                        </div>
+                        <p class="timeline-description muted">{{ event.description }}</p>
+                        <span class="timeline-date">{{ event.timestamp|date:"M j, Y · H:i" }}</span>
                     </div>
-                    <p class="timeline-desc">
-                        <span>{{ event.timestamp|date:"M j, Y · H:i" }}</span>
-                        <span>{{ event.description }}</span>
-                    </p>
                 </div>
-            </li>
-            {% endfor %}
-        </ol>
-    </section>
-    {% endif %}
-
-    {% if comparative_insights.cohort_total %}
-    <section class="panel portal-panel comparative-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Comparative insights</p>
-                <h2>Pipeline context</h2>
-            </div>
-        </header>
-        <div class="comparative-grid">
-            <article class="metric-chip">
-                <p class="label">Percentile</p>
-                <strong>{% if comparative_insights.percentile %}Top {{ comparative_insights.percentile|floatformat:0 }}%{% else %}—{% endif %}</strong>
-            </article>
-            <article class="metric-chip">
-                <p class="label">Cohort size</p>
-                <strong>{{ comparative_insights.cohort_total }}</strong>
-                <p class="muted">{{ comparative_insights.cohort_recent }} in last 30 days</p>
-            </article>
-            <article class="metric-chip">
-                <p class="label">Avg. score</p>
-                <strong>{% if comparative_insights.cohort_avg %}{{ comparative_insights.cohort_avg|floatformat:1 }}{% else %}—{% endif %}</strong>
-            </article>
-            <article class="metric-chip">
-                <p class="label">Top score</p>
-                <strong>{% if comparative_insights.top_score %}{{ comparative_insights.top_score|floatformat:1 }}{% else %}—{% endif %}</strong>
-            </article>
-        </div>
-    </section>
-    {% endif %}
-
-    {% if candidate_feedback %}
-    <section class="panel portal-panel feedback-insight">
-        <header>
-            <div>
-                <p class="eyebrow">Candidate experience</p>
-                <h2>Post-assessment feedback</h2>
-            </div>
-        </header>
-        <div class="feedback-insight-grid">
-            <article>
-                <p class="label">Rating</p>
-                <strong>{% if candidate_feedback.label %}{{ candidate_feedback.label }}{% elif candidate_feedback.score %}{{ candidate_feedback.score }} / 5{% else %}—{% endif %}</strong>
-            </article>
-            <article>
-                <p class="label">Submitted</p>
-                <strong>{% if candidate_feedback.submitted_at %}{{ candidate_feedback.submitted_at|naturaltime }}{% else %}—{% endif %}</strong>
-            </article>
-        </div>
-        {% if candidate_feedback.comment %}
-        <p class="muted">“{{ candidate_feedback.comment }}”</p>
-        {% endif %}
-        {% if candidate_feedback.contact_email or candidate_feedback.contact_phone %}
-        <div class="feedback-contact">
-            {% if candidate_feedback.contact_email %}
-            <p><strong>Email:</strong> <a href="mailto:{{ candidate_feedback.contact_email }}">{{ candidate_feedback.contact_email }}</a></p>
-            {% endif %}
-            {% if candidate_feedback.contact_phone %}
-            <p><strong>Phone / chat:</strong> {{ candidate_feedback.contact_phone }}</p>
-            {% endif %}
-            {% if candidate_feedback.allow_follow_up %}
-            <p class="pill subtle success">Candidate opted in for follow-up</p>
-            {% endif %}
-        </div>
-        {% endif %}
-    </section>
-    {% endif %}
-
-    {% if integrity_signals %}
-    <section class="panel portal-panel integrity-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Integrity signals</p>
-                <h2>Environment telemetry</h2>
-            </div>
-        </header>
-        <div class="integrity-grid">
-            <article>
-                <p class="label">Primary IP</p>
-                <strong>{{ integrity_signals.ip_address|default:"—" }}</strong>
-                {% if integrity_signals.ip_switches %}
-                <p class="muted">{{ integrity_signals.ip_switches }} change(s) detected</p>
-                {% endif %}
-            </article>
-            <article>
-                <p class="label">Device</p>
-                <p class="muted">{{ integrity_signals.user_agent|default:"Unknown" }}</p>
-                {% if integrity_signals.timezone %}
-                <p class="muted">Timezone: {{ integrity_signals.timezone }}</p>
-                {% endif %}
-            </article>
-            <article>
-                <p class="label">Paste events</p>
-                <strong>{{ integrity_signals.paste_count }}</strong>
-            </article>
-        </div>
-        {% if integrity_signals.last_event %}
-        <p class="muted small">Last telemetry event captured {{ integrity_signals.last_event.timestamp }}</p>
-        {% endif %}
-    </section>
-    {% endif %}
-
-    {% if audit_log %}
-    <section class="panel portal-panel audit-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Audit trail</p>
-                <h2>Recent activity</h2>
-            </div>
-        </header>
-        <div class="audit-grid">
-            {% for item in audit_log %}
-            <article class="audit-card">
-                <span class="audit-time">{{ item.timestamp|naturaltime }}</span>
-                <h3>{{ item.label }}</h3>
-                <p>{{ item.description }}</p>
-            </article>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
-    <section class="panel portal-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Summary</p>
-                <h2>Candidate performance</h2>
-            </div>
-        </header>
-        <div class="summary-grid">
-            <article class="summary-card">
-                <h3>Overall score</h3>
-                <p class="summary-value">{% if report.score %}{{ report.score|floatformat:2 }}{% elif report.overall %}{{ report.overall|floatformat:2 }}{% else %}—{% endif %}</p>
-                <a class="link" href="{{ share_link }}" target="_blank">Share report</a>
-            </article>
-            {% if assessment_type == 'behavioral' and report.label %}
-            <article class="summary-card">
-                <h3>Eligibility decision</h3>
-                <p class="summary-value">{{ report.label }}</p>
-                <p class="muted">Behavioral eligibility rating</p>
-            </article>
-            {% elif assessment_type != 'behavioral' %}
-            <article class="summary-card">
-                <h3>Skill mix</h3>
-                <p class="summary-value">{{ report.hard|default:'—' }}/{{ report.soft|default:'—' }}</p>
-                <p class="muted">Hard vs. soft skills</p>
-            </article>
-            {% endif %}
-            {% if report.seniority %}
-            <article class="summary-card">
-                <h3>Recommended level</h3>
-                <p class="summary-value">{{ report.seniority }}</p>
-                <p class="muted">Suggested seniority band</p>
-            </article>
-            {% endif %}
-        </div>
-    </section>
-
-    {% if decision_summary %}
-    <section class="panel portal-panel review-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Review panel</p>
-                <h2>Decision votes</h2>
-            </div>
-        </header>
-        <div class="review-grid">
-            {% for item in decision_summary %}
-            <article class="review-card{% if recommended_decision and recommended_decision.decision == item.decision %} is-recommended{% endif %}">
-                <span class="badge">{{ item.decision|title }}</span>
-                <strong>{{ item.count }}</strong>
-            </article>
-            {% endfor %}
-        </div>
-        {% if recommended_decision %}
-        <p class="muted">Recommended direction: <strong>{{ recommended_decision.decision|title }}</strong></p>
-        {% endif %}
-    </section>
-    {% endif %}
-
-    <section class="panel portal-panel">
-        {% if assessment_type == 'behavioral' %}
-        <header>
-            <div>
-                <p class="eyebrow">Behavioral breakdown</p>
-                <h2>Trait scores</h2>
-            </div>
-        </header>
-        <div class="heatmap-grid">
-            {% for trait, score in report.traits.items %}
-            {% with percent=score|floatformat:0 %}
-            <article class="trait-bar">
-                <div class="trait-bar-header">
-                    <span class="label">{{ trait|title }}</span>
-                    <span class="value">{% if score %}{{ score|floatformat:1 }}{% else %}—{% endif %}</span>
-                </div>
-                <div class="progress">
-                    <div class="progress-fill" style="width: {{ percent }}%;"></div>
-                </div>
-            </article>
-            {% endwith %}
-            {% endfor %}
-        </div>
-        <header>
-            <div>
-                <h2>Risk flags</h2>
-            </div>
-        </header>
-        {% if report.flags %}
-        <div class="risk-grid">
-            {% for flag in report.flags %}
-            {% with severity=flag.level|default:"watchlist"|lower %}
-            <article class="risk-card severity-{{ severity }}">
-                <div class="risk-icon" aria-hidden="true">!</div>
-                <div class="risk-copy">
-                    <h3>{{ flag.trait|default:flag.code|title }}</h3>
-                    <p>{{ flag.reason }}</p>
-                </div>
-                <span class="risk-pill">{{ severity|title }}</span>
-            </article>
-            {% endwith %}
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="empty-state">No red flags triggered.</p>
-        {% endif %}
-        {% else %}
-        <header>
-            <div>
-                <p class="eyebrow">Category breakdown</p>
-                <h2>Skill profile</h2>
-            </div>
-        </header>
-        <div class="heatmap-grid">
-            {% for item in report.category_heatmap %}
-            <article class="heatmap-card status-{{ item.status }}">
-                <p class="label">{{ item.label|title }}</p>
-                <strong>{% if item.score is not None %}{{ item.score|floatformat:0 }}{% else %}—{% endif %}</strong>
-            </article>
-            {% endfor %}
-        </div>
-        <div class="table">
-            <div class="table-row table-head">
-                <span>Category</span>
-                <span>Score</span>
-            </div>
-            {% for cat, value in report.categories.items %}
-            <div class="table-row">
-                <span>{{ cat|title }}</span>
-                <span>{{ value }}</span>
-            </div>
-            {% endfor %}
-        </div>
-        <header>
-            <div>
-                <h2>Fit signals</h2>
-            </div>
-        </header>
-        {% if report.fit_scores %}
-        <div class="table">
-            <div class="table-row table-head">
-                <span>Domain</span>
-                <span>Score</span>
-            </div>
-            {% for domain, score in report.fit_scores.items %}
-            <div class="table-row">
-                <span>{{ domain|title }}</span>
-                <span>{{ score }}</span>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        <div class="chip-row">
-            {% if report.strengths %}
-            <div>
-                <p class="label">Strengths</p>
-                {% for item in report.strengths %}
-                <span class="chip">{{ item|title }}</span>
                 {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {# Performance Breakdown #}
+    <section class="performance-section">
+        <div class="section-header">
+            <h3>{% if assessment_type == 'behavioral' %}Behavioral Profile{% else %}Skill Breakdown{% endif %}</h3>
+            <p class="muted">Detailed performance analysis</p>
+        </div>
+
+        {% if assessment_type == 'behavioral' %}
+        {# Behavioral Assessment - Trait Scores #}
+        {% if report.traits %}
+        <div class="portal-card-grid two-up">
+            {% for trait, score in report.traits.items %}
+            <article class="portal-card trait-card">
+                <div class="trait-header">
+                    <h4>{{ trait|title }}</h4>
+                    <span class="trait-score">{% if score %}{{ score|floatformat:1 }}{% else %}—{% endif %}</span>
+                </div>
+                <div class="trait-bar">
+                    <div class="trait-fill" style="width: {{ score|floatformat:0 }}%;"></div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Risk Flags #}
+        {% if report.flags %}
+        <div class="section-header">
+            <h3>Risk Flags</h3>
+            <p class="muted">Areas requiring attention</p>
+        </div>
+        <div class="portal-card-grid two-up">
+            {% for flag in report.flags %}
+            <article class="portal-card risk-card severity-{{ flag.level|default:'watchlist'|lower }}">
+                <div class="risk-icon">⚠</div>
+                <div class="risk-content">
+                    <h4>{{ flag.trait|default:flag.code|title }}</h4>
+                    <p>{{ flag.reason }}</p>
+                    <span class="risk-level">{{ flag.level|default:'Watchlist'|title }}</span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        {# Skills Assessment - Category Heatmap #}
+        {% if report.category_heatmap %}
+        <div class="portal-card-grid skill-grid">
+            {% for item in report.category_heatmap %}
+            <article class="portal-card skill-card status-{{ item.status }}">
+                <h4>{{ item.label|title }}</h4>
+                <div class="skill-score">
+                    {% if item.score is not None %}{{ item.score|floatformat:0 }}{% else %}—{% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Detailed Category Scores #}
+        {% if report.categories %}
+        <div class="portal-card">
+            <div class="category-table">
+                <div class="category-header">
+                    <span>Category</span>
+                    <span>Score</span>
+                </div>
+                {% for cat, value in report.categories.items %}
+                <div class="category-row">
+                    <span class="category-name">{{ cat|title }}</span>
+                    <span class="category-score">{{ value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Strengths and Development Areas #}
+        {% if report.strengths or report.development %}
+        <div class="portal-card strengths-card">
+            {% if report.strengths %}
+            <div class="strengths-section">
+                <h4>Strengths</h4>
+                <div class="chip-list">
+                    {% for item in report.strengths %}
+                    <span class="chip chip-success">{{ item|title }}</span>
+                    {% endfor %}
+                </div>
             </div>
             {% endif %}
             {% if report.development %}
-                <div>
-                    <p class="label">Development areas</p>
+            <div class="development-section">
+                <h4>Development Areas</h4>
+                <div class="chip-list">
                     {% for item in report.development %}
-                    <span class="chip warning">{{ item|title }}</span>
+                    <span class="chip chip-warning">{{ item|title }}</span>
                     {% endfor %}
                 </div>
+            </div>
             {% endif %}
         </div>
-        {% if not report.fit_scores and not report.strengths and not report.development %}
-        <p class="muted">No recommendation data recorded.</p>
         {% endif %}
         {% endif %}
     </section>
 
-    <section class="panel portal-panel notes-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Collaboration</p>
-                <h2>Candidate notes</h2>
-            </div>
-        </header>
-        {% if can_edit_notes or can_record_decision %}
-        <form method="post" class="note-form">
-            {% csrf_token %}
-            {{ note_form.non_field_errors }}
-            <div class="form-field">
-                {{ note_form.note_type.label_tag }}
-                {{ note_form.note_type }}
-                {% for error in note_form.note_type.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="form-field">
-                {{ note_form.decision.label_tag }}
-                {{ note_form.decision }}
-                {% for error in note_form.decision.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="form-field">
-                {{ note_form.note.label_tag }}
-                {{ note_form.note }}
-                {% for error in note_form.note.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <label class="note-flag">
-                {{ note_form.needs_review }}
-                <span>{{ note_form.needs_review.label }}</span>
-            </label>
-            {% for error in note_form.needs_review.errors %}
-            <span class="field-error">{{ error }}</span>
-            {% endfor %}
-            <button class="btn btn-outline small" type="submit">Save note</button>
-        </form>
-        {% else %}
-        <p class="muted">You have viewer access. Contact your admin to share feedback.</p>
-        {% endif %}
-        <div class="notes-timeline">
+    {# Candidate Notes #}
+    <section class="notes-section">
+        <div class="section-header">
+            <h3>Team Notes</h3>
+            <p class="muted">Shared feedback and decisions</p>
+        </div>
+        <div class="portal-card">
+            {% if can_edit_notes or can_record_decision %}
+            <form method="post" class="notes-form">
+                {% csrf_token %}
+                {{ note_form.non_field_errors }}
+                <div class="notes-form-grid">
+                    <div class="form-field">
+                        {{ note_form.note_type.label_tag }}
+                        {{ note_form.note_type }}
+                        {% for error in note_form.note_type.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        {{ note_form.decision.label_tag }}
+                        {{ note_form.decision }}
+                        {% for error in note_form.decision.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-field">
+                    {{ note_form.note.label_tag }}
+                    {{ note_form.note }}
+                    {% for error in note_form.note.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-actions">
+                    <label class="checkbox-label">
+                        {{ note_form.needs_review }}
+                        <span>{{ note_form.needs_review.label }}</span>
+                    </label>
+                    <button type="submit" class="btn btn-primary">Save Note</button>
+                </div>
+            </form>
+            {% endif %}
+
+            {# Notes List #}
             {% if notes %}
-            <ul class="notes-list">
+            <div class="notes-list">
                 {% for note in notes %}
-                <li>
-                    <div class="note-dot"></div>
-                    <div class="note-body">
-                        <div class="note-heading">
-                            <p class="note-meta">
-                                {{ note.created_at|naturaltime }}
-                                {% if note.author %}· {{ note.author.get_full_name|default:note.author.username }}{% endif %}
-                            </p>
-                            {% if note.note_type == 'decision' %}
-                            <span class="badge">{{ note.get_decision_display }}</span>
-                            {% endif %}
+                <div class="note-item">
+                    <div class="note-header">
+                        <div class="note-meta">
+                            <span class="note-author">
+                                {% if note.author %}{{ note.author.get_full_name|default:note.author.username }}{% else %}System{% endif %}
+                            </span>
+                            <span class="note-time">{{ note.created_at|naturaltime }}</span>
                         </div>
-                        {% if note.note %}
-                        <p>{{ note.note }}</p>
-                        {% endif %}
-                        <p class="muted">
-                            {{ note.get_note_type_display }} · {{ note.get_author_role_display|default:note.author_role|title }}
-                        </p>
-                        {% if note.needs_review %}
-                        <span class="pill warning">Needs review</span>
+                        {% if note.note_type == 'decision' %}
+                        <span class="note-badge">{{ note.get_decision_display }}</span>
                         {% endif %}
                     </div>
-                </li>
+                    {% if note.note %}
+                    <p class="note-content">{{ note.note }}</p>
+                    {% endif %}
+                    <div class="note-footer">
+                        <span class="note-type">{{ note.get_note_type_display }}</span>
+                        {% if note.needs_review %}
+                        <span class="badge badge-warning">Needs Review</span>
+                        {% endif %}
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
             {% else %}
-            <p class="muted">No notes yet. Use the form above to capture feedback or flag follow-ups.</p>
+            <p class="empty-note-state">No notes yet. Use the form above to add feedback or flag follow-ups.</p>
             {% endif %}
         </div>
     </section>
+
+    {# Advanced Details (Collapsed by default) #}
+    <details class="advanced-section">
+        <summary class="advanced-toggle">
+            <h3>Advanced Details</h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </summary>
+
+        <div class="advanced-content">
+            {# Candidate Feedback #}
+            {% if candidate_feedback %}
+            <div class="portal-card feedback-card">
+                <h4>Candidate Feedback</h4>
+                <div class="feedback-grid">
+                    <div>
+                        <span class="label">Rating</span>
+                        <strong>{% if candidate_feedback.label %}{{ candidate_feedback.label }}{% elif candidate_feedback.score %}{{ candidate_feedback.score }}/5{% else %}—{% endif %}</strong>
+                    </div>
+                    <div>
+                        <span class="label">Submitted</span>
+                        <strong>{% if candidate_feedback.submitted_at %}{{ candidate_feedback.submitted_at|naturaltime }}{% else %}—{% endif %}</strong>
+                    </div>
+                </div>
+                {% if candidate_feedback.comment %}
+                <p class="feedback-comment">"{{ candidate_feedback.comment }}"</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {# Integrity Signals #}
+            {% if integrity_signals %}
+            <div class="portal-card integrity-card">
+                <h4>Environment Telemetry</h4>
+                <div class="integrity-grid">
+                    <div>
+                        <span class="label">Primary IP</span>
+                        <span>{{ integrity_signals.ip_address|default:"—" }}</span>
+                        {% if integrity_signals.ip_switches %}
+                        <span class="muted">{{ integrity_signals.ip_switches }} change(s)</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="label">Device</span>
+                        <span class="muted">{{ integrity_signals.user_agent|default:"Unknown" }}</span>
+                    </div>
+                    <div>
+                        <span class="label">Paste Events</span>
+                        <span>{{ integrity_signals.paste_count }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# Responses Drilldown #}
+            {% if response_drilldown %}
+            <div class="portal-card responses-card">
+                <h4>Response Details</h4>
+                {% for item in response_drilldown|slice:":5" %}
+                <details class="response-item">
+                    <summary>
+                        <strong>{{ item.prompt }}</strong>
+                        <span class="response-outcome {{ item.outcome_class }}">{{ item.outcome }}</span>
+                    </summary>
+                    <div class="response-details">
+                        <p><strong>Answer:</strong> {{ item.answer }}</p>
+                        <p><strong>Time:</strong> {{ item.elapsed }}</p>
+                    </div>
+                </details>
+                {% endfor %}
+                {% if response_drilldown|length > 5 %}
+                <p class="muted">Showing 5 of {{ response_drilldown|length }} responses</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </details>
 </div>
+
+<style>
+/* Assessment Report Styles */
+
+/* Breadcrumb (reuse from project detail) */
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link {
+    color: var(--orange);
+    text-decoration: none;
+    transition: opacity var(--portal-transition);
+}
+
+.breadcrumb-link:hover {
+    opacity: 0.8;
+}
+
+.breadcrumb-separator {
+    color: var(--text-muted);
+}
+
+.breadcrumb-current {
+    color: var(--text-muted);
+}
+
+/* Report Meta */
+.report-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-badge.status-submitted {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.status-badge.status-in_progress {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.status-badge.status-draft {
+    background: rgba(14, 20, 40, 0.08);
+    color: var(--text-muted);
+}
+
+.meta-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Recommendation Banner */
+.recommendation-banner {
+    margin-top: 2rem;
+    padding: 1.5rem;
+}
+
+.recommendation-banner.tone-positive {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+    border-left: 4px solid #10b981;
+}
+
+.recommendation-banner.tone-negative {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+    border-left: 4px solid #ef4444;
+}
+
+.recommendation-banner.tone-neutral {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+    border-left: 4px solid #f59e0b;
+}
+
+.recommendation-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.recommendation-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0.5rem 0;
+}
+
+.recommendation-header p {
+    color: var(--text-body);
+    margin: 0;
+}
+
+.recommendation-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 138, 0, 0.1);
+    color: var(--orange);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recommendation-metrics {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.metric-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.chip-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chip-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+/* Metric Cards with text values */
+.metric-text {
+    font-size: 1.5rem !important;
+}
+
+/* Take Action Section */
+.take-action-section {
+    margin-top: 3rem;
+}
+
+.action-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 2px solid var(--portal-border-color);
+    border-radius: var(--portal-radius-md);
+    background: #fff;
+    cursor: pointer;
+    transition: all var(--portal-transition);
+    text-align: left;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--portal-shadow-md);
+}
+
+.action-button svg {
+    flex-shrink: 0;
+}
+
+.action-button .action-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.25rem;
+}
+
+.action-button .action-hint {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.action-advance:hover {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.action-advance svg {
+    color: #10b981;
+}
+
+.action-hold:hover {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.05);
+}
+
+.action-hold svg {
+    color: #f59e0b;
+}
+
+.action-reject:hover {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.action-reject svg {
+    color: #ef4444;
+}
+
+.action-note {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.action-note label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--navy);
+}
+
+.action-note textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--navy);
+    resize: vertical;
+    transition: all var(--portal-transition);
+}
+
+.action-note textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+/* Timeline Section */
+.timeline-section {
+    margin-top: 3rem;
+}
+
+.journey-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.timeline-event {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+}
+
+.timeline-event:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 30px;
+    bottom: -24px;
+    width: 2px;
+    background: var(--portal-border-color);
+}
+
+.timeline-marker {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--orange);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.timeline-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.timeline-header strong {
+    color: var(--navy);
+    font-size: 0.95rem;
+}
+
+.timeline-time {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.timeline-description {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.timeline-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Performance Section */
+.performance-section {
+    margin-top: 3rem;
+}
+
+/* Trait Cards (Behavioral) */
+.trait-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.trait-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.trait-header h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0;
+}
+
+.trait-score {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--orange);
+}
+
+.trait-bar {
+    height: 8px;
+    background: rgba(14, 20, 40, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.trait-fill {
+    height: 100%;
+    background: var(--orange);
+    transition: width 0.3s ease;
+}
+
+/* Risk Cards */
+.risk-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem !important;
+}
+
+.risk-card.severity-critical {
+    background: rgba(239, 68, 68, 0.05);
+    border-left: 4px solid #ef4444;
+}
+
+.risk-card.severity-watchlist {
+    background: rgba(245, 158, 11, 0.05);
+    border-left: 4px solid #f59e0b;
+}
+
+.risk-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.risk-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.risk-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0;
+}
+
+.risk-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-body);
+}
+
+.risk-level {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Skill Cards (Skills Assessment) */
+.skill-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.skill-card {
+    text-align: center;
+    padding: 1.25rem !important;
+}
+
+.skill-card h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.skill-score {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--orange);
+}
+
+.skill-card.status-strong {
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.skill-card.status-weak {
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Category Table */
+.category-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.category-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--portal-border-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.category-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--portal-border-color);
+    transition: background var(--portal-transition);
+}
+
+.category-row:hover {
+    background: var(--portal-bg-hover);
+}
+
+.category-row:last-child {
+    border-bottom: none;
+}
+
+.category-name {
+    color: var(--navy);
+    font-weight: 500;
+}
+
+.category-score {
+    color: var(--text-body);
+    font-weight: 600;
+}
+
+/* Strengths Card */
+.strengths-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.strengths-section h4,
+.development-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.75rem;
+}
+
+.chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.chip-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.chip-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+/* Notes Section */
+.notes-section {
+    margin-top: 3rem;
+}
+
+.notes-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--portal-border-color);
+    margin-bottom: 1.5rem;
+}
+
+.notes-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-field label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--navy);
+}
+
+.form-field select,
+.form-field textarea {
+    padding: 0.65rem 0.875rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: var(--navy);
+    background: #fff;
+    transition: all var(--portal-transition);
+}
+
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.form-field textarea {
+    min-height: 80px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.note-item {
+    padding: 1rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    transition: all var(--portal-transition);
+}
+
+.note-item:hover {
+    border-color: var(--orange);
+    box-shadow: 0 2px 8px rgba(255, 138, 0, 0.1);
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.note-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.note-author {
+    font-weight: 600;
+    color: var(--navy);
+    font-size: 0.9rem;
+}
+
+.note-time {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.note-badge {
+    padding: 0.25rem 0.65rem;
+    background: rgba(255, 138, 0, 0.1);
+    color: var(--orange);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.note-content {
+    margin: 0.75rem 0;
+    color: var(--text-body);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.note-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.note-type {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.empty-note-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Advanced Section */
+.advanced-section {
+    margin-top: 3rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: var(--portal-radius-md);
+    overflow: hidden;
+}
+
+.advanced-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: var(--portal-bg);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.advanced-toggle h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0;
+}
+
+.advanced-toggle svg {
+    color: var(--text-muted);
+    transition: transform 0.2s;
+}
+
+.advanced-section[open] .advanced-toggle svg {
+    transform: rotate(180deg);
+}
+
+.advanced-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.feedback-card h4,
+.integrity-card h4,
+.responses-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 1rem;
+}
+
+.feedback-grid,
+.integrity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.feedback-grid > div,
+.integrity-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.feedback-grid .label,
+.integrity-grid .label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.feedback-comment {
+    margin: 1rem 0 0;
+    padding: 1rem;
+    background: var(--portal-bg);
+    border-left: 3px solid var(--orange);
+    border-radius: 6px;
+    font-style: italic;
+    color: var(--text-body);
+}
+
+.response-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+
+.response-item:last-child {
+    border-bottom: none;
+}
+
+.response-item summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem 0;
+}
+
+.response-item summary strong {
+    color: var(--navy);
+}
+
+.response-outcome {
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.response-outcome.correct {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.response-outcome.incorrect {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.response-details {
+    padding: 1rem;
+    background: var(--portal-bg);
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+.response-details p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .recommendation-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .recommendation-metrics {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .notes-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skill-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
 {% endblock %}
-        {% if pdf_export_url %}
-        <a class="pill" href="{{ pdf_export_url }}" target="_blank" rel="noreferrer">Download PDF</a>
-        {% endif %}
