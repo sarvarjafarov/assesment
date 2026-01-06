@@ -1,132 +1,132 @@
-{% extends 'base.html' %}
+{% extends 'portal_base.html' %}
+{% load static %}
 {% load humanize %}
-{% block content %}
+{% block title %}{{ project.title }} · Projects · Evalon{% endblock %}
+{% block meta_description %}Manage candidates and track progress for {{ project.title }}.{% endblock %}
+{% block portal_content %}
 <div class="portal-shell">
-    <section class="portal-hero compact">
+    {# Project Header #}
+    <header class="page-header-with-actions">
         <div>
-            <p class="eyebrow">{{ project.get_status_display }}</p>
+            <div class="breadcrumb-nav">
+                <a href="{% url 'clients:project-list' %}" class="breadcrumb-link">Projects</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-current">{{ project.title }}</span>
+            </div>
             <h1>{{ project.title }}</h1>
-            <p class="muted">
-                {% if project.department %}{{ project.department }} · {% endif %}
-                {% if project.location %}{{ project.location }} · {% endif %}
-                Priority {{ project.get_priority_display }}
-            </p>
+            <div class="project-meta-badges">
+                <span class="badge {% if project.status == 'active' %}badge-success{% else %}badge-neutral{% endif %}">
+                    {{ project.get_status_display }}
+                </span>
+                <span class="badge badge-priority-{{ project.priority }}">
+                    {{ project.get_priority_display }} priority
+                </span>
+                {% if project.department or project.location %}
+                <span class="meta-text">
+                    {% if project.department %}{{ project.department }}{% endif %}
+                    {% if project.department and project.location %} · {% endif %}
+                    {% if project.location %}{{ project.location }}{% endif %}
+                </span>
+                {% endif %}
+            </div>
         </div>
-        <div class="portal-actions">
-            <a class="btn btn-outline small" href="{% url 'clients:project-list' %}">Back to projects</a>
+        <div class="header-actions">
             {% if request.user.client_account.role == 'manager' %}
-            <a class="btn btn-pill small" href="{% url 'clients:project-clone' project.uuid %}">Duplicate project</a>
+            <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Duplicate
+            </a>
             {% endif %}
         </div>
-    </section>
+    </header>
 
-    <section class="portal-card-grid metric-snapshot">
-        <article class="portal-card">
+    {# Key Metrics - Only 3 essential cards #}
+    <section class="portal-card-grid three-up key-metrics">
+        <article class="portal-card metric-card">
             <p class="label">Open roles</p>
-            <h2>{{ project.open_roles }}</h2>
-            <p class="muted">Target start {% if project.target_start_date %}{{ project.target_start_date|date:"M j, Y" }}{% else %}—{% endif %}</p>
+            <h2 class="metric-value">{{ project.open_roles }}</h2>
+            <p class="muted">
+                {% if project.target_start_date %}
+                    Target start {{ project.target_start_date|date:"M j, Y" }}
+                {% else %}
+                    No target date set
+                {% endif %}
+            </p>
         </article>
-        <article class="portal-card">
+        <article class="portal-card metric-card">
             <p class="label">Total invites</p>
-            <h2>{{ project.total_sessions }}</h2>
-            <p class="muted">Across all assessments</p>
+            <h2 class="metric-value">{{ project.total_sessions }}</h2>
+            <p class="muted">{{ project_health.submitted }} completed</p>
         </article>
-        <article class="portal-card">
-            <p class="label">Description</p>
-            <p class="muted">{{ project.description|default:"No description yet." }}</p>
+        <article class="portal-card metric-card">
+            <p class="label">Completion rate</p>
+            <h2 class="metric-value">
+                {% if project_health.completion_rate is not None %}
+                    {{ project_health.completion_rate|floatformat:0 }}%
+                {% else %}
+                    —
+                {% endif %}
+            </h2>
+            <p class="muted">
+                {% if project_health.total > 0 %}
+                    {{ project_health.submitted }}/{{ project_health.total }} submitted
+                {% else %}
+                    No invites yet
+                {% endif %}
+            </p>
         </article>
     </section>
 
-    {% with health=project_health %}
-    <section class="portal-card-grid project-health-grid">
-        <article class="portal-card">
-            <p class="label">Active invites</p>
-            <h2>{{ health.active_invites }}</h2>
-            <p class="muted">Draft, paused, or in progress</p>
-        </article>
-        <article class="portal-card">
-            <p class="label">Completion rate</p>
-            <h2>{% if health.completion_rate is not None %}{{ health.completion_rate|floatformat:0 }}%{% else %}—{% endif %}</h2>
-            <p class="muted">{{ health.submitted }}/{{ health.total }} submitted</p>
-        </article>
-        <article class="portal-card">
-            <p class="label">Avg. completion time</p>
-            <h2>{% if health.avg_completion_minutes %}{{ health.avg_completion_minutes|floatformat:0 }} min{% else %}—{% endif %}</h2>
-            <p class="muted">From start to submission</p>
-        </article>
-        <article class="portal-card">
-            <p class="label">Avg. time to fill</p>
-            <h2>{% if health.avg_time_to_fill_days %}{{ health.avg_time_to_fill_days|floatformat:1 }} days{% else %}—{% endif %}</h2>
-            <p class="muted">Invite creation to completion</p>
-        </article>
-    </section>
-    {% if health.top_candidates %}
-    <section class="panel portal-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Top candidates</p>
-                <h2>Best-performing submissions</h2>
-            </div>
-        </header>
-        <div class="top-candidate-list">
-            {% for candidate in health.top_candidates %}
-            <article class="top-candidate-card">
-                <div>
-                    <p class="label">{{ candidate.candidate }}</p>
-                    <p class="muted">{{ candidate.assessment }}</p>
-                </div>
-                <div class="spotlight-score">
-                    <strong>{{ candidate.score|floatformat:0 }}</strong>
-                    <span>score</span>
-                </div>
-                {% if candidate.detail_url %}
-                <a class="pill subtle" href="{{ candidate.detail_url }}">Report</a>
-                {% endif %}
-            </article>
-            {% endfor %}
-        </div>
+    {# Project Description - Only if exists #}
+    {% if project.description %}
+    <section class="portal-card description-card">
+        <h3>Description</h3>
+        <p class="description-text">{{ project.description }}</p>
     </section>
     {% endif %}
-    {% endwith %}
 
-    <section class="pipeline-board" id="pipeline">
-        <header class="pipeline-head">
+    {# Pipeline Board #}
+    <section class="pipeline-section">
+        <div class="section-header">
             <div>
-                <p class="eyebrow">Pipeline</p>
-                <h2>Stage-by-stage visibility</h2>
+                <h3>Candidate Pipeline</h3>
+                <p class="muted">Stage-by-stage visibility</p>
             </div>
-            <p class="muted">Drag-and-drop coming soon; for now update stages inline.</p>
-        </header>
-        <div class="pipeline-columns">
+            <p class="muted hint-text">Drag-and-drop coming soon; for now update stages inline.</p>
+        </div>
+
+        <div class="pipeline-board">
             {% for column in pipeline_columns %}
             <article class="pipeline-column">
-                <div class="pipeline-column-head">
-                    <h3>{{ column.label }}</h3>
-                    <span class="micro-pill">{{ column.count }} candidate{{ column.count|pluralize }}</span>
+                <div class="pipeline-column-header">
+                    <h4>{{ column.label }}</h4>
+                    <span class="count-badge">{{ column.count }}</span>
                 </div>
                 {% if column.sessions %}
                 <ul class="pipeline-card-list">
                     {% for card in column.sessions %}
-                    <li class="pipeline-card">
-                        <div class="pipeline-card-main">
-                            <p class="label">{{ card.candidate }}</p>
-                            <p class="muted">{{ card.assessment }}</p>
+                    <li class="pipeline-candidate-card">
+                        <div class="candidate-info">
+                            <p class="candidate-name">{{ card.candidate }}</p>
+                            <p class="candidate-assessment muted">{{ card.assessment }}</p>
                         </div>
-                        <div class="pipeline-card-meta">
-                            <span class="status-pill">{{ card.status }}</span>
-                            {% if card.score %}
-                            <span class="score-pill">{{ card.score|floatformat:0 }}</span>
-                            {% endif %}
+                        {% if card.score %}
+                        <div class="candidate-score">
+                            <span class="score-value">{{ card.score|floatformat:0 }}</span>
                         </div>
-                        <p class="muted tiny">Updated {{ card.updated_at|naturaltime }}</p>
-                        <div class="pipeline-card-actions">
+                        {% endif %}
+                        <p class="candidate-updated muted">{{ card.updated_at|naturaltime }}</p>
+                        <div class="candidate-actions">
                             {% if card.detail_url %}
-                            <a class="pill subtle" href="{{ card.detail_url }}">Report</a>
+                            <a href="{{ card.detail_url }}" class="btn btn-ghost small">View Report</a>
                             {% endif %}
                             {% if can_edit_pipeline %}
-                            <form method="post" action="{{ card.stage_url }}" class="pipeline-stage-form">
+                            <form method="post" action="{{ card.stage_url }}" class="stage-select-form">
                                 {% csrf_token %}
-                                <select name="stage" class="pipeline-stage-select" aria-label="Update stage for {{ card.candidate }}" onchange="this.form.submit()">
+                                <select name="stage" class="stage-select" aria-label="Update stage" onchange="this.form.submit()">
                                     {% for value,label in pipeline_stage_choices %}
                                     <option value="{{ value }}" {% if value == card.stage %}selected{% endif %}>{{ label }}</option>
                                     {% endfor %}
@@ -138,70 +138,512 @@
                     {% endfor %}
                 </ul>
                 {% else %}
-                <p class="empty-state">No candidates in this stage.</p>
+                <p class="pipeline-empty">No candidates in this stage.</p>
                 {% endif %}
             </article>
             {% endfor %}
         </div>
     </section>
 
-    <section class="panel portal-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Assessment breakdown</p>
-                <h2>By assessment type</h2>
-            </div>
-        </header>
-        {% if assessment_details %}
-        <div class="portal-card-grid metric-snapshot">
+    {# Assessment Breakdown #}
+    {% if assessment_details %}
+    <section class="breakdown-section">
+        <div class="section-header">
+            <h3>Assessment Breakdown</h3>
+            <p class="muted">Invites by assessment type</p>
+        </div>
+        <div class="portal-card-grid two-up">
             {% for row in assessment_details %}
-            <article class="portal-card">
-                <p class="label">{{ row.label }}</p>
-                <h2>{{ row.total }} invites</h2>
-                <p class="muted">{{ row.submitted }} completed · {{ row.in_progress }} in progress · {{ row.draft }} draft</p>
+            <article class="portal-card breakdown-card">
+                <h4>{{ row.label }}</h4>
+                <div class="breakdown-stats">
+                    <div class="breakdown-main">
+                        <span class="breakdown-total">{{ row.total }}</span>
+                        <span class="breakdown-label">total invites</span>
+                    </div>
+                    <div class="breakdown-details">
+                        <span class="stat-item">{{ row.submitted }} completed</span>
+                        <span class="stat-separator">·</span>
+                        <span class="stat-item">{{ row.in_progress }} in progress</span>
+                        <span class="stat-separator">·</span>
+                        <span class="stat-item">{{ row.draft }} draft</span>
+                    </div>
+                </div>
             </article>
             {% endfor %}
         </div>
-        {% else %}
-        <p class="empty-state">No invites have been created for this project yet.</p>
-        {% endif %}
     </section>
+    {% endif %}
 
-    <section class="panel portal-panel">
-        <header>
-            <div>
-                <p class="eyebrow">Recent activity</p>
-                <h2>Latest candidates</h2>
-            </div>
-        </header>
-        {% if recent_sessions %}
-        <div class="table">
-            <div class="table-row table-head">
-                <span>Candidate</span>
-                <span>Assessment</span>
-                <span>Status</span>
-                <span>Updated</span>
-                <span>Actions</span>
-            </div>
-            {% for row in recent_sessions %}
-            <div class="table-row">
-                <span>{{ row.candidate }}</span>
-                <span>{{ row.assessment }}</span>
-                <span>{{ row.status }}</span>
-                <span>{{ row.updated_at|naturaltime }}</span>
-                <span>
-                    {% if row.detail_url %}
-                    <a class="pill" href="{{ row.detail_url }}">Report</a>
-                    {% else %}
-                    <span class="muted">—</span>
-                    {% endif %}
-                </span>
-            </div>
-            {% endfor %}
+    {# Recent Activity #}
+    {% if recent_sessions %}
+    <section class="activity-section">
+        <div class="section-header">
+            <h3>Recent Activity</h3>
+            <p class="muted">Latest candidate updates</p>
         </div>
-        {% else %}
-        <p class="empty-state">No candidate activity yet for this project.</p>
-        {% endif %}
+        <div class="portal-card">
+            <div class="activity-table">
+                <div class="activity-table-header">
+                    <span>Candidate</span>
+                    <span>Assessment</span>
+                    <span>Status</span>
+                    <span>Updated</span>
+                    <span>Actions</span>
+                </div>
+                {% for row in recent_sessions %}
+                <div class="activity-table-row">
+                    <span class="activity-candidate">{{ row.candidate }}</span>
+                    <span class="activity-assessment">{{ row.assessment }}</span>
+                    <span class="activity-status">
+                        <span class="status-badge">{{ row.status }}</span>
+                    </span>
+                    <span class="activity-time muted">{{ row.updated_at|naturaltime }}</span>
+                    <span class="activity-actions">
+                        {% if row.detail_url %}
+                        <a href="{{ row.detail_url }}" class="btn btn-ghost small">Report</a>
+                        {% else %}
+                        <span class="muted">—</span>
+                        {% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </section>
+    {% else %}
+    <section class="portal-card empty-state-card">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <h4>No candidate activity yet</h4>
+        <p class="muted">Invites sent for this project will appear here.</p>
+    </section>
+    {% endif %}
 </div>
+
+<style>
+/* Project Detail Styles */
+
+/* Breadcrumb Navigation */
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link {
+    color: var(--orange);
+    text-decoration: none;
+    transition: opacity var(--portal-transition);
+}
+
+.breadcrumb-link:hover {
+    opacity: 0.8;
+}
+
+.breadcrumb-separator {
+    color: var(--text-muted);
+}
+
+.breadcrumb-current {
+    color: var(--text-muted);
+}
+
+/* Project Meta Badges */
+.project-meta-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+.meta-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Description Card */
+.description-card {
+    margin-top: 2rem;
+}
+
+.description-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.75rem;
+}
+
+.description-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-body);
+    margin: 0;
+}
+
+/* Pipeline Section */
+.pipeline-section {
+    margin-top: 3rem;
+}
+
+.hint-text {
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.pipeline-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.pipeline-column {
+    background: var(--portal-bg);
+    border: 1px solid var(--portal-border-color);
+    border-radius: var(--portal-radius-md);
+    min-width: 240px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pipeline-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+
+.pipeline-column-header h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0;
+}
+
+.count-badge {
+    display: inline-block;
+    background: rgba(14, 20, 40, 0.08);
+    color: var(--text-muted);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.pipeline-card-list {
+    list-style: none;
+    padding: 0.75rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.pipeline-candidate-card {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: all var(--portal-transition);
+}
+
+.pipeline-candidate-card:hover {
+    border-color: var(--orange);
+    box-shadow: 0 2px 8px rgba(255, 138, 0, 0.1);
+}
+
+.candidate-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.candidate-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0;
+}
+
+.candidate-assessment {
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.candidate-score {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.score-value {
+    display: inline-block;
+    background: rgba(255, 138, 0, 0.1);
+    color: var(--orange);
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.candidate-updated {
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.candidate-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--portal-border-color);
+}
+
+.stage-select-form {
+    margin: 0;
+}
+
+.stage-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--navy);
+    background: #fff;
+    cursor: pointer;
+    transition: all var(--portal-transition);
+}
+
+.stage-select:hover {
+    border-color: var(--orange);
+}
+
+.stage-select:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.pipeline-empty {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+    margin: 0;
+}
+
+/* Assessment Breakdown Section */
+.breakdown-section {
+    margin-top: 3rem;
+}
+
+.breakdown-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.breakdown-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--orange);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.breakdown-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.breakdown-main {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.breakdown-total {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.breakdown-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.breakdown-details {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: var(--text-body);
+}
+
+.stat-separator {
+    color: var(--text-muted);
+}
+
+/* Activity Section */
+.activity-section {
+    margin-top: 3rem;
+}
+
+.activity-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-table-header {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1.5fr 1.5fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--portal-border-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.activity-table-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1.5fr 1.5fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--portal-border-color);
+    font-size: 0.9rem;
+    align-items: center;
+    transition: background var(--portal-transition);
+}
+
+.activity-table-row:hover {
+    background: var(--portal-bg-hover);
+}
+
+.activity-table-row:last-child {
+    border-bottom: none;
+}
+
+.activity-candidate {
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.activity-assessment {
+    color: var(--text-body);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    background: rgba(14, 20, 40, 0.08);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.activity-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .pipeline-board {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .breadcrumb-nav {
+        font-size: 0.85rem;
+    }
+
+    .page-header-with-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pipeline-board {
+        grid-template-columns: 1fr;
+    }
+
+    .activity-table-header,
+    .activity-table-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .activity-table-header {
+        display: none;
+    }
+
+    .activity-table-row {
+        border: 1px solid var(--portal-border-color);
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        padding: 1rem;
+    }
+
+    .activity-table-row::before {
+        content: none;
+    }
+
+    .activity-candidate::before {
+        content: "Candidate: ";
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+
+    .activity-assessment::before {
+        content: "Assessment: ";
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+
+    .activity-time::before {
+        content: "Updated: ";
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+
+    .activity-actions {
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+    }
+}
+</style>
+
 {% endblock %}
