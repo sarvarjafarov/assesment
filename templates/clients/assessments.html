@@ -8,7 +8,7 @@
     <header class="page-header-with-actions">
         <div>
             <h1>Assessments</h1>
-            <p class="muted">{{ allowed_assessments|length }} assessment{{ allowed_assessments|length|pluralize }} available</p>
+            <p class="muted">{{ allowed_assessments|length }} assessment{{ allowed_assessments|length|pluralize }} available in your catalog</p>
         </div>
         {% if can_manage_invites %}
         <div class="header-actions">
@@ -25,7 +25,7 @@
     </header>
 
     {# Search and Filter Bar #}
-    <section class="search-filter-bar">
+    <section class="search-filter-section">
         <div class="search-box">
             <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -56,63 +56,75 @@
     {% if allowed_assessments %}
     <section class="assessment-grid">
         {% for assessment in allowed_assessments %}
-        <article class="assessment-card"
+        <article class="assessment-card portal-card"
                  data-code="{{ assessment.code }}"
                  data-label="{{ assessment.label|lower }}"
                  data-has-invites="{% if assessment.metrics.total_invites %}true{% else %}false{% endif %}">
             <div class="assessment-card-header">
                 <div class="assessment-icon">
                     {% if assessment.code == 'marketing' %}
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                             <path d="M2 17l10 5 10-5"></path>
                             <path d="M2 12l10 5 10-5"></path>
                         </svg>
                     {% elif assessment.code == 'product' %}
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                         </svg>
                     {% elif assessment.code == 'behavioral' %}
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                             <circle cx="9" cy="7" r="4"></circle>
                             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                         </svg>
                     {% else %}
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
                         </svg>
                     {% endif %}
                 </div>
-                <h3 class="assessment-title">{{ assessment.label }}</h3>
-                <p class="assessment-description">{{ assessment.description }}</p>
+                <div class="assessment-title-area">
+                    <h3 class="assessment-title">{{ assessment.label }}</h3>
+                    <p class="assessment-description">{{ assessment.description }}</p>
+                </div>
             </div>
 
-            <div class="assessment-metrics">
-                <div class="metric-row">
-                    <span class="metric-label">Total invites</span>
-                    <span class="metric-value">{{ assessment.metrics.total_invites|default:0 }}</span>
+            <div class="assessment-stats">
+                <div class="stat-inline">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="stat-text">
+                        <strong>{{ assessment.metrics.total_invites|default:0 }}</strong> invite{{ assessment.metrics.total_invites|default:0|pluralize }}
+                    </span>
                 </div>
-                <div class="metric-row">
-                    <span class="metric-label">Completed</span>
-                    <span class="metric-value">{{ assessment.metrics.completed_invites|default:0 }}</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">In progress</span>
-                    <span class="metric-value">{{ assessment.metrics.in_progress_invites|default:0 }}</span>
+                <div class="stat-inline">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <span class="stat-text">
+                        <strong>{{ assessment.metrics.completed_invites|default:0 }}</strong> completed
+                    </span>
                 </div>
                 {% if assessment.metrics.completion_rate is not None %}
-                <div class="metric-row">
-                    <span class="metric-label">Completion rate</span>
-                    <span class="metric-value highlight">{{ assessment.metrics.completion_rate|floatformat:0 }}%</span>
+                <div class="stat-inline highlight">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span class="stat-text">
+                        <strong>{{ assessment.metrics.completion_rate|floatformat:0 }}%</strong> completion
+                    </span>
                 </div>
                 {% endif %}
             </div>
 
-            <div class="assessment-actions">
+            <div class="assessment-footer">
                 <a href="{{ assessment.manage_url }}" class="btn btn-primary btn-block">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -122,33 +134,30 @@
                     </svg>
                     Invite Candidates
                 </a>
-                <a href="{{ assessment.manage_url }}" class="btn btn-ghost btn-block">
-                    View All Sessions
-                </a>
             </div>
         </article>
         {% endfor %}
     </section>
     {% else %}
     <div class="portal-card empty-state-card">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 1rem;">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
         </svg>
-        <h3>No assessments available</h3>
+        <h4>No assessments available</h4>
         <p class="muted">Contact support to add assessments to your account.</p>
     </div>
     {% endif %}
 
     {# Help Section #}
     <section class="help-section">
-        <div class="help-card">
+        <div class="portal-card help-card">
             <svg class="help-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
-            <div>
+            <div class="help-content">
                 <h4>Need help choosing an assessment?</h4>
                 <p class="muted">Our team can help you select the right assessments for your hiring needs.</p>
                 <a href="mailto:support@evalon.app" class="link-with-arrow">
@@ -162,6 +171,292 @@
         </div>
     </section>
 </div>
+
+<style>
+/* ========================================================================
+   ASSESSMENTS PAGE - CLEAN DESIGN
+   ======================================================================== */
+
+/* Search and Filter Section */
+.search-filter-section {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 280px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: var(--navy);
+    background: #fff;
+    transition: all var(--portal-transition);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.filter-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--navy);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--portal-transition);
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background: var(--portal-bg-hover);
+}
+
+.filter-btn.active {
+    background: var(--orange);
+    color: #fff;
+    border-color: var(--orange);
+}
+
+/* Assessment Grid */
+.assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.assessment-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transition: all var(--portal-transition);
+    cursor: pointer;
+}
+
+.assessment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--portal-shadow-lg);
+}
+
+/* Card Header */
+.assessment-card-header {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+
+.assessment-icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 138, 0, 0.08);
+    border-radius: 12px;
+    color: var(--orange);
+}
+
+.assessment-title-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.assessment-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.5rem;
+}
+
+.assessment-description {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Stats - Inline Clean Design */
+.assessment-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stat-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.95rem;
+    color: var(--text-body);
+}
+
+.stat-inline svg {
+    color: var(--orange);
+    flex-shrink: 0;
+}
+
+.stat-inline.highlight {
+    color: var(--orange);
+}
+
+.stat-inline.highlight svg {
+    color: var(--orange);
+}
+
+.stat-text {
+    line-height: 1.4;
+}
+
+.stat-text strong {
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.stat-inline.highlight .stat-text strong {
+    color: var(--orange);
+}
+
+/* Footer */
+.assessment-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--portal-border-color);
+}
+
+/* Help Section */
+.help-section {
+    margin-top: 3rem;
+}
+
+.help-card {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    background: rgba(255, 138, 0, 0.04);
+    border: 1px solid rgba(255, 138, 0, 0.2);
+}
+
+.help-icon {
+    flex-shrink: 0;
+    color: var(--orange);
+}
+
+.help-content {
+    flex: 1;
+}
+
+.help-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.5rem;
+}
+
+.help-content p {
+    margin: 0 0 1rem;
+}
+
+.link-with-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--orange);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: gap var(--portal-transition);
+}
+
+.link-with-arrow:hover {
+    gap: 0.75rem;
+}
+
+.link-with-arrow svg {
+    color: var(--orange);
+}
+
+/* Empty State */
+.empty-state-card {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.empty-state-card h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.5rem;
+}
+
+.empty-state-card p {
+    margin: 0;
+}
+
+.empty-search-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-filter-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        min-width: 100%;
+    }
+
+    .filter-controls {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .filter-btn {
+        flex: 1;
+    }
+
+    .assessment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .help-card {
+        flex-direction: column;
+    }
+}
+</style>
 
 <script>
 // Assessment search and filter functionality
