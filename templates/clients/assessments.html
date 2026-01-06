@@ -111,17 +111,19 @@
                         <strong>{{ assessment.metrics.completed_invites|default:0 }}</strong> completed
                     </span>
                 </div>
-                {% if assessment.metrics.completion_rate is not None %}
-                <div class="stat-inline highlight">
+                <div class="stat-inline {% if assessment.metrics.completion_rate is not None %}highlight{% endif %}">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
                     <span class="stat-text">
+                        {% if assessment.metrics.completion_rate is not None %}
                         <strong>{{ assessment.metrics.completion_rate|floatformat:0 }}%</strong> completion
+                        {% else %}
+                        <strong>—</strong> completion
+                        {% endif %}
                     </span>
                 </div>
-                {% endif %}
             </div>
 
             <div class="assessment-footer">
@@ -249,7 +251,7 @@
 /* Assessment Grid */
 .assessment-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
@@ -257,9 +259,9 @@
 .assessment-card {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
     transition: all var(--portal-transition);
     cursor: pointer;
+    min-height: 340px;
 }
 
 .assessment-card:hover {
@@ -270,15 +272,16 @@
 /* Card Header */
 .assessment-card-header {
     display: flex;
-    gap: 1rem;
-    padding-bottom: 1.25rem;
+    gap: 1.125rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--portal-border-color);
 }
 
 .assessment-icon {
     flex-shrink: 0;
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -290,17 +293,21 @@
 .assessment-title-area {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .assessment-title {
-    font-size: 1.125rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--navy);
     margin: 0 0 0.5rem;
+    line-height: 1.3;
 }
 
 .assessment-description {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--text-muted);
     margin: 0;
     line-height: 1.5;
@@ -310,13 +317,15 @@
 .assessment-stats {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.875rem;
+    flex: 1;
+    margin-bottom: 1.5rem;
 }
 
 .stat-inline {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.75rem;
     font-size: 0.95rem;
     color: var(--text-body);
 }
@@ -324,6 +333,8 @@
 .stat-inline svg {
     color: var(--orange);
     flex-shrink: 0;
+    width: 18px;
+    height: 18px;
 }
 
 .stat-inline.highlight {
@@ -335,11 +346,15 @@
 }
 
 .stat-text {
-    line-height: 1.4;
+    line-height: 1.3;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
 }
 
 .stat-text strong {
     font-weight: 700;
+    font-size: 1.05rem;
     color: var(--navy);
 }
 
@@ -349,8 +364,24 @@
 
 /* Footer */
 .assessment-footer {
-    padding-top: 1rem;
+    padding-top: 1.5rem;
+    margin-top: auto;
     border-top: 1px solid var(--portal-border-color);
+}
+
+.assessment-footer .btn {
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.assessment-footer .btn svg {
+    width: 18px;
+    height: 18px;
 }
 
 /* Help Section */
