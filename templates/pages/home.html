@@ -660,6 +660,61 @@
     font-style: italic;
 }
 
+/* Animated Orbs */
+.hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 138, 0, 0.3), rgba(255, 138, 0, 0.05));
+    filter: blur(60px);
+    z-index: 1;
+}
+
+.orb-one {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    left: -100px;
+    animation: float-orb-1 20s ease-in-out infinite;
+}
+
+.orb-two {
+    width: 350px;
+    height: 350px;
+    bottom: -80px;
+    right: -80px;
+    animation: float-orb-2 25s ease-in-out infinite;
+}
+
+@keyframes float-orb-1 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(50px, -30px) scale(1.1);
+    }
+    50% {
+        transform: translate(-30px, 40px) scale(0.9);
+    }
+    75% {
+        transform: translate(40px, 20px) scale(1.05);
+    }
+}
+
+@keyframes float-orb-2 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(-40px, 30px) scale(1.08);
+    }
+    50% {
+        transform: translate(50px, -40px) scale(0.92);
+    }
+    75% {
+        transform: translate(-30px, -20px) scale(1.03);
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero-v2 {
@@ -686,6 +741,17 @@
     .trust-logos {
         gap: 1rem;
         font-size: 1rem;
+    }
+
+    /* Smaller orbs on mobile */
+    .orb-one {
+        width: 250px;
+        height: 250px;
+    }
+
+    .orb-two {
+        width: 220px;
+        height: 220px;
     }
 }
 </style>
