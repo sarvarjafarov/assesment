@@ -240,6 +240,17 @@ DEFAULT_FROM_EMAIL = os.environ.get(
     "DEFAULT_FROM_EMAIL", "Evalon Hiring <talent@evalon.com>"
 )
 EMAIL_ENABLED = EMAIL_BACKEND != "django.core.mail.backends.console.EmailBackend"
+
+# Site URL for generating absolute URLs in emails
+SITE_URL = os.environ.get("SITE_URL", "https://www.evalon.tech")
+
+# Admin notification emails (for client approval notifications)
+ADMIN_NOTIFICATION_EMAILS = [
+    email.strip()
+    for email in os.environ.get("ADMIN_NOTIFICATION_EMAILS", "info@evalon.tech").split(",")
+    if email.strip()
+]
+
 ASSESSMENT_PASSING_SCORE = float(os.environ.get("ASSESSMENT_PASSING_SCORE", "70"))
 
 # Default primary key field type

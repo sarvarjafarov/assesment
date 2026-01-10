@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0e1428; line-height: 1.6; margin: 0; padding: 0; background-color: #f8f9fa;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 8px; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        <!-- Header -->
+        <div style="margin-bottom: 32px;">
+            <h1 style="color: #ff8a00; font-size: 24px; margin: 0 0 8px 0;">New Client Ready for Approval</h1>
+            <p style="color: #6b7280; font-size: 14px; margin: 0;">A client has verified their email and is awaiting approval</p>
+        </div>
+
+        <!-- Client Details -->
+        <div style="background-color: #f8f9fa; padding: 24px; border-radius: 6px; border-left: 4px solid #ff8a00; margin-bottom: 24px;">
+            <h2 style="color: #0e1428; font-size: 18px; margin: 0 0 16px 0;">Client Information</h2>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600; vertical-align: top; width: 140px;">
+                        Company:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        <strong>{{ company_name }}</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600; vertical-align: top;">
+                        Contact Name:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        {{ full_name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600; vertical-align: top;">
+                        Email:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        <a href="mailto:{{ email }}" style="color: #ff8a00; text-decoration: none;">{{ email }}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600; vertical-align: top;">
+                        Phone:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        {{ phone_number }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600; vertical-align: top;">
+                        Company Size:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        {{ employee_size }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Requested Assessments -->
+        <div style="margin-bottom: 24px;">
+            <h3 style="color: #0e1428; font-size: 16px; margin: 0 0 12px 0;">Requested Assessments</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #0e1428; font-size: 14px;">
+                {% for assessment in requested_assessments %}
+                <li style="margin-bottom: 6px;">{{ assessment }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Objectives/Notes -->
+        {% if notes %}
+        <div style="margin-bottom: 24px;">
+            <h3 style="color: #0e1428; font-size: 16px; margin: 0 0 12px 0;">Additional Information</h3>
+            <div style="background-color: #f8f9fa; padding: 16px; border-radius: 6px; font-size: 14px; color: #4b5563; white-space: pre-wrap;">{{ notes }}</div>
+        </div>
+        {% endif %}
+
+        <!-- CTA Button -->
+        <div style="text-align: center; margin: 32px 0;">
+            <a href="{{ admin_url }}" style="display: inline-block; background-color: #ff8a00; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">
+                Review & Approve in Admin
+            </a>
+        </div>
+
+        <p style="font-size: 13px; color: #6b7280; text-align: center; margin-top: 16px;">
+            Or copy this link: <a href="{{ admin_url }}" style="color: #ff8a00; text-decoration: none; word-break: break-all;">{{ admin_url }}</a>
+        </p>
+
+        <!-- Instructions -->
+        <div style="border-top: 1px solid #e0e3e7; padding-top: 24px; margin-top: 32px;">
+            <h3 style="color: #0e1428; font-size: 16px; margin: 0 0 12px 0;">Next Steps</h3>
+            <ol style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 14px;">
+                <li style="margin-bottom: 8px;">Review the client's information and requested assessments</li>
+                <li style="margin-bottom: 8px;">Verify the company domain and business legitimacy</li>
+                <li style="margin-bottom: 8px;">In the admin panel, set "Allowed assessments" and change status to "Approved"</li>
+                <li style="margin-bottom: 8px;">A welcome email will be automatically sent to the client</li>
+            </ol>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e0e3e7;">
+            <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                Evalon Admin Notification
+            </p>
+        </div>
+    </div>
+</body>
+</html>

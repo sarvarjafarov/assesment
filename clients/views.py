@@ -40,6 +40,7 @@ from .forms import (
     ClientSessionNoteForm,
 )
 from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote
+from .services import send_verification_email, send_approval_notification, send_welcome_email
 
 logger = logging.getLogger(__name__)
 
@@ -357,11 +358,18 @@ class ClientSignupView(FormView):
 
     def form_valid(self, form):
         account = form.save()
-        send_client_verification_email(account, self.request)
-        messages.info(
-            self.request,
-            "Thanks for signing up! Please check your inbox to confirm your email address.",
-        )
+        # Send verification email with new service
+        email_sent = send_verification_email(account)
+        if email_sent:
+            messages.success(
+                self.request,
+                "Thanks for signing up! Please check your inbox to verify your email address.",
+            )
+        else:
+            messages.warning(
+                self.request,
+                "Account created, but we couldn't send the verification email. Please contact support.",
+            )
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -391,8 +399,16 @@ class ClientVerifyEmailView(TemplateView):
                 if account.is_email_verified:
                     status = "already"
                 else:
+                    # Mark email as verified
                     account.mark_email_verified()
                     status = "verified"
+
+                    # Send admin notification for approval
+                    admin_notified = send_approval_notification(account)
+                    if admin_notified:
+                        logger.info(f"Admin notification sent for account: {account.email}")
+                    else:
+                        logger.warning(f"Failed to send admin notification for: {account.email}")
         context["status"] = status
         context["account"] = account
         return context

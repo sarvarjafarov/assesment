@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0e1428; line-height: 1.6; margin: 0; padding: 0; background-color: #f8f9fa;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 8px; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 32px; padding: 32px 0; background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%); border-radius: 8px; margin: -40px -40px 32px -40px;">
+            <h1 style="color: #ff8a00; font-size: 32px; margin: 0;">🎉 Welcome to Evalon!</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 16px; margin-top: 12px;">Your account has been approved</p>
+        </div>
+
+        <!-- Content -->
+        <div style="margin-bottom: 32px;">
+            <p style="font-size: 16px; margin-bottom: 16px;">Hi {{ full_name }},</p>
+
+            <p style="margin-bottom: 16px;">
+                Great news! Your Evalon account for <strong>{{ company_name }}</strong> has been approved and is ready to use.
+            </p>
+
+            <p style="margin-bottom: 24px;">
+                You now have access to our hiring assessment platform and can start evaluating candidates right away.
+            </p>
+
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 32px 0;">
+                <a href="{{ dashboard_url }}" style="display: inline-block; background-color: #ff8a00; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 6px; font-weight: 700; font-size: 18px; box-shadow: 0 4px 12px rgba(255, 138, 0, 0.3);">
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Your Plan -->
+        <div style="background-color: #f8f9fa; padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid #ff8a00;">
+            <h2 style="color: #0e1428; font-size: 18px; margin: 0 0 16px 0;">Your Account Details</h2>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600;">
+                        Plan:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        <strong>{{ plan_name }}</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600;">
+                        Monthly Projects:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        {% if project_quota == 0 %}Unlimited{% else %}{{ project_quota }}{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280; font-size: 14px; font-weight: 600;">
+                        Monthly Invites:
+                    </td>
+                    <td style="padding: 8px 0; color: #0e1428; font-size: 14px;">
+                        {% if invite_quota == 0 %}Unlimited{% else %}{{ invite_quota }}{% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Approved Assessments -->
+        <div style="margin-bottom: 32px;">
+            <h2 style="color: #0e1428; font-size: 18px; margin: 0 0 16px 0;">Your Approved Assessments</h2>
+            <p style="color: #6b7280; font-size: 14px; margin-bottom: 12px;">You now have access to:</p>
+
+            <ul style="margin: 0 0 16px 0; padding-left: 20px; color: #0e1428; font-size: 14px;">
+                {% for assessment in approved_assessments %}
+                <li style="margin-bottom: 8px;">✓ <strong>{{ assessment }}</strong></li>
+                {% endfor %}
+            </ul>
+
+            <a href="{{ assessments_url }}" style="color: #ff8a00; text-decoration: none; font-weight: 600; font-size: 14px;">
+                Browse Assessments →
+            </a>
+        </div>
+
+        <!-- Getting Started -->
+        <div style="border-top: 2px solid #e0e3e7; padding-top: 24px; margin-top: 32px;">
+            <h2 style="color: #0e1428; font-size: 20px; margin: 0 0 20px 0;">🚀 Getting Started in 3 Steps</h2>
+
+            <!-- Step 1 -->
+            <div style="margin-bottom: 24px; padding-left: 40px; position: relative;">
+                <div style="position: absolute; left: 0; top: 4px; width: 28px; height: 28px; background-color: #ff8a00; color: #ffffff; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">1</div>
+                <h3 style="color: #0e1428; font-size: 16px; margin: 0 0 8px 0;">Create Your First Project</h3>
+                <p style="color: #6b7280; font-size: 14px; margin: 0 0 8px 0;">
+                    Set up a hiring project for each role you're filling. Projects help you organize candidates and track progress.
+                </p>
+                <a href="{{ projects_url }}" style="color: #ff8a00; text-decoration: none; font-size: 13px; font-weight: 600;">
+                    Create Project →
+                </a>
+            </div>
+
+            <!-- Step 2 -->
+            <div style="margin-bottom: 24px; padding-left: 40px; position: relative;">
+                <div style="position: absolute; left: 0; top: 4px; width: 28px; height: 28px; background-color: #ff8a00; color: #ffffff; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">2</div>
+                <h3 style="color: #0e1428; font-size: 16px; margin: 0 0 8px 0;">Send Candidate Invites</h3>
+                <p style="color: #6b7280; font-size: 14px; margin: 0 0 8px 0;">
+                    Invite candidates to take assessments. Each candidate gets a personalized link with clear instructions.
+                </p>
+                <a href="{{ assessments_url }}" style="color: #ff8a00; text-decoration: none; font-size: 13px; font-weight: 600;">
+                    View Assessments →
+                </a>
+            </div>
+
+            <!-- Step 3 -->
+            <div style="margin-bottom: 0; padding-left: 40px; position: relative;">
+                <div style="position: absolute; left: 0; top: 4px; width: 28px; height: 28px; background-color: #ff8a00; color: #ffffff; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">3</div>
+                <h3 style="color: #0e1428; font-size: 16px; margin: 0 0 8px 0;">Review Auto-Scored Results</h3>
+                <p style="color: #6b7280; font-size: 14px; margin: 0;">
+                    When candidates complete assessments, you'll see detailed reports with scores, breakdowns, and recommendations.
+                </p>
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div style="background-color: #fff7ed; border: 2px solid #ff8a00; border-radius: 8px; padding: 24px; margin-top: 32px;">
+            <h3 style="color: #0e1428; font-size: 16px; margin: 0 0 12px 0;">📚 Helpful Resources</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 14px;">
+                <li style="margin-bottom: 8px;"><a href="{{ site_url }}" style="color: #ff8a00; text-decoration: none;">How Evalon Works</a></li>
+                <li style="margin-bottom: 8px;"><a href="{{ site_url }}/blog" style="color: #ff8a00; text-decoration: none;">Best Practices for Assessment Invites</a></li>
+                <li style="margin-bottom: 8px;"><a href="mailto:support@evalon.app" style="color: #ff8a00; text-decoration: none;">Contact Support</a></li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div style="border-top: 1px solid #e0e3e7; padding-top: 24px; margin-top: 32px;">
+            <p style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">
+                <strong>Need help getting started?</strong>
+            </p>
+            <p style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">
+                Our team is here to help! Reply to this email or reach out at <a href="mailto:support@evalon.app" style="color: #ff8a00; text-decoration: none;">support@evalon.app</a>
+            </p>
+
+            <p style="font-size: 14px; color: #6b7280; margin-top: 24px; margin-bottom: 0;">
+                Welcome aboard!<br>
+                <strong style="color: #0e1428;">The Evalon Team</strong>
+            </p>
+        </div>
+
+        <!-- Brand Footer -->
+        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e0e3e7;">
+            <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                © 2024 Evalon. All rights reserved.
+            </p>
+            <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
+                <a href="{{ site_url }}" style="color: #ff8a00; text-decoration: none;">evalon.tech</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
