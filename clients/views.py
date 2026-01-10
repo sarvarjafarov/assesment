@@ -500,6 +500,10 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 account.clear_logo()
                 account.save(update_fields=["logo", "logo_data", "logo_mime"])
             messages.info(request, "Logo removed.")
+        elif action == "dismiss_onboarding":
+            # Mark onboarding as complete when user dismisses it
+            account.mark_onboarding_complete()
+            messages.success(request, "Onboarding dismissed. You can always access help from the support link.")
         return redirect("clients:dashboard")
 
     def get_context_data(self, **kwargs):
@@ -586,6 +590,40 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "project_count": account.projects.count(),
             }
         )
+
+        # Onboarding progress calculation
+        if not account.has_completed_onboarding:
+            # Check which steps have been completed
+            step_1_completed = account.projects.exists()  # Has at least one project
+            step_2_completed = stats["total_candidates"] > 0  # Has sent at least one invite
+            step_3_completed = stats["completed_count"] > 0  # Has at least one completed assessment
+
+            # Auto-update onboarding step data
+            account.onboarding_step_data = {
+                'step_1': step_1_completed,
+                'step_2': step_2_completed,
+                'step_3': step_3_completed,
+            }
+            account.save(update_fields=['onboarding_step_data'])
+
+            # Auto-complete onboarding if all steps are done
+            if step_1_completed and step_2_completed and step_3_completed:
+                account.mark_onboarding_complete()
+
+            # Calculate progress
+            total_steps = 3
+            completed_steps = sum([step_1_completed, step_2_completed, step_3_completed])
+            progress_percent = round((completed_steps / total_steps) * 100)
+
+            context.update({
+                'onboarding_step_1_completed': step_1_completed,
+                'onboarding_step_2_completed': step_2_completed,
+                'onboarding_step_3_completed': step_3_completed,
+                'onboarding_total_steps': total_steps,
+                'onboarding_completed_steps': completed_steps,
+                'onboarding_progress': progress_percent,
+            })
+
         plan_details = account.plan_details()
         invite_limit = account.invite_limit()
         invites_used = account.invites_used()
