@@ -33,30 +33,31 @@
     </header>
 
     <main>
-        {# HERO SECTION - Simplified #}
-        <section class="hero-v2 reveal">
-            <div class="hero-v2-inner">
-                <div class="hero-badge">{{ hero_content.badge }}</div>
-                <h1 class="hero-title">{{ hero_content.title }}</h1>
-                <p class="hero-subtitle">{{ hero_content.subtitle }}</p>
-                <div class="hero-cta">
-                    <a class="btn btn-pill" href="{{ hero_content.primary_url }}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
-                    <a class="btn btn-outline" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
-                </div>
-                <div class="hero-trust">
-                    <p class="muted small">Trusted by hiring teams at</p>
-                    <div class="trust-logos">
-                        <span>Stripe</span>
-                        <span>Lattice</span>
-                        <span>Notion</span>
-                        <span>Atlassian</span>
+        {# HERO SECTION - Simplified with animated orbs #}
+        <div class="hero-wrapper">
+            <section class="hero-v2 reveal">
+                <div class="hero-v2-inner">
+                    <div class="hero-badge">{{ hero_content.badge }}</div>
+                    <h1 class="hero-title">{{ hero_content.title }}</h1>
+                    <p class="hero-subtitle">{{ hero_content.subtitle }}</p>
+                    <div class="hero-cta">
+                        <a class="btn btn-pill" href="{{ hero_content.primary_url }}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
+                        <a class="btn btn-outline" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
+                    </div>
+                    <div class="hero-trust">
+                        <p class="muted small">Trusted by hiring teams at</p>
+                        <div class="trust-logos">
+                            <span>Stripe</span>
+                            <span>Lattice</span>
+                            <span>Notion</span>
+                            <span>Atlassian</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="hero-grid"></div>
+            </section>
             <div class="hero-orb orb-one"></div>
             <div class="hero-orb orb-two"></div>
-        </section>
+        </div>
 
         {# HOW IT WORKS - New simplified section #}
         <section class="how-it-works reveal" id="how-it-works">
@@ -326,12 +327,17 @@
    HOMEPAGE V2 - SIMPLIFIED & IMPROVED
    ======================================================================== */
 
+/* Hero Wrapper - Contains hero section and animated orbs */
+.hero-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
 /* Hero V2 - Clean, focused */
 .hero-v2 {
     position: relative;
     padding: 8rem 2rem 6rem;
     background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
-    overflow: hidden;
     text-align: center;
 }
 
