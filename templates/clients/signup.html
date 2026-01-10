@@ -74,7 +74,7 @@
                     <div class="form-field">
                         <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="required">*</span></label>
                         {{ form.email }}
-                        <small class="field-help">Use your work email so we can verify your organization</small>
+                        <small class="field-help">We'll send a verification link to this email address</small>
                         {% for error in form.email.errors %}
                         <span class="field-error">{{ error }}</span>
                         {% endfor %}

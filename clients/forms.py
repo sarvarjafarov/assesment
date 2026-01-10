@@ -107,8 +107,9 @@ class ClientSignupForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower().strip()
-        if email.split("@")[-1] in PUBLIC_EMAIL_DOMAINS:
-            raise forms.ValidationError("Please use your company email address.")
+        # Allow any email domain (removed company email restriction)
+        # if email.split("@")[-1] in PUBLIC_EMAIL_DOMAINS:
+        #     raise forms.ValidationError("Please use your company email address.")
         if ClientAccount.objects.filter(email=email).exists():
             raise forms.ValidationError("An account with this email already exists.")
         return email

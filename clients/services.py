@@ -119,7 +119,7 @@ def send_welcome_email(client_account):
     # Build dashboard URL
     dashboard_url = settings.SITE_URL.rstrip('/') + reverse('clients:dashboard')
     assessments_url = settings.SITE_URL.rstrip('/') + reverse('clients:assessments')
-    projects_url = settings.SITE_URL.rstrip('/') + reverse('clients:projects')
+    projects_url = settings.SITE_URL.rstrip('/') + reverse('clients:project-list')
 
     context = {
         'client': client_account,
