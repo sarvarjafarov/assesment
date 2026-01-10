@@ -145,38 +145,6 @@
                 </div>
             </div>
 
-            {# Integration & Team Section #}
-            <div class="form-section">
-                <h3 class="form-section-title">Integration & Team (Optional)</h3>
-                <div class="form-row single">
-                    <div class="form-field">
-                        {{ form.talent_stack.label_tag }}
-                        <div class="option-grid">
-                            {% for checkbox in form.talent_stack %}
-                            <label class="checkbox-pill">
-                                <span class="checkbox-pill__box">{{ checkbox.tag }}</span>
-                                <span>{{ checkbox.choice_label }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                        {% if form.talent_stack.help_text %}<small class="field-help">{{ form.talent_stack.help_text }}</small>{% endif %}
-                        {% for error in form.talent_stack.errors %}
-                        <span class="field-error">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="form-row single">
-                    <div class="form-field">
-                        {{ form.stakeholders.label_tag }}
-                        {{ form.stakeholders }}
-                        {% if form.stakeholders.help_text %}<small class="field-help">{{ form.stakeholders.help_text }}</small>{% endif %}
-                        {% for error in form.stakeholders.errors %}
-                        <span class="field-error">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-
             {# Account Security Section #}
             <div class="form-section">
                 <h3 class="form-section-title">Account Security</h3>
@@ -210,13 +178,60 @@
 
 <style>
 /* ========================================================================
-   IMPROVED SIGNUP PAGE UX
+   IMPROVED SIGNUP PAGE UX - PROFESSIONAL DESIGN
    ======================================================================== */
+
+/* Enhanced page layout */
+.apply-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+.request-panel {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+}
+
+/* Better intro section */
+.request-intro {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+    border-radius: 12px;
+    color: #fff;
+}
+
+.request-copy h1 {
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.request-copy .lede {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.request-note {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.request-note .label {
+    color: var(--orange);
+    font-weight: 600;
+}
+
+.request-note ul li {
+    color: rgba(255, 255, 255, 0.95);
+}
 
 /* Required field indicator */
 .required {
     color: #e74c3c;
     font-weight: 600;
+    margin-left: 2px;
 }
 
 .required-note {
@@ -224,6 +239,9 @@
     font-size: 0.875rem;
     color: var(--text-muted);
     margin: 0 0 1.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
 
 .required-note .required {
@@ -232,60 +250,117 @@
 
 /* Signup login link */
 .signup-login-link {
-    margin-top: 1rem;
+    margin-top: 1.25rem;
+    padding: 1rem;
+    background: rgba(255, 138, 0, 0.1);
+    border-radius: 8px;
     font-size: 0.95rem;
-    color: var(--text-body);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.95);
 }
 
 .signup-login-link a {
     color: var(--orange);
     font-weight: 600;
     text-decoration: none;
-    transition: color 0.2s;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
 }
 
 .signup-login-link a:hover {
-    color: #cc5500;
-    text-decoration: underline;
+    color: #fff;
+    border-bottom-color: var(--orange);
 }
 
-/* Form sections for better organization */
+/* Form sections - Better visual hierarchy */
 .form-section {
-    margin-bottom: 2.5rem;
-    padding-bottom: 2.5rem;
-    border-bottom: 2px solid #e8eaed;
+    margin-bottom: 3rem;
+    padding: 2.5rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e8eaed;
+    transition: all 0.3s ease;
+}
+
+.form-section:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-color: #d0d5dd;
 }
 
 .form-section:last-of-type {
-    border-bottom: none;
-    padding-bottom: 0;
+    margin-bottom: 2rem;
 }
 
 .form-section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.375rem;
+    font-weight: 700;
     color: var(--navy);
-    margin: 0 0 1.5rem;
+    margin: 0 0 1.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #f8f9fa;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .form-section-title::before {
     content: "";
-    width: 4px;
-    height: 24px;
+    width: 6px;
+    height: 32px;
     background: linear-gradient(135deg, var(--orange) 0%, #ff6b00 100%);
-    border-radius: 2px;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(255, 138, 0, 0.3);
 }
 
-/* Field help text styling */
+/* Enhanced form fields */
+.form-field {
+    position: relative;
+}
+
+.form-field label {
+    display: block;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+    font-size: 0.9375rem;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e0e3e7;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--navy);
+    background: #fff;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.form-field input:hover,
+.form-field select:hover,
+.form-field textarea:hover {
+    border-color: #c1c7cd;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 4px rgba(255, 138, 0, 0.1);
+}
+
+/* Field help text */
 .field-help {
     display: block;
-    margin-top: 0.375rem;
+    margin-top: 0.5rem;
     font-size: 0.875rem;
-    color: var(--text-muted);
-    line-height: 1.4;
+    color: #6b7280;
+    line-height: 1.5;
 }
 
 /* Textarea with character counter */
@@ -295,54 +370,80 @@
 
 .char-counter {
     position: absolute;
-    bottom: 0.5rem;
+    bottom: 0.75rem;
     right: 0.75rem;
     font-size: 0.8125rem;
     color: var(--text-muted);
-    background: rgba(255, 255, 255, 0.95);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    background: #fff;
+    padding: 0.375rem 0.625rem;
+    border-radius: 6px;
     pointer-events: none;
+    border: 1px solid #e8eaed;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .char-counter.warning {
     color: #e67e22;
+    border-color: #e67e22;
+    background: #fff7ed;
 }
 
 .char-counter.error {
     color: #e74c3c;
+    border-color: #e74c3c;
+    background: #fef2f2;
 }
 
 .char-count {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--navy);
 }
 
 /* Improved textarea styling */
 .textarea-wrapper textarea {
-    padding-bottom: 2rem;
+    padding-bottom: 3rem;
+    min-height: 120px;
+    resize: vertical;
 }
 
 /* Form footer */
 .form-footer {
     margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 2px solid #e8eaed;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    border: 2px dashed #e0e3e7;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.75rem;
 }
 
 .form-footer .btn {
-    min-width: 240px;
+    min-width: 280px;
     font-size: 1.0625rem;
-    padding: 0.875rem 2rem;
+    font-weight: 700;
+    padding: 1rem 2.5rem;
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.25);
+    transition: all 0.3s ease;
 }
 
-/* Improved assessment section spacing */
+.form-footer .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(255, 138, 0, 0.35);
+}
+
+.form-footer .btn:active {
+    transform: translateY(0);
+}
+
+/* Improved assessment section */
 .form-section .assessment-section {
     margin-top: 0;
+}
+
+.assessment-section__header {
+    margin-bottom: 1.5rem;
 }
 
 .assessment-section__header label {
@@ -350,21 +451,126 @@
     font-weight: 600;
     color: var(--navy);
     margin-bottom: 0.5rem;
+    display: block;
 }
 
-/* Better checkbox styling */
-.option-grid {
+.assessment-section__header p {
+    color: #6b7280;
+    font-size: 0.9375rem;
+}
+
+/* Enhanced assessment cards */
+.assessment-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
 }
 
-/* Enhanced focus states for accessibility */
-input:focus,
-select:focus,
-textarea:focus {
-    outline: 2px solid var(--orange);
-    outline-offset: 2px;
+.assessment-card {
+    position: relative;
+    padding: 1.25rem;
+    border: 2px solid #e0e3e7;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.assessment-card:hover {
+    border-color: var(--orange);
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.assessment-card input[type="checkbox"] {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+.assessment-card:has(input:checked) {
+    border-color: var(--orange);
+    background: rgba(255, 138, 0, 0.05);
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.15);
+}
+
+.assessment-card strong {
+    display: block;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+    padding-right: 2rem;
+}
+
+.assessment-card p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Form row layout */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-row.single {
+    grid-template-columns: 1fr;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+/* Error handling */
+.field-error {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #e74c3c;
+    font-weight: 500;
+    animation: errorSlideIn 0.3s ease;
+}
+
+@keyframes errorSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-field:has(.field-error) input,
+.form-field:has(.field-error) select,
+.form-field:has(.field-error) textarea {
+    border-color: #e74c3c;
+    background: #fef2f2;
+}
+
+.form-field:has(.field-error) label {
+    color: #e74c3c;
+}
+
+/* File input styling */
+.form-field input[type="file"] {
+    padding: 0.75rem;
+    cursor: pointer;
+    border-style: dashed;
+}
+
+.form-field input[type="file"]:hover {
+    background: #f8f9fa;
+    border-color: var(--orange);
 }
 
 /* Password field improvements */
@@ -378,24 +584,112 @@ input[type="password"]::placeholder {
     letter-spacing: normal;
 }
 
+/* Loading state for submit button */
+.form-footer .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Smooth animations */
+.form-section,
+.assessment-card,
+.form-field input,
+.form-field select,
+.form-field textarea {
+    animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation delay for sections */
+.form-section:nth-child(1) { animation-delay: 0.05s; }
+.form-section:nth-child(2) { animation-delay: 0.1s; }
+.form-section:nth-child(3) { animation-delay: 0.15s; }
+.form-section:nth-child(4) { animation-delay: 0.2s; }
+.form-section:nth-child(5) { animation-delay: 0.25s; }
+
 /* Responsive improvements */
 @media (max-width: 768px) {
+    .request-intro {
+        padding: 1.5rem;
+    }
+
     .form-section {
         margin-bottom: 2rem;
-        padding-bottom: 2rem;
+        padding: 1.5rem;
     }
 
     .form-section-title {
         font-size: 1.125rem;
+        margin-bottom: 1.25rem;
     }
 
-    .option-grid {
+    .form-section-title::before {
+        width: 4px;
+        height: 24px;
+    }
+
+    .form-row {
         grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .assessment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-footer {
+        padding: 1.5rem;
+        gap: 1.25rem;
     }
 
     .form-footer .btn {
         width: 100%;
         min-width: auto;
+        padding: 0.875rem 1.5rem;
+    }
+
+    .char-counter {
+        position: static;
+        margin-top: 0.5rem;
+        text-align: right;
+    }
+
+    .textarea-wrapper textarea {
+        padding-bottom: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .request-intro {
+        padding: 1.25rem;
+    }
+
+    .request-copy h1 {
+        font-size: 1.75rem;
+    }
+
+    .form-section {
+        padding: 1.25rem;
+        border-radius: 8px;
+    }
+
+    .form-section-title {
+        font-size: 1rem;
+    }
+
+    .assessment-card {
+        padding: 1rem;
     }
 }
 </style>

@@ -61,29 +61,6 @@ class ClientSignupForm(forms.ModelForm):
         help_text="What roles, volume, or timelines are most important? (500 characters max)",
         required=False,
     )
-    talent_stack = forms.MultipleChoiceField(
-        label="Which tools do you rely on?",
-        required=False,
-        choices=[
-            ("greenhouse", "Greenhouse"),
-            ("lever", "Lever"),
-            ("ashby", "Ashby"),
-            ("smartrecruiters", "SmartRecruiters"),
-            ("workday", "Workday"),
-            ("other", "Other"),
-        ],
-        widget=forms.CheckboxSelectMultiple,
-        help_text="Helps us prioritize integrations (optional)",
-    )
-    stakeholders = forms.CharField(
-        label="Key stakeholders",
-        required=False,
-        widget=forms.TextInput(attrs={
-            "placeholder": "e.g., Head of Talent, CTO",
-            "maxlength": 200
-        }),
-        help_text="Who will be involved in reviewing candidates? (optional)",
-    )
     requested_assessments = forms.MultipleChoiceField(
         label="Assessments you'd like to pilot",
         choices=ClientAccount.ASSESSMENT_CHOICES,
@@ -107,8 +84,6 @@ class ClientSignupForm(forms.ModelForm):
             "employee_size",
             "requested_assessments",
             "objectives",
-            "talent_stack",
-            "stakeholders",
         ]
         widgets = {
             "full_name": forms.TextInput(attrs={
@@ -171,16 +146,9 @@ class ClientSignupForm(forms.ModelForm):
         user.save(update_fields=["is_active"])
         account.user = user
         account.requested_assessments = self.cleaned_data.get("requested_assessments", [])
-        account.notes = "\n".join(
-            filter(
-                None,
-                [
-                    f"Objectives: {self.cleaned_data.get('objectives')}".strip(),
-                    f"Talent stack: {', '.join(self.cleaned_data.get('talent_stack', []))}".strip(),
-                    f"Stakeholders: {self.cleaned_data.get('stakeholders')}".strip(),
-                ],
-            )
-        )
+        objectives = self.cleaned_data.get('objectives', '').strip()
+        if objectives:
+            account.notes = f"Objectives: {objectives}"
         if commit:
             account.save()
         return account
