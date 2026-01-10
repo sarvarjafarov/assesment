@@ -391,24 +391,29 @@ class ClientVerifyEmailView(TemplateView):
         account_id = kwargs.get("account_id")
         status = "invalid"
         account = None
+
+        # Try to find account by account_id and token first, then by token only
         if token and account_id:
             account = ClientAccount.objects.filter(pk=account_id, verification_token=token).first()
         if not account and token:
             account = ClientAccount.objects.filter(verification_token=token).first()
-            if account:
-                if account.is_email_verified:
-                    status = "already"
-                else:
-                    # Mark email as verified
-                    account.mark_email_verified()
-                    status = "verified"
 
-                    # Send admin notification for approval
-                    admin_notified = send_approval_notification(account)
-                    if admin_notified:
-                        logger.info(f"Admin notification sent for account: {account.email}")
-                    else:
-                        logger.warning(f"Failed to send admin notification for: {account.email}")
+        # Process verification if account found
+        if account:
+            if account.is_email_verified:
+                status = "already"
+            else:
+                # Mark email as verified
+                account.mark_email_verified()
+                status = "verified"
+
+                # Send admin notification for approval
+                admin_notified = send_approval_notification(account)
+                if admin_notified:
+                    logger.info(f"Admin notification sent for account: {account.email}")
+                else:
+                    logger.warning(f"Failed to send admin notification for: {account.email}")
+
         context["status"] = status
         context["account"] = account
         return context
