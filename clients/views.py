@@ -10,7 +10,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1276,22 +1278,45 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         route = self.assessment_config.get("candidate_route")
         if not route:
             return "no_route"
+
+        # Build assessment URLs
         start_link = self.request.build_absolute_uri(reverse(route, args=[session.uuid]))
+        session_link = start_link  # Same link for now
+
+        # Extract candidate first name from email if possible
+        candidate_first_name = email.split('@')[0].split('.')[0].title()
+
+        # Prepare email context
+        context = {
+            'company_name': self.account.company_name,
+            'invited_by': self.account.company_name,
+            'candidate': {
+                'first_name': candidate_first_name,
+            },
+            'assessment': {
+                'title': self.assessment_config['label'],
+            },
+            'start_link': start_link,
+            'session_link': session_link,
+            'due_at': getattr(session, 'expires_at', None),
+            'notes': getattr(session, 'notes', ''),
+        }
+
+        # Render HTML and text versions
         subject = f"{self.account.company_name} invited you to the {self.assessment_config['label']}"
-        body = (
-            f"Hi there,\n\n"
-            f"{self.account.company_name} invited you to complete the {self.assessment_config['label']} on Evalon.\n"
-            f"Start your assessment here:\n{start_link}\n\n"
-            "If you were not expecting this invite, reply to this email or contact the hiring team.\n\n"
-            "— Evalon Assessments"
-        )
+        html_body = render_to_string('emails/invite_candidate.html', context)
+        text_body = strip_tags(html_body)
+
+        # Send email with HTML
         try:
-            send_mail(
+            msg = EmailMultiAlternatives(
                 subject,
-                body,
+                text_body,
                 getattr(settings, "DEFAULT_FROM_EMAIL", None),
                 [email],
             )
+            msg.attach_alternative(html_body, "text/html")
+            msg.send()
             return "sent"
         except Exception as exc:  # pragma: no cover
             logger.warning("Failed to email invite for session %s: %s", session.uuid, exc)
