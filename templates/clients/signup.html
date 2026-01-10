@@ -15,14 +15,15 @@
             <div class="request-copy">
                 <p class="eyebrow">Become a hiring partner</p>
                 <h1>Create your client workspace</h1>
-                <p class="lede">Tell us about your company, how large your talent team is, and which assessments you need. We’ll review within one business day.</p>
+                <p class="lede">Tell us about your company, how large your talent team is, and which assessments you need. We'll review within one business day.</p>
+                <p class="signup-login-link">Already have an account? <a href="{% url 'clients:login' %}">Sign in here</a></p>
             </div>
             <div class="request-note">
                 <p class="label">What happens next?</p>
                 <ul>
-                    <li>We verify that you’re using a company domain.</li>
+                    <li>We verify that you're using a company domain.</li>
                     <li>Our team approves the assessments you requested.</li>
-                    <li>You’ll receive an approval email with dashboard access.</li>
+                    <li>You'll receive an approval email with dashboard access.</li>
                 </ul>
             </div>
         </div>
@@ -34,140 +35,444 @@
               data-gtag-label="client_portal_signup"
               data-gtag-params='{"method":"client_portal","form_name":"client_signup"}'>
             {% csrf_token %}
-            <div class="form-row">
-                <div class="form-field">
-                    {{ form.full_name.label_tag }}
-                    {{ form.full_name }}
-                    {% for error in form.full_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-field">
-                    {{ form.company_name.label_tag }}
-                    {{ form.company_name }}
-                    {% for error in form.company_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="form-row single">
-                <div class="form-field">
-                    {{ form.logo.label_tag }}
-                    {{ form.logo }}
-                    {% if form.logo.help_text %}<small>{{ form.logo.help_text }}</small>{% endif %}
-                    {% for error in form.logo.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-field">
-                    {{ form.email.label_tag }}
-                    {{ form.email }}
-                    <small>Use your work email so we can verify your organization.</small>
-                    {% for error in form.email.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-field">
-                    {{ form.phone_number.label_tag }}
-                    {{ form.phone_number }}
-                    {% for error in form.phone_number.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="form-row single">
-                <div class="form-field">
-                    {{ form.employee_size.label_tag }}
-                    {{ form.employee_size }}
-                    {% for error in form.employee_size.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="form-row single">
-                <div class="form-field">
-                    {{ form.objectives.label_tag }}
-                    {{ form.objectives }}
-                    {% if form.objectives.help_text %}<small>{{ form.objectives.help_text }}</small>{% endif %}
-                    {% for error in form.objectives.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="assessment-section">
-                <div class="assessment-section__header">
-                    <label for="{{ form.requested_assessments.id_for_label }}">Select assessments</label>
-                    <p>Choose one or more products to pilot with your team.</p>
-                </div>
-                <div class="assessment-grid">
-                    {% for checkbox in form.requested_assessments %}
-                    {% with detail=assessment_details|dict_get:checkbox.data.value %}
-                    <label class="assessment-card">
-                        {{ checkbox.tag }}
-                        <div>
-                            <strong>{{ detail.label|default:checkbox.choice_label }}</strong>
-                            <p>{{ detail.description|default:"Pick this assessment to evaluate candidates in this discipline." }}</p>
-                        </div>
-                    </label>
-                    {% endwith %}
-                    {% endfor %}
-                </div>
-                {% for error in form.requested_assessments.errors %}
-                <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="form-row single">
-                <div class="form-field">
-                    {{ form.talent_stack.label_tag }}
-                    <div class="option-grid">
-                        {% for checkbox in form.talent_stack %}
-                        <label class="checkbox-pill">
-                            <span class="checkbox-pill__box">{{ checkbox.tag }}</span>
-                            <span>{{ checkbox.choice_label }}</span>
-                        </label>
+
+            {# Personal Information Section #}
+            <div class="form-section">
+                <h3 class="form-section-title">Personal & Company Information</h3>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }} <span class="required">*</span></label>
+                        {{ form.full_name }}
+                        {% for error in form.full_name.errors %}
+                        <span class="field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
-                    {% if form.talent_stack.help_text %}<small>{{ form.talent_stack.help_text }}</small>{% endif %}
-                    {% for error in form.talent_stack.errors %}
+                    <div class="form-field">
+                        <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }} <span class="required">*</span></label>
+                        {{ form.company_name }}
+                        {% for error in form.company_name.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-row single">
+                    <div class="form-field">
+                        {{ form.logo.label_tag }}
+                        {{ form.logo }}
+                        {% if form.logo.help_text %}<small class="field-help">{{ form.logo.help_text }}</small>{% endif %}
+                        {% for error in form.logo.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {# Contact Information Section #}
+            <div class="form-section">
+                <h3 class="form-section-title">Contact Information</h3>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="required">*</span></label>
+                        {{ form.email }}
+                        <small class="field-help">Use your work email so we can verify your organization</small>
+                        {% for error in form.email.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }} <span class="required">*</span></label>
+                        {{ form.phone_number }}
+                        <small class="field-help">International format: +1 (555) 123-4567</small>
+                        {% for error in form.phone_number.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {# Company Details Section #}
+            <div class="form-section">
+                <h3 class="form-section-title">Company Details</h3>
+                <div class="form-row single">
+                    <div class="form-field">
+                        <label for="{{ form.employee_size.id_for_label }}">{{ form.employee_size.label }} <span class="required">*</span></label>
+                        {{ form.employee_size }}
+                        {% for error in form.employee_size.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-row single">
+                    <div class="form-field">
+                        {{ form.objectives.label_tag }}
+                        <div class="textarea-wrapper">
+                            {{ form.objectives }}
+                            <div class="char-counter">
+                                <span class="char-count">0</span> / 500
+                            </div>
+                        </div>
+                        {% if form.objectives.help_text %}<small class="field-help">{{ form.objectives.help_text }}</small>{% endif %}
+                        {% for error in form.objectives.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {# Assessments Section #}
+            <div class="form-section">
+                <h3 class="form-section-title">Assessment Selection</h3>
+                <div class="assessment-section">
+                    <div class="assessment-section__header">
+                        <label for="{{ form.requested_assessments.id_for_label }}">Select assessments <span class="required">*</span></label>
+                        <p>Choose one or more products to pilot with your team.</p>
+                    </div>
+                    <div class="assessment-grid">
+                        {% for checkbox in form.requested_assessments %}
+                        {% with detail=assessment_details|dict_get:checkbox.data.value %}
+                        <label class="assessment-card">
+                            {{ checkbox.tag }}
+                            <div>
+                                <strong>{{ detail.label|default:checkbox.choice_label }}</strong>
+                                <p>{{ detail.description|default:"Pick this assessment to evaluate candidates in this discipline." }}</p>
+                            </div>
+                        </label>
+                        {% endwith %}
+                        {% endfor %}
+                    </div>
+                    {% for error in form.requested_assessments.errors %}
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
             </div>
-            <div class="form-row single">
-                <div class="form-field">
-                    {{ form.stakeholders.label_tag }}
-                    {{ form.stakeholders }}
-                    {% for error in form.stakeholders.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
+
+            {# Integration & Team Section #}
+            <div class="form-section">
+                <h3 class="form-section-title">Integration & Team (Optional)</h3>
+                <div class="form-row single">
+                    <div class="form-field">
+                        {{ form.talent_stack.label_tag }}
+                        <div class="option-grid">
+                            {% for checkbox in form.talent_stack %}
+                            <label class="checkbox-pill">
+                                <span class="checkbox-pill__box">{{ checkbox.tag }}</span>
+                                <span>{{ checkbox.choice_label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% if form.talent_stack.help_text %}<small class="field-help">{{ form.talent_stack.help_text }}</small>{% endif %}
+                        {% for error in form.talent_stack.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-row single">
+                    <div class="form-field">
+                        {{ form.stakeholders.label_tag }}
+                        {{ form.stakeholders }}
+                        {% if form.stakeholders.help_text %}<small class="field-help">{{ form.stakeholders.help_text }}</small>{% endif %}
+                        {% for error in form.stakeholders.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-field">
-                    {{ form.password1.label_tag }}
-                    {{ form.password1 }}
-                    {% for error in form.password1.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-field">
-                    {{ form.password2.label_tag }}
-                    {{ form.password2 }}
-                    {% for error in form.password2.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
+
+            {# Account Security Section #}
+            <div class="form-section">
+                <h3 class="form-section-title">Account Security</h3>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }} <span class="required">*</span></label>
+                        {{ form.password1 }}
+                        {% if form.password1.help_text %}<small class="field-help">{{ form.password1.help_text }}</small>{% endif %}
+                        {% for error in form.password1.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }} <span class="required">*</span></label>
+                        {{ form.password2 }}
+                        {% for error in form.password2.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-            <button class="btn btn-pill" type="submit">Submit application</button>
+
+            <div class="form-footer">
+                <p class="required-note"><span class="required">*</span> Required fields</p>
+                <button class="btn btn-pill" type="submit">Submit application</button>
+            </div>
         </form>
     </section>
-    </section>
     </main>
-
-    </main>
-
 </div>
+
+<style>
+/* ========================================================================
+   IMPROVED SIGNUP PAGE UX
+   ======================================================================== */
+
+/* Required field indicator */
+.required {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.required-note {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0 0 1.5rem;
+}
+
+.required-note .required {
+    font-size: 1rem;
+}
+
+/* Signup login link */
+.signup-login-link {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: var(--text-body);
+}
+
+.signup-login-link a {
+    color: var(--orange);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.signup-login-link a:hover {
+    color: #cc5500;
+    text-decoration: underline;
+}
+
+/* Form sections for better organization */
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 2px solid #e8eaed;
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.form-section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-section-title::before {
+    content: "";
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--orange) 0%, #ff6b00 100%);
+    border-radius: 2px;
+}
+
+/* Field help text styling */
+.field-help {
+    display: block;
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* Textarea with character counter */
+.textarea-wrapper {
+    position: relative;
+}
+
+.char-counter {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.char-counter.warning {
+    color: #e67e22;
+}
+
+.char-counter.error {
+    color: #e74c3c;
+}
+
+.char-count {
+    font-weight: 600;
+    color: var(--navy);
+}
+
+/* Improved textarea styling */
+.textarea-wrapper textarea {
+    padding-bottom: 2rem;
+}
+
+/* Form footer */
+.form-footer {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e8eaed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.form-footer .btn {
+    min-width: 240px;
+    font-size: 1.0625rem;
+    padding: 0.875rem 2rem;
+}
+
+/* Improved assessment section spacing */
+.form-section .assessment-section {
+    margin-top: 0;
+}
+
+.assessment-section__header label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+}
+
+/* Better checkbox styling */
+.option-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+/* Enhanced focus states for accessibility */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
+}
+
+/* Password field improvements */
+input[type="password"] {
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+
+input[type="password"]::placeholder {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: normal;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    .form-section-title {
+        font-size: 1.125rem;
+    }
+
+    .option-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-footer .btn {
+        width: 100%;
+        min-width: auto;
+    }
+}
+</style>
+
+<script>
+// Character counter for textarea
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.querySelector('[name="objectives"]');
+    const charCount = document.querySelector('.char-count');
+    const charCounter = document.querySelector('.char-counter');
+
+    if (textarea && charCount) {
+        // Update counter on input
+        textarea.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            const maxLength = parseInt(this.getAttribute('maxlength')) || 500;
+
+            charCount.textContent = currentLength;
+
+            // Visual feedback
+            charCounter.classList.remove('warning', 'error');
+            if (currentLength > maxLength * 0.9) {
+                charCounter.classList.add('error');
+            } else if (currentLength > maxLength * 0.75) {
+                charCounter.classList.add('warning');
+            }
+        });
+
+        // Initialize counter with existing content
+        const event = new Event('input');
+        textarea.dispatchEvent(event);
+    }
+
+    // Phone number formatting hint
+    const phoneInput = document.querySelector('[name="phone_number"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('blur', function() {
+            const value = this.value.trim();
+            // Basic validation - just check if it starts with + for international format
+            if (value && !value.startsWith('+') && !value.match(/^\(\d{3}\)/)) {
+                // Show a subtle hint if no international format detected
+                const helpText = this.parentElement.querySelector('.field-help');
+                if (helpText && !helpText.classList.contains('highlighted')) {
+                    helpText.style.color = '#e67e22';
+                    helpText.classList.add('highlighted');
+                    setTimeout(() => {
+                        helpText.style.color = '';
+                        helpText.classList.remove('highlighted');
+                    }, 3000);
+                }
+            }
+        });
+    }
+
+    // Password strength indicator (optional enhancement)
+    const password1 = document.querySelector('[name="password1"]');
+    if (password1) {
+        password1.addEventListener('input', function() {
+            const value = this.value;
+            const helpText = this.parentElement.querySelector('.field-help');
+
+            if (value.length > 0 && value.length < 8) {
+                if (helpText) {
+                    helpText.style.color = '#e74c3c';
+                }
+            } else if (value.length >= 8) {
+                if (helpText) {
+                    helpText.style.color = '#27ae60';
+                }
+            } else {
+                if (helpText) {
+                    helpText.style.color = '';
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
 {% block site_footer %}{% include 'includes/site_footer.html' %}{% endblock %}

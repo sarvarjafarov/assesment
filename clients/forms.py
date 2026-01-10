@@ -36,12 +36,29 @@ def _validate_logo_file(file_obj):
 
 
 class ClientSignupForm(forms.ModelForm):
-    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
+    password1 = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={
+            "placeholder": "Minimum 8 characters",
+            "autocomplete": "new-password"
+        }),
+        help_text="At least 8 characters with a mix of letters and numbers",
+    )
+    password2 = forms.CharField(
+        label="Confirm password",
+        widget=forms.PasswordInput(attrs={
+            "placeholder": "Re-enter your password",
+            "autocomplete": "new-password"
+        })
+    )
     objectives = forms.CharField(
         label="Hiring objectives",
-        widget=forms.Textarea(attrs={"rows": 3, "placeholder": "Tell us what success looks like for your hiring funnel."}),
-        help_text="What roles, volume, or timelines are most important?",
+        widget=forms.Textarea(attrs={
+            "rows": 4,
+            "placeholder": "Tell us what success looks like for your hiring funnel.",
+            "maxlength": 500
+        }),
+        help_text="What roles, volume, or timelines are most important? (500 characters max)",
         required=False,
     )
     talent_stack = forms.MultipleChoiceField(
@@ -56,12 +73,16 @@ class ClientSignupForm(forms.ModelForm):
             ("other", "Other"),
         ],
         widget=forms.CheckboxSelectMultiple,
-        help_text="Helps us prioritize integrations.",
+        help_text="Helps us prioritize integrations (optional)",
     )
     stakeholders = forms.CharField(
         label="Key stakeholders",
         required=False,
-        widget=forms.TextInput(attrs={"placeholder": "e.g., Head of Talent, CTO"}),
+        widget=forms.TextInput(attrs={
+            "placeholder": "e.g., Head of Talent, CTO",
+            "maxlength": 200
+        }),
+        help_text="Who will be involved in reviewing candidates? (optional)",
     )
     requested_assessments = forms.MultipleChoiceField(
         label="Assessments you'd like to pilot",
@@ -71,7 +92,7 @@ class ClientSignupForm(forms.ModelForm):
     logo = forms.FileField(
         label="Company logo",
         required=False,
-        help_text="Optional. Upload a PNG or SVG so your dashboard is branded.",
+        help_text="Optional. Upload a PNG, JPG, or SVG (max 2MB) for dashboard branding",
         widget=forms.FileInput(attrs={"accept": "image/png,image/jpeg,image/svg+xml"}),
     )
 
@@ -89,6 +110,25 @@ class ClientSignupForm(forms.ModelForm):
             "talent_stack",
             "stakeholders",
         ]
+        widgets = {
+            "full_name": forms.TextInput(attrs={
+                "placeholder": "John Smith",
+                "autocomplete": "name"
+            }),
+            "company_name": forms.TextInput(attrs={
+                "placeholder": "Acme Inc.",
+                "autocomplete": "organization"
+            }),
+            "email": forms.EmailInput(attrs={
+                "placeholder": "john@company.com",
+                "autocomplete": "email"
+            }),
+            "phone_number": forms.TextInput(attrs={
+                "placeholder": "+1 (555) 123-4567",
+                "autocomplete": "tel",
+                "type": "tel"
+            }),
+        }
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower().strip()
@@ -97,6 +137,12 @@ class ClientSignupForm(forms.ModelForm):
         if ClientAccount.objects.filter(email=email).exists():
             raise forms.ValidationError("An account with this email already exists.")
         return email
+
+    def clean_password1(self):
+        password = self.cleaned_data.get("password1")
+        if password and len(password) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters long.")
+        return password
 
     def clean(self):
         cleaned = super().clean()
