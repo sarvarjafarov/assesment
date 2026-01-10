@@ -17,7 +17,14 @@ class ClientAccountAdmin(admin.ModelAdmin):
     )
     list_filter = ("status", "plan_slug")
     search_fields = ("company_name", "email", "full_name")
-    readonly_fields = ("created_at", "updated_at", "email_verified_at", "verification_sent_at")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "email_verified_at",
+        "verification_sent_at",
+        "logo_data",  # Binary field, display only
+        "logo_mime",  # Display only
+    )
 
     fieldsets = (
         ("Account Information", {
@@ -33,8 +40,9 @@ class ClientAccountAdmin(admin.ModelAdmin):
             "fields": ("plan_slug", "project_quota", "invite_quota", "invite_quota_reset")
         }),
         ("Branding", {
-            "fields": ("logo", "logo_data", "logo_mime"),
-            "classes": ("collapse",)
+            "fields": ("logo",),
+            "classes": ("collapse",),
+            "description": "Upload a company logo (PNG, JPG, or SVG, max 2MB). The logo is automatically processed and stored."
         }),
         ("Notes & Settings", {
             "fields": ("notes", "receive_weekly_summary", "data_retention_days")

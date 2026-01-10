@@ -121,6 +121,13 @@ def send_welcome_email(client_account):
     assessments_url = settings.SITE_URL.rstrip('/') + reverse('clients:assessments')
     projects_url = settings.SITE_URL.rstrip('/') + reverse('clients:project-list')
 
+    # Get approved assessment labels
+    catalog = client_account.ASSESSMENT_DETAILS
+    approved_assessment_labels = [
+        catalog.get(code, {}).get('label', code.title())
+        for code in (client_account.allowed_assessments or [])
+    ]
+
     context = {
         'client': client_account,
         'full_name': client_account.full_name,
@@ -128,7 +135,7 @@ def send_welcome_email(client_account):
         'dashboard_url': dashboard_url,
         'assessments_url': assessments_url,
         'projects_url': projects_url,
-        'approved_assessments': client_account.requested_labels(),
+        'approved_assessments': approved_assessment_labels,
         'plan_name': client_account.plan_details()['label'],
         'project_quota': client_account.project_quota,
         'invite_quota': client_account.invite_quota,
