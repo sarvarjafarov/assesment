@@ -112,6 +112,16 @@ class ProductAssessmentView(FormView):
         kwargs["question"] = self.current_question
         return kwargs
 
+    def post(self, request, *args, **kwargs):
+        # Handle onboarding completion
+        if request.POST.get('complete_onboarding'):
+            onboarding_key = f'onboarding_seen_{self.session.uuid}'
+            request.session[onboarding_key] = True
+            return redirect(self.request.path)
+
+        # Continue with normal form handling
+        return super().post(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         total = len(self.session.question_set)
@@ -138,6 +148,15 @@ class ProductAssessmentView(FormView):
                 ),
             }
         )
+
+        # Add onboarding logic
+        onboarding_key = f'onboarding_seen_{self.session.uuid}'
+        show_onboarding = (
+            self.current_index == 0 and  # First question
+            not self.request.session.get(onboarding_key, False)  # Not seen before
+        )
+        context['show_onboarding'] = show_onboarding
+
         return context
 
     def form_valid(self, form):
