@@ -46,6 +46,11 @@ class BehavioralAssessmentSession(TimeStampedModel):
         ("paused", "Paused"),
         ("submitted", "Submitted"),
     ]
+    DEADLINE_TYPE_CHOICES = [
+        ("none", "No deadline"),
+        ("relative", "Days from invite"),
+        ("absolute", "Specific date"),
+    ]
     client = models.ForeignKey(
         "clients.ClientAccount",
         null=True,
@@ -72,6 +77,9 @@ class BehavioralAssessmentSession(TimeStampedModel):
     scheduled_for = models.DateTimeField(null=True, blank=True)
     last_reminder_at = models.DateTimeField(null=True, blank=True)
     reminder_count = models.PositiveIntegerField(default=0)
+    deadline_type = models.CharField(max_length=16, choices=DEADLINE_TYPE_CHOICES, default="none")
+    deadline_days = models.PositiveIntegerField(null=True, blank=True, help_text="Days from invite to complete")
+    deadline_at = models.DateTimeField(null=True, blank=True, help_text="Absolute deadline")
     candidate_feedback_score = models.PositiveSmallIntegerField(null=True, blank=True)
     candidate_feedback_comment = models.TextField(blank=True)
     candidate_feedback_submitted_at = models.DateTimeField(null=True, blank=True)

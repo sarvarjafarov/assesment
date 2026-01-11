@@ -189,6 +189,28 @@ class BaseClientInviteForm(forms.Form):
         queryset=ClientProject.objects.none(),
         help_text="Each invite must be tied to a project/role.",
     )
+    deadline_type = forms.ChoiceField(
+        required=False,
+        initial="none",
+        label="Completion deadline",
+        choices=[
+            ("none", "No deadline"),
+            ("relative", "Days from invite"),
+            ("absolute", "Specific date"),
+        ],
+    )
+    deadline_days = forms.IntegerField(
+        required=False,
+        min_value=1,
+        label="Days to complete",
+        help_text="Number of days from when invite is sent",
+    )
+    deadline_at = forms.DateTimeField(
+        required=False,
+        label="Deadline date",
+        help_text="Absolute deadline. Use YYYY-MM-DD HH:MM format.",
+        input_formats=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%m/%d/%Y %H:%M", "%Y-%m-%d"],
+    )
 
     model = None
     generate_question_set = None
@@ -219,6 +241,20 @@ class BaseClientInviteForm(forms.Form):
             raise forms.ValidationError(
                 "You've reached your monthly invite quota. Upgrade your plan to send more invites."
             )
+
+        # Validate deadline fields
+        deadline_type = cleaned.get("deadline_type")
+        deadline_days = cleaned.get("deadline_days")
+        deadline_at = cleaned.get("deadline_at")
+
+        if deadline_type == "relative" and not deadline_days:
+            self.add_error("deadline_days", "Days to complete is required for relative deadlines")
+        if deadline_type == "absolute" and not deadline_at:
+            self.add_error("deadline_at", "Deadline date is required for absolute deadlines")
+        if deadline_type == "none":
+            cleaned["deadline_days"] = None
+            cleaned["deadline_at"] = None
+
         return cleaned
 
     def clean_send_at(self):
@@ -252,6 +288,9 @@ class ClientMarketingInviteForm(BaseClientInviteForm):
         session.started_at = None
         session.client = self.client
         session.project = self.cleaned_data["project"]
+        session.deadline_type = self.cleaned_data.get("deadline_type", "none")
+        session.deadline_days = self.cleaned_data.get("deadline_days")
+        session.deadline_at = self.cleaned_data.get("deadline_at")
         if send_at:
             session.status = "draft"
             session.scheduled_for = send_at
@@ -267,6 +306,9 @@ class ClientMarketingInviteForm(BaseClientInviteForm):
                 "started_at",
                 "client",
                 "project",
+                "deadline_type",
+                "deadline_days",
+                "deadline_at",
             ]
         )
         return session
@@ -289,6 +331,9 @@ class ClientProductInviteForm(BaseClientInviteForm):
         session.started_at = None
         session.client = self.client
         session.project = self.cleaned_data["project"]
+        session.deadline_type = self.cleaned_data.get("deadline_type", "none")
+        session.deadline_days = self.cleaned_data.get("deadline_days")
+        session.deadline_at = self.cleaned_data.get("deadline_at")
         if send_at:
             session.status = "draft"
             session.scheduled_for = send_at
@@ -304,6 +349,9 @@ class ClientProductInviteForm(BaseClientInviteForm):
                 "started_at",
                 "client",
                 "project",
+                "deadline_type",
+                "deadline_days",
+                "deadline_at",
             ]
         )
         return session
@@ -330,6 +378,9 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
         session.started_at = None
         session.client = self.client
         session.project = self.cleaned_data["project"]
+        session.deadline_type = self.cleaned_data.get("deadline_type", "none")
+        session.deadline_days = self.cleaned_data.get("deadline_days")
+        session.deadline_at = self.cleaned_data.get("deadline_at")
         if send_at:
             session.status = "draft"
             session.scheduled_for = send_at
@@ -345,6 +396,9 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
                 "started_at",
                 "client",
                 "project",
+                "deadline_type",
+                "deadline_days",
+                "deadline_at",
             ]
         )
         return session
