@@ -1,106 +1,179 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% block content %}
-<div class="candidate-shell single-column">
-    <section class="candidate-panel response-panel question-step">
-        <div class="question-progress">
-            <div class="progress-meta">
-                <span class="status-chip"><span class="chip-dot"></span>Product management assessment</span>
+<div class="candidate-shell single-column assessment-session">
+    <!-- Sticky Progress Header -->
+    <div class="session-header">
+        <div class="session-header-content">
+            <div class="header-left">
+                <span class="assessment-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    Product Management Assessment
+                </span>
             </div>
-            <div class="progress-meter">
-                <div class="progress-bar">
-                    <span style="width: {{ progress_percent }}%"></span>
+            <div class="header-progress">
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: {{ progress_percent }}%"></div>
+                </div>
+                <div class="progress-stats-compact">
+                    <span class="stat-item">
+                        <strong>{{ step_number }}</strong>/{{ total_steps }}
+                    </span>
+                    <span class="stat-item">
+                        <strong>{{ progress_percent }}%</strong>
+                    </span>
+                    {% if remaining_minutes %}
+                    <span class="stat-item time-left">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        {{ remaining_minutes }} min
+                    </span>
+                    {% endif %}
                 </div>
             </div>
-            <div class="progress-stats">
-                <article class="progress-stat">
-                    <span>Step</span>
-                    <strong>{{ step_number }} / {{ total_steps }}</strong>
-                </article>
-                <article class="progress-stat">
-                    <span>Complete</span>
-                    <strong>{{ progress_percent }}%</strong>
-                </article>
-                {% if remaining_minutes %}
-                <article class="progress-stat">
-                    <span>Time left</span>
-                    <strong>{{ remaining_minutes }} min</strong>
-                </article>
+        </div>
+    </div>
+
+    <section class="candidate-panel response-panel question-step-enhanced">
+        <!-- Utility Toolbar -->
+        <div class="utility-toolbar">
+            <div class="utility-item auto-save">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>Saved {% if last_saved_at %}{{ last_saved_at|naturaltime }}{% else %}just now{% endif %}</span>
+            </div>
+            <div class="utility-actions">
+                <button type="button" class="utility-btn" onclick="toggleDeviceSwitch()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                    Switch Device
+                </button>
+                <form method="post" action="{{ pause_url }}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="utility-btn pause-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="10" y1="15" x2="10" y2="9"></line>
+                            <line x1="14" y1="15" x2="14" y2="9"></line>
+                        </svg>
+                        Pause
+                    </button>
+                </form>
+                {% if help_topics %}
+                <button type="button" class="utility-btn" onclick="toggleHelp()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Help
+                </button>
                 {% endif %}
             </div>
         </div>
-        <div class="session-utility-bar">
-            <div>
-                <p class="eyebrow">Progress saved</p>
-                <strong>
-                    {% if last_saved_at %}
-                        {{ last_saved_at|naturaltime }}
-                    {% else %}
-                        Just now
-                    {% endif %}
-                </strong>
+
+        <!-- Device Switch Panel (Hidden by default) -->
+        <div class="device-switch-panel" id="deviceSwitchPanel" style="display: none;">
+            <div class="panel-header">
+                <h4>Continue on Another Device</h4>
+                <button type="button" class="panel-close" onclick="toggleDeviceSwitch()">×</button>
             </div>
-            <form method="post" action="{{ pause_url }}">
+            <p>Enter your email to receive a secure link to continue this assessment on another screen.</p>
+            <form method="post" action="{{ switch_device_url }}" class="device-form-enhanced">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline">Pause &amp; resume later</button>
+                <div class="form-group-inline">
+                    <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address">
+                    <button type="submit" class="btn-send">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Send Link
+                    </button>
+                </div>
             </form>
         </div>
-        <div class="device-support">
-            <div>
-                <p class="eyebrow">Switch device</p>
-                <p>Email yourself the secure link to continue on another laptop or tablet.</p>
-            </div>
-            <form method="post" action="{{ switch_device_url }}" class="device-form">
-                {% csrf_token %}
-                <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address for the assessment link">
-                <button type="submit" class="btn btn-ghost">Send link</button>
-            </form>
-        </div>
+
+        <!-- Help Panel (Hidden by default) -->
         {% if help_topics %}
-        <details class="help-drawer">
-            <summary>
-                <span>FAQ &amp; support</span>
-                <span class="chevron" aria-hidden="true"></span>
-            </summary>
-            <div class="help-content">
+        <div class="help-panel" id="helpPanel" style="display: none;">
+            <div class="panel-header">
+                <h4>FAQ & Support</h4>
+                <button type="button" class="panel-close" onclick="toggleHelp()">×</button>
+            </div>
+            <div class="help-topics">
                 {% for topic in help_topics %}
-                <article>
+                <div class="help-topic">
                     <strong>{{ topic.question }}</strong>
                     <p>{{ topic.answer }}</p>
-                </article>
+                </div>
                 {% endfor %}
-                <p class="muted">Questions? Email <a href="mailto:support@evalon.so">support@evalon.so</a> or practice first <a href="{{ practice_url }}">here</a>.</p>
             </div>
-        </details>
+            <div class="help-footer">
+                <p>Need more help? Email <a href="mailto:support@evalon.so">support@evalon.so</a> or <a href="{{ practice_url }}">try practice questions</a>.</p>
+            </div>
+        </div>
         {% endif %}
-        <form method="post" class="question-form">
+
+        <!-- Main Question Form -->
+        <form method="post" class="question-form-enhanced">
             {% csrf_token %}
             <input type="hidden" name="telemetry_payload" data-telemetry-field>
-            <div class="question-card">
-                <p class="eyebrow">{{ question.get_category_display }}</p>
-                <h2>{{ question.question_text }}</h2>
+
+            <div class="question-card-enhanced">
+                <div class="question-header">
+                    <span class="question-category">{{ question.get_category_display }}</span>
+                </div>
+
+                <h2 class="question-title">{{ question.question_text }}</h2>
+
                 {% if question.explanation %}
-                <p class="help-text">{{ question.explanation }}</p>
-                {% endif %}
-                {% if guidance_tip %}
-                <div class="question-guidance">
-                    <strong>{{ guidance_tip.title }}</strong>
-                    <p>{{ guidance_tip.body }}</p>
+                <div class="question-explanation">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <p>{{ question.explanation }}</p>
                 </div>
                 {% endif %}
-                <div class="question-input">
+
+                {% if guidance_tip %}
+                <div class="guidance-tip">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                    </svg>
+                    <div>
+                        <strong>{{ guidance_tip.title }}</strong>
+                        <p>{{ guidance_tip.body }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="question-input-enhanced">
                     {% if question.question_type == 'ranking' %}
-                    <p class="help-text">Arrange the following items before submitting your final order:</p>
+                    <p class="input-instruction">Arrange the following items in order:</p>
                     <ol class="ranking-items">
                         {% for item in form.ranking_items %}
                         <li>{{ item }}</li>
                         {% endfor %}
                     </ol>
                     {% elif question.question_type == 'behavioral_most' %}
-                    <p class="help-text">Select the statement that is most like you.</p>
+                    <p class="input-instruction">Select the statement that is most like you:</p>
                     {% elif question.question_type == 'behavioral_least' %}
-                    <p class="help-text">Select the statement that is least like you.</p>
+                    <p class="input-instruction">Select the statement that is least like you:</p>
                     {% endif %}
+
                     {% for field in form %}
                         {{ field }}
                         {% for error in field.errors %}
@@ -108,21 +181,576 @@
                         {% endfor %}
                     {% endfor %}
                 </div>
+
                 {% if show_preview %}
-                <div class="answer-preview">
-                    <div class="preview-head">
-                        <p class="eyebrow">Live preview</p>
+                <div class="answer-preview-enhanced">
+                    <div class="preview-header">
+                        <span class="preview-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            Live Preview
+                        </span>
                         <span class="char-count" data-char-count data-min-length="{{ preview_min_length }}">0 characters</span>
                     </div>
-                    <p class="preview-hint">We autosave your work. Aim for at least {{ preview_min_length }} characters covering assumptions, approach, and metrics.</p>
-                    <div class="preview-body" data-preview-body data-placeholder="Start typing to see your response preview."></div>
+                    <p class="preview-hint">Aim for at least {{ preview_min_length }} characters. Your progress auto-saves.</p>
+                    <div class="preview-body" data-preview-body data-placeholder="Start typing to see your response preview..."></div>
                 </div>
                 {% endif %}
             </div>
-            <button type="submit" class="btn btn-pill">
-                {% if step_number == total_steps %}Submit assessment{% else %}Save & Continue{% endif %}
-            </button>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit-enhanced">
+                    {% if step_number == total_steps %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        Submit Assessment
+                    {% else %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"></path>
+                            <path d="m12 5 7 7-7 7"></path>
+                        </svg>
+                        Save & Continue
+                    {% endif %}
+                </button>
+            </div>
         </form>
     </section>
 </div>
+
+<style>
+/* Enhanced Assessment Session Styles */
+.assessment-session {
+    padding-top: 80px; /* Space for fixed header */
+}
+
+/* Sticky Progress Header */
+.session-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-bottom: 2px solid #e2e8f0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.session-header-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.header-left {
+    flex-shrink: 0;
+}
+
+.assessment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0e1428;
+}
+
+.assessment-badge svg {
+    color: #ff8a00;
+}
+
+.header-progress {
+    flex: 1;
+    min-width: 0;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff8a00 0%, #ff6b00 100%);
+    border-radius: 100px;
+    transition: width 0.3s ease;
+}
+
+.progress-stats-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: 13px;
+    color: #718096;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-item strong {
+    color: #0e1428;
+    font-weight: 700;
+}
+
+.time-left {
+    color: #ff8a00;
+    font-weight: 600;
+}
+
+/* Utility Toolbar */
+.utility-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f7fafc;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    border: 1px solid #e2e8f0;
+}
+
+.utility-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.auto-save svg {
+    color: #10b981;
+}
+
+.utility-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.utility-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.utility-btn:hover {
+    border-color: #ff8a00;
+    color: #ff8a00;
+    background: #fff7ed;
+}
+
+.pause-btn:hover {
+    border-color: #ff8a00;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
+}
+
+/* Collapsible Panels */
+.device-switch-panel,
+.help-panel {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #bae6fd;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.panel-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0e1428;
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #718096;
+    cursor: pointer;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.panel-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #0e1428;
+}
+
+.device-switch-panel p {
+    margin: 0 0 16px;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.form-group-inline {
+    display: flex;
+    gap: 8px;
+}
+
+.form-group-inline input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-group-inline input:focus {
+    outline: none;
+    border-color: #ff8a00;
+}
+
+.btn-send {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-send:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 138, 0, 0.3);
+}
+
+.help-topics {
+    margin-bottom: 16px;
+}
+
+.help-topic {
+    padding: 12px 0;
+    border-bottom: 1px solid #bae6fd;
+}
+
+.help-topic:last-child {
+    border-bottom: none;
+}
+
+.help-topic strong {
+    display: block;
+    color: #0e1428;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.help-topic p {
+    margin: 0;
+    color: #4a5568;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.help-footer {
+    padding-top: 16px;
+    border-top: 1px solid #bae6fd;
+}
+
+.help-footer p {
+    margin: 0;
+    font-size: 13px;
+    color: #4a5568;
+}
+
+.help-footer a {
+    color: #ff8a00;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.help-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Enhanced Question Card */
+.question-card-enhanced {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.question-header {
+    margin-bottom: 16px;
+}
+
+.question-category {
+    display: inline-flex;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
+    border: 1px solid #ff8a00;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ff8a00;
+}
+
+.question-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0e1428;
+    line-height: 1.4;
+    margin: 0 0 20px;
+}
+
+.question-explanation {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: #f7fafc;
+    border-left: 3px solid #3b82f6;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.question-explanation svg {
+    flex-shrink: 0;
+    color: #3b82f6;
+    margin-top: 2px;
+}
+
+.question-explanation p {
+    margin: 0;
+    color: #4a5568;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.guidance-tip {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-left: 3px solid #10b981;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.guidance-tip svg {
+    flex-shrink: 0;
+    color: #10b981;
+    margin-top: 2px;
+}
+
+.guidance-tip strong {
+    display: block;
+    color: #0e1428;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.guidance-tip p {
+    margin: 0;
+    color: #4a5568;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.question-input-enhanced {
+    margin-top: 24px;
+}
+
+.input-instruction {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0e1428;
+    margin: 0 0 16px;
+}
+
+.answer-preview-enhanced {
+    margin-top: 24px;
+    padding: 20px;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.preview-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0e1428;
+}
+
+.preview-label svg {
+    color: #ff8a00;
+}
+
+.char-count {
+    font-size: 13px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.preview-hint {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: #4a5568;
+}
+
+.preview-body {
+    padding: 16px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    min-height: 100px;
+    font-size: 15px;
+    color: #0e1428;
+    line-height: 1.6;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-submit-enhanced {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.3);
+    transition: all 0.2s;
+}
+
+.btn-submit-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 138, 0, 0.4);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .assessment-session {
+        padding-top: 100px;
+    }
+
+    .session-header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .progress-stats-compact {
+        gap: 12px;
+        font-size: 12px;
+    }
+
+    .utility-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .utility-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .question-card-enhanced {
+        padding: 20px;
+    }
+
+    .question-title {
+        font-size: 18px;
+    }
+
+    .form-group-inline {
+        flex-direction: column;
+    }
+
+    .btn-submit-enhanced {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+function toggleDeviceSwitch() {
+    const panel = document.getElementById('deviceSwitchPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleHelp() {
+    const panel = document.getElementById('helpPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+</script>
 {% endblock %}
