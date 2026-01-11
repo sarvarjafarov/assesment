@@ -167,9 +167,55 @@ class MarketingAssessmentView(FormView):
         )
         context['show_onboarding'] = show_onboarding
 
+        # Add deadline information
+        deadline_info = self._calculate_deadline()
+        if deadline_info:
+            context['deadline_at'] = deadline_info['deadline_at']
+            context['deadline_passed'] = deadline_info['deadline_passed']
+            context['deadline_warning'] = deadline_info['deadline_warning']
+
         return context
 
+    def _calculate_deadline(self):
+        """Calculate deadline information for this session"""
+        if self.session.deadline_type == 'absolute' and self.session.deadline_at:
+            deadline_at = self.session.deadline_at
+            now = timezone.now()
+            deadline_passed = now > deadline_at
+            # Warning if less than 24 hours remaining
+            deadline_warning = not deadline_passed and (deadline_at - now).total_seconds() < 86400
+            return {
+                'deadline_at': deadline_at,
+                'deadline_passed': deadline_passed,
+                'deadline_warning': deadline_warning,
+            }
+        elif self.session.deadline_type == 'relative' and self.session.deadline_days:
+            from datetime import timedelta
+            # Calculate from scheduled_for or created_at
+            base_time = self.session.scheduled_for or self.session.created_at
+            deadline_at = base_time + timedelta(days=self.session.deadline_days)
+            now = timezone.now()
+            deadline_passed = now > deadline_at
+            deadline_warning = not deadline_passed and (deadline_at - now).total_seconds() < 86400
+            return {
+                'deadline_at': deadline_at,
+                'deadline_passed': deadline_passed,
+                'deadline_warning': deadline_warning,
+            }
+        return None
+
     def form_valid(self, form):
+        # Check if deadline has passed
+        deadline_info = self._calculate_deadline()
+        if deadline_info and deadline_info['deadline_passed']:
+            from django.contrib import messages
+            messages.error(
+                self.request,
+                f"The deadline for this assessment was {deadline_info['deadline_at'].strftime('%B %d, %Y at %I:%M %p')}. "
+                "You can no longer submit responses."
+            )
+            return redirect("candidate:marketing-session", session_uuid=self.session.uuid)
+
         responses = list(self.session.responses)
         responses.append(form.to_response())
         self.session.responses = responses

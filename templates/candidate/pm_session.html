@@ -83,6 +83,30 @@
             </div>
         </div>
 
+        <!-- Deadline Banner -->
+        {% if deadline_at %}
+        <div class="deadline-banner {% if deadline_passed %}deadline-expired{% elif deadline_warning %}deadline-warning{% endif %}">
+            <div class="deadline-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+            <div class="deadline-content">
+                {% if deadline_passed %}
+                    <strong>Deadline Passed</strong>
+                    <p>This assessment was due on {{ deadline_at|date:"F d, Y" }} at {{ deadline_at|date:"g:i A" }}. You can no longer submit responses.</p>
+                {% elif deadline_warning %}
+                    <strong>Deadline Approaching</strong>
+                    <p>This assessment is due on {{ deadline_at|date:"F d, Y" }} at {{ deadline_at|date:"g:i A" }}. Please complete it soon.</p>
+                {% else %}
+                    <strong>Completion Deadline</strong>
+                    <p>Please submit this assessment by {{ deadline_at|date:"F d, Y" }} at {{ deadline_at|date:"g:i A" }}.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Device Switch Panel (Hidden by default) -->
         <div class="device-switch-panel" id="deviceSwitchPanel" style="display: none;">
             <div class="panel-header">
@@ -370,6 +394,73 @@
 .pause-btn:hover {
     border-color: #ff8a00;
     background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
+}
+
+/* Deadline Banner */
+.deadline-banner {
+    display: flex;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #bae6fd;
+    border-left: 4px solid #3b82f6;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.deadline-banner.deadline-warning {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 2px solid #fbbf24;
+    border-left: 4px solid #f59e0b;
+}
+
+.deadline-banner.deadline-expired {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 2px solid #fca5a5;
+    border-left: 4px solid #ef4444;
+}
+
+.deadline-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+}
+
+.deadline-banner.deadline-warning .deadline-icon svg,
+.deadline-icon svg {
+    color: #3b82f6;
+}
+
+.deadline-banner.deadline-warning .deadline-icon svg {
+    color: #f59e0b;
+}
+
+.deadline-banner.deadline-expired .deadline-icon svg {
+    color: #ef4444;
+}
+
+.deadline-content {
+    flex: 1;
+}
+
+.deadline-content strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0e1428;
+    margin-bottom: 4px;
+}
+
+.deadline-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #4a5568;
+    line-height: 1.5;
 }
 
 /* Collapsible Panels */

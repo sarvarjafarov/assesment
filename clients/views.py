@@ -1286,6 +1286,18 @@ class ClientAssessmentMixin(LoginRequiredMixin):
         # Extract candidate first name from email if possible
         candidate_first_name = email.split('@')[0].split('.')[0].title()
 
+        # Calculate deadline based on deadline_type
+        due_at = None
+        if hasattr(session, 'deadline_type'):
+            if session.deadline_type == 'absolute':
+                due_at = session.deadline_at
+            elif session.deadline_type == 'relative' and session.deadline_days:
+                from datetime import timedelta
+                from django.utils import timezone as tz
+                # Calculate from scheduled_for or now
+                base_time = session.scheduled_for or tz.now()
+                due_at = base_time + timedelta(days=session.deadline_days)
+
         # Prepare email context
         context = {
             'company_name': self.account.company_name,
@@ -1298,7 +1310,7 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             },
             'start_link': start_link,
             'session_link': session_link,
-            'due_at': getattr(session, 'expires_at', None),
+            'due_at': due_at,
             'notes': getattr(session, 'notes', ''),
         }
 
