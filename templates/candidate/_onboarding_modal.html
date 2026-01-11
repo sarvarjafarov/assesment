@@ -1,0 +1,816 @@
+<!-- Assessment Onboarding Modal -->
+<div class="onboarding-overlay" id="onboardingOverlay" style="display: {% if show_onboarding %}flex{% else %}none{% endif %};">
+    <div class="onboarding-modal">
+        <!-- Step 1: Welcome -->
+        <div class="onboarding-step" data-step="1">
+            <div class="onboarding-step-content">
+                <div class="onboarding-icon-large">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <h2>Welcome to Your Assessment!</h2>
+                <p class="onboarding-description">Let's take a quick 30-second tour of the assessment interface so you can focus on showing your best work.</p>
+                <div class="onboarding-features">
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        <span>Auto-saves your progress</span>
+                    </div>
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="10" y1="15" x2="10" y2="9"></line>
+                            <line x1="14" y1="15" x2="14" y2="9"></line>
+                        </svg>
+                        <span>Pause anytime and resume later</span>
+                    </div>
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                        <span>Switch between devices seamlessly</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Progress Tracking -->
+        <div class="onboarding-step" data-step="2" style="display: none;">
+            <div class="onboarding-step-content">
+                <div class="onboarding-screenshot">
+                    <div class="demo-header">
+                        <div class="demo-badge">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg>
+                            Assessment Name
+                        </div>
+                        <div class="demo-progress">
+                            <div class="demo-progress-bar">
+                                <div class="demo-progress-fill" style="width: 40%"></div>
+                            </div>
+                            <div class="demo-stats">
+                                <span><strong>4</strong>/10</span>
+                                <span><strong>40%</strong></span>
+                                <span class="demo-time">⏱ 15 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h2>Track Your Progress</h2>
+                <p class="onboarding-description">The progress header stays at the top as you scroll, so you always know:</p>
+                <ul class="onboarding-list">
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Which question you're on (e.g., 4 of 10)
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        How much you've completed (40%)
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        How much time is left (if timed)
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Step 3: Auto-Save & Tools -->
+        <div class="onboarding-step" data-step="3" style="display: none;">
+            <div class="onboarding-step-content">
+                <div class="onboarding-screenshot">
+                    <div class="demo-toolbar">
+                        <div class="demo-save">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            </svg>
+                            Saved just now
+                        </div>
+                        <div class="demo-buttons">
+                            <button class="demo-btn">Switch Device</button>
+                            <button class="demo-btn">Pause</button>
+                            <button class="demo-btn">Help</button>
+                        </div>
+                    </div>
+                </div>
+                <h2>Helpful Tools</h2>
+                <p class="onboarding-description">Just below the progress bar, you'll find quick-access tools:</p>
+                <ul class="onboarding-list">
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <strong>Auto-save:</strong> Your work saves automatically every few seconds
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <strong>Switch Device:</strong> Email yourself a link to continue on another screen
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <strong>Pause:</strong> Take a break and come back when you're ready
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <strong>Help:</strong> Access FAQs and support contact information
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Step 4: Question Card -->
+        <div class="onboarding-step" data-step="4" style="display: none;">
+            <div class="onboarding-step-content">
+                <div class="onboarding-screenshot">
+                    <div class="demo-question">
+                        <span class="demo-category">QUESTION CATEGORY</span>
+                        <h3 class="demo-question-title">Your question will appear here</h3>
+                        <div class="demo-tip">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg>
+                            Helpful tips and guidance will appear here
+                        </div>
+                        <div class="demo-input">
+                            <span>Your answer input goes here...</span>
+                        </div>
+                    </div>
+                </div>
+                <h2>Answering Questions</h2>
+                <p class="onboarding-description">Each question is presented in a clean, focused card:</p>
+                <ul class="onboarding-list">
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Read the question carefully and any additional context provided
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Look for guidance tips (highlighted in green) for helpful hints
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Take your time—there's no rush to answer
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Step 5: Ready to Start -->
+        <div class="onboarding-step" data-step="5" style="display: none;">
+            <div class="onboarding-step-content">
+                <div class="onboarding-icon-large success">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                    </svg>
+                </div>
+                <h2>You're All Set!</h2>
+                <p class="onboarding-description">Remember, the assessment:</p>
+                <ul class="onboarding-list centered">
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Auto-saves your progress continuously
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Can be paused and resumed anytime
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Has help available if you need it
+                    </li>
+                </ul>
+                <div class="onboarding-final-tip">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                    </svg>
+                    <p><strong>Pro tip:</strong> If you need to take a break, use the "Pause" button rather than just closing your browser.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="onboarding-navigation">
+            <button type="button" class="onboarding-btn-back" id="onboardingBack" style="visibility: hidden;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5"></path>
+                    <path d="m12 19-7-7 7-7"></path>
+                </svg>
+                Back
+            </button>
+            <div class="onboarding-dots">
+                <span class="dot active" data-dot="1"></span>
+                <span class="dot" data-dot="2"></span>
+                <span class="dot" data-dot="3"></span>
+                <span class="dot" data-dot="4"></span>
+                <span class="dot" data-dot="5"></span>
+            </div>
+            <button type="button" class="onboarding-btn-next" id="onboardingNext">
+                Next
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                </svg>
+            </button>
+            <form method="post" id="onboardingCompleteForm" style="display: none;">
+                {% csrf_token %}
+                <input type="hidden" name="complete_onboarding" value="1">
+                <button type="submit" class="onboarding-btn-start">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Start Assessment
+                </button>
+            </form>
+        </div>
+
+        <button type="button" class="onboarding-skip" id="onboardingSkip">
+            Skip tutorial
+        </button>
+    </div>
+</div>
+
+<style>
+/* Onboarding Overlay */
+.onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(14, 20, 40, 0.95);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.onboarding-modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.onboarding-step {
+    padding: 48px 40px 32px;
+}
+
+.onboarding-step-content {
+    text-align: center;
+}
+
+.onboarding-icon-large {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 8px 24px rgba(255, 138, 0, 0.3);
+}
+
+.onboarding-icon-large.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+}
+
+.onboarding-step h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0e1428;
+    margin: 0 0 16px;
+}
+
+.onboarding-description {
+    font-size: 16px;
+    color: #4a5568;
+    line-height: 1.6;
+    margin: 0 0 24px;
+}
+
+.onboarding-features {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 12px;
+    text-align: left;
+    color: #0e1428;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.feature-item svg {
+    flex-shrink: 0;
+    color: #ff8a00;
+}
+
+.onboarding-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.onboarding-list.centered {
+    text-align: center;
+}
+
+.onboarding-list.centered li {
+    justify-content: center;
+}
+
+.onboarding-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    color: #4a5568;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.onboarding-list li svg {
+    flex-shrink: 0;
+    color: #10b981;
+    margin-top: 2px;
+}
+
+.onboarding-list li strong {
+    color: #0e1428;
+}
+
+.onboarding-screenshot {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: #f7fafc;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+}
+
+/* Demo Components */
+.demo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.demo-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0e1428;
+}
+
+.demo-badge svg {
+    color: #ff8a00;
+}
+
+.demo-progress {
+    flex: 1;
+    min-width: 0;
+}
+
+.demo-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.demo-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff8a00 0%, #ff6b00 100%);
+    border-radius: 100px;
+}
+
+.demo-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 11px;
+    color: #718096;
+}
+
+.demo-stats strong {
+    color: #0e1428;
+    font-weight: 700;
+}
+
+.demo-time {
+    color: #ff8a00;
+    font-weight: 600;
+}
+
+.demo-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 8px;
+    gap: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.demo-save {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #4a5568;
+}
+
+.demo-save svg {
+    color: #10b981;
+}
+
+.demo-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.demo-btn {
+    padding: 6px 10px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.demo-question {
+    text-align: left;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+}
+
+.demo-category {
+    display: inline-flex;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
+    border: 1px solid #ff8a00;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ff8a00;
+}
+
+.demo-question-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0e1428;
+    margin: 12px 0;
+}
+
+.demo-tip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-left: 3px solid #10b981;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #4a5568;
+    margin-bottom: 12px;
+}
+
+.demo-tip svg {
+    flex-shrink: 0;
+    color: #10b981;
+}
+
+.demo-input {
+    padding: 12px;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #718096;
+}
+
+.onboarding-final-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
+    border-left: 4px solid #ff8a00;
+    border-radius: 12px;
+    margin-top: 24px;
+    text-align: left;
+}
+
+.onboarding-final-tip svg {
+    flex-shrink: 0;
+    color: #ff8a00;
+    margin-top: 2px;
+}
+
+.onboarding-final-tip p {
+    margin: 0;
+    font-size: 15px;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+/* Navigation */
+.onboarding-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px 32px;
+}
+
+.onboarding-btn-back,
+.onboarding-btn-next {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.onboarding-btn-back:hover,
+.onboarding-btn-next:hover {
+    border-color: #ff8a00;
+    color: #ff8a00;
+    background: #fff7ed;
+}
+
+.onboarding-btn-start {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.3);
+    transition: all 0.2s;
+}
+
+.onboarding-btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 138, 0, 0.4);
+}
+
+.onboarding-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dot.active {
+    width: 24px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff8a00 0%, #ff6b00 100%);
+}
+
+.onboarding-skip {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #718096;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.onboarding-skip:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #0e1428;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .onboarding-modal {
+        border-radius: 16px;
+        max-height: 100vh;
+    }
+
+    .onboarding-step {
+        padding: 32px 24px 24px;
+    }
+
+    .onboarding-step h2 {
+        font-size: 24px;
+    }
+
+    .onboarding-icon-large {
+        width: 80px;
+        height: 80px;
+    }
+
+    .onboarding-icon-large svg {
+        width: 48px;
+        height: 48px;
+    }
+
+    .onboarding-navigation {
+        padding: 0 24px 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .onboarding-dots {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .demo-header,
+    .demo-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .demo-buttons {
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('onboarding Overlay');
+    if (!overlay || overlay.style.display === 'none') return;
+
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    const steps = document.querySelectorAll('.onboarding-step');
+    const dots = document.querySelectorAll('.dot');
+    const backBtn = document.getElementById('onboardingBack');
+    const nextBtn = document.getElementById('onboardingNext');
+    const skipBtn = document.getElementById('onboardingSkip');
+    const completeForm = document.getElementById('onboardingCompleteForm');
+
+    function showStep(stepNumber) {
+        steps.forEach(step => step.style.display = 'none');
+        dots.forEach(dot => dot.classList.remove('active'));
+
+        const targetStep = document.querySelector(`[data-step="${stepNumber}"]`);
+        const targetDot = document.querySelector(`[data-dot="${stepNumber}"]`);
+
+        if (targetStep) targetStep.style.display = 'block';
+        if (targetDot) targetDot.classList.add('active');
+
+        // Update navigation buttons
+        backBtn.style.visibility = stepNumber === 1 ? 'hidden' : 'visible';
+
+        if (stepNumber === totalSteps) {
+            nextBtn.style.display = 'none';
+            completeForm.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'flex';
+            completeForm.style.display = 'none';
+        }
+
+        currentStep = stepNumber;
+    }
+
+    backBtn.addEventListener('click', function() {
+        if (currentStep > 1) {
+            showStep(currentStep - 1);
+        }
+    });
+
+    nextBtn.addEventListener('click', function() {
+        if (currentStep < totalSteps) {
+            showStep(currentStep + 1);
+        }
+    });
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', function() {
+            const stepNumber = parseInt(this.dataset.dot);
+            showStep(stepNumber);
+        });
+    });
+
+    skipBtn.addEventListener('click', function() {
+        overlay.style.display = 'none';
+        // Submit the form to mark onboarding as complete
+        completeForm.querySelector('button').click();
+    });
+
+    // Initialize
+    showStep(1);
+});
+</script>
