@@ -719,6 +719,34 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Deadline Type Toggle Functionality
+    const deadlineTypeSelect = document.getElementById('id_deadline_type');
+    const deadlineDaysGroup = document.querySelector('[for="id_deadline_days"]')?.closest('.form-group');
+    const deadlineAtGroup = document.querySelector('[for="id_deadline_at"]')?.closest('.form-group');
+
+    if (deadlineTypeSelect && deadlineDaysGroup && deadlineAtGroup) {
+        function toggleDeadlineFields() {
+            const selectedType = deadlineTypeSelect.value;
+
+            if (selectedType === 'relative') {
+                deadlineDaysGroup.style.display = 'block';
+                deadlineAtGroup.style.display = 'none';
+            } else if (selectedType === 'absolute') {
+                deadlineDaysGroup.style.display = 'none';
+                deadlineAtGroup.style.display = 'block';
+            } else {
+                deadlineDaysGroup.style.display = 'none';
+                deadlineAtGroup.style.display = 'none';
+            }
+        }
+
+        // Initialize on page load
+        toggleDeadlineFields();
+
+        // Update on change
+        deadlineTypeSelect.addEventListener('change', toggleDeadlineFields);
+    }
 });
 </script>
 
