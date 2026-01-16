@@ -389,7 +389,7 @@
                     <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
                 </div>
                 <div class="sample-note">
-                    <p>Pair these with our webhooks to keep ATS, CRM, and analytics tools in sync.</p>
+                    <p>Poll session status or integrate with your existing workflow tools.</p>
                 </div>
             </div>
             <div class="sample-flow">
@@ -397,45 +397,48 @@
                     <span class="step-badge">01</span>
                     <div class="sample-card-header">
                         <div>
-                            <p class="label">Start a session</p>
-                            <strong>POST /api/marketing-assessment/start/</strong>
+                            <p class="label">Create invitation</p>
+                            <strong>POST /api/assessments/invitations/</strong>
                         </div>
                         <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode1" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
                     </div>
 <pre><code id="sampleCode1">{
-  "candidate_id": "cand-123"
-} 
-→ { "session_uuid": "uuid" }</code></pre>
+  "email": "candidate@example.com",
+  "full_name": "Jane Doe",
+  "assessment_slug": "sales-behavioral"
+}
+→ { "session_uuid": "uuid", "email_sent": true }</code></pre>
                 </article>
                 <article class="sample-card is-process">
                     <span class="step-badge">02</span>
                     <div class="sample-card-header">
                         <div>
-                            <p class="label">Fetch results</p>
-                            <strong>GET /api/marketing-assessment/cand-123/results/</strong>
+                            <p class="label">Get results</p>
+                            <strong>GET /api/assessments/sessions/&lt;uuid&gt;/responses/</strong>
                         </div>
                         <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode2" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
                     </div>
 <pre><code id="sampleCode2">{
-  "overall_score": 82.5,
-  "category_breakdown": {...},
-  "recommendations": {...}
+  "status": "submitted",
+  "overall_score": 84.2,
+  "score_breakdown": {...},
+  "behavioral_profile": {...}
 }</code></pre>
                 </article>
                 <article class="sample-card is-complete">
                     <span class="step-badge">03</span>
                     <div class="sample-card-header">
                         <div>
-                            <p class="label">Submit responses</p>
-                            <strong>POST /api/marketing-assessment/cand-123/submit/</strong>
+                            <p class="label">List categories</p>
+                            <strong>GET /api/assessments/categories/</strong>
                         </div>
                         <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode3" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
                     </div>
-<pre><code id="sampleCode3">[
-  {"question_id": 45, "answer": "B"},
-  {"question_id": 52, "selected": "most"}
-]
-→ { "detail": "Assessment submitted", "session_uuid": "uuid" }</code></pre>
+<pre><code id="sampleCode3">{
+  "categories": [
+    {"name": "Sales", "slug": "sales", "assessments": [...]}
+  ]
+}</code></pre>
                 </article>
             </div>
         </section>
