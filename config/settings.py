@@ -60,6 +60,7 @@ DEFAULT_ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     ".evalon.tech",
+    ".herokuapp.com",
 ]
 env_allowed_hosts = [
     host.strip()
@@ -73,6 +74,7 @@ if not ALLOWED_HOSTS:
 DEFAULT_CSRF_TRUSTED_ORIGINS = [
     "https://evalon.tech",
     "https://www.evalon.tech",
+    "https://assesment-7249edfd30d7.herokuapp.com",
 ]
 env_csrf_origins = [
     origin.strip()
