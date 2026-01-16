@@ -3,34 +3,7 @@
 {% block title %}{{ marketing_settings.meta_title|default:"Evalon · Structured Hiring Assessments" }}{% endblock %}
 {% block content %}
 <div class="page-shell">
-    <header class="site-header">
-        <nav class="nav">
-            <div class="nav-header">
-                <a class="brand" href="{% url 'pages:home' %}">
-                    <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
-                    <span class="sr-only">Evalon</span>
-                </a>
-                <button class="nav-toggle" type="button" aria-controls="siteNavMenu" aria-expanded="false" data-nav-toggle>
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="nav-toggle-line"></span>
-                    <span class="nav-toggle-line"></span>
-                    <span class="nav-toggle-line"></span>
-                </button>
-            </div>
-            <div class="nav-menu" id="siteNavMenu" data-nav-menu>
-                <ul class="nav-links">
-                    <li><a href="#how-it-works">How it works</a></li>
-                    <li><a href="#assessments">Assessments</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="{% url 'marketing_assessments:api' %}">API</a></li>
-                </ul>
-            <div class="nav-actions">
-                <a class="btn btn-outline small" href="{% url 'clients:login' %}">Login</a>
-                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Start Free Trial</a>
-            </div>
-            </div>
-        </nav>
-    </header>
+    {% include 'includes/site_header.html' %}
 
     <main>
         {# HERO SECTION - Simplified with animated orbs #}
