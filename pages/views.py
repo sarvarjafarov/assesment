@@ -1,12 +1,18 @@
+import json
+
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django import forms
 from django.utils.text import slugify
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
 from .forms import DemoRequestForm
+from .models import NewsletterSubscriber
 
 def home(request):
     """Render the marketing landing page."""
@@ -593,3 +599,48 @@ def _page_builder_context(page_slug, fallback):
     else:
         sections = fallback.get("sections", [])
     return {"hero": hero, "sections": sections}
+
+
+@csrf_exempt
+@require_POST
+def newsletter_subscribe(request):
+    """Handle newsletter subscription via AJAX."""
+    try:
+        data = json.loads(request.body)
+        email = data.get("email", "").strip().lower()
+    except (json.JSONDecodeError, AttributeError):
+        email = request.POST.get("email", "").strip().lower()
+
+    if not email:
+        return JsonResponse({"success": False, "error": "Email is required."}, status=400)
+
+    # Basic email validation
+    if "@" not in email or "." not in email.split("@")[-1]:
+        return JsonResponse({"success": False, "error": "Please enter a valid email."}, status=400)
+
+    # Check if already subscribed
+    existing = NewsletterSubscriber.objects.filter(email=email).first()
+    if existing:
+        if existing.status == "active":
+            return JsonResponse({
+                "success": True,
+                "message": "You're already subscribed! Thanks for being part of our community."
+            })
+        else:
+            # Reactivate subscription
+            existing.status = "active"
+            existing.unsubscribed_at = None
+            existing.save(update_fields=["status", "unsubscribed_at"])
+            return JsonResponse({
+                "success": True,
+                "message": "Welcome back! Your subscription has been reactivated."
+            })
+
+    # Create new subscription
+    source = data.get("source", "footer") if isinstance(data, dict) else "footer"
+    NewsletterSubscriber.objects.create(email=email, source=source)
+
+    return JsonResponse({
+        "success": True,
+        "message": "Thanks for subscribing! You'll receive monthly updates on product releases and hiring best practices."
+    })

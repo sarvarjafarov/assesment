@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DemoRequest, APIAccessRequest
+from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber
 
 
 @admin.register(DemoRequest)
@@ -82,3 +82,43 @@ class APIAccessRequestAdmin(admin.ModelAdmin):
         updated = queryset.update(status='credentials_sent', api_key_issued_at=timezone.now())
         self.message_user(request, f'{updated} request(s) marked as Credentials Sent.')
     mark_as_credentials_sent.short_description = "Mark selected as Credentials Sent"
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ['email', 'status', 'source', 'subscribed_at', 'emails_sent_count']
+    list_filter = ['status', 'source', 'subscribed_at']
+    search_fields = ['email']
+    readonly_fields = ['subscribed_at', 'unsubscribed_at', 'last_email_sent_at', 'emails_sent_count']
+    ordering = ['-subscribed_at']
+
+    fieldsets = (
+        ('Subscriber Information', {
+            'fields': ('email', 'status', 'source')
+        }),
+        ('Email Tracking', {
+            'fields': ('last_email_sent_at', 'emails_sent_count')
+        }),
+        ('Timestamps', {
+            'fields': ('subscribed_at', 'unsubscribed_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    actions = ['mark_as_active', 'mark_as_unsubscribed', 'export_emails']
+
+    def mark_as_active(self, request, queryset):
+        updated = queryset.update(status='active')
+        self.message_user(request, f'{updated} subscriber(s) marked as active.')
+    mark_as_active.short_description = "Mark selected as Active"
+
+    def mark_as_unsubscribed(self, request, queryset):
+        from django.utils import timezone
+        updated = queryset.update(status='unsubscribed', unsubscribed_at=timezone.now())
+        self.message_user(request, f'{updated} subscriber(s) marked as unsubscribed.')
+    mark_as_unsubscribed.short_description = "Mark selected as Unsubscribed"
+
+    def export_emails(self, request, queryset):
+        emails = list(queryset.filter(status='active').values_list('email', flat=True))
+        self.message_user(request, f'Active emails: {", ".join(emails[:10])}{"..." if len(emails) > 10 else ""} ({len(emails)} total)')
+    export_emails.short_description = "Show active emails (for copy)"

@@ -38,14 +38,15 @@
         <div class="footer-newsletter">
             <p class="footer-heading">Stay in the loop</p>
             <p>Monthly updates on product releases and interview best practices.</p>
-            <form class="footer-form">
-                <input type="email" placeholder="you@company.com" aria-label="Email address">
-                <button type="button"
+            <form class="footer-form" data-newsletter-form action="{% url 'pages:newsletter_subscribe' %}">
+                <input type="email" name="email" placeholder="you@company.com" aria-label="Email address" required>
+                <button type="submit"
                         data-gtag-click="generate_lead"
                         data-gtag-category="lead"
                         data-gtag-label="footer_subscribe"
                         data-gtag-params='{"form_name":"footer_subscribe"}'>Subscribe</button>
             </form>
+            <p class="footer-form-message" data-newsletter-message style="display: none;"></p>
         </div>
     </div>
     <div class="footer-bottom">

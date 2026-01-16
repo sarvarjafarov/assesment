@@ -1315,4 +1315,62 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 5000);
         }, 2000);
     }
+
+    // Newsletter subscription form handler
+    const newsletterForms = document.querySelectorAll('[data-newsletter-form]');
+    newsletterForms.forEach((form) => {
+        const messageEl = form.parentElement?.querySelector('[data-newsletter-message]');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const emailInput = form.querySelector('input[name="email"]');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = emailInput?.value?.trim();
+            if (!email) {
+                showMessage('Please enter your email address.', false);
+                return;
+            }
+
+            // Disable form during submission
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Subscribing...';
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, source: 'footer' }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(data.message, true);
+                    form.style.display = 'none';
+                } else {
+                    showMessage(data.error || 'Something went wrong. Please try again.', false);
+                }
+            } catch (error) {
+                showMessage('Connection error. Please try again.', false);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Subscribe';
+                }
+            }
+        });
+
+        function showMessage(text, isSuccess) {
+            if (messageEl) {
+                messageEl.textContent = text;
+                messageEl.style.display = 'block';
+                messageEl.style.color = isSuccess ? '#10b981' : '#ef4444';
+            }
+        }
+    });
 });

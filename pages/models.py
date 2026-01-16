@@ -70,3 +70,36 @@ class APIAccessRequest(models.Model):
 
     def __str__(self):
         return f"{self.company_name} ({self.contact_email}) - {self.get_status_display()}"
+
+
+class NewsletterSubscriber(models.Model):
+    """Store newsletter subscribers from the footer form."""
+
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('unsubscribed', 'Unsubscribed'),
+        ('bounced', 'Bounced'),
+    ]
+
+    email = models.EmailField(unique=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    subscribed_at = models.DateTimeField(default=timezone.now)
+    unsubscribed_at = models.DateTimeField(null=True, blank=True)
+    source = models.CharField(max_length=50, default='footer', help_text="Where they subscribed from")
+
+    # For tracking email sends
+    last_email_sent_at = models.DateTimeField(null=True, blank=True)
+    emails_sent_count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['-subscribed_at']
+        verbose_name = 'Newsletter Subscriber'
+        verbose_name_plural = 'Newsletter Subscribers'
+
+    def __str__(self):
+        return f"{self.email} ({self.get_status_display()})"
+
+    def unsubscribe(self):
+        self.status = 'unsubscribed'
+        self.unsubscribed_at = timezone.now()
+        self.save(update_fields=['status', 'unsubscribed_at'])
