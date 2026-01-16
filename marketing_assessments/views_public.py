@@ -42,60 +42,157 @@ def api_overview(request):
     postman_url = None  # Available upon API access approval
     openapi_url = None  # Available upon API access approval
     schema_url = None   # Available upon API access approval
+
+    # Actual API endpoints matching the implementation
     rest_endpoints = [
+        # Main Assessment API (Behavioral assessments)
         {
             "method": "POST",
-            "path": "/api/marketing-assessment/start/",
-            "description": "Create digital marketing session",
-            "request_schema": {"candidate_id": "string", "assessment": "marketing|pm|behavioral"},
-            "response_schema": {
-                "session_uuid": "UUID",
-                "launch_url": "https://session-link",
-                "expires_at": "ISO8601 timestamp",
+            "path": "/api/assessments/invitations/",
+            "description": "Create candidate invitation for behavioral assessment",
+            "request_schema": {
+                "email": "candidate@example.com",
+                "full_name": "Jane Doe",
+                "assessment_slug": "sales-associate-behavioral",
+                "behavioral_focus": ["adaptability", "collaboration"],
+                "notes": "Optional notes for the session",
+                "due_at": "2025-06-30T17:00:00Z"
             },
-        },
-        {
-            "method": "GET",
-            "path": "/api/marketing-assessment/<candidate_id>/questions/",
-            "description": "Retrieve question bundle",
-            "request_schema": {"headers": {"X-API-Key": "token"}},
             "response_schema": {
-                "questions": [
-                    {"id": 42, "type": "multiple_choice", "category": "strategy", "prompt": "text", "options": ["A", "B", "C"]},
-                ],
-                "time_limit_minutes": 45,
-            },
-        },
-        {
-            "method": "POST",
-            "path": "/api/marketing-assessment/<candidate_id>/submit/",
-            "description": "Submit responses",
-            "request_schema": [
-                {"question_id": 42, "answer": "A"},
-                {"question_id": 51, "selected": "most"},
-            ],
-            "response_schema": {"detail": "Assessment submitted", "session_uuid": "UUID"},
-        },
-        {
-            "method": "GET",
-            "path": "/api/marketing-assessment/<candidate_id>/results/",
-            "description": "Fetch scores + fit summary",
-            "request_schema": {"headers": {"X-API-Key": "token"}},
-            "response_schema": {
-                "overall_score": 84.2,
-                "category_breakdown": {"strategy": 86, "execution": 82},
-                "fit_recommendation": "text",
+                "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
+                "assessment": "sales-associate-behavioral",
+                "candidate": {
+                    "id": 123,
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "email": "candidate@example.com"
+                },
+                "status": "invited",
+                "behavioral_focus": ["adaptability", "collaboration"],
+                "email_sent": True
             },
         },
         {
             "method": "GET",
             "path": "/api/assessments/sessions/<uuid>/responses/",
-            "description": "Behavioral profile + score breakdown",
-            "request_schema": {"headers": {"X-API-Key": "token"}},
+            "description": "Get session status and results",
+            "request_schema": {"headers": {"X-API-Key": "your-api-key"}},
             "response_schema": {
-                "session_uuid": "UUID",
-                "insights": [{"trait": "Adaptability", "score": 78}],
-                "raw_responses": [{"block": 1, "most": "A", "least": "C"}],
+                "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
+                "status": "submitted",
+                "submitted_at": "2025-06-11T08:42:22Z",
+                "overall_score": 84.2,
+                "candidate": {
+                    "id": 123,
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "email": "candidate@example.com"
+                },
+                "assessment": {
+                    "id": 5,
+                    "title": "Sales Associate Behavioral",
+                    "category": "Sales"
+                },
+                "score_breakdown": {"adaptability": 86, "collaboration": 82},
+                "behavioral_profile": {"dominant_traits": ["adaptability"]},
+                "behavioral_focus": ["adaptability", "collaboration"]
+            },
+        },
+        {
+            "method": "POST",
+            "path": "/api/assessments/sessions/<uuid>/responses/",
+            "description": "Submit candidate responses and scores",
+            "request_schema": {
+                "responses": [
+                    {"question_id": 42, "answer": "A"},
+                    {"question_id": 43, "most": "B", "least": "D"}
+                ],
+                "overall_score": 84.2,
+                "score_breakdown": {"adaptability": 86, "collaboration": 82}
+            },
+            "response_schema": {
+                "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
+                "status": "submitted",
+                "submitted_at": "2025-06-11T08:42:22Z"
+            },
+        },
+        {
+            "method": "GET",
+            "path": "/api/assessments/categories/",
+            "description": "List all assessment categories",
+            "request_schema": None,
+            "response_schema": {
+                "categories": [
+                    {
+                        "name": "Sales",
+                        "slug": "sales",
+                        "summary": "Assessments for sales roles",
+                        "assessments": [
+                            {
+                                "title": "Sales Associate Behavioral",
+                                "slug": "sales-associate-behavioral",
+                                "level": "entry",
+                                "duration_minutes": 30,
+                                "skills_focus": ["communication", "resilience"]
+                            }
+                        ]
+                    }
+                ]
+            },
+        },
+        # Marketing Assessment API
+        {
+            "method": "POST",
+            "path": "/api/marketing-assessment/start/",
+            "description": "Start a marketing skills assessment session",
+            "request_schema": {"candidate_id": "cand-123"},
+            "response_schema": {"session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e"},
+        },
+        {
+            "method": "GET",
+            "path": "/api/marketing-assessment/<candidate_id>/questions/",
+            "description": "Retrieve questions for the candidate's session",
+            "request_schema": {"headers": {"X-API-Key": "your-api-key"}},
+            "response_schema": {
+                "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
+                "questions": [
+                    {
+                        "id": 42,
+                        "question_text": "How would you approach a declining CTR?",
+                        "question_type": "multiple_choice",
+                        "difficulty_level": "intermediate",
+                        "category": "analytics",
+                        "options": ["A", "B", "C", "D"],
+                        "scoring_weight": 1.0
+                    }
+                ]
+            },
+        },
+        {
+            "method": "POST",
+            "path": "/api/marketing-assessment/<candidate_id>/submit/",
+            "description": "Submit assessment responses",
+            "request_schema": [
+                {"question_id": 42, "answer": "A"},
+                {"question_id": 43, "answer": "B"}
+            ],
+            "response_schema": {
+                "detail": "Assessment submitted",
+                "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e"
+            },
+        },
+        {
+            "method": "GET",
+            "path": "/api/marketing-assessment/<candidate_id>/results/",
+            "description": "Fetch assessment scores and breakdown",
+            "request_schema": {"headers": {"X-API-Key": "your-api-key"}},
+            "response_schema": {
+                "candidate_id": "cand-123",
+                "hard_skill_score": 82.5,
+                "soft_skill_score": 78.0,
+                "overall_score": 80.3,
+                "category_breakdown": {"strategy": 86, "analytics": 78, "execution": 82},
+                "recommendations": "Strong analytical skills. Consider for senior roles."
             },
         },
     ]
@@ -113,19 +210,19 @@ def api_overview(request):
             "language_examples": [
                 {
                     "title": "Python requests",
-                    "code": "import requests\\nrequests.post('https://your-domain/api/marketing-assessment/start/', json={'candidate_id': 'cand-123'}, headers={'X-API-Key': '<token>'})",
+                    "code": "import requests\\nrequests.post('https://your-domain/api/assessments/invitations/',\\n    json={'email': 'candidate@example.com', 'full_name': 'Jane Doe', 'assessment_slug': 'sales-behavioral'},\\n    headers={'X-API-Key': 'your-api-key'})",
                 },
                 {
                     "title": "Node.js fetch",
-                    "code": "await fetch('/api/marketing-assessment/<id>/submit/', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': token }, body: JSON.stringify(responses) });",
+                    "code": "await fetch('/api/assessments/sessions/<uuid>/responses/', {\\n  headers: { 'X-API-Key': token }\\n}).then(r => r.json());",
                 },
                 {
                     "title": "cURL",
-                    "code": "curl -H 'X-API-Key: <token>' https://your-domain/api/assessments/sessions/<uuid>/responses/",
+                    "code": "curl -X POST https://your-domain/api/assessments/invitations/ \\\\\\n  -H 'X-API-Key: your-api-key' \\\\\\n  -H 'Content-Type: application/json' \\\\\\n  -d '{\"email\": \"candidate@example.com\", \"full_name\": \"Jane Doe\", \"assessment_slug\": \"sales-behavioral\"}'",
                 },
                 {
                     "title": "Ruby Net::HTTP",
-                    "code": "require 'net/http'\\nuri = URI('https://your-domain/api/marketing-assessment/cand-123/results/')\\nreq = Net::HTTP::Get.new(uri)\\nreq['X-API-Key'] = token\\nres = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }",
+                    "code": "require 'net/http'\\nuri = URI('https://your-domain/api/assessments/sessions/<uuid>/responses/')\\nreq = Net::HTTP::Get.new(uri)\\nreq['X-API-Key'] = 'your-api-key'\\nres = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }",
                 },
             ],
             "hero_use_cases": [
@@ -134,14 +231,14 @@ def api_overview(request):
                 "Sync completed assignments back to HRIS or CRMs.",
             ],
             "hero_metrics": [
-                {"value": "99.98%", "label": "Uptime across regions"},
-                {"value": "120 ms", "label": "Median response time"},
-                {"value": "180+", "label": "Active partner teams"},
+                {"value": "REST", "label": "JSON API"},
+                {"value": "3", "label": "Assessment types"},
+                {"value": "Secure", "label": "API key auth"},
             ],
             "loop_steps": [
-                {"title": "Issue invite", "detail": "Call /start with candidate metadata and assessment type to receive a secure session link."},
-                {"title": "Candidate completes", "detail": "Evalon hosts the UX on mobile or desktop, saves progress, and scores responses in real time."},
-                {"title": "Sync outcomes", "detail": "Webhooks push scores + breakdowns back to your ATS/CRM, and you can pull the JSON results anytime."},
+                {"title": "Create invitation", "detail": "POST to /api/assessments/invitations/ with candidate email and assessment slug. A secure session link is emailed to the candidate."},
+                {"title": "Candidate completes", "detail": "Evalon hosts the assessment experience on mobile or desktop, auto-saves progress, and scores responses."},
+                {"title": "Retrieve results", "detail": "GET /api/assessments/sessions/<uuid>/responses/ to fetch scores, behavioral profile, and candidate data."},
             ],
             "environment_details": [
                 {"label": "API base URL", "value": request.build_absolute_uri('/api/')},
@@ -151,93 +248,104 @@ def api_overview(request):
             ],
             "architecture_flows": [
                 {
-                    "title": "Create session",
-                    "description": "Your system hits <code>/start</code> with candidate + assessment metadata. Evalon returns a secure link.",
+                    "title": "Create invitation",
+                    "description": "POST to <code>/api/assessments/invitations/</code> with candidate email and assessment details. Candidate receives an email with their unique session link.",
                 },
                 {
                     "title": "Candidate completes",
-                    "description": "Evalon handles UX, scoring, and telemetry. Webhooks notify your app when responses arrive.",
+                    "description": "Candidate completes the assessment through Evalon's responsive interface. Progress is saved automatically.",
                 },
                 {
-                    "title": "Pull scores",
-                    "description": "Fetch score reports or export behavioral traits into interview guides or ATS notes.",
+                    "title": "Retrieve results",
+                    "description": "GET <code>/api/assessments/sessions/&lt;uuid&gt;/responses/</code> to fetch overall score, category breakdown, and behavioral profile.",
                 },
             ],
-            "partner_highlights": [
-                {"name": "Northwind ATS", "quote": "Evalon's API shaved 4 hours per req by auto-issuing PM assessments."},
-                {"name": "Atlas CRM", "quote": "We embed candidate scorecards right in our enterprise deal rooms."},
-            ],
+            "partner_highlights": [],
             "changelog": [
-                {"date": "May 2025", "entry": "Added behavioral profile endpoint + webhook retries."},
-                {"date": "Apr 2025", "entry": "Released Postman collection and OpenAPI 1.2."},
-                {"date": "Mar 2025", "entry": "Launched sandbox environment + per-workspace API keys."},
+                {"date": "Jan 2026", "entry": "Added API key authentication to all assessment endpoints."},
+                {"date": "Jan 2026", "entry": "Added deadline (due_at) support for assessment invitations."},
+                {"date": "Dec 2025", "entry": "Launched behavioral focus selection for targeted assessments."},
             ],
             "postman_url": postman_url,
             "openapi_url": openapi_url,
             "schema_url": schema_url,
             "download_bundle": {
                 "headline": "API resources",
-                "description": "Request API access to receive our Postman collection, OpenAPI spec, and webhook schemas for your team.",
+                "description": "Request API access to receive your API key and documentation for your team.",
                 "resources": [
-                    {"label": "Postman collection", "description": "Pre-built requests for every endpoint.", "href": postman_url},
-                    {"label": "OpenAPI spec", "description": "Full contract with parameters + responses.", "href": openapi_url},
-                    {"label": "Webhook schema", "description": "JSON schema for score callbacks.", "href": schema_url},
+                    {"label": "API key", "description": "Secure authentication token for all endpoints.", "href": None},
+                    {"label": "Documentation", "description": "Full endpoint reference with examples.", "href": None},
                 ],
             },
             "playground_examples": [
                 {
-                    "slug": "start",
-                    "title": "Create marketing assessment session",
+                    "slug": "invite",
+                    "title": "Create candidate invitation",
                     "method": "POST",
-                    "path": "/api/marketing-assessment/start/",
-                    "description": "Provision a secure invite link for your candidate.",
+                    "path": "/api/assessments/invitations/",
+                    "description": "Send an assessment invitation to a candidate.",
                     "request": {
-                        "headers": {"X-API-Key": "sk_live_***", "Content-Type": "application/json"},
-                        "body": {"candidate_id": "cand-123", "assessment": "marketing"},
+                        "headers": {"X-API-Key": "your-api-key", "Content-Type": "application/json"},
+                        "body": {
+                            "email": "candidate@example.com",
+                            "full_name": "Jane Doe",
+                            "assessment_slug": "sales-associate-behavioral",
+                            "behavioral_focus": ["adaptability", "collaboration"]
+                        },
                     },
                     "response": {
                         "status": 201,
-                        "body": {"session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e", "expires_at": "2025-06-20T19:04:00Z"},
+                        "body": {
+                            "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
+                            "assessment": "sales-associate-behavioral",
+                            "candidate": {"id": 123, "first_name": "Jane", "last_name": "Doe", "email": "candidate@example.com"},
+                            "status": "invited",
+                            "email_sent": True
+                        },
                     },
                 },
                 {
                     "slug": "results",
-                    "title": "Fetch completed results",
+                    "title": "Fetch session results",
                     "method": "GET",
-                    "path": "/api/marketing-assessment/cand-123/results/",
-                    "description": "Retrieve the overall score and category-level insights.",
+                    "path": "/api/assessments/sessions/<uuid>/responses/",
+                    "description": "Retrieve the session status, scores, and behavioral profile.",
                     "request": {
-                        "headers": {"X-API-Key": "sk_live_***"},
+                        "headers": {"X-API-Key": "your-api-key"},
                         "body": None,
                     },
                     "response": {
                         "status": 200,
                         "body": {
+                            "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
+                            "status": "submitted",
                             "overall_score": 84.2,
-                            "category_breakdown": {"strategy": 86, "execution": 82, "analytics": 80},
-                            "fit_recommendation": "Great fit for performance marketing lead.",
+                            "score_breakdown": {"adaptability": 86, "collaboration": 82},
+                            "behavioral_profile": {"dominant_traits": ["adaptability"]}
                         },
                     },
                 },
                 {
-                    "slug": "webhook",
-                    "title": "Receive webhook payload",
-                    "method": "POST",
-                    "path": "https://your-app.com/webhooks/evalon",
-                    "description": "Example JSON body delivered when a candidate finishes.",
+                    "slug": "categories",
+                    "title": "List assessment categories",
+                    "method": "GET",
+                    "path": "/api/assessments/categories/",
+                    "description": "Get all available assessment categories and their assessments.",
                     "request": {
-                        "headers": {"X-Evalon-Signature": "sha256=***"},
-                        "body": {
-                            "event": "assessment.completed",
-                            "session_uuid": "7c6c8842-ff8b-4d85-9b64-1c1190cb9a1e",
-                            "candidate_id": "cand-123",
-                            "overall_score": 84.2,
-                            "completed_at": "2025-06-11T08:42:22Z",
-                        },
+                        "headers": {},
+                        "body": None,
                     },
                     "response": {
                         "status": 200,
-                        "body": {"detail": "Webhook received"},
+                        "body": {
+                            "categories": [
+                                {
+                                    "name": "Sales",
+                                    "slug": "sales",
+                                    "assessments": [{"title": "Sales Associate Behavioral", "slug": "sales-associate-behavioral"}]
+                                }
+                            ]
+                        },
                     },
                 },
             ],

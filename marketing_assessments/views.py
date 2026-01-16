@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -9,8 +10,20 @@ from .models import DigitalMarketingAssessmentSession, DigitalMarketingQuestion
 from .services import evaluate_session, generate_question_set
 
 
+class ApiKeyRequiredMixin:
+    """Simple header-based API key authentication."""
+
+    def dispatch(self, request, *args, **kwargs):
+        api_key = getattr(settings, "API_ACCESS_TOKEN", None)
+        if api_key:
+            provided = request.headers.get("X-API-Key") or request.GET.get("api_key")
+            if provided != api_key:
+                return JsonResponse({"detail": "Invalid or missing API key"}, status=401)
+        return super().dispatch(request, *args, **kwargs)
+
+
 @method_decorator(csrf_exempt, name="dispatch")
-class StartAssessmentView(View):
+class StartAssessmentView(ApiKeyRequiredMixin, View):
     def post(self, request):
         try:
             payload = json.loads(request.body or "{}")
@@ -28,7 +41,7 @@ class StartAssessmentView(View):
         return JsonResponse({"session_uuid": str(session.uuid)}, status=201)
 
 
-class QuestionListView(View):
+class QuestionListView(ApiKeyRequiredMixin, View):
     def get(self, request, candidate_id):
         session = DigitalMarketingAssessmentSession.objects.get(candidate_id=candidate_id)
         qs = DigitalMarketingQuestion.objects.filter(id__in=session.question_set)
@@ -48,7 +61,7 @@ class QuestionListView(View):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class SubmitAssessmentView(View):
+class SubmitAssessmentView(ApiKeyRequiredMixin, View):
     def post(self, request, candidate_id):
         session = DigitalMarketingAssessmentSession.objects.get(candidate_id=candidate_id)
         try:
@@ -65,7 +78,7 @@ class SubmitAssessmentView(View):
         )
 
 
-class AssessmentResultView(View):
+class AssessmentResultView(ApiKeyRequiredMixin, View):
     def get(self, request, candidate_id):
         session = DigitalMarketingAssessmentSession.objects.get(
             candidate_id=candidate_id, status="submitted"
