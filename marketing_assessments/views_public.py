@@ -1,44 +1,42 @@
 import json
 
 from django import forms
-from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 
+from pages.models import APIAccessRequest
 
-class ApiTokenRequestForm(forms.Form):
-    company_name = forms.CharField(max_length=180, label="Company name")
-    contact_email = forms.EmailField(label="Contact email")
-    use_case = forms.CharField(
-        label="Use case",
-        widget=forms.Textarea(attrs={"rows": 4, "placeholder": "Describe your integration goals."}),
-    )
+
+class ApiTokenRequestForm(forms.ModelForm):
+    """Form for API access requests - saves to database."""
+
+    class Meta:
+        model = APIAccessRequest
+        fields = ['company_name', 'contact_email', 'use_case']
+        widgets = {
+            'company_name': forms.TextInput(attrs={'placeholder': 'Your Company'}),
+            'contact_email': forms.EmailInput(attrs={'placeholder': 'you@company.com'}),
+            'use_case': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Describe your integration goals - ATS sync, workflow automation, custom dashboards, etc.'
+            }),
+        }
+        labels = {
+            'company_name': 'Company name',
+            'contact_email': 'Contact email',
+            'use_case': 'Use case',
+        }
 
 
 def api_overview(request):
     form = ApiTokenRequestForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        payload = form.cleaned_data
-        admin_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
-        body = (
-            f"Company: {payload['company_name']}\n"
-            f"Email: {payload['contact_email']}\n"
-            f"Use case:\n{payload['use_case']}"
-        )
-        if admin_email:
-            send_mail(
-                subject="API Token Request",
-                message=body,
-                from_email=payload["contact_email"],
-                recipient_list=[admin_email],
-                fail_silently=True,
-            )
+        api_request = form.save()
         messages.success(
             request,
-            "Thanks! Our team will review your request and share credentials shortly.",
+            f"Thanks! We've received your API access request for {api_request.company_name}. Our team will review and share credentials within 1 business day.",
         )
-        return redirect("marketing-assessment:api")
+        return redirect("marketing_assessments:api")
     postman_url = "https://evalon-assets.s3.amazonaws.com/api/evalon.postman_collection.json"
     openapi_url = "https://evalon-assets.s3.amazonaws.com/api/evalon-openapi.yaml"
     schema_url = "https://evalon-assets.s3.amazonaws.com/api/evalon-webhook-schema.json"

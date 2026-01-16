@@ -15,14 +15,14 @@
         </div>
         <div class="nav-menu" id="siteNavMenu" data-nav-menu>
             <ul class="nav-links">
-                <li><a class="{% if active == 'products' %}is-active{% endif %}" href="{% url 'pages:home' %}#suite">For talent teams</a></li>
-                <li><a class="{% if active == 'journey' %}is-active{% endif %}" href="{% url 'pages:home' %}#journey">For candidates</a></li>
-                <li><a class="{% if active == 'blog' %}is-active{% endif %}" href="{% url 'blog:list' %}">Resources</a></li>
+                <li><a href="{% url 'pages:home' %}#how-it-works">How it works</a></li>
+                <li><a href="{% url 'pages:home' %}#assessments">Assessments</a></li>
+                <li><a href="{% url 'pages:home' %}#pricing">Pricing</a></li>
                 <li><a class="{% if active == 'api' %}is-active{% endif %}" href="{% url 'marketing_assessments:api' %}">API</a></li>
             </ul>
             <div class="nav-actions">
                 <a class="btn btn-outline small" href="{% url 'clients:login' %}">Login</a>
-                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Get Started</a>
+                <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Start Free Trial</a>
             </div>
         </div>
     </nav>
