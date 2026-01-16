@@ -4,10 +4,9 @@ from django.urls import reverse
 from django import forms
 from django.utils.text import slugify
 
-from assessments.forms import AssessmentInviteForm
-from assessments.services import send_invite_email
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
+from .forms import DemoRequestForm
 
 def home(request):
     """Render the marketing landing page."""
@@ -291,35 +290,16 @@ def home(request):
         ]
 
     if request.method == "POST":
-        form = AssessmentInviteForm(request.POST)
+        form = DemoRequestForm(request.POST)
         if form.is_valid():
-            try:
-                result = form.save(invited_by="Site CTA")
-                intro_link = request.build_absolute_uri(
-                    reverse("candidate:session-entry", args=[result.session.uuid])
-                )
-                start_link = request.build_absolute_uri(
-                    reverse("candidate:session-start", args=[result.session.uuid])
-                )
-                send_invite_email(
-                    candidate=result.candidate,
-                    assessment=result.assessment,
-                    session=result.session,
-                    intro_link=intro_link,
-                    start_link=start_link,
-                    invited_by="Site CTA",
-                    notes=form.cleaned_data.get("notes", ""),
-                )
-                messages.success(
-                    request,
-                    f"Invite created for {result.candidate.first_name} "
-                    f"({result.assessment.title}).",
-                )
-                return redirect(f"{reverse('pages:home')}#cta")
-            except forms.ValidationError as exc:
-                form.add_error(None, exc)
+            demo_request = form.save()
+            messages.success(
+                request,
+                f"Thanks {demo_request.full_name.split()[0]}! We've received your demo request and will be in touch within 1 business day.",
+            )
+            return redirect(f"{reverse('pages:home')}#cta")
     else:
-        form = AssessmentInviteForm()
+        form = DemoRequestForm()
 
     return render(
         request,
