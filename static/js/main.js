@@ -705,12 +705,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     runButton.disabled = true;
                     runButton.textContent = "Running…";
                     responseCard.classList.add("is-running");
+                    if (responseEl) {
+                        responseEl.style.opacity = "0.3";
+                    }
+                    if (statusEl) {
+                        statusEl.textContent = "…";
+                    }
                     setTimeout(() => {
+                        if (responseEl) {
+                            responseEl.style.opacity = "1";
+                        }
                         renderExample(activeSlug);
                         runButton.disabled = false;
                         runButton.textContent = "Run mock call";
                         responseCard.classList.remove("is-running");
-                    }, 700);
+                    }, 1200);
                 });
             }
             renderExample(activeSlug);

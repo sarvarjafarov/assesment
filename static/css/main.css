@@ -5084,8 +5084,35 @@ main {
 .playground-run {
     align-self: flex-start;
 }
+.playground-run:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
 .playground-card.is-running pre[data-playground-response] {
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.6);
+    animation: playgroundPulse 0.5s ease-in-out infinite;
+}
+.playground-card.is-running pre[data-playground-response]::after {
+    content: "Fetching response...";
+    display: block;
+    color: rgba(255, 138, 0, 0.9);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    animation: playgroundDots 1s steps(4, end) infinite;
+}
+@keyframes playgroundPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 4px rgba(255, 138, 0, 0.6);
+    }
+}
+@keyframes playgroundDots {
+    0% { content: "Fetching response"; }
+    25% { content: "Fetching response."; }
+    50% { content: "Fetching response.."; }
+    75% { content: "Fetching response..."; }
 }
 .playground-tip {
     margin: 0;
