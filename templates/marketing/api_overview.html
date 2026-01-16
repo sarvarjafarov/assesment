@@ -105,7 +105,7 @@
                 <li><a href="#section-auth">Authentication</a></li>
                 <li><a href="#section-architecture">Flow</a></li>
                 <li><a href="#section-sdks">SDKs & samples</a></li>
-                <li><a href="#section-partners">Partners</a></li>
+                {% if partner_highlights %}<li><a href="#section-partners">Partners</a></li>{% endif %}
                 <li><a href="#section-changelog">Changelog</a></li>
                 <li><a href="#api-request">Access</a></li>
             </ul>
@@ -440,6 +440,7 @@
             </div>
         </section>
 
+        {% if partner_highlights %}
         <section class="panel partner-panel panel-contained" id="section-partners">
             <div class="section-heading align-left">
                 <p class="eyebrow">Partners shipping on Evalon</p>
@@ -454,6 +455,7 @@
                 {% endfor %}
             </div>
         </section>
+        {% endif %}
 
         <section class="panel changelog-panel panel-contained" id="section-changelog">
             <div class="section-heading align-left">
