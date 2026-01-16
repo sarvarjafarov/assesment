@@ -20,7 +20,7 @@
             </ul>
             <div class="hero-cta">
                 <a class="btn btn-pill" href="#api-request">Request API access</a>
-                <a class="btn btn-outline" href="{{ postman_url }}" target="_blank" rel="noopener">Download Postman collection</a>
+                <a class="btn btn-outline" href="#section-endpoints">View endpoints</a>
             </div>
             <div class="api-hero-metrics">
                 {% for metric in hero_metrics %}
@@ -125,7 +125,11 @@
                             <strong>{{ resource.label }}</strong>
                             <p>{{ resource.description }}</p>
                         </div>
+                        {% if resource.href %}
                         <a class="btn btn-pill" href="{{ resource.href }}" target="_blank" rel="noopener">Download</a>
+                        {% else %}
+                        <a class="btn btn-pill secondary" href="#api-request">Request access</a>
+                        {% endif %}
                     </li>
                     {% endfor %}
                 </ul>

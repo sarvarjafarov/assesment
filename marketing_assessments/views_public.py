@@ -37,9 +37,11 @@ def api_overview(request):
             f"Thanks! We've received your API access request for {api_request.company_name}. Our team will review and share credentials within 1 business day.",
         )
         return redirect("marketing_assessments:api")
-    postman_url = "https://evalon-assets.s3.amazonaws.com/api/evalon.postman_collection.json"
-    openapi_url = "https://evalon-assets.s3.amazonaws.com/api/evalon-openapi.yaml"
-    schema_url = "https://evalon-assets.s3.amazonaws.com/api/evalon-webhook-schema.json"
+
+    # API documentation resources (contact us for access)
+    postman_url = None  # Available upon API access approval
+    openapi_url = None  # Available upon API access approval
+    schema_url = None   # Available upon API access approval
     rest_endpoints = [
         {
             "method": "POST",
@@ -142,10 +144,10 @@ def api_overview(request):
                 {"title": "Sync outcomes", "detail": "Webhooks push scores + breakdowns back to your ATS/CRM, and you can pull the JSON results anytime."},
             ],
             "environment_details": [
-                {"label": "Prod base URL", "value": "https://api.evalon.so"},
-                {"label": "Sandbox URL", "value": "https://sandbox.evalon.so"},
+                {"label": "API base URL", "value": request.build_absolute_uri('/api/')},
+                {"label": "Authentication", "value": "X-API-Key header"},
                 {"label": "Rate limit", "value": "600 req/min per workspace"},
-                {"label": "Webhook domain", "value": "hooks.evalon.so"},
+                {"label": "Response format", "value": "JSON (UTF-8)"},
             ],
             "architecture_flows": [
                 {
@@ -174,8 +176,8 @@ def api_overview(request):
             "openapi_url": openapi_url,
             "schema_url": schema_url,
             "download_bundle": {
-                "headline": "Download everything",
-                "description": "Keep a copy of our Postman collection, OpenAPI spec, and webhook schemas so you can work offline or share with your team.",
+                "headline": "API resources",
+                "description": "Request API access to receive our Postman collection, OpenAPI spec, and webhook schemas for your team.",
                 "resources": [
                     {"label": "Postman collection", "description": "Pre-built requests for every endpoint.", "href": postman_url},
                     {"label": "OpenAPI spec", "description": "Full contract with parameters + responses.", "href": openapi_url},
