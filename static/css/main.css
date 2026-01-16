@@ -4971,6 +4971,8 @@ main {
     margin: 0;
     color: var(--text-muted);
     font-size: 0.9rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .download-list .btn {
     white-space: nowrap;
@@ -5014,6 +5016,8 @@ main {
 .playground-tab .path {
     font-family: "SFMono-Regular", Menlo, monospace;
     font-size: 0.9rem;
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 .playground-tab p {
     margin: 0;
@@ -5054,6 +5058,10 @@ main {
     letter-spacing: 0.2em;
     font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.6);
+}
+.playground-card header code {
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 .playground-meta strong {
     display: block;
@@ -5107,6 +5115,8 @@ main {
 }
 .env-grid strong {
     font-size: 1.05rem;
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 .architecture-panel {
     background: #fffdf8;
@@ -5124,6 +5134,10 @@ main {
 }
 .arch-card h3 {
     margin: 0 0 0.5rem;
+}
+.arch-card p {
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .panel-heading {
     display: flex;
@@ -5448,6 +5462,8 @@ main {
 .sample-card-header strong {
     display: block;
     font-size: 0.9rem;
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 .copy-trigger.dark {
     background: rgba(255, 255, 255, 0.15);
@@ -5747,6 +5763,11 @@ main {
     color: var(--orange);
     min-width: 110px;
 }
+.changelog-list p {
+    margin: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
 .token-panel .token-card {
     background: #0e1428;
     border-radius: 22px;
@@ -5774,6 +5795,8 @@ main {
     padding: 0.75rem 1rem;
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.06);
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 .token-actions {
     display: flex;
