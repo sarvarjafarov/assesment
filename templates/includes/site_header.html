@@ -21,8 +21,12 @@
                 <li><a class="{% if active == 'api' %}is-active{% endif %}" href="{% url 'marketing_assessments:api' %}">API</a></li>
             </ul>
             <div class="nav-actions">
+                {% if user.is_authenticated %}
+                <a class="btn btn-outline small" href="{% url 'clients:dashboard' %}">Dashboard</a>
+                {% else %}
                 <a class="btn btn-outline small" href="{% url 'clients:login' %}">Login</a>
                 <a class="btn btn-pill nav-primary-cta" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Start Free Trial</a>
+                {% endif %}
             </div>
         </div>
     </nav>
