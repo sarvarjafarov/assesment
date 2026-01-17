@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Account Pending · Evalon{% endblock %}
+{% block content %}
+<div class="page-shell apply-page">
+    {% include 'includes/site_header.html' %}
+
+    <main class="apply-main auth-main">
+        <section class="panel auth-panel">
+            <div class="auth-icon auth-icon--warning">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+            </div>
+            <p class="eyebrow">Account Status</p>
+            <h1>Your account is pending approval</h1>
+            <p class="lede">Your account has been created but is awaiting admin approval. You'll receive an email at your registered address once your workspace is ready.</p>
+
+            <div class="auth-actions">
+                <a class="btn btn-pill" href="{% url 'pages:home' %}">Return home</a>
+                <a class="btn btn-outline" href="mailto:support@evalon.tech">Contact support</a>
+            </div>
+        </section>
+    </main>
+
+    {% include 'includes/site_footer.html' %}
+</div>
+
+<style>
+.auth-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 200px);
+    padding: 2rem 1rem;
+}
+
+.auth-panel {
+    background: #fff;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+}
+
+.auth-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.auth-icon--warning {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.auth-panel h1 {
+    font-size: 1.5rem;
+    margin: 0.5rem 0 1rem;
+    color: var(--navy);
+}
+
+.auth-panel .lede {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+}
+
+.auth-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.auth-actions .btn {
+    min-width: 140px;
+}
+
+@media (max-width: 640px) {
+    .auth-panel {
+        padding: 2rem 1.5rem;
+    }
+    .auth-actions {
+        flex-direction: column;
+    }
+    .auth-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

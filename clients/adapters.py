@@ -2,6 +2,7 @@
 Custom social account adapter for django-allauth.
 Integrates social authentication with the ClientAccount model.
 """
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -10,12 +11,18 @@ from allauth.account.adapter import DefaultAccountAdapter
 
 from .models import ClientAccount
 
+User = get_user_model()
+
 
 class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
     Custom adapter to handle social account signups and logins.
     Creates or links ClientAccount records for social auth users.
     """
+
+    def is_open_for_signup(self, request, sociallogin):
+        """Allow social signup."""
+        return True
 
     def pre_social_login(self, request, sociallogin):
         """
@@ -29,13 +36,12 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         if not email:
             return
 
-        # Check if a ClientAccount exists with this email
+        # Check if a User exists with this email
         try:
-            client = ClientAccount.objects.get(email__iexact=email)
-            if client.user:
-                # Link this social account to the existing user
-                sociallogin.connect(request, client.user)
-        except ClientAccount.DoesNotExist:
+            existing_user = User.objects.get(email__iexact=email)
+            # Connect this social account to the existing user
+            sociallogin.connect(request, existing_user)
+        except User.DoesNotExist:
             pass
 
     def save_user(self, request, sociallogin, form=None):
@@ -44,6 +50,10 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         Creates the associated ClientAccount record.
         """
         user = super().save_user(request, sociallogin, form)
+
+        # IMPORTANT: Keep user active for social auth (they need to complete profile)
+        user.is_active = True
+        user.save(update_fields=['is_active'])
 
         # Determine auth provider
         provider = sociallogin.account.provider
@@ -66,11 +76,17 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
             if not client.user:
                 client.user = user
                 client.auth_provider = auth_provider
-                client.save(update_fields=['user', 'auth_provider'])
+                # Use update to avoid triggering save() which would deactivate user
+                ClientAccount.objects.filter(pk=client.pk).update(
+                    user=user, auth_provider=auth_provider
+                )
+            # Re-activate user after ClientAccount link
+            user.is_active = True
+            user.save(update_fields=['is_active'])
         except ClientAccount.DoesNotExist:
             # Create new ClientAccount with placeholder data
-            # User will complete profile after signup
-            ClientAccount.objects.create(
+            # Use direct insert to avoid save() deactivating the user
+            client = ClientAccount(
                 user=user,
                 email=email,
                 full_name=full_name or email.split('@')[0],
@@ -80,8 +96,12 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
                 auth_provider=auth_provider,
                 status='pending',  # Still requires admin approval
             )
+            # Save without triggering the user deactivation
+            client.save()
+            # Re-activate user after ClientAccount creation
+            user.is_active = True
+            user.save(update_fields=['is_active'])
             # Mark email as verified (social providers verify emails)
-            client = ClientAccount.objects.get(email__iexact=email)
             client.mark_email_verified()
 
         return user
@@ -124,8 +144,12 @@ class ClientAccountAdapter(DefaultAccountAdapter):
     Ensures compatibility with social auth flow.
     """
 
+    def is_open_for_signup(self, request):
+        """Allow signup."""
+        return True
+
     def get_login_redirect_url(self, request):
-        """Redirect to dashboard after login."""
+        """Redirect after login based on profile completion status."""
         user = request.user
         if not user.is_authenticated:
             return reverse('clients:login')
