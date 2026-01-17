@@ -195,7 +195,14 @@ class ClientAccount(TimeStampedModel):
         self._apply_plan_defaults()
         self._process_logo_upload()
         # Auto-sync the linked user's active flag with client approval status.
-        should_activate = self.status == "approved"
+        # Social auth users stay active to complete their profile and see pending approval page.
+        # Email auth users are activated only after admin approval.
+        if self.auth_provider in ('google', 'linkedin'):
+            # Social auth users should always be active (they verified email via provider)
+            should_activate = True
+        else:
+            # Email auth users: only active when approved
+            should_activate = self.status == "approved"
         if self.user and self.user.is_active != should_activate:
             self.user.is_active = should_activate
             self.user.save(update_fields=["is_active"])
