@@ -40,6 +40,7 @@ from .forms import (
     ClientProductInviteForm,
     ClientSignupForm,
     ClientSessionNoteForm,
+    SocialProfileCompleteForm,
 )
 from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote
 from .services import send_verification_email, send_approval_notification, send_welcome_email
@@ -2315,4 +2316,81 @@ class ClientBillingView(LoginRequiredMixin, TemplateView):
         context['available_plans'] = available_plans
         context['contact_email'] = 'support@evalon.app'
 
+        return context
+
+
+class CompleteProfileView(LoginRequiredMixin, FormView):
+    """View for completing profile after social authentication signup."""
+
+    template_name = "clients/complete_profile.html"
+    form_class = SocialProfileCompleteForm
+    login_url = reverse_lazy("clients:login")
+    success_url = reverse_lazy("clients:pending_approval")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("clients:login")
+        try:
+            client = request.user.client_account
+            # If profile is already complete, redirect appropriately
+            if client.company_name:
+                if client.status == "approved":
+                    return redirect("clients:dashboard")
+                return redirect("clients:pending_approval")
+        except ClientAccount.DoesNotExist:
+            # If no client account exists yet, something went wrong
+            messages.error(request, "No account found. Please try signing up again.")
+            return redirect("clients:signup")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        form_class = form_class or self.get_form_class()
+        return form_class(instance=self.request.user.client_account, **self.get_form_kwargs())
+
+    def form_valid(self, form):
+        account = form.save()
+        # Send admin notification for approval
+        admin_notified = send_approval_notification(account)
+        if admin_notified:
+            logger.info(f"Admin notification sent for social signup: {account.email}")
+        messages.success(
+            self.request,
+            "Profile completed! Your account is now pending admin approval.",
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["assessment_details"] = ClientAccount.ASSESSMENT_DETAILS
+        try:
+            context["client"] = self.request.user.client_account
+        except ClientAccount.DoesNotExist:
+            pass
+        return context
+
+
+class PendingApprovalView(LoginRequiredMixin, TemplateView):
+    """View shown to users waiting for admin approval."""
+
+    template_name = "clients/pending_approval.html"
+    login_url = reverse_lazy("clients:login")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("clients:login")
+        try:
+            client = request.user.client_account
+            # If already approved, redirect to dashboard
+            if client.status == "approved":
+                return redirect("clients:dashboard")
+        except ClientAccount.DoesNotExist:
+            return redirect("clients:signup")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context["client"] = self.request.user.client_account
+        except ClientAccount.DoesNotExist:
+            pass
         return context

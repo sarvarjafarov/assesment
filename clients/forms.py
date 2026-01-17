@@ -510,3 +510,40 @@ class ClientProjectForm(forms.ModelForm):
         if commit:
             project.save()
         return project
+
+
+class SocialProfileCompleteForm(forms.ModelForm):
+    """Form for completing profile after social authentication signup."""
+
+    requested_assessments = forms.MultipleChoiceField(
+        label="Assessments you'd like to pilot",
+        choices=ClientAccount.ASSESSMENT_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    class Meta:
+        model = ClientAccount
+        fields = [
+            "company_name",
+            "phone_number",
+            "employee_size",
+            "requested_assessments",
+        ]
+        widgets = {
+            "company_name": forms.TextInput(attrs={
+                "placeholder": "Acme Inc.",
+                "autocomplete": "organization"
+            }),
+            "phone_number": forms.TextInput(attrs={
+                "placeholder": "+1 (555) 123-4567",
+                "autocomplete": "tel",
+                "type": "tel"
+            }),
+        }
+
+    def save(self, commit=True) -> ClientAccount:
+        account = super().save(commit=False)
+        account.requested_assessments = self.cleaned_data.get("requested_assessments", [])
+        if commit:
+            account.save()
+        return account

@@ -88,6 +88,11 @@ class ClientAccount(TimeStampedModel):
         ("approved", "Approved"),
         ("rejected", "Rejected"),
     ]
+    AUTH_PROVIDER_CHOICES = [
+        ("email", "Email"),
+        ("google", "Google"),
+        ("linkedin", "LinkedIn"),
+    ]
     ROLE_CHOICES = [
         ("manager", "Manager"),
         ("recruiter", "Recruiter"),
@@ -108,6 +113,9 @@ class ClientAccount(TimeStampedModel):
     allowed_assessments = models.JSONField(default=list, blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="pending")
     role = models.CharField(max_length=16, choices=ROLE_CHOICES, default="manager")
+    auth_provider = models.CharField(
+        max_length=20, choices=AUTH_PROVIDER_CHOICES, default="email"
+    )
     notes = models.TextField(blank=True)
     receive_weekly_summary = models.BooleanField(default=False)
     logo = models.FileField(upload_to="client_logos/", null=True, blank=True)

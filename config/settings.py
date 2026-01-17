@@ -93,8 +93,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'marketing',
+    'django.contrib.sites',
     'django.contrib.humanize',
+    # Allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.linkedin_oauth2',
+    # Project apps
+    'marketing',
     'console',
     'candidate',
     'pages',
@@ -106,6 +114,8 @@ INSTALLED_APPS = [
     'clients',
 ]
 
+SITE_ID = 1
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -113,8 +123,14 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -261,3 +277,38 @@ ASSESSMENT_PASSING_SCORE = float(os.environ.get("ASSESSMENT_PASSING_SCORE", "70"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 API_ACCESS_TOKEN = os.environ.get("API_ACCESS_TOKEN", "")
+
+# Django-allauth settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_ADAPTER = 'clients.adapters.ClientSocialAccountAdapter'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+LOGIN_URL = 'clients:login'
+LOGIN_REDIRECT_URL = 'clients:dashboard'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'pages:home'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', ''),
+        }
+    },
+    'linkedin_oauth2': {
+        'SCOPE': ['openid', 'profile', 'email'],
+        'PROFILE_FIELDS': ['id', 'first-name', 'last-name', 'email-address', 'picture-url'],
+        'APP': {
+            'client_id': os.environ.get('LINKEDIN_CLIENT_ID', ''),
+            'secret': os.environ.get('LINKEDIN_CLIENT_SECRET', ''),
+        }
+    },
+}

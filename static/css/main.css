@@ -10917,3 +10917,177 @@ main {
         padding: 2rem 1.5rem;
     }
 }
+
+/* ========================================================================
+   SOCIAL AUTHENTICATION STYLES
+   ======================================================================== */
+
+/* Social auth divider */
+.social-auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.social-auth-divider::before,
+.social-auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.social-auth-divider span {
+    padding: 0 1rem;
+    white-space: nowrap;
+}
+
+/* Light variant for dark backgrounds */
+.social-auth-divider--light {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.social-auth-divider--light::before,
+.social-auth-divider--light::after {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Social auth buttons container */
+.social-auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.social-auth-buttons--horizontal {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Social auth section in signup */
+.social-auth-section {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+}
+
+/* Social button base styles */
+.btn-social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.btn-social .social-icon {
+    flex-shrink: 0;
+}
+
+/* Google button */
+.btn-google {
+    background: #fff;
+    color: #3c4043;
+    border-color: #dadce0;
+}
+
+.btn-google:hover {
+    background: #f8f9fa;
+    border-color: #c1c4c9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-google:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* LinkedIn button */
+.btn-linkedin {
+    background: #0A66C2;
+    color: #fff;
+    border-color: #0A66C2;
+}
+
+.btn-linkedin:hover {
+    background: #004182;
+    border-color: #004182;
+    box-shadow: 0 2px 8px rgba(10, 102, 194, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-linkedin:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.btn-linkedin .social-icon path {
+    fill: #fff;
+}
+
+/* Auth main layout for login page */
+.auth-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 200px);
+    padding: 2rem 1rem;
+}
+
+.auth-panel {
+    background: #fff;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    max-width: 440px;
+    width: 100%;
+}
+
+.auth-panel h1 {
+    margin: 0.5rem 0 0.75rem;
+    font-size: 1.75rem;
+}
+
+.auth-panel .lede {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.auth-panel .muted {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.auth-panel .muted .link {
+    color: var(--orange);
+    font-weight: 600;
+}
+
+/* Responsive social buttons */
+@media (max-width: 640px) {
+    .social-auth-buttons--horizontal {
+        flex-direction: column;
+    }
+
+    .btn-social {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .auth-panel {
+        padding: 2rem 1.5rem;
+    }
+}
