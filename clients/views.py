@@ -452,10 +452,14 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
+        client = request.user.client_account
+        # Check profile completion first
+        if not client.company_name:
+            return redirect("clients:complete_profile")
         self.logo_form = self.logo_form_class()
-        if request.user.client_account.status != "approved":
+        if client.status != "approved":
             messages.info(request, "Your account is still pending approval.")
-            return redirect("clients:signup")
+            return redirect("clients:pending_approval")
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -851,9 +855,12 @@ class ClientAssessmentsView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
-        if request.user.client_account.status != "approved":
+        client = request.user.client_account
+        if not client.company_name:
+            return redirect("clients:complete_profile")
+        if client.status != "approved":
             messages.info(request, "Your account is still pending approval.")
-            return redirect("clients:signup")
+            return redirect("clients:pending_approval")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -905,9 +912,12 @@ class ClientAnalyticsView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
-        if request.user.client_account.status != "approved":
+        client = request.user.client_account
+        if not client.company_name:
+            return redirect("clients:complete_profile")
+        if client.status != "approved":
             messages.info(request, "Your account is still pending approval.")
-            return redirect("clients:signup")
+            return redirect("clients:pending_approval")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1087,9 +1097,12 @@ class ClientSettingsView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
-        if request.user.client_account.status != "approved":
+        client = request.user.client_account
+        if not client.company_name:
+            return redirect("clients:complete_profile")
+        if client.status != "approved":
             messages.info(request, "Your account is still pending approval.")
-            return redirect("clients:signup")
+            return redirect("clients:pending_approval")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1111,9 +1124,11 @@ class ClientActivityExportView(LoginRequiredMixin, View):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
         account = request.user.client_account
+        if not account.company_name:
+            return redirect("clients:complete_profile")
         if account.status != "approved":
             messages.error(request, "Your account is not approved yet.")
-            return redirect("clients:dashboard")
+            return redirect("clients:pending_approval")
         filters = parse_activity_filters(request.GET)
         dataset_map = build_dataset_map(account)
         activity_rows = build_activity_feed(account, dataset_map, filters, activity_limit=None)
@@ -1170,9 +1185,11 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             return redirect("clients:login")
         self.account = request.user.client_account
         self.is_manager = self.account.role == "manager"
+        if not self.account.company_name:
+            return redirect("clients:complete_profile")
         if self.account.status != "approved":
             messages.info(request, "Your account is pending approval.")
-            return redirect("clients:dashboard")
+            return redirect("clients:pending_approval")
         assessment_type = kwargs.get("assessment_type")
         if assessment_type not in self.ASSESSMENT_CONFIG:
             raise Http404
@@ -1675,9 +1692,11 @@ class ClientProjectAccessMixin(LoginRequiredMixin):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
         self.account = request.user.client_account
+        if not self.account.company_name:
+            return redirect("clients:complete_profile")
         if self.account.status != "approved":
             messages.info(request, "Your account is pending approval.")
-            return redirect("clients:dashboard")
+            return redirect("clients:pending_approval")
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -2200,6 +2219,17 @@ class ClientBillingView(LoginRequiredMixin, TemplateView):
     login_url = reverse_lazy("clients:login")
     template_name = "clients/billing.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        client = request.user.client_account
+        if not client.company_name:
+            return redirect("clients:complete_profile")
+        if client.status != "approved":
+            messages.info(request, "Your account is pending approval.")
+            return redirect("clients:pending_approval")
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         account = self.request.user.client_account
@@ -2380,6 +2410,9 @@ class PendingApprovalView(LoginRequiredMixin, TemplateView):
             return redirect("clients:login")
         try:
             client = request.user.client_account
+            # If profile incomplete, redirect to complete profile first
+            if not client.company_name:
+                return redirect("clients:complete_profile")
             # If already approved, redirect to dashboard
             if client.status == "approved":
                 return redirect("clients:dashboard")
