@@ -11369,11 +11369,14 @@ main {
 /* Detail Hero */
 .assessment-detail-hero {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.2fr 0.8fr;
     gap: 4rem;
-    padding: 4rem 2rem;
+    align-items: center;
+    padding: 4rem 3rem;
     background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
     color: #fff;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .assessment-detail-hero .breadcrumb {
@@ -11470,6 +11473,12 @@ main {
     flex-wrap: wrap;
 }
 
+.hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .hero-image {
     display: flex;
     align-items: center;
@@ -11481,6 +11490,23 @@ main {
     max-width: 100%;
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.hero-icon-large {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    color: var(--orange);
+}
+
+.hero-icon-large svg {
+    width: 100px;
+    height: 100px;
 }
 
 /* Assessment Sections */
@@ -11931,6 +11957,11 @@ main {
     .assessment-detail-hero {
         grid-template-columns: 1fr;
         gap: 2rem;
+        padding: 3rem 2rem;
+    }
+
+    .hero-visual {
+        display: none;
     }
 
     .hero-image {
