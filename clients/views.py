@@ -460,7 +460,11 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         if client.status != "approved":
             messages.info(request, "Your account is still pending approval.")
             return redirect("clients:pending_approval")
-        return super().dispatch(request, *args, **kwargs)
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except Exception as e:
+            logger.exception(f"Dashboard error for user {request.user.email}: {e}")
+            raise
 
     def post(self, request, *args, **kwargs):
         account = request.user.client_account
