@@ -5,6 +5,38 @@
 {% block extra_meta %}
     {% if post.meta_keywords %}<meta name="keywords" content="{{ post.meta_keywords }}">{% endif %}
     {% if post.meta_image %}<meta property="og:image" content="{{ post.meta_image }}">{% endif %}
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="{{ post.published_at|date:'c' }}">
+    <meta property="article:modified_time" content="{{ post.updated_at|date:'c' }}">
+    <meta property="article:author" content="{{ post.display_author }}">
+    {% if post.category %}<meta property="article:section" content="{{ post.category.name }}">{% endif %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "{{ post.title|escapejs }}",
+        "description": "{{ post.meta_description|default:post.excerpt|escapejs }}",
+        "author": {
+            "@type": "Person",
+            "name": "{{ post.display_author|escapejs }}"
+        },
+        "datePublished": "{{ post.published_at|date:'c' }}",
+        "dateModified": "{{ post.updated_at|date:'c' }}",
+        {% if post.meta_image or post.hero_image %}"image": "{{ post.meta_image|default:post.hero_image }}",{% endif %}
+        "publisher": {
+            "@type": "Organization",
+            "name": "Evalon",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-glyph.svg' %}"
+            }
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ request.build_absolute_uri }}"
+        }
+    }
+    </script>
 {% endblock %}
 {% block content %}
 <div class="page-shell">
@@ -50,7 +82,13 @@
         <div class="article-body" data-article-body>
             {{ post.body|linebreaks }}
         </div>
+
+        {# Social share buttons #}
+        {% include 'blog/includes/share_buttons.html' %}
     </article>
+
+    {# Newsletter signup CTA #}
+    {% include 'blog/includes/newsletter_cta.html' %}
 
     {% if recent_posts %}
     <section class="blog-related">

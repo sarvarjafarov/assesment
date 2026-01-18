@@ -1,34 +1,38 @@
 {% extends 'base.html' %}
 {% load humanize static %}
-{% block title %}{% if current_category %}{{ current_category|title }} Articles{% else %}Insights & Resources{% endif %} · Evalon{% endblock %}
-{% block meta_description %}Browse the latest Evalon product updates, hiring playbooks, and behavioral interviewing tips.{% endblock %}
+{% block title %}{% if query %}Search: {{ query }}{% else %}Search{% endif %} · Evalon Insights{% endblock %}
+{% block meta_description %}Search Evalon's blog for hiring tips, product updates, and assessment best practices.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='blog' %}
     <main>
         <div class="blog-shell simple" data-blog-list-shell>
             <section class="blog-simple-hero">
-                <p class="eyebrow">Insights</p>
-                <h1>Hiring ideas, playbooks, and product news.</h1>
-                <p class="lede">Browse our latest articles on assessments, hiring best practices, and product updates.</p>
+                <p class="eyebrow">Search</p>
+                <h1>{% if query %}Results for "{{ query }}"{% else %}Search articles{% endif %}</h1>
+                {% if posts %}
+                <p class="lede">Found {{ posts|length }} article{{ posts|length|pluralize }}{% if query %} matching your search{% endif %}.</p>
+                {% elif query %}
+                <p class="lede">No articles found. Try a different search term.</p>
+                {% else %}
+                <p class="lede">Enter a search term to find articles.</p>
+                {% endif %}
             </section>
 
             {# Search bar #}
             <section class="blog-search-bar">
                 <form action="{% url 'blog:search' %}" method="get" class="search-form">
-                    <input type="search" name="q" placeholder="Search articles..." aria-label="Search articles">
+                    <input type="search" name="q" value="{{ query }}" placeholder="Search articles..." aria-label="Search articles" autofocus>
                     <button type="submit" class="btn btn-pill">Search</button>
                 </form>
             </section>
 
-            {# Category filter #}
+            {# Category navigation #}
             {% if categories %}
-            <nav class="blog-categories" aria-label="Filter by category">
-                <a href="{% url 'blog:list' %}" class="category-pill{% if not current_category %} active{% endif %}">All</a>
+            <nav class="blog-categories" aria-label="Browse by category">
+                <a href="{% url 'blog:list' %}" class="category-pill">All articles</a>
                 {% for cat in categories %}
-                <a href="?category={{ cat.slug }}" class="category-pill{% if current_category == cat.slug %} active{% endif %}">
-                    {{ cat.name }}
-                </a>
+                <a href="{% url 'blog:list' %}?category={{ cat.slug }}" class="category-pill">{{ cat.name }}</a>
                 {% endfor %}
             </nav>
             {% endif %}
@@ -38,7 +42,7 @@
                 <article class="blog-card simple-card" data-blog-card>
                     <div class="meta-row">
                         {% if post.category %}
-                        <a href="?category={{ post.category.slug }}" class="pill {{ post.pill_style }}">{{ post.category.name }}</a>
+                        <a href="{% url 'blog:list' %}?category={{ post.category.slug }}" class="pill {{ post.pill_style }}">{{ post.category.name }}</a>
                         {% else %}
                         <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
                         {% endif %}
@@ -51,13 +55,16 @@
                     <a class="outline-link" href="{{ post.get_absolute_url }}">Read article</a>
                 </article>
                 {% empty %}
-                <p class="empty-state">{% if current_category %}No articles in this category yet.{% else %}Fresh content is on the way.{% endif %}</p>
+                <div class="empty-state-box">
+                    <h3>No results found</h3>
+                    <p>Try adjusting your search or <a href="{% url 'blog:list' %}">browse all articles</a>.</p>
+                </div>
                 {% endfor %}
             </section>
 
             {% if is_paginated and page_obj.has_next %}
             <div class="blog-load-more">
-                <a class="btn btn-pill secondary" href="?{% if current_category %}category={{ current_category }}&{% endif %}page={{ page_obj.next_page_number }}">Load more</a>
+                <a class="btn btn-pill secondary" href="?q={{ query|urlencode }}&page={{ page_obj.next_page_number }}">Load more</a>
             </div>
             {% endif %}
         </div>

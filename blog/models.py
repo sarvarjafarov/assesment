@@ -13,6 +13,26 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
+class BlogCategory(models.Model):
+    """Categories for organizing blog posts."""
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True, help_text="Brief description for SEO and category pages.")
+    order = models.PositiveIntegerField(default=0, help_text="Lower numbers appear first.")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name_plural = 'Categories'
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return f"{reverse('blog:list')}?category={self.slug}"
+
+
 class BlogPostQuerySet(models.QuerySet):
     def published(self):
         now = timezone.now()
@@ -58,6 +78,14 @@ class BlogPost(TimeStampedModel):
     )
     is_featured = models.BooleanField(
         default=False, help_text="Surface in the homepage hero slot."
+    )
+    category = models.ForeignKey(
+        'BlogCategory',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='posts',
+        help_text="Primary category for this post."
     )
     preview_key = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 

@@ -13,4 +13,5 @@ urlpatterns = [
     path('terms/', views.terms, name='terms'),
     path('resources/', views.resources, name='resources'),
     path('subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+    path('robots.txt', views.robots_txt, name='robots'),
 ]

@@ -1,7 +1,8 @@
+from django.db.models import Q
 from django.http import Http404
 from django.views.generic import DetailView, ListView
 
-from .models import BlogPost
+from .models import BlogPost, BlogCategory
 
 
 class BlogListView(ListView):
@@ -11,10 +12,43 @@ class BlogListView(ListView):
 
     def get_queryset(self):
         qs = BlogPost.objects.published()
+        # Category filtering
+        category_slug = self.request.GET.get('category')
+        if category_slug:
+            qs = qs.filter(category__slug=category_slug)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['categories'] = BlogCategory.objects.filter(is_active=True)
+        context['current_category'] = self.request.GET.get('category')
+        return context
+
+
+class BlogSearchView(ListView):
+    """Search view for blog posts."""
+    model = BlogPost
+    template_name = "blog/search.html"
+    context_object_name = "posts"
+    paginate_by = 12
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '').strip()
+        qs = BlogPost.objects.published()
+        if query:
+            qs = qs.filter(
+                Q(title__icontains=query) |
+                Q(excerpt__icontains=query) |
+                Q(body__icontains=query) |
+                Q(meta_keywords__icontains=query) |
+                Q(author_name__icontains=query)
+            ).distinct()
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '').strip()
+        context['categories'] = BlogCategory.objects.filter(is_active=True)
         return context
 
 

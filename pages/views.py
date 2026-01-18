@@ -1,13 +1,14 @@
 import json
 
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django import forms
 from django.utils.text import slugify
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
@@ -644,3 +645,28 @@ def newsletter_subscribe(request):
         "success": True,
         "message": "Thanks for subscribing! You'll receive monthly updates on product releases and hiring best practices."
     })
+
+
+@require_GET
+@cache_page(60 * 60 * 24)  # Cache for 24 hours
+def robots_txt(request):
+    """
+    Generate robots.txt for search engine crawlers.
+    Includes sitemap location and disallows private areas.
+    """
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "",
+        "# Private areas",
+        "Disallow: /admin/",
+        "Disallow: /console/",
+        "Disallow: /clients/",
+        "Disallow: /candidate/",
+        "Disallow: /api/",
+        "Disallow: /accounts/",
+        "",
+        "# Sitemap",
+        f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")

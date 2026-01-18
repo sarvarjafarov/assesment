@@ -1,0 +1,149 @@
+{# Newsletter signup CTA for blog posts #}
+<aside class="article-newsletter">
+    <div class="newsletter-content">
+        <h3>Stay ahead of hiring trends</h3>
+        <p>Get monthly insights on assessments, interviewing, and building great teams. No spam, unsubscribe anytime.</p>
+    </div>
+    <form class="newsletter-form" data-newsletter-form>
+        <div class="newsletter-input-group">
+            <input type="email"
+                   name="email"
+                   placeholder="you@company.com"
+                   required
+                   aria-label="Email address">
+            <button type="submit" class="btn btn-pill">Subscribe</button>
+        </div>
+        <p class="newsletter-status" data-newsletter-status></p>
+    </form>
+</aside>
+
+<style>
+.article-newsletter {
+    background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 3rem 0;
+    color: #fff;
+}
+
+.newsletter-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: #fff;
+}
+
+.newsletter-content p {
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.newsletter-form {
+    max-width: 480px;
+}
+
+.newsletter-input-group {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.newsletter-input-group input {
+    flex: 1;
+    padding: 0.875rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+}
+
+.newsletter-input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.newsletter-input-group input:focus {
+    outline: none;
+    border-color: var(--orange, #ff8a00);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.newsletter-input-group .btn {
+    flex-shrink: 0;
+    background: var(--orange, #ff8a00);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.875rem 1.5rem;
+}
+
+.newsletter-input-group .btn:hover {
+    background: #e67a00;
+}
+
+.newsletter-status {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    min-height: 1.25rem;
+}
+
+.newsletter-status.success {
+    color: #4ade80;
+}
+
+.newsletter-status.error {
+    color: #f87171;
+}
+
+@media (max-width: 640px) {
+    .newsletter-input-group {
+        flex-direction: column;
+    }
+
+    .newsletter-input-group .btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('[data-newsletter-form]');
+    forms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[name="email"]').value;
+            const status = this.querySelector('[data-newsletter-status]');
+            const btn = this.querySelector('button[type="submit"]');
+
+            btn.disabled = true;
+            btn.textContent = 'Subscribing...';
+
+            try {
+                const response = await fetch('{% url "pages:newsletter_subscribe" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, source: 'blog_article' })
+                });
+
+                const data = await response.json();
+                status.textContent = data.message;
+                status.className = 'newsletter-status ' + (data.success ? 'success' : 'error');
+
+                if (data.success) {
+                    this.querySelector('input[name="email"]').value = '';
+                }
+            } catch (err) {
+                status.textContent = 'Something went wrong. Please try again.';
+                status.className = 'newsletter-status error';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Subscribe';
+            }
+        });
+    });
+});
+</script>
