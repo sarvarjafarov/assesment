@@ -157,6 +157,7 @@
             {% if assessment.stats %}
             <section class="assessment-section bg-gradient" id="stats">
                 <div class="section-content">
+                    <h2 class="stats-title">Assessment at a Glance</h2>
                     <div class="stats-grid">
                         {% for stat in assessment.stats %}
                         <div class="stat-box">
@@ -178,8 +179,16 @@
                     <div class="use-cases-grid">
                         {% for case in assessment.use_cases %}
                         <article class="use-case-card">
-                            <h3>{{ case.title }}</h3>
-                            <p>{{ case.description }}</p>
+                            <div class="use-case-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                            <div class="use-case-content">
+                                <h3>{{ case.title }}</h3>
+                                <p>{{ case.description }}</p>
+                            </div>
                         </article>
                         {% endfor %}
                     </div>
