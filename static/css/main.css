@@ -11368,18 +11368,22 @@ main {
 
 /* Detail Hero */
 .assessment-detail-hero {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 3rem;
-    align-items: center;
-    padding: 4rem;
-    padding-left: max(4rem, calc((100vw - 1100px) / 2));
     background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
     color: #fff;
+    padding: 4rem 2rem;
+}
+
+.assessment-detail-hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 3rem;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 .assessment-detail-hero .hero-content {
-    max-width: 580px;
+    max-width: none;
 }
 
 .assessment-detail-hero .breadcrumb {
@@ -11470,10 +11474,11 @@ main {
     color: rgba(255, 255, 255, 0.7);
 }
 
-.hero-cta {
+.assessment-detail-hero .hero-cta {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .hero-visual {
@@ -11958,9 +11963,12 @@ main {
 /* Responsive */
 @media (max-width: 900px) {
     .assessment-detail-hero {
+        padding: 3rem 1.5rem;
+    }
+
+    .assessment-detail-hero-inner {
         grid-template-columns: 1fr;
         gap: 2rem;
-        padding: 3rem 2rem;
     }
 
     .hero-visual {

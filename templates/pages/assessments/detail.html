@@ -34,60 +34,62 @@
         <div class="assessment-detail-shell">
             {# Hero Section #}
             <header class="assessment-detail-hero">
-                <div class="hero-content">
-                    <div class="breadcrumb">
-                        <a href="{% url 'pages:assessment_list' %}">Assessment Library</a>
-                        <span>/</span>
-                        <span>{{ assessment.label }}</span>
-                    </div>
-                    {% if preview_mode %}
-                    <div class="preview-banner">
-                        <strong>Preview mode</strong>
-                        <span>Only visible with a valid preview link.</span>
-                    </div>
-                    {% endif %}
-                    <span class="pill">{{ assessment.label }}</span>
-                    <h1>{{ assessment.title }}</h1>
-                    {% if assessment.subtitle %}
-                    <p class="subtitle">{{ assessment.subtitle }}</p>
-                    {% endif %}
-                    <p class="summary">{{ assessment.summary }}</p>
-                    <div class="hero-stats">
-                        <div class="stat">
-                            <span class="stat-value">{{ assessment.duration_minutes }} min</span>
-                            <span class="stat-label">Duration</span>
+                <div class="assessment-detail-hero-inner">
+                    <div class="hero-content">
+                        <div class="breadcrumb">
+                            <a href="{% url 'pages:assessment_list' %}">Assessment Library</a>
+                            <span>/</span>
+                            <span>{{ assessment.label }}</span>
                         </div>
-                        <div class="stat">
-                            <span class="stat-value">{{ assessment.question_count }}</span>
-                            <span class="stat-label">Questions</span>
+                        {% if preview_mode %}
+                        <div class="preview-banner">
+                            <strong>Preview mode</strong>
+                            <span>Only visible with a valid preview link.</span>
                         </div>
-                        <div class="stat">
-                            <span class="stat-value">{{ assessment.get_difficulty_level_display }}</span>
-                            <span class="stat-label">Difficulty</span>
+                        {% endif %}
+                        <span class="pill">{{ assessment.label }}</span>
+                        <h1>{{ assessment.title }}</h1>
+                        {% if assessment.subtitle %}
+                        <p class="subtitle">{{ assessment.subtitle }}</p>
+                        {% endif %}
+                        <p class="summary">{{ assessment.summary }}</p>
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <span class="stat-value">{{ assessment.duration_minutes }} min</span>
+                                <span class="stat-label">Duration</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">{{ assessment.question_count }}</span>
+                                <span class="stat-label">Questions</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">{{ assessment.get_difficulty_level_display }}</span>
+                                <span class="stat-label">Difficulty</span>
+                            </div>
+                        </div>
+                        <div class="hero-cta">
+                            <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}" class="btn btn-pill">{{ assessment.cta_label }}</a>
+                            <a href="{% url 'pages:contact' %}" class="btn btn-outline-white">Contact sales</a>
                         </div>
                     </div>
-                    <div class="hero-cta">
-                        <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}" class="btn btn-pill">{{ assessment.cta_label }}</a>
-                        <a href="{% url 'pages:contact' %}" class="btn btn-outline-white">Contact sales</a>
-                    </div>
-                </div>
-                <div class="hero-visual">
-                    {% if assessment.featured_image %}
-                    <figure class="hero-image">
-                        <img src="{{ assessment.featured_image }}" alt="{{ assessment.title }}">
-                    </figure>
-                    {% else %}
-                    <div class="hero-icon-large">
-                        {% if assessment.icon_svg %}
-                        {{ assessment.icon_svg|safe }}
+                    <div class="hero-visual">
+                        {% if assessment.featured_image %}
+                        <figure class="hero-image">
+                            <img src="{{ assessment.featured_image }}" alt="{{ assessment.title }}">
+                        </figure>
                         {% else %}
-                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            <path d="M9 12h6M9 16h6"></path>
-                        </svg>
+                        <div class="hero-icon-large">
+                            {% if assessment.icon_svg %}
+                            {{ assessment.icon_svg|safe }}
+                            {% else %}
+                            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                <path d="M9 12h6M9 16h6"></path>
+                            </svg>
+                            {% endif %}
+                        </div>
                         {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </header>
 
