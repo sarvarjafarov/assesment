@@ -11479,6 +11479,7 @@ main {
     gap: 1rem;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-start;
 }
 
 .hero-visual {
