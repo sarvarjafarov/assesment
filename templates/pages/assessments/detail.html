@@ -131,11 +131,14 @@
                 <div class="section-content">
                     <h2>Sample Questions</h2>
                     <p class="section-lede">Get a preview of the types of questions candidates will encounter.</p>
-                    <div class="samples-list">
+                    <div class="assessment-samples-list">
                         {% for sample in assessment.sample_questions %}
-                        <article class="sample-card">
-                            <div class="sample-type">{{ sample.type|default:"Scenario" }}</div>
-                            <p class="sample-question">{{ sample.question }}</p>
+                        <article class="assessment-sample-card">
+                            <div class="sample-number">{{ forloop.counter }}</div>
+                            <div class="sample-body">
+                                <span class="sample-type-badge">{{ sample.type|default:"Scenario" }}</span>
+                                <p class="sample-question-text">{{ sample.question }}</p>
+                            </div>
                         </article>
                         {% endfor %}
                     </div>
