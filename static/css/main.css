@@ -11788,13 +11788,21 @@ main {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    width: 100%;
 }
 
 .faq-item {
+    width: 100%;
     background: #fff;
     border: 1px solid #e8eaed;
     border-radius: 10px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease;
+}
+
+.faq-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .faq-item summary {
