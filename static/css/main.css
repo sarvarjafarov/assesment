@@ -11840,33 +11840,61 @@ main {
 /* Assessment CTA */
 .assessment-cta {
     background: linear-gradient(135deg, var(--navy) 0%, #003d7a 100%);
-    padding: 4rem 2rem;
+    padding: 5rem 2rem;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.assessment-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at top right, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .cta-content {
-    max-width: 700px;
+    max-width: 600px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .assessment-cta h2 {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 700;
     color: #fff;
     margin: 0 0 1rem;
+    line-height: 1.3;
 }
 
 .assessment-cta p {
     font-size: 1.125rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0 0 2rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 2.5rem;
+    line-height: 1.6;
 }
 
 .cta-buttons {
     display: flex;
-    gap: 1rem;
+    gap: 1.25rem;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
+}
+
+.cta-buttons .btn-pill {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+}
+
+.cta-buttons .btn-outline-white {
+    padding: 0.875rem 2rem;
 }
 
 .btn-outline-white {
