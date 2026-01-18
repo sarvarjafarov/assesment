@@ -11369,14 +11369,17 @@ main {
 /* Detail Hero */
 .assessment-detail-hero {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 4rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3rem;
     align-items: center;
-    padding: 4rem 3rem;
+    padding: 4rem;
+    padding-left: max(4rem, calc((100vw - 1100px) / 2));
     background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
     color: #fff;
-    max-width: 1400px;
-    margin: 0 auto;
+}
+
+.assessment-detail-hero .hero-content {
+    max-width: 580px;
 }
 
 .assessment-detail-hero .breadcrumb {
