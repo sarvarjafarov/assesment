@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber
+from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber, PublicAssessment
 
 
 @admin.register(DemoRequest)
@@ -122,3 +122,77 @@ class NewsletterSubscriberAdmin(admin.ModelAdmin):
         emails = list(queryset.filter(status='active').values_list('email', flat=True))
         self.message_user(request, f'Active emails: {", ".join(emails[:10])}{"..." if len(emails) > 10 else ""} ({len(emails)} total)')
     export_emails.short_description = "Show active emails (for copy)"
+
+
+@admin.register(PublicAssessment)
+class PublicAssessmentAdmin(admin.ModelAdmin):
+    list_display = ['label', 'title', 'internal_code', 'is_active', 'is_featured', 'order', 'updated_at']
+    list_filter = ['is_active', 'is_featured', 'difficulty_level']
+    list_editable = ['is_active', 'is_featured', 'order']
+    search_fields = ['title', 'label', 'internal_code', 'summary']
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['preview_key', 'created_at', 'updated_at']
+    ordering = ['order', 'title']
+
+    fieldsets = (
+        ('Identification', {
+            'fields': ('title', 'slug', 'internal_code', 'label', 'subtitle')
+        }),
+        ('Description', {
+            'fields': ('summary', 'description', 'overview_content'),
+            'description': 'Summary is used for cards. Description and overview for detail page.'
+        }),
+        ('Visual', {
+            'fields': ('icon_svg', 'featured_image'),
+            'classes': ('collapse',),
+            'description': 'icon_svg should be SVG code. featured_image is a URL.'
+        }),
+        ('Assessment Details', {
+            'fields': ('duration_minutes', 'question_count', 'difficulty_level', 'focus_areas', 'stats')
+        }),
+        ('Skills & Content', {
+            'fields': ('skills_tested', 'sample_questions', 'scoring_rubric'),
+            'classes': ('collapse',)
+        }),
+        ('Use Cases & FAQs', {
+            'fields': ('use_cases', 'faqs'),
+            'classes': ('collapse',)
+        }),
+        ('CTA', {
+            'fields': ('cta_label', 'cta_url'),
+            'classes': ('collapse',)
+        }),
+        ('Display Settings', {
+            'fields': ('is_active', 'is_featured', 'order')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords', 'meta_image'),
+            'classes': ('collapse',)
+        }),
+        ('Preview & Timestamps', {
+            'fields': ('preview_key', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    actions = ['mark_as_featured', 'remove_from_featured', 'activate', 'deactivate']
+
+    def mark_as_featured(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} assessment(s) marked as featured.')
+    mark_as_featured.short_description = "Mark as featured (show on homepage)"
+
+    def remove_from_featured(self, request, queryset):
+        updated = queryset.update(is_featured=False)
+        self.message_user(request, f'{updated} assessment(s) removed from featured.')
+    remove_from_featured.short_description = "Remove from featured"
+
+    def activate(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f'{updated} assessment(s) activated.')
+    activate.short_description = "Activate selected assessments"
+
+    def deactivate(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f'{updated} assessment(s) deactivated.')
+    deactivate.short_description = "Deactivate selected assessments"

@@ -14,4 +14,8 @@ urlpatterns = [
     path('resources/', views.resources, name='resources'),
     path('subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path('robots.txt', views.robots_txt, name='robots'),
+    # Public assessments
+    path('assessments/', views.assessment_list, name='assessment_list'),
+    path('assessments/<slug:slug>/', views.assessment_detail, name='assessment_detail'),
+    path('assessments/preview/<slug:slug>/<uuid:token>/', views.assessment_preview, name='assessment_preview'),
 ]

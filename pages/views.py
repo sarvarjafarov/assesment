@@ -10,10 +10,15 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
 from .forms import DemoRequestForm
-from .models import NewsletterSubscriber
+from .models import NewsletterSubscriber, PublicAssessment
 
 def home(request):
     """Render the marketing landing page."""
@@ -250,21 +255,41 @@ def home(request):
             }
         )
 
-    suite_blocks = SiteContentBlock.objects.filter(
-        page=SiteContentBlock.PAGE_HOME, slot=SiteContentBlock.SLOT_SUITE, is_active=True
-    ).order_by("order")
-    if suite_blocks:
+    # Try database-driven assessments first
+    db_assessments = PublicAssessment.objects.filter(
+        is_active=True, is_featured=True
+    ).order_by('order')[:6]
+    if db_assessments.exists():
         assessment_suite = [
             {
-                "slug": slugify(block.title) or f"suite-{block.pk}",
-                "label": block.badge or block.title,
-                "title": block.title,
-                "summary": block.body,
-                "focus": block.list_values(),
-                "stats": block.meta_pairs(),
+                "slug": a.slug,
+                "label": a.label,
+                "title": a.title,
+                "summary": a.summary,
+                "focus": a.focus_list,
+                "stats": a.stats if isinstance(a.stats, list) else [],
+                "icon_svg": a.icon_svg,
+                "url": a.get_absolute_url(),
             }
-            for block in suite_blocks
+            for a in db_assessments
         ]
+    else:
+        # Fallback to SiteContentBlock CMS overrides
+        suite_blocks = SiteContentBlock.objects.filter(
+            page=SiteContentBlock.PAGE_HOME, slot=SiteContentBlock.SLOT_SUITE, is_active=True
+        ).order_by("order")
+        if suite_blocks:
+            assessment_suite = [
+                {
+                    "slug": slugify(block.title) or f"suite-{block.pk}",
+                    "label": block.badge or block.title,
+                    "title": block.title,
+                    "summary": block.body,
+                    "focus": block.list_values(),
+                    "stats": block.meta_pairs(),
+                }
+                for block in suite_blocks
+            ]
 
     feature_blocks = SiteContentBlock.objects.filter(
         page=SiteContentBlock.PAGE_HOME, slot=SiteContentBlock.SLOT_FEATURE, is_active=True
@@ -670,3 +695,65 @@ def robots_txt(request):
         f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def assessment_list(request):
+    """List all active public assessments with search."""
+    assessments = PublicAssessment.objects.filter(is_active=True)
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        assessments = assessments.filter(
+            Q(title__icontains=query) |
+            Q(label__icontains=query) |
+            Q(summary__icontains=query) |
+            Q(description__icontains=query)
+        ).distinct()
+
+    paginator = Paginator(assessments, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'pages/assessments/list.html', {
+        'assessments': page_obj,
+        'page_obj': page_obj,
+        'query': query,
+        'is_paginated': page_obj.has_other_pages(),
+    })
+
+
+def assessment_detail(request, slug):
+    """Display detailed public assessment information."""
+    assessment = get_object_or_404(PublicAssessment, slug=slug, is_active=True)
+
+    # Get related assessments (excluding current)
+    related = PublicAssessment.objects.filter(
+        is_active=True
+    ).exclude(pk=assessment.pk).order_by('order')[:4]
+
+    return render(request, 'pages/assessments/detail.html', {
+        'assessment': assessment,
+        'related_assessments': related,
+    })
+
+
+def assessment_preview(request, slug, token):
+    """Preview assessment before publishing (requires valid token or staff)."""
+    try:
+        assessment = PublicAssessment.objects.get(slug=slug)
+    except PublicAssessment.DoesNotExist:
+        raise Http404
+
+    # Check token or staff access
+    if str(assessment.preview_key) != str(token) and not request.user.is_staff:
+        raise Http404
+
+    related = PublicAssessment.objects.filter(
+        is_active=True
+    ).exclude(pk=assessment.pk).order_by('order')[:4]
+
+    return render(request, 'pages/assessments/detail.html', {
+        'assessment': assessment,
+        'related_assessments': related,
+        'preview_mode': True,
+    })

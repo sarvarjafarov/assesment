@@ -1,11 +1,12 @@
 """
-Sitemap configurations for blog and static pages.
+Sitemap configurations for blog, assessments, and static pages.
 Used for SEO to help search engines discover and index content.
 """
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
 from .models import BlogPost, BlogCategory
+from pages.models import PublicAssessment
 
 
 class BlogPostSitemap(Sitemap):
@@ -49,8 +50,24 @@ class StaticPagesSitemap(Sitemap):
             'pages:privacy',
             'pages:terms',
             'pages:resources',
+            'pages:assessment_list',
             'blog:list',
         ]
 
     def location(self, item):
         return reverse(item)
+
+
+class PublicAssessmentSitemap(Sitemap):
+    """Sitemap for public assessment pages."""
+    changefreq = "weekly"
+    priority = 0.8
+
+    def items(self):
+        return PublicAssessment.objects.filter(is_active=True)
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+    def location(self, obj):
+        return obj.get_absolute_url()

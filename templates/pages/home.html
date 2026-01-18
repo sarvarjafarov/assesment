@@ -65,7 +65,9 @@
                     {% for item in suite %}
                     <article class="suite-card-v2">
                         <div class="suite-card-icon accent-{{ item.slug }}">
-                            {% if item.slug == 'marketing' %}
+                            {% if item.icon_svg %}
+                            {{ item.icon_svg|safe }}
+                            {% elif item.slug == 'marketing' %}
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                                 <path d="M2 17l10 5 10-5"></path>
@@ -103,9 +105,16 @@
                             </div>
                             {% endfor %}
                         </div>
+                        {% if item.url %}
+                        <a class="btn btn-outline small" href="{{ item.url }}">Learn more</a>
+                        {% else %}
                         <a class="btn btn-outline small" href="mailto:hello@evalon.so?subject={{ item.label|urlencode }}%20rubric">Download rubric</a>
+                        {% endif %}
                     </article>
                     {% endfor %}
+                </div>
+                <div class="suite-see-all">
+                    <a href="{% url 'pages:assessment_list' %}" class="btn btn-outline">See all assessments</a>
                 </div>
             </div>
         </section>

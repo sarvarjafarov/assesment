@@ -16,8 +16,9 @@
         <div class="nav-menu" id="siteNavMenu" data-nav-menu>
             <ul class="nav-links">
                 <li><a href="{% url 'pages:home' %}#how-it-works">How it works</a></li>
-                <li><a href="{% url 'pages:home' %}#assessments">Assessments</a></li>
+                <li><a class="{% if active == 'assessments' %}is-active{% endif %}" href="{% url 'pages:assessment_list' %}">Assessments</a></li>
                 <li><a href="{% url 'pages:home' %}#pricing">Pricing</a></li>
+                <li><a class="{% if active == 'blog' %}is-active{% endif %}" href="{% url 'blog:list' %}">Blog</a></li>
                 <li><a class="{% if active == 'api' %}is-active{% endif %}" href="{% url 'marketing_assessments:api' %}">API</a></li>
             </ul>
             <div class="nav-actions">
