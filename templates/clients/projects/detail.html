@@ -31,6 +31,17 @@
             </div>
         </div>
         <div class="header-actions">
+            {% if request.user.client_account.role == 'manager' or request.user.client_account.role == 'recruiter' %}
+            <a href="{% url 'clients:assessments' %}" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+                Invite Candidates
+            </a>
+            {% endif %}
             {% if request.user.client_account.role == 'manager' %}
             <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-ghost">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -212,13 +223,26 @@
         </div>
     </section>
     {% else %}
-    <section class="portal-card empty-state-card">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
+    <section class="portal-card empty-state-card empty-state-with-cta">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--orange); margin-bottom: 1.25rem;">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
         </svg>
-        <h4>No candidate activity yet</h4>
-        <p class="muted">Invites sent for this project will appear here.</p>
+        <h4>Ready to add candidates?</h4>
+        <p class="muted">Start by inviting candidates to take an assessment for this project.</p>
+        {% if request.user.client_account.role == 'manager' or request.user.client_account.role == 'recruiter' %}
+        <a href="{% url 'clients:assessments' %}" class="btn btn-primary" style="margin-top: 1.5rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            Invite Candidates
+        </a>
+        {% endif %}
     </section>
     {% endif %}
 </div>
@@ -643,6 +667,38 @@
         justify-content: flex-start;
         margin-top: 0.5rem;
     }
+}
+
+/* Empty State with CTA */
+.empty-state-with-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+    margin-top: 2rem;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.03) 0%, rgba(14, 20, 40, 0.02) 100%);
+    border: 1px dashed var(--portal-border-color);
+}
+
+.empty-state-with-cta h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.5rem;
+}
+
+.empty-state-with-cta p {
+    font-size: 0.95rem;
+    max-width: 400px;
+    margin: 0;
+}
+
+.empty-state-with-cta .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 </style>
 

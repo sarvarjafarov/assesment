@@ -54,6 +54,16 @@
                 <span class="nav-label">Dashboard</span>
             </a>
 
+            <a href="{% url 'clients:project-list' %}" class="nav-item {% if 'project-list' in request.resolver_match.url_name or 'project-detail' in request.resolver_match.url_name or 'project-clone' in request.resolver_match.url_name %}active{% endif %}">
+                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="nav-label">Projects</span>
+                {% if project_badge_count %}
+                <span class="nav-badge">{{ project_badge_count }}</span>
+                {% endif %}
+            </a>
+
             <a href="{% url 'clients:assessments' %}" class="nav-item {% if request.resolver_match.url_name == 'assessments' or request.resolver_match.url_name == 'assessment-manage' or request.resolver_match.url_name == 'assessment-detail' %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -65,16 +75,6 @@
                 <span class="nav-label">Assessments</span>
                 {% if assessment_badge_count %}
                 <span class="nav-badge">{{ assessment_badge_count }}</span>
-                {% endif %}
-            </a>
-
-            <a href="{% url 'clients:project-list' %}" class="nav-item {% if 'project-list' in request.resolver_match.url_name or 'project-detail' in request.resolver_match.url_name or 'project-clone' in request.resolver_match.url_name %}active{% endif %}">
-                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span class="nav-label">Projects</span>
-                {% if project_badge_count %}
-                <span class="nav-badge">{{ project_badge_count }}</span>
                 {% endif %}
             </a>
 
