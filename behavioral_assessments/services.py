@@ -9,8 +9,6 @@ from assessments.behavioral import build_behavioral_profile
 from .models import BehavioralAssessmentSession, BehavioralQuestion
 
 
-DEFAULT_QUESTION_COUNT = 30
-
 # Maps assessment level to question difficulty range (min, max)
 LEVEL_DIFFICULTY_RANGES = {
     "junior": (1, 2),
@@ -18,18 +16,35 @@ LEVEL_DIFFICULTY_RANGES = {
     "senior": (3, 5),
 }
 
+# Total questions per assessment level (more questions = harder to cheat)
+LEVEL_QUESTION_COUNTS = {
+    "junior": 20,
+    "mid": 30,
+    "senior": 35,
+}
 
-def generate_question_set(count: int = DEFAULT_QUESTION_COUNT, level: str = "mid") -> list[int]:
-    """Generate a question set filtered by assessment level.
+
+def generate_question_set(level: str = "mid") -> list[int]:
+    """Generate a randomized question set filtered by assessment level.
+
+    Each level gets different difficulty questions and different total counts:
+    - Junior (0-2 years): 20 questions, difficulty 1-2 (foundational)
+    - Mid (2-5 years): 30 questions, difficulty 2-4 (applied)
+    - Senior (5+ years): 35 questions, difficulty 3-5 (complex scenarios)
+
+    Questions are randomly selected from a larger pool to prevent cheating.
 
     Args:
-        count: Number of questions to include
         level: Assessment level ('junior', 'mid', or 'senior')
 
     Returns:
         List of question IDs filtered by difficulty for the given level
     """
     min_diff, max_diff = LEVEL_DIFFICULTY_RANGES.get(level, (2, 4))
+    total_questions = LEVEL_QUESTION_COUNTS.get(level, 30)
+
+    # Pull from a larger pool (2x) to ensure randomization
+    pool_size = total_questions * 2
 
     # First try to get questions at the target difficulty level
     ids = list(
@@ -38,19 +53,22 @@ def generate_question_set(count: int = DEFAULT_QUESTION_COUNT, level: str = "mid
             difficulty_level__gte=min_diff,
             difficulty_level__lte=max_diff,
         )
-        .values_list("id", flat=True)
+        .order_by("?")[:pool_size]
     )
 
     # Fallback: if not enough questions at level, get all questions
-    if len(ids) < count:
+    if len(ids) < total_questions:
         ids = list(
-            BehavioralQuestion.objects.published().values_list("id", flat=True)
+            BehavioralQuestion.objects.published()
+            .order_by("?")[:pool_size]
         )
 
     if not ids:
         return []
+
+    # Shuffle and take required count
     shuffle(ids)
-    return ids[:count]
+    return ids[:total_questions]
 
 
 def evaluate_session(session: BehavioralAssessmentSession):

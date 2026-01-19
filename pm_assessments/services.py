@@ -60,16 +60,38 @@ SENIORITY_RULES = [
     (Decimal("0"), "Needs development"),
 ]
 
-# Maps assessment level to question difficulty range (min, max)
+# Maps assessment level to question difficulty range (min, max) and total question count
 LEVEL_DIFFICULTY_RANGES = {
     "junior": (1, 2),
     "mid": (2, 4),
     "senior": (3, 5),
 }
 
+# Total questions per assessment level (more questions = harder to cheat)
+LEVEL_QUESTION_COUNTS = {
+    "junior": 25,
+    "mid": 35,
+    "senior": 40,
+}
+
+# Category distribution multipliers per level
+# Junior: fewer questions per category, Senior: more questions per category
+LEVEL_CATEGORY_MULTIPLIERS = {
+    "junior": 0.8,
+    "mid": 1.0,
+    "senior": 1.3,
+}
+
 
 def generate_question_set(level: str = "mid") -> list[int]:
-    """Generate a question set filtered by assessment level.
+    """Generate a randomized question set filtered by assessment level.
+
+    Each level gets different difficulty questions and different total counts:
+    - Junior (0-2 years): 25 questions, difficulty 1-2 (foundational)
+    - Mid (2-5 years): 35 questions, difficulty 2-4 (applied knowledge)
+    - Senior (5+ years): 40 questions, difficulty 3-5 (strategic thinking)
+
+    Questions are randomly selected from a larger pool to prevent cheating.
 
     Args:
         level: Assessment level ('junior', 'mid', or 'senior')
@@ -78,9 +100,18 @@ def generate_question_set(level: str = "mid") -> list[int]:
         List of question IDs filtered by difficulty for the given level
     """
     min_diff, max_diff = LEVEL_DIFFICULTY_RANGES.get(level, (2, 4))
+    total_questions = LEVEL_QUESTION_COUNTS.get(level, 35)
+    multiplier = LEVEL_CATEGORY_MULTIPLIERS.get(level, 1.0)
+
     question_ids: list[int] = []
 
-    for category, count in CATEGORY_TARGETS.items():
+    for category, base_count in CATEGORY_TARGETS.items():
+        # Adjust count based on level multiplier
+        count = max(2, int(base_count * multiplier))
+
+        # Pull from a larger pool (3x) to ensure randomization
+        pool_size = count * 3
+
         # First try to get questions at the target difficulty level
         qs = list(
             ProductQuestion.objects.published()
@@ -89,7 +120,7 @@ def generate_question_set(level: str = "mid") -> list[int]:
                 difficulty_level__gte=min_diff,
                 difficulty_level__lte=max_diff,
             )
-            .order_by("?")[: count * 2]
+            .order_by("?")[:pool_size]
         )
 
         # Fallback: if not enough questions at level, expand to all difficulties
@@ -97,13 +128,16 @@ def generate_question_set(level: str = "mid") -> list[int]:
             qs = list(
                 ProductQuestion.objects.published()
                 .filter(category=category)
-                .order_by("?")[: count * 2]
+                .order_by("?")[:pool_size]
             )
 
+        # Shuffle and take the required count
+        shuffle(qs)
         question_ids.extend(q.id for q in qs[:count])
 
+    # Final shuffle and limit to total question count
     shuffle(question_ids)
-    return question_ids[:30]
+    return question_ids[:total_questions]
 
 
 def evaluate_session(session: ProductAssessmentSession):
