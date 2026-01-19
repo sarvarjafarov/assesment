@@ -299,10 +299,118 @@
     </section>
 </div>
 
+<!-- Flatpickr Date Picker Library -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <style>
 /* ========================================================================
    ASSESSMENT MANAGE PAGE - CLEAN DESIGN
    ======================================================================== */
+
+/* Flatpickr Custom Styling */
+.datetime-picker {
+    cursor: pointer !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 44px !important;
+}
+
+.flatpickr-calendar {
+    font-family: inherit;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e2e8f0;
+}
+
+.flatpickr-calendar.arrowTop:before,
+.flatpickr-calendar.arrowTop:after {
+    border-bottom-color: #fff;
+}
+
+.flatpickr-months {
+    border-radius: 12px 12px 0 0;
+    background: #fff;
+}
+
+.flatpickr-month {
+    height: 40px;
+}
+
+.flatpickr-current-month {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+    padding: 8px;
+}
+
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+    color: #ff8a00;
+}
+
+.flatpickr-prev-month:hover svg,
+.flatpickr-next-month:hover svg {
+    fill: #ff8a00;
+}
+
+.flatpickr-weekdays {
+    background: #f7fafc;
+}
+
+.flatpickr-weekday {
+    font-weight: 600;
+    color: #718096;
+    font-size: 0.75rem;
+}
+
+.flatpickr-day {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.flatpickr-day:hover {
+    background: #fff3e8;
+    border-color: #ff8a00;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+    background: #ff8a00;
+    border-color: #ff8a00;
+}
+
+.flatpickr-day.today {
+    border-color: #ff8a00;
+}
+
+.flatpickr-day.today:hover {
+    background: #ff8a00;
+    color: #fff;
+}
+
+.flatpickr-time {
+    border-top: 1px solid #e2e8f0;
+    padding: 8px;
+}
+
+.flatpickr-time input {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.flatpickr-time .flatpickr-am-pm {
+    font-weight: 600;
+}
+
+.flatpickr-time .flatpickr-am-pm:hover {
+    background: #fff3e8;
+}
 
 /* Card Grid Layout */
 .portal-card-grid {
@@ -817,6 +925,39 @@
 </style>
 
 <script>
+// Initialize Flatpickr Date Pickers
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all datetime picker inputs
+    const dateTimePickers = document.querySelectorAll('.datetime-picker');
+
+    dateTimePickers.forEach(function(input) {
+        flatpickr(input, {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            altInput: true,
+            altFormat: "F j, Y at h:i K",
+            minDate: "today",
+            time_24hr: false,
+            minuteIncrement: 15,
+            disableMobile: false,
+            allowInput: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                // Add clear button
+                const clearBtn = document.createElement('button');
+                clearBtn.type = 'button';
+                clearBtn.className = 'flatpickr-clear-btn';
+                clearBtn.innerHTML = 'Clear';
+                clearBtn.style.cssText = 'position: absolute; right: 50px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; font-size: 12px; cursor: pointer; padding: 4px 8px;';
+                clearBtn.addEventListener('click', function() {
+                    instance.clear();
+                });
+                input.parentElement.style.position = 'relative';
+                input.parentElement.appendChild(clearBtn);
+            }
+        });
+    });
+});
+
 // Copy Link Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const copyButtons = document.querySelectorAll('.copy-link-btn');

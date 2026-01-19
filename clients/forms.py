@@ -194,8 +194,12 @@ class BaseClientInviteForm(forms.Form):
     send_at = forms.DateTimeField(
         required=False,
         label="Schedule send (optional)",
-        help_text="Leave blank to send immediately. Use YYYY-MM-DD HH:MM format.",
+        help_text="Leave blank to send immediately.",
         input_formats=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%m/%d/%Y %H:%M"],
+        widget=forms.DateTimeInput(attrs={
+            "class": "datetime-picker",
+            "placeholder": "Select date and time",
+        }),
     )
     project = forms.ModelChoiceField(
         label="Project",
@@ -221,8 +225,12 @@ class BaseClientInviteForm(forms.Form):
     deadline_at = forms.DateTimeField(
         required=False,
         label="Deadline date",
-        help_text="Absolute deadline. Use YYYY-MM-DD HH:MM format.",
+        help_text="Select the deadline date and time.",
         input_formats=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%m/%d/%Y %H:%M", "%Y-%m-%d"],
+        widget=forms.DateTimeInput(attrs={
+            "class": "datetime-picker",
+            "placeholder": "Select date and time",
+        }),
     )
 
     model = None
