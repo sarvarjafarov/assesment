@@ -159,6 +159,11 @@
     {# Product Tour Video #}
     <section class="portal-card video-tour-section">
         <div class="video-tour-header">
+            <div class="video-tour-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </div>
             <div>
                 <h3>How Evalon Works</h3>
                 <p class="muted">Watch a quick 2-minute overview of the platform</p>
@@ -400,9 +405,20 @@
 
 .video-tour-header {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+.video-tour-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--orange), #ff6b00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .video-tour-header h3 {
@@ -420,7 +436,8 @@
     position: relative;
     width: 100%;
     padding-bottom: 56.25%; /* 16:9 aspect ratio */
-    background: var(--portal-bg);
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.06) 0%, rgba(14, 20, 40, 0.02) 100%);
+    border: 1px dashed rgba(255, 138, 0, 0.25);
     border-radius: 12px;
     overflow: hidden;
 }
@@ -447,7 +464,7 @@
     justify-content: center;
     text-align: center;
     padding: 2rem;
-    background: linear-gradient(135deg, rgba(255, 138, 0, 0.05) 0%, rgba(14, 20, 40, 0.03) 100%);
+    background: transparent;
 }
 
 .video-placeholder svg {
