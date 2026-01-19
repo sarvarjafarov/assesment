@@ -1791,6 +1791,8 @@ class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
                     "status": session.get_status_display(),
                     "status_slug": session.status,
                     "score": score,
+                    "level": getattr(session, "level", "mid"),
+                    "level_display": session.get_level_display() if hasattr(session, "get_level_display") else "Mid-Level",
                     "updated_at": session.pipeline_stage_updated_at
                     or session.updated_at
                     or session.created_at,
@@ -1807,6 +1809,8 @@ class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
                         "candidate": session.candidate_id,
                         "assessment": label,
                         "status": session.get_status_display(),
+                        "level": getattr(session, "level", "mid"),
+                        "level_display": session.get_level_display() if hasattr(session, "get_level_display") else "Mid-Level",
                         "updated_at": session.updated_at or session.created_at,
                         "detail_url": reverse("clients:assessment-detail", args=[code, session.uuid])
                         if session.status == "submitted"

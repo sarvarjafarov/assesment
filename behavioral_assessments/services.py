@@ -11,11 +11,42 @@ from .models import BehavioralAssessmentSession, BehavioralQuestion
 
 DEFAULT_QUESTION_COUNT = 30
 
+# Maps assessment level to question difficulty range (min, max)
+LEVEL_DIFFICULTY_RANGES = {
+    "junior": (1, 2),
+    "mid": (2, 4),
+    "senior": (3, 5),
+}
 
-def generate_question_set(count: int = DEFAULT_QUESTION_COUNT) -> list[int]:
+
+def generate_question_set(count: int = DEFAULT_QUESTION_COUNT, level: str = "mid") -> list[int]:
+    """Generate a question set filtered by assessment level.
+
+    Args:
+        count: Number of questions to include
+        level: Assessment level ('junior', 'mid', or 'senior')
+
+    Returns:
+        List of question IDs filtered by difficulty for the given level
+    """
+    min_diff, max_diff = LEVEL_DIFFICULTY_RANGES.get(level, (2, 4))
+
+    # First try to get questions at the target difficulty level
     ids = list(
-        BehavioralQuestion.objects.published().values_list("id", flat=True)
+        BehavioralQuestion.objects.published()
+        .filter(
+            difficulty_level__gte=min_diff,
+            difficulty_level__lte=max_diff,
+        )
+        .values_list("id", flat=True)
     )
+
+    # Fallback: if not enough questions at level, get all questions
+    if len(ids) < count:
+        ids = list(
+            BehavioralQuestion.objects.published().values_list("id", flat=True)
+        )
+
     if not ids:
         return []
     shuffle(ids)

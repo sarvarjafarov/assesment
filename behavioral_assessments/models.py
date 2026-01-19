@@ -28,6 +28,10 @@ class BehavioralQuestion(TimeStampedModel):
         default="Select the statements that best describe you.",
     )
     statements = models.JSONField(default=list)
+    difficulty_level = models.PositiveSmallIntegerField(
+        default=3,
+        help_text="1=Easy (Junior), 5=Hard (Senior)",
+    )
     is_active = models.BooleanField(default=True)
 
     objects = BehavioralQuestionQuerySet.as_manager()
@@ -50,6 +54,11 @@ class BehavioralAssessmentSession(TimeStampedModel):
         ("none", "No deadline"),
         ("relative", "Days from invite"),
         ("absolute", "Specific date"),
+    ]
+    LEVEL_CHOICES = [
+        ("junior", "Junior (0-2 years)"),
+        ("mid", "Mid-Level (2-5 years)"),
+        ("senior", "Senior (5+ years)"),
     ]
     client = models.ForeignKey(
         "clients.ClientAccount",
@@ -103,6 +112,12 @@ class BehavioralAssessmentSession(TimeStampedModel):
         default="invited",
     )
     pipeline_stage_updated_at = models.DateTimeField(null=True, blank=True)
+    level = models.CharField(
+        max_length=10,
+        choices=LEVEL_CHOICES,
+        default="mid",
+        help_text="Target experience level for this assessment",
+    )
 
     class Meta:
         ordering = ("-created_at",)

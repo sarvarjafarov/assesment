@@ -172,10 +172,23 @@ class ClientLoginForm(AuthenticationForm):
             )
 
 
+LEVEL_CHOICES = [
+    ("junior", "Junior (0-2 years)"),
+    ("mid", "Mid-Level (2-5 years)"),
+    ("senior", "Senior (5+ years)"),
+]
+
+
 class BaseClientInviteForm(forms.Form):
     candidate_identifier = forms.CharField(
         label="Candidate identifier (email or ID)",
         help_text="Shared with the candidate to access their workspace.",
+    )
+    level = forms.ChoiceField(
+        label="Assessment Level",
+        choices=LEVEL_CHOICES,
+        initial="mid",
+        help_text="Select the experience level this assessment should target",
     )
     duration_minutes = forms.IntegerField(min_value=5, initial=30, label="Duration (minutes)")
     send_at = forms.DateTimeField(
@@ -232,7 +245,8 @@ class BaseClientInviteForm(forms.Form):
         generator = self.generate_question_set
         if not generator:
             raise forms.ValidationError("Assessment configuration missing.")
-        question_set = generator()
+        level = cleaned.get("level", "mid")
+        question_set = generator(level=level)
         if not question_set:
             raise forms.ValidationError("No questions are active right now.")
         self.question_set = question_set
@@ -277,17 +291,19 @@ class ClientMarketingInviteForm(BaseClientInviteForm):
 
     def save(self) -> DigitalMarketingAssessmentSession:
         candidate_id = self.cleaned_data["candidate_identifier"]
+        level = self.cleaned_data.get("level", "mid")
         session, _ = self.model.objects.get_or_create(
             candidate_id=candidate_id,
             client=self.client,
             defaults={"status": "draft"},
         )
-        session.question_set = getattr(self, "question_set", None) or self.generate_question_set()
+        session.question_set = getattr(self, "question_set", None) or self.generate_question_set(level=level)
         send_at = self.cleaned_data.get("send_at")
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
         session.project = self.cleaned_data["project"]
+        session.level = level
         session.deadline_type = self.cleaned_data.get("deadline_type", "none")
         session.deadline_days = self.cleaned_data.get("deadline_days")
         session.deadline_at = self.cleaned_data.get("deadline_at")
@@ -306,6 +322,7 @@ class ClientMarketingInviteForm(BaseClientInviteForm):
                 "started_at",
                 "client",
                 "project",
+                "level",
                 "deadline_type",
                 "deadline_days",
                 "deadline_at",
@@ -320,17 +337,19 @@ class ClientProductInviteForm(BaseClientInviteForm):
 
     def save(self) -> ProductAssessmentSession:
         candidate_id = self.cleaned_data["candidate_identifier"]
+        level = self.cleaned_data.get("level", "mid")
         session, _ = self.model.objects.get_or_create(
             candidate_id=candidate_id,
             client=self.client,
             defaults={"status": "draft"},
         )
-        session.question_set = getattr(self, "question_set", None) or self.generate_question_set()
+        session.question_set = getattr(self, "question_set", None) or self.generate_question_set(level=level)
         send_at = self.cleaned_data.get("send_at")
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
         session.project = self.cleaned_data["project"]
+        session.level = level
         session.deadline_type = self.cleaned_data.get("deadline_type", "none")
         session.deadline_days = self.cleaned_data.get("deadline_days")
         session.deadline_at = self.cleaned_data.get("deadline_at")
@@ -349,6 +368,7 @@ class ClientProductInviteForm(BaseClientInviteForm):
                 "started_at",
                 "client",
                 "project",
+                "level",
                 "deadline_type",
                 "deadline_days",
                 "deadline_at",
@@ -367,17 +387,19 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
 
     def save(self) -> BehavioralAssessmentSession:
         candidate_id = self.cleaned_data["candidate_identifier"]
+        level = self.cleaned_data.get("level", "mid")
         session, _ = self.model.objects.get_or_create(
             candidate_id=candidate_id,
             client=self.client,
             defaults={"status": "draft"},
         )
-        session.question_set = getattr(self, "question_set", None) or self.generate_question_set()
+        session.question_set = getattr(self, "question_set", None) or self.generate_question_set(level=level)
         send_at = self.cleaned_data.get("send_at")
         session.duration_minutes = self.cleaned_data["duration_minutes"]
         session.started_at = None
         session.client = self.client
         session.project = self.cleaned_data["project"]
+        session.level = level
         session.deadline_type = self.cleaned_data.get("deadline_type", "none")
         session.deadline_days = self.cleaned_data.get("deadline_days")
         session.deadline_at = self.cleaned_data.get("deadline_at")
@@ -396,6 +418,7 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
                 "started_at",
                 "client",
                 "project",
+                "level",
                 "deadline_type",
                 "deadline_days",
                 "deadline_at",

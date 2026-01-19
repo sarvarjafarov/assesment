@@ -45,16 +45,48 @@ SENIORITY_RULES = [
     (Decimal("0"), "Needs development"),
 ]
 
+# Maps assessment level to question difficulty range (min, max)
+LEVEL_DIFFICULTY_RANGES = {
+    "junior": (1, 2),
+    "mid": (2, 4),
+    "senior": (3, 5),
+}
 
-def generate_question_set() -> list[int]:
+
+def generate_question_set(level: str = "mid") -> list[int]:
+    """Generate a question set filtered by assessment level.
+
+    Args:
+        level: Assessment level ('junior', 'mid', or 'senior')
+
+    Returns:
+        List of question IDs filtered by difficulty for the given level
+    """
+    min_diff, max_diff = LEVEL_DIFFICULTY_RANGES.get(level, (2, 4))
     question_ids: list[int] = []
+
     for category, count in CATEGORY_TARGETS.items():
+        # First try to get questions at the target difficulty level
         qs = list(
             DigitalMarketingQuestion.objects.published()
-            .filter(category=category)
+            .filter(
+                category=category,
+                difficulty_level__gte=min_diff,
+                difficulty_level__lte=max_diff,
+            )
             .order_by("?")[: count * 2]
         )
+
+        # Fallback: if not enough questions at level, expand to all difficulties
+        if len(qs) < count:
+            qs = list(
+                DigitalMarketingQuestion.objects.published()
+                .filter(category=category)
+                .order_by("?")[: count * 2]
+            )
+
         question_ids.extend(q.id for q in qs[:count])
+
     shuffle(question_ids)
     return question_ids[:30]
 

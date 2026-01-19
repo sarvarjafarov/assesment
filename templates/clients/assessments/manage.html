@@ -43,14 +43,42 @@
                 {% csrf_token %}
                 {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
                 {% for field in form %}
-                <div class="form-group">
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% if field.help_text %}<small class="form-help">{{ field.help_text }}</small>{% endif %}
-                    {% for error in field.errors %}
-                    <span class="form-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
+                    {% if field.name == 'level' %}
+                    <div class="form-group level-selector-group">
+                        <label class="form-label">{{ field.label }}</label>
+                        <p class="form-help">{{ field.help_text }}</p>
+                        <div class="level-options">
+                            {% for choice in field.field.choices %}
+                            <label class="level-option {% if choice.0 == 'mid' %}recommended{% endif %}">
+                                <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" {% if choice.0 == field.value or choice.0 == 'mid' and not field.value %}checked{% endif %}>
+                                <span class="level-card">
+                                    <span class="level-name">
+                                        {% if choice.0 == 'junior' %}Junior{% elif choice.0 == 'mid' %}Mid-Level{% else %}Senior{% endif %}
+                                    </span>
+                                    <span class="level-years">
+                                        {% if choice.0 == 'junior' %}0-2 years{% elif choice.0 == 'mid' %}2-5 years{% else %}5+ years{% endif %}
+                                    </span>
+                                    <span class="level-desc">
+                                        {% if choice.0 == 'junior' %}Foundational concepts{% elif choice.0 == 'mid' %}Applied knowledge{% else %}Strategic thinking{% endif %}
+                                    </span>
+                                </span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% for error in field.errors %}
+                        <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}<small class="form-help">{{ field.help_text }}</small>{% endif %}
+                        {% for error in field.errors %}
+                        <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 {% endfor %}
                 <button class="btn btn-primary btn-block" type="submit">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -301,6 +329,96 @@
 
 .section-header .muted {
     margin: 0;
+}
+
+/* Level Selector */
+.level-selector-group {
+    margin-bottom: 0.5rem;
+}
+
+.level-selector-group > .form-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--navy);
+    margin-bottom: 0.25rem;
+}
+
+.level-selector-group > .form-help {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 0.75rem;
+}
+
+.level-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.level-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.level-option input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.level-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0.75rem;
+    border: 2px solid var(--portal-border-color);
+    border-radius: 10px;
+    text-align: center;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.level-option input:checked + .level-card {
+    border-color: var(--orange);
+    background: rgba(255, 138, 0, 0.04);
+}
+
+.level-option:hover .level-card {
+    border-color: rgba(255, 138, 0, 0.5);
+}
+
+.level-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--navy);
+}
+
+.level-years {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.125rem;
+}
+
+.level-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    line-height: 1.3;
+}
+
+.level-option.recommended .level-card::after {
+    content: 'Recommended';
+    position: absolute;
+    top: -0.5rem;
+    right: 50%;
+    transform: translateX(50%);
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--orange);
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
 }
 
 /* Forms */
@@ -685,6 +803,15 @@
 
     .action-buttons {
         flex-direction: column;
+    }
+
+    .level-options {
+        grid-template-columns: 1fr;
+    }
+
+    .level-option.recommended .level-card::after {
+        right: auto;
+        left: 50%;
     }
 }
 </style>
