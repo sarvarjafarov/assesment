@@ -649,6 +649,83 @@
     margin: 0 0 16px;
 }
 
+/* Textarea and Select Styling */
+.question-input-enhanced textarea,
+.question-input-enhanced select {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    line-height: 1.6;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.question-input-enhanced textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.question-input-enhanced textarea:focus,
+.question-input-enhanced select:focus {
+    outline: none;
+    border-color: #ff8a00;
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.question-input-enhanced textarea::placeholder {
+    color: #a0aec0;
+    font-style: italic;
+}
+
+/* Radio/Checkbox Options Styling */
+.question-input-enhanced ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.question-input-enhanced ul li {
+    margin: 0;
+}
+
+.question-input-enhanced ul li label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    color: #0e1428;
+}
+
+.question-input-enhanced ul li label:hover {
+    border-color: #ff8a00;
+    background: #fff9f5;
+}
+
+.question-input-enhanced ul li input[type="radio"],
+.question-input-enhanced ul li input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #ff8a00;
+    flex-shrink: 0;
+}
+
+.question-input-enhanced ul li label:has(input:checked) {
+    border-color: #ff8a00;
+    background: linear-gradient(135deg, #fff9f5 0%, #fff3e8 100%);
+}
+
 .form-field {
     margin-bottom: 20px;
 }
