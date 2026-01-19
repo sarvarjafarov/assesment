@@ -167,7 +167,15 @@
                         <th>Project</th>
                         <th>Status</th>
                         <th>Timing</th>
-                        <th>Score</th>
+                        <th class="sortable-header" data-sort="score" title="Click to sort by score">
+                            Score
+                            <span class="sort-icon">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M7 15l5 5 5-5"></path>
+                                    <path d="M7 9l5-5 5 5"></path>
+                                </svg>
+                            </span>
+                        </th>
                         <th>Notes</th>
                         <th>Updated</th>
                         <th>Actions</th>
@@ -200,7 +208,7 @@
                             <span class="muted">—</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td class="score-cell" data-score="{{ row.score|default:'0' }}">
                             {% if row.score %}
                             <span class="score-badge">{{ row.score }}</span>
                             {% else %}
@@ -692,6 +700,41 @@
     letter-spacing: 0.05em;
 }
 
+/* Sortable Header */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sortable-header:hover {
+    color: var(--orange);
+}
+
+.sort-icon {
+    display: inline-flex;
+    opacity: 0.4;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sortable-header:hover .sort-icon {
+    opacity: 0.7;
+}
+
+.sortable-header.sort-asc .sort-icon,
+.sortable-header.sort-desc .sort-icon {
+    opacity: 1;
+    color: var(--orange);
+}
+
+.sortable-header.sort-asc .sort-icon svg path:last-child,
+.sortable-header.sort-desc .sort-icon svg path:first-child {
+    opacity: 0.3;
+}
+
 .sessions-table td {
     padding: 1.25rem;
     border-bottom: 1px solid var(--portal-border-color);
@@ -1015,6 +1058,56 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update on change
         deadlineTypeSelect.addEventListener('change', toggleDeadlineFields);
     }
+});
+
+// Table Sorting Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.querySelector('.sessions-table');
+    if (!table) return;
+
+    const sortableHeaders = table.querySelectorAll('.sortable-header');
+    let currentSort = { column: null, direction: null };
+
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const sortKey = this.dataset.sort;
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            // Determine sort direction
+            let direction = 'desc'; // Default to highest first
+            if (currentSort.column === sortKey && currentSort.direction === 'desc') {
+                direction = 'asc';
+            }
+
+            // Update header classes
+            sortableHeaders.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+            });
+            this.classList.add(direction === 'asc' ? 'sort-asc' : 'sort-desc');
+
+            // Sort rows
+            rows.sort((a, b) => {
+                const aCell = a.querySelector('.score-cell');
+                const bCell = b.querySelector('.score-cell');
+
+                const aValue = parseFloat(aCell?.dataset.score || 0);
+                const bValue = parseFloat(bCell?.dataset.score || 0);
+
+                if (direction === 'asc') {
+                    return aValue - bValue;
+                } else {
+                    return bValue - aValue;
+                }
+            });
+
+            // Re-append rows in sorted order
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Update current sort state
+            currentSort = { column: sortKey, direction };
+        });
+    });
 });
 </script>
 
