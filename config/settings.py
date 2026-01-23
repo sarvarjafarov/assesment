@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     'marketing_assessments',
     'pm_assessments',
     'behavioral_assessments',
+    'custom_assessments',
     'clients',
 ]
 
@@ -278,6 +279,9 @@ ASSESSMENT_PASSING_SCORE = float(os.environ.get("ASSESSMENT_PASSING_SCORE", "70"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 API_ACCESS_TOKEN = os.environ.get("API_ACCESS_TOKEN", "")
+
+# Anthropic API for AI question generation
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 # Django-allauth settings
 ACCOUNT_EMAIL_REQUIRED = True

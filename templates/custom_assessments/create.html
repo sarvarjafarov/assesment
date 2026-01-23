@@ -1,0 +1,180 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% block title %}Create Custom Assessment · Evalon{% endblock %}
+{% block meta_description %}Create a new custom assessment{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <header class="dashboard-page-header">
+        <div>
+            <a href="{% url 'custom_assessments:list' %}" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Assessments
+            </a>
+            <h1>Create Custom Assessment</h1>
+            <p class="muted">Set up the basic details for your assessment</p>
+        </div>
+    </header>
+
+    <div class="create-form-container">
+        <form method="post" class="create-assessment-form">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h3>Assessment Details</h3>
+
+                <div class="form-group">
+                    <label for="id_name">{{ form.name.label }} <span class="required">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <span class="form-error">{{ form.name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_description">{{ form.description.label }}</label>
+                    {{ form.description }}
+                    <span class="form-help">Optional description shown to candidates</span>
+                    {% if form.description.errors %}
+                    <span class="form-error">{{ form.description.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Settings</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_time_limit_minutes">{{ form.time_limit_minutes.label }}</label>
+                        {{ form.time_limit_minutes }}
+                        <span class="form-help">Time candidates have to complete the assessment</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_passing_score">{{ form.passing_score.label }}</label>
+                        {{ form.passing_score }}
+                        <span class="form-help">Minimum score (%) to pass</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'custom_assessments:list' %}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    Create & Add Questions
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+.back-link:hover {
+    color: var(--navy);
+}
+
+.create-form-container {
+    max-width: 640px;
+}
+
+.create-assessment-form {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 12px;
+    padding: 32px;
+}
+
+.form-section {
+    margin-bottom: 32px;
+}
+.form-section:last-of-type {
+    margin-bottom: 24px;
+}
+.form-section h3 {
+    font-size: 1rem;
+    color: var(--navy);
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--navy);
+}
+.required {
+    color: #dc2626;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--orange);
+}
+
+.form-help {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+.form-error {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: #dc2626;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--portal-border-color);
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

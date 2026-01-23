@@ -1,0 +1,687 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% block title %}Manage Questions - {{ assessment.name }} · Evalon{% endblock %}
+{% block meta_description %}Add and manage questions for your custom assessment{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <header class="dashboard-page-header">
+        <div>
+            <a href="{% url 'custom_assessments:list' %}" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Assessments
+            </a>
+            <h1>{{ assessment.name }}</h1>
+            <p class="muted">{{ questions|length }} question{{ questions|length|pluralize }}</p>
+        </div>
+        <div class="header-actions">
+            {% if assessment.status == 'draft' and questions %}
+            <form method="post" action="{% url 'custom_assessments:publish' assessment.uuid %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Publish Assessment
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </header>
+
+    {% if assessment.status == 'draft' %}
+    {# Import Options #}
+    <div class="import-options">
+        <div class="import-card" onclick="openModal('ai-modal')">
+            <div class="import-icon ai-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+            </div>
+            <div class="import-content">
+                <h3>Generate with AI</h3>
+                <p>Describe your requirements and let AI create relevant questions</p>
+            </div>
+        </div>
+
+        <div class="import-card" onclick="openModal('csv-modal')">
+            <div class="import-icon csv-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+            </div>
+            <div class="import-content">
+                <h3>Upload CSV</h3>
+                <p>Import questions from a spreadsheet file</p>
+            </div>
+        </div>
+
+        <div class="import-card" onclick="openModal('manual-modal')">
+            <div class="import-icon manual-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </div>
+            <div class="import-content">
+                <h3>Add Manually</h3>
+                <p>Create questions one at a time</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Questions List #}
+    {% if questions %}
+    <div class="questions-list">
+        {% for question in questions %}
+        <div class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q{{ question.order }}</span>
+                {% if question.ai_generated %}
+                <span class="ai-tag">AI Generated</span>
+                {% endif %}
+                {% if question.category %}
+                <span class="category-tag">{{ question.category }}</span>
+                {% endif %}
+                <span class="difficulty-tag difficulty-{{ question.difficulty_level }}">
+                    Difficulty {{ question.difficulty_level }}
+                </span>
+            </div>
+
+            <p class="question-text">{{ question.question_text }}</p>
+
+            <div class="options-list">
+                <div class="option {% if question.correct_answer == 'A' %}correct{% endif %}">
+                    <span class="option-letter">A</span>
+                    <span>{{ question.option_a }}</span>
+                </div>
+                <div class="option {% if question.correct_answer == 'B' %}correct{% endif %}">
+                    <span class="option-letter">B</span>
+                    <span>{{ question.option_b }}</span>
+                </div>
+                {% if question.option_c %}
+                <div class="option {% if question.correct_answer == 'C' %}correct{% endif %}">
+                    <span class="option-letter">C</span>
+                    <span>{{ question.option_c }}</span>
+                </div>
+                {% endif %}
+                {% if question.option_d %}
+                <div class="option {% if question.correct_answer == 'D' %}correct{% endif %}">
+                    <span class="option-letter">D</span>
+                    <span>{{ question.option_d }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if question.explanation %}
+            <div class="explanation">
+                <strong>Explanation:</strong> {{ question.explanation }}
+            </div>
+            {% endif %}
+
+            {% if assessment.status == 'draft' %}
+            <div class="question-actions">
+                <button class="btn-icon" onclick="editQuestion({{ question.pk }})" title="Edit">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+                <form method="post" action="{% url 'custom_assessments:question-delete' assessment.uuid question.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-icon delete" onclick="return confirm('Delete this question?')" title="Delete">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </div>
+        <h3>No Questions Yet</h3>
+        <p>Add questions using AI generation, CSV upload, or manually create them one by one.</p>
+    </div>
+    {% endif %}
+</div>
+
+{# AI Generation Modal #}
+<div id="ai-modal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2>Generate Questions with AI</h2>
+            <button class="modal-close" onclick="closeModal('ai-modal')">&times;</button>
+        </div>
+        <form method="post" action="{% url 'custom_assessments:generate-ai' assessment.uuid %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Role/Position <span class="required">*</span></label>
+                    {{ ai_form.role_description }}
+                </div>
+                <div class="form-group">
+                    <label>Skills to Test <span class="required">*</span></label>
+                    {{ ai_form.skills_to_test }}
+                    <span class="form-help">List the skills, knowledge areas, or competencies to assess</span>
+                </div>
+                <div class="form-group">
+                    <label>Difficulty Level</label>
+                    <div class="level-options">
+                        {% for value, label in ai_form.difficulty_level.field.choices %}
+                        <label class="level-option">
+                            <input type="radio" name="difficulty_level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
+                            <span class="level-card">
+                                <span class="level-name">{{ label }}</span>
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Number of Questions</label>
+                    {{ ai_form.num_questions }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('ai-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Generate Questions</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# CSV Upload Modal #}
+<div id="csv-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Upload CSV</h2>
+            <button class="modal-close" onclick="closeModal('csv-modal')">&times;</button>
+        </div>
+        <form method="post" action="{% url 'custom_assessments:upload-csv' assessment.uuid %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-body">
+                <p class="modal-description">
+                    Upload a CSV file with your questions. Each row should contain a question with options and the correct answer.
+                </p>
+                <a href="{% url 'custom_assessments:csv-template' %}" class="btn btn-outline btn-small" style="margin-bottom: 16px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Template
+                </a>
+                <div class="form-group">
+                    <label>CSV File <span class="required">*</span></label>
+                    {{ csv_form.csv_file }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('csv-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Upload & Import</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Manual Question Modal #}
+<div id="manual-modal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2>Add Question</h2>
+            <button class="modal-close" onclick="closeModal('manual-modal')">&times;</button>
+        </div>
+        <form method="post" action="{% url 'custom_assessments:question-add' assessment.uuid %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Question Text <span class="required">*</span></label>
+                    {{ question_form.question_text }}
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Option A <span class="required">*</span></label>
+                        {{ question_form.option_a }}
+                    </div>
+                    <div class="form-group">
+                        <label>Option B <span class="required">*</span></label>
+                        {{ question_form.option_b }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Option C</label>
+                        {{ question_form.option_c }}
+                    </div>
+                    <div class="form-group">
+                        <label>Option D</label>
+                        {{ question_form.option_d }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Correct Answer <span class="required">*</span></label>
+                        {{ question_form.correct_answer }}
+                    </div>
+                    <div class="form-group">
+                        <label>Difficulty</label>
+                        {{ question_form.difficulty_level }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    {{ question_form.category }}
+                </div>
+                <div class="form-group">
+                    <label>Explanation</label>
+                    {{ question_form.explanation }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('manual-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Question</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+.back-link:hover {
+    color: var(--navy);
+}
+
+.import-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+.import-card {
+    background: #fff;
+    border: 2px dashed var(--portal-border-color);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.import-card:hover {
+    border-color: var(--orange);
+    border-style: solid;
+}
+.import-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.import-icon.ai-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+.import-icon.csv-icon {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+.import-icon.manual-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+.import-content h3 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    color: var(--navy);
+}
+.import-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.question-card {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 12px;
+    padding: 20px;
+}
+.question-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.question-number {
+    background: var(--navy);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+.ai-tag {
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+.category-tag {
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+.difficulty-tag {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+.difficulty-1, .difficulty-2 { background: #d1fae5; color: #059669; }
+.difficulty-3 { background: #fef3c7; color: #d97706; }
+.difficulty-4, .difficulty-5 { background: #fee2e2; color: #dc2626; }
+
+.question-text {
+    font-size: 1rem;
+    color: var(--navy);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.options-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.option.correct {
+    background: #d1fae5;
+    border: 1px solid #10b981;
+}
+.option-letter {
+    width: 24px;
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+.option.correct .option-letter {
+    background: #10b981;
+    color: white;
+}
+
+.explanation {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.question-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid var(--portal-border-color);
+}
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+.btn-icon:hover {
+    background: #f3f4f6;
+    color: var(--navy);
+}
+.btn-icon.delete:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal.active {
+    display: flex;
+}
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow: auto;
+}
+.modal-content.modal-lg {
+    max-width: 640px;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+.modal-close:hover {
+    background: #f3f4f6;
+}
+.modal-body {
+    padding: 24px;
+}
+.modal-description {
+    color: var(--text-muted);
+    margin: 0 0 16px 0;
+}
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--portal-border-color);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--navy);
+}
+.required { color: #dc2626; }
+.form-help {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.level-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+.level-option {
+    cursor: pointer;
+}
+.level-option input {
+    position: absolute;
+    opacity: 0;
+}
+.level-card {
+    display: block;
+    padding: 12px;
+    border: 2px solid var(--portal-border-color);
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.level-option input:checked + .level-card {
+    border-color: var(--orange);
+    background: rgba(255, 138, 0, 0.05);
+}
+.level-name {
+    font-size: 0.85rem;
+    color: var(--navy);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 12px;
+}
+.empty-icon {
+    margin-bottom: 20px;
+    color: var(--text-muted);
+}
+.empty-state h3 {
+    margin: 0 0 8px 0;
+    color: var(--navy);
+}
+.empty-state p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .import-options {
+        grid-template-columns: 1fr;
+    }
+    .options-list {
+        grid-template-columns: 1fr;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .level-options {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal.active').forEach(modal => {
+            modal.classList.remove('active');
+        });
+        document.body.style.overflow = '';
+    }
+});
+</script>
+{% endblock %}

@@ -78,6 +78,18 @@
                 {% endif %}
             </a>
 
+            {% if has_custom_assessments %}
+            <a href="{% url 'custom_assessments:list' %}" class="nav-item {% if 'custom_assessments' in request.resolver_match.app_name %}active{% endif %}">
+                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                <span class="nav-label">Custom Assessments</span>
+                <span class="nav-badge premium">AI</span>
+            </a>
+            {% endif %}
+
             <a href="{% url 'clients:analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="20" x2="12" y2="10"></line>

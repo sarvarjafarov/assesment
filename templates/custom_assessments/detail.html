@@ -1,0 +1,528 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}{{ assessment.name }} · Evalon{% endblock %}
+{% block meta_description %}View results and manage your custom assessment{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <header class="dashboard-page-header">
+        <div>
+            <a href="{% url 'custom_assessments:list' %}" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Assessments
+            </a>
+            <h1>{{ assessment.name }}</h1>
+            <p class="muted">
+                <span class="status-badge status-{{ assessment.status }}">{{ assessment.get_status_display }}</span>
+                · {{ assessment.question_count }} questions · {{ assessment.time_limit_minutes }} min
+            </p>
+        </div>
+        <div class="header-actions">
+            {% if assessment.status == 'published' %}
+            <button class="btn btn-primary" onclick="openModal('invite-modal')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+                Invite Candidate
+            </button>
+            {% elif assessment.status == 'draft' %}
+            <a href="{% url 'custom_assessments:questions' assessment.uuid %}" class="btn btn-primary">
+                Edit Questions
+            </a>
+            {% endif %}
+        </div>
+    </header>
+
+    {# Assessment Stats #}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ sessions|length }}</div>
+                <div class="stat-label">Total Candidates</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon completed">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{% with completed=sessions|dictsort:"completed_at"|last %}{% if completed.completed_at %}{{ completed.completed_at|date:"M j" }}{% else %}—{% endif %}{% endwith %}</div>
+                <div class="stat-label">Last Completed</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon score">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20V10"></path>
+                    <path d="M18 20V4"></path>
+                    <path d="M6 20v-4"></path>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ assessment.passing_score }}%</div>
+                <div class="stat-label">Passing Score</div>
+            </div>
+        </div>
+    </div>
+
+    {# Candidates Table #}
+    <div class="section-header">
+        <h2>Candidates</h2>
+    </div>
+
+    {% if sessions %}
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Level</th>
+                    <th>Status</th>
+                    <th>Score</th>
+                    <th>Started</th>
+                    <th>Completed</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td>
+                        <div class="candidate-cell">
+                            <strong>{{ session.candidate_id }}</strong>
+                            {% if session.candidate_email %}
+                            <span class="email">{{ session.candidate_email }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="level-badge level-{{ session.level }}">
+                            {{ session.get_level_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-pill status-{{ session.status }}">
+                            {{ session.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if session.score is not None %}
+                        <span class="score {% if session.passed %}passed{% else %}failed{% endif %}">
+                            {{ session.score|floatformat:0 }}%
+                        </span>
+                        {% else %}
+                        <span class="muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if session.started_at %}
+                        {{ session.started_at|date:"M j, g:i A" }}
+                        {% else %}
+                        <span class="muted">Not started</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if session.completed_at %}
+                        {{ session.completed_at|date:"M j, g:i A" }}
+                        {% else %}
+                        <span class="muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if session.status == 'submitted' %}
+                        <a href="{% url 'custom_assessments:session-result' session.uuid %}" class="btn btn-outline btn-small">
+                            View Results
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <line x1="17" y1="11" x2="23" y2="11"></line>
+            </svg>
+        </div>
+        <h3>No Candidates Yet</h3>
+        <p>Invite candidates to take this assessment</p>
+        {% if assessment.status == 'published' %}
+        <button class="btn btn-primary" onclick="openModal('invite-modal')">
+            Invite Candidate
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# Assessment Actions #}
+    <div class="assessment-actions">
+        <h3>Assessment Actions</h3>
+        <div class="action-buttons">
+            {% if assessment.status == 'draft' %}
+            <a href="{% url 'custom_assessments:edit' assessment.uuid %}" class="btn btn-outline">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Edit Settings
+            </a>
+            {% endif %}
+
+            <form method="post" action="{% url 'custom_assessments:duplicate' assessment.uuid %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Duplicate
+                </button>
+            </form>
+
+            {% if assessment.status != 'archived' %}
+            <form method="post" action="{% url 'custom_assessments:archive' assessment.uuid %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline btn-danger" onclick="return confirm('Archive this assessment? It will no longer be available for new candidates.')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                        <rect x="1" y="3" width="22" height="5"></rect>
+                        <line x1="10" y1="12" x2="14" y2="12"></line>
+                    </svg>
+                    Archive
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# Invite Modal #}
+<div id="invite-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Invite Candidate</h2>
+            <button class="modal-close" onclick="closeModal('invite-modal')">&times;</button>
+        </div>
+        <form method="post" action="{% url 'custom_assessments:invite' assessment.uuid %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Candidate Name/ID <span class="required">*</span></label>
+                    {{ invite_form.candidate_id }}
+                </div>
+                <div class="form-group">
+                    <label>Email <span class="required">*</span></label>
+                    {{ invite_form.candidate_email }}
+                </div>
+                <div class="form-group">
+                    <label>Assessment Level</label>
+                    <div class="level-options">
+                        {% for value, label in invite_form.level.field.choices %}
+                        <label class="level-option">
+                            <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
+                            <span class="level-card">
+                                <span class="level-name">{{ label }}</span>
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('invite-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Send Invitation</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+.back-link:hover {
+    color: var(--navy);
+}
+
+.status-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+.status-draft { background: #f3f4f6; color: #6b7280; }
+.status-published { background: #d1fae5; color: #059669; }
+.status-archived { background: #fee2e2; color: #dc2626; }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+.stat-card {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+}
+.stat-icon.completed { background: #d1fae5; color: #059669; }
+.stat-icon.score { background: #dbeafe; color: #1d4ed8; }
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.section-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.table-container {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th, .data-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+.data-table th {
+    background: #f9fafb;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.candidate-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.candidate-cell .email {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.level-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.level-junior { background: #d1fae5; color: #059669; }
+.level-mid { background: #fef3c7; color: #d97706; }
+.level-senior { background: #fee2e2; color: #dc2626; }
+
+.status-pill {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+.status-draft { background: #f3f4f6; color: #6b7280; }
+.status-in_progress { background: #dbeafe; color: #1d4ed8; }
+.status-submitted { background: #d1fae5; color: #059669; }
+
+.score {
+    font-weight: 600;
+}
+.score.passed { color: #059669; }
+.score.failed { color: #dc2626; }
+
+.assessment-actions {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 12px;
+    padding: 20px;
+}
+.assessment-actions h3 {
+    margin: 0 0 16px 0;
+    font-size: 1rem;
+}
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.btn-danger {
+    color: #dc2626;
+    border-color: #dc2626;
+}
+.btn-danger:hover {
+    background: #fee2e2;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 12px;
+    margin-bottom: 32px;
+}
+.empty-icon {
+    margin-bottom: 16px;
+    color: var(--text-muted);
+}
+.empty-state h3 {
+    margin: 0 0 8px 0;
+    color: var(--navy);
+}
+.empty-state p {
+    color: var(--text-muted);
+    margin: 0 0 16px 0;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal.active { display: flex; }
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+.modal-header h2 { margin: 0; font-size: 1.25rem; }
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+.modal-body { padding: 24px; }
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--portal-border-color);
+}
+.form-group { margin-bottom: 16px; }
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+.required { color: #dc2626; }
+.level-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+.level-option { cursor: pointer; }
+.level-option input { position: absolute; opacity: 0; }
+.level-card {
+    display: block;
+    padding: 12px;
+    border: 2px solid var(--portal-border-color);
+    border-radius: 8px;
+    text-align: center;
+}
+.level-option input:checked + .level-card {
+    border-color: var(--orange);
+    background: rgba(255, 138, 0, 0.05);
+}
+.level-name { font-size: 0.85rem; }
+
+@media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .level-options { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+});
+</script>
+{% endblock %}
