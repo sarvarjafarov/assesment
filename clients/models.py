@@ -405,3 +405,87 @@ class ClientProject(TimeStampedModel):
         pm_qs = getattr(self, "pm_sessions", None)
         pm_count = pm_qs.count() if pm_qs is not None else 0
         return self.marketing_sessions.count() + pm_count + self.behavioral_sessions.count()
+
+
+class SupportRequest(TimeStampedModel):
+    """Track support requests from clients for admin management."""
+
+    TYPE_BILLING = "billing"
+    TYPE_TECHNICAL = "technical"
+    TYPE_FEATURE = "feature"
+    TYPE_OTHER = "other"
+    TYPE_CHOICES = [
+        (TYPE_BILLING, "Billing & Plans"),
+        (TYPE_TECHNICAL, "Technical Issue"),
+        (TYPE_FEATURE, "Feature Request"),
+        (TYPE_OTHER, "Other"),
+    ]
+
+    STATUS_PENDING = "pending"
+    STATUS_IN_PROGRESS = "in_progress"
+    STATUS_RESOLVED = "resolved"
+    STATUS_CLOSED = "closed"
+    STATUS_CHOICES = [
+        (STATUS_PENDING, "Pending"),
+        (STATUS_IN_PROGRESS, "In Progress"),
+        (STATUS_RESOLVED, "Resolved"),
+        (STATUS_CLOSED, "Closed"),
+    ]
+
+    PRIORITY_LOW = "low"
+    PRIORITY_NORMAL = "normal"
+    PRIORITY_HIGH = "high"
+    PRIORITY_URGENT = "urgent"
+    PRIORITY_CHOICES = [
+        (PRIORITY_LOW, "Low"),
+        (PRIORITY_NORMAL, "Normal"),
+        (PRIORITY_HIGH, "High"),
+        (PRIORITY_URGENT, "Urgent"),
+    ]
+
+    client = models.ForeignKey(
+        ClientAccount,
+        related_name="support_requests",
+        on_delete=models.CASCADE,
+    )
+    request_type = models.CharField(
+        max_length=20,
+        choices=TYPE_CHOICES,
+        default=TYPE_BILLING,
+    )
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+    )
+    priority = models.CharField(
+        max_length=20,
+        choices=PRIORITY_CHOICES,
+        default=PRIORITY_NORMAL,
+    )
+    admin_notes = models.TextField(blank=True, help_text="Internal notes for support team")
+    resolved_at = models.DateTimeField(blank=True, null=True)
+    resolved_by = models.ForeignKey(
+        User,
+        related_name="resolved_support_requests",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = "Support Request"
+        verbose_name_plural = "Support Requests"
+
+    def __str__(self):
+        return f"#{self.pk} - {self.subject} ({self.client.company_name})"
+
+    def mark_resolved(self, user=None):
+        """Mark the request as resolved."""
+        self.status = self.STATUS_RESOLVED
+        self.resolved_at = timezone.now()
+        self.resolved_by = user
+        self.save(update_fields=["status", "resolved_at", "resolved_by", "updated_at"])

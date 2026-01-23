@@ -194,10 +194,68 @@
                 <p class="muted">Contact our support team for plan changes, billing questions, or invoice requests.</p>
             </div>
         </div>
-        <a href="mailto:{{ contact_email }}?subject=Billing Support Request" class="btn btn-outline">
+        <button type="button" class="btn btn-outline" id="openSupportModal">
             Contact Support
-        </a>
+        </button>
     </section>
+</div>
+
+{# Support Request Modal #}
+<div class="modal-overlay" id="supportModal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Contact Support</h2>
+            <button type="button" class="modal-close" id="closeSupportModal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form id="supportRequestForm" class="support-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="request_type">Request Type</label>
+                <select name="request_type" id="request_type" required>
+                    <option value="billing">Billing & Plans</option>
+                    <option value="technical">Technical Issue</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" name="subject" id="subject" placeholder="Brief description of your request" required maxlength="200">
+            </div>
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea name="message" id="message" rows="5" placeholder="Please provide details about your request..." required></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-ghost" id="cancelSupportModal">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submitSupportRequest">
+                    <span class="btn-text">Submit Request</span>
+                    <span class="btn-loading" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32">
+                                <animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/>
+                            </circle>
+                        </svg>
+                        Submitting...
+                    </span>
+                </button>
+            </div>
+        </form>
+        <div class="support-success" id="supportSuccess" style="display: none;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <h3>Request Submitted</h3>
+            <p>Your support request has been submitted successfully. We'll get back to you soon.</p>
+            <button type="button" class="btn btn-primary" id="closeSupportSuccess">Done</button>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -519,6 +577,135 @@
     margin: 0;
 }
 
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(14, 20, 40, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(14, 20, 40, 0.25);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--portal-border-color);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+    color: var(--navy);
+}
+
+.support-form {
+    padding: 1.5rem;
+}
+
+.support-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.support-form label {
+    display: block;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.support-form input,
+.support-form select,
+.support-form textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.support-form input:focus,
+.support-form select:focus,
+.support-form textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.support-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+}
+
+.btn-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.support-success {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.support-success svg {
+    margin-bottom: 1.5rem;
+}
+
+.support-success h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 0.75rem;
+}
+
+.support-success p {
+    color: var(--text-muted);
+    margin: 0 0 1.5rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .plan-header {
@@ -542,7 +729,112 @@
     .billing-support-card .btn {
         width: 100%;
     }
+
+    .modal-content {
+        margin: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('supportModal');
+    const form = document.getElementById('supportRequestForm');
+    const successView = document.getElementById('supportSuccess');
+    const openBtn = document.getElementById('openSupportModal');
+    const closeBtn = document.getElementById('closeSupportModal');
+    const cancelBtn = document.getElementById('cancelSupportModal');
+    const closeSuccessBtn = document.getElementById('closeSupportSuccess');
+    const submitBtn = document.getElementById('submitSupportRequest');
+
+    function openModal() {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        form.style.display = 'block';
+        successView.style.display = 'none';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        form.reset();
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    closeSuccessBtn.addEventListener('click', closeModal);
+
+    // Close on overlay click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            closeModal();
+        }
+    });
+
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+
+        // Show loading state
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline-flex';
+        submitBtn.disabled = true;
+
+        const formData = {
+            request_type: form.request_type.value,
+            subject: form.subject.value,
+            message: form.message.value
+        };
+
+        try {
+            const response = await fetch('{% url "clients:support-request" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Show success view
+                form.style.display = 'none';
+                successView.style.display = 'block';
+            } else {
+                alert(data.error || 'Something went wrong. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to submit request. Please try again.');
+        } finally {
+            // Reset button state
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    });
+});
+</script>
 
 {% endblock %}

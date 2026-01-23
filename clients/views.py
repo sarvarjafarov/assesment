@@ -42,7 +42,7 @@ from .forms import (
     ClientSessionNoteForm,
     SocialProfileCompleteForm,
 )
-from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote
+from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote, SupportRequest
 from .services import send_verification_email, send_approval_notification, send_welcome_email
 
 logger = logging.getLogger(__name__)
@@ -2435,3 +2435,50 @@ class PendingApprovalView(LoginRequiredMixin, TemplateView):
         except ClientAccount.DoesNotExist:
             pass
         return context
+
+
+class SupportRequestCreateView(LoginRequiredMixin, View):
+    """Handle support request submissions via AJAX."""
+    login_url = reverse_lazy("clients:login")
+
+    def post(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return JsonResponse({"success": False, "error": "Not authenticated"}, status=401)
+
+        client = request.user.client_account
+
+        # Parse JSON body or form data
+        if request.content_type == "application/json":
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"success": False, "error": "Invalid JSON"}, status=400)
+        else:
+            data = request.POST
+
+        # Validate required fields
+        request_type = data.get("request_type", "billing")
+        subject = data.get("subject", "").strip()
+        message = data.get("message", "").strip()
+
+        if not subject:
+            return JsonResponse({"success": False, "error": "Subject is required"}, status=400)
+        if not message:
+            return JsonResponse({"success": False, "error": "Message is required"}, status=400)
+
+        # Create support request
+        support_request = SupportRequest.objects.create(
+            client=client,
+            request_type=request_type,
+            subject=subject,
+            message=message,
+        )
+
+        # Log the request
+        logger.info(f"Support request #{support_request.pk} created by {client.company_name}")
+
+        return JsonResponse({
+            "success": True,
+            "message": "Your support request has been submitted. We'll get back to you soon.",
+            "request_id": support_request.pk,
+        })

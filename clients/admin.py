@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib import messages
+from django.utils import timezone
 
-from .models import ClientAccount
+from .models import ClientAccount, SupportRequest
 from .services import send_welcome_email
 
 
@@ -91,3 +92,72 @@ class ClientAccountAdmin(admin.ModelAdmin):
                 return
 
         super().save_model(request, obj, form, change)
+
+
+@admin.register(SupportRequest)
+class SupportRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "subject",
+        "client_company",
+        "request_type",
+        "status",
+        "priority",
+        "created_at",
+    )
+    list_filter = ("status", "request_type", "priority", "created_at")
+    search_fields = ("subject", "message", "client__company_name", "client__email")
+    readonly_fields = ("created_at", "updated_at", "resolved_at", "resolved_by")
+    list_editable = ("status", "priority")
+    date_hierarchy = "created_at"
+    ordering = ("-created_at",)
+
+    fieldsets = (
+        ("Request Details", {
+            "fields": ("client", "request_type", "subject", "message")
+        }),
+        ("Status", {
+            "fields": ("status", "priority")
+        }),
+        ("Admin Response", {
+            "fields": ("admin_notes",),
+            "classes": ("wide",)
+        }),
+        ("Resolution", {
+            "fields": ("resolved_at", "resolved_by"),
+            "classes": ("collapse",)
+        }),
+        ("Timestamps", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",)
+        }),
+    )
+
+    actions = ["mark_resolved", "mark_in_progress", "mark_closed"]
+
+    def client_company(self, obj):
+        return obj.client.company_name
+    client_company.short_description = "Company"
+    client_company.admin_order_field = "client__company_name"
+
+    def mark_resolved(self, request, queryset):
+        count = 0
+        for obj in queryset:
+            if obj.status != SupportRequest.STATUS_RESOLVED:
+                obj.status = SupportRequest.STATUS_RESOLVED
+                obj.resolved_at = timezone.now()
+                obj.resolved_by = request.user
+                obj.save(update_fields=["status", "resolved_at", "resolved_by", "updated_at"])
+                count += 1
+        self.message_user(request, f"{count} request(s) marked as resolved.")
+    mark_resolved.short_description = "Mark selected as resolved"
+
+    def mark_in_progress(self, request, queryset):
+        count = queryset.update(status=SupportRequest.STATUS_IN_PROGRESS)
+        self.message_user(request, f"{count} request(s) marked as in progress.")
+    mark_in_progress.short_description = "Mark selected as in progress"
+
+    def mark_closed(self, request, queryset):
+        count = queryset.update(status=SupportRequest.STATUS_CLOSED)
+        self.message_user(request, f"{count} request(s) marked as closed.")
+    mark_closed.short_description = "Mark selected as closed"
