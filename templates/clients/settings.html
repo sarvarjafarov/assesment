@@ -122,35 +122,99 @@
         </div>
     </section>
 
-    {# Security & Access - Coming Soon #}
+    {# Security & Access - Password Change #}
     <section class="settings-section">
         <div class="settings-section-header">
             <h2>Security & Access</h2>
             <p class="muted">Manage password and login preferences</p>
         </div>
-        <div class="portal-card coming-soon-card">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <h4>Password Management</h4>
-            <p class="muted">Password reset and security settings coming soon.</p>
+        <div class="portal-card">
+            <form method="post" class="settings-form" id="password-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <h4>Change Password</h4>
+                        <p class="muted">Update your account password</p>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id_current_password">Current Password</label>
+                        {{ password_form.current_password }}
+                        {% if password_form.current_password.errors %}
+                        <span class="form-error">{{ password_form.current_password.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_new_password1">New Password</label>
+                        {{ password_form.new_password1 }}
+                        {% if password_form.new_password1.errors %}
+                        <span class="form-error">{{ password_form.new_password1.errors.0 }}</span>
+                        {% endif %}
+                        <span class="form-help">At least 8 characters</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_new_password2">Confirm New Password</label>
+                        {{ password_form.new_password2 }}
+                        {% if password_form.new_password2.errors %}
+                        <span class="form-error">{{ password_form.new_password2.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </div>
+            </form>
         </div>
     </section>
 
-    {# Notifications - Coming Soon #}
+    {# Notifications - Email Preferences #}
     <section class="settings-section">
         <div class="settings-section-header">
             <h2>Notifications</h2>
             <p class="muted">Control how and when you receive updates</p>
         </div>
-        <div class="portal-card coming-soon-card">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            <h4>Email Preferences</h4>
-            <p class="muted">Notification preferences and email settings coming soon.</p>
+        <div class="portal-card">
+            <form method="post" class="settings-form" id="email-preferences-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_email_preferences">
+                <div class="settings-row toggle-row">
+                    <div class="setting-info">
+                        <h4>Weekly Summary Email</h4>
+                        <p class="muted">Receive a weekly digest of your assessment activity and candidate results</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="receive_weekly_summary" {% if account.receive_weekly_summary %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row toggle-row">
+                    <div class="setting-info">
+                        <h4>Assessment Completion Alerts</h4>
+                        <p class="muted">Get notified when a candidate completes an assessment</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" disabled>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="badge badge-muted">Coming Soon</span>
+                </div>
+                <div class="settings-row toggle-row">
+                    <div class="setting-info">
+                        <h4>New Candidate Alerts</h4>
+                        <p class="muted">Get notified when a new candidate starts an assessment</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" disabled>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="badge badge-muted">Coming Soon</span>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                </div>
+            </form>
         </div>
     </section>
 

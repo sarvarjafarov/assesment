@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django import forms
+from django.contrib.auth import password_validation
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
 
@@ -578,3 +579,80 @@ class SocialProfileCompleteForm(forms.ModelForm):
         if commit:
             account.save()
         return account
+
+
+class ClientPasswordChangeForm(forms.Form):
+    """Form for changing client password."""
+
+    current_password = forms.CharField(
+        label="Current Password",
+        widget=forms.PasswordInput(attrs={
+            "placeholder": "Enter current password",
+            "autocomplete": "current-password",
+        }),
+    )
+    new_password1 = forms.CharField(
+        label="New Password",
+        widget=forms.PasswordInput(attrs={
+            "placeholder": "Minimum 8 characters",
+            "autocomplete": "new-password",
+        }),
+        help_text="At least 8 characters with a mix of letters and numbers",
+    )
+    new_password2 = forms.CharField(
+        label="Confirm New Password",
+        widget=forms.PasswordInput(attrs={
+            "placeholder": "Re-enter new password",
+            "autocomplete": "new-password",
+        }),
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_current_password(self):
+        current_password = self.cleaned_data.get("current_password")
+        if not self.user.check_password(current_password):
+            raise forms.ValidationError("Your current password is incorrect.")
+        return current_password
+
+    def clean_new_password1(self):
+        password = self.cleaned_data.get("new_password1")
+        if password and len(password) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters long.")
+        # Run Django's password validators
+        password_validation.validate_password(password, self.user)
+        return password
+
+    def clean(self):
+        cleaned = super().clean()
+        new_password1 = cleaned.get("new_password1")
+        new_password2 = cleaned.get("new_password2")
+        if new_password1 and new_password2 and new_password1 != new_password2:
+            self.add_error("new_password2", "Passwords do not match.")
+        return cleaned
+
+    def save(self):
+        self.user.set_password(self.cleaned_data["new_password1"])
+        self.user.save(update_fields=["password"])
+        return self.user
+
+
+class EmailPreferencesForm(forms.ModelForm):
+    """Form for managing email notification preferences."""
+
+    class Meta:
+        model = ClientAccount
+        fields = ["receive_weekly_summary"]
+        widgets = {
+            "receive_weekly_summary": forms.CheckboxInput(attrs={
+                "class": "toggle-checkbox",
+            }),
+        }
+        labels = {
+            "receive_weekly_summary": "Weekly Summary Email",
+        }
+        help_texts = {
+            "receive_weekly_summary": "Receive a weekly digest of your assessment activity and candidate results.",
+        }

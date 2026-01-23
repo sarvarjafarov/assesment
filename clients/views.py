@@ -32,6 +32,7 @@ from pm_assessments.models import ProductAssessmentSession
 
 from .forms import (
     ClientLogoForm,
+    ClientPasswordChangeForm,
     ClientProjectForm,
     ClientBehavioralInviteForm,
     ClientBulkInviteForm,
@@ -40,6 +41,7 @@ from .forms import (
     ClientProductInviteForm,
     ClientSignupForm,
     ClientSessionNoteForm,
+    EmailPreferencesForm,
     SocialProfileCompleteForm,
 )
 from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote, SupportRequest
@@ -1093,7 +1095,7 @@ class ClientAnalyticsView(LoginRequiredMixin, TemplateView):
         return distribution
 
 
-class ClientSettingsView(LoginRequiredMixin, TemplateView):
+class ClientSettingsView(LoginRequiredMixin, View):
     """Account settings and preferences page."""
     template_name = "clients/settings.html"
     login_url = reverse_lazy("clients:login")
@@ -1109,16 +1111,52 @@ class ClientSettingsView(LoginRequiredMixin, TemplateView):
             return redirect("clients:pending_approval")
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self):
         account = self.request.user.client_account
-        context.update({
+        return {
             'account': account,
             'is_manager': account.role == 'manager',
             'can_manage_branding': account.role in ROLE_BRANDING_ACCESS,
             'role_label': dict(ClientAccount.ROLE_CHOICES).get(account.role, account.role.title()),
-        })
-        return context
+            'password_form': ClientPasswordChangeForm(user=self.request.user),
+            'email_form': EmailPreferencesForm(instance=account),
+        }
+
+    def get(self, request, *args, **kwargs):
+        from django.shortcuts import render
+        return render(request, self.template_name, self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        from django.shortcuts import render
+        from django.contrib.auth import update_session_auth_hash
+
+        account = request.user.client_account
+        action = request.POST.get("action", "")
+        context = self.get_context_data()
+
+        if action == "change_password":
+            password_form = ClientPasswordChangeForm(user=request.user, data=request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                # Keep user logged in after password change
+                update_session_auth_hash(request, request.user)
+                messages.success(request, "Your password has been changed successfully.")
+                return redirect("clients:settings")
+            else:
+                context['password_form'] = password_form
+                messages.error(request, "Please correct the errors below.")
+
+        elif action == "update_email_preferences":
+            email_form = EmailPreferencesForm(data=request.POST, instance=account)
+            if email_form.is_valid():
+                email_form.save()
+                messages.success(request, "Your email preferences have been updated.")
+                return redirect("clients:settings")
+            else:
+                context['email_form'] = email_form
+                messages.error(request, "Please correct the errors below.")
+
+        return render(request, self.template_name, context)
 
 
 class ClientActivityExportView(LoginRequiredMixin, View):

@@ -10115,6 +10115,130 @@ main {
     margin: 0;
 }
 
+/* Settings Form Styles */
+.settings-form {
+    padding: 0.5rem 0;
+}
+
+.settings-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.settings-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settings-form .form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--navy);
+}
+
+.settings-form .form-group input {
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(14, 20, 40, 0.15);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.settings-form .form-group input:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.settings-form .form-help {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.settings-form .form-error {
+    font-size: 0.8125rem;
+    color: var(--red, #dc3545);
+}
+
+.settings-form .form-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(14, 20, 40, 0.08);
+}
+
+/* Toggle Switch Styles */
+.toggle-row {
+    gap: 1rem;
+}
+
+.toggle-row .setting-info {
+    flex: 1;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(14, 20, 40, 0.15);
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--orange);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.badge-muted {
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(14, 20, 40, 0.08);
+    color: var(--text-muted);
+    border-radius: 4px;
+    margin-left: 0.5rem;
+}
+
 /* Branding Section */
 .branding-preview {
     display: flex;
