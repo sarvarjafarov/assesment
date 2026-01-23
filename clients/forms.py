@@ -644,15 +644,29 @@ class EmailPreferencesForm(forms.ModelForm):
 
     class Meta:
         model = ClientAccount
-        fields = ["receive_weekly_summary"]
+        fields = [
+            "receive_weekly_summary",
+            "receive_completion_alerts",
+            "receive_new_candidate_alerts",
+        ]
         widgets = {
             "receive_weekly_summary": forms.CheckboxInput(attrs={
+                "class": "toggle-checkbox",
+            }),
+            "receive_completion_alerts": forms.CheckboxInput(attrs={
+                "class": "toggle-checkbox",
+            }),
+            "receive_new_candidate_alerts": forms.CheckboxInput(attrs={
                 "class": "toggle-checkbox",
             }),
         }
         labels = {
             "receive_weekly_summary": "Weekly Summary Email",
+            "receive_completion_alerts": "Assessment Completion Alerts",
+            "receive_new_candidate_alerts": "New Candidate Alerts",
         }
         help_texts = {
             "receive_weekly_summary": "Receive a weekly digest of your assessment activity and candidate results.",
+            "receive_completion_alerts": "Get notified when a candidate completes an assessment.",
+            "receive_new_candidate_alerts": "Get notified when a new candidate starts an assessment.",
         }

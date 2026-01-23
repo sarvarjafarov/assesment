@@ -118,6 +118,14 @@ class ClientAccount(TimeStampedModel):
     )
     notes = models.TextField(blank=True)
     receive_weekly_summary = models.BooleanField(default=False)
+    receive_completion_alerts = models.BooleanField(
+        default=True,
+        help_text="Get notified when a candidate completes an assessment"
+    )
+    receive_new_candidate_alerts = models.BooleanField(
+        default=False,
+        help_text="Get notified when a new candidate starts an assessment"
+    )
     logo = models.FileField(upload_to="client_logos/", null=True, blank=True)
     logo_data = models.BinaryField(blank=True, null=True, editable=False)
     logo_mime = models.CharField(max_length=100, blank=True, editable=False)

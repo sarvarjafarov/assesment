@@ -195,10 +195,9 @@
                         <p class="muted">Get notified when a candidate completes an assessment</p>
                     </div>
                     <label class="toggle-switch">
-                        <input type="checkbox" disabled>
+                        <input type="checkbox" name="receive_completion_alerts" {% if account.receive_completion_alerts %}checked{% endif %}>
                         <span class="toggle-slider"></span>
                     </label>
-                    <span class="badge badge-muted">Coming Soon</span>
                 </div>
                 <div class="settings-row toggle-row">
                     <div class="setting-info">
@@ -206,10 +205,9 @@
                         <p class="muted">Get notified when a new candidate starts an assessment</p>
                     </div>
                     <label class="toggle-switch">
-                        <input type="checkbox" disabled>
+                        <input type="checkbox" name="receive_new_candidate_alerts" {% if account.receive_new_candidate_alerts %}checked{% endif %}>
                         <span class="toggle-slider"></span>
                     </label>
-                    <span class="badge badge-muted">Coming Soon</span>
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Save Preferences</button>

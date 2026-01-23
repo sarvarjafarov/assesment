@@ -160,3 +160,121 @@ def send_welcome_email(client_account):
     except Exception as e:
         print(f"Failed to send welcome email: {e}")
         return False
+
+
+def send_completion_alert(client_account, session, assessment_type):
+    """
+    Send email notification when a candidate completes an assessment.
+
+    Args:
+        client_account: ClientAccount instance
+        session: Assessment session instance (Marketing, PM, or Behavioral)
+        assessment_type: String identifying the assessment type
+
+    Returns:
+        bool: True if email was sent successfully
+    """
+    if not client_account.receive_completion_alerts:
+        return False
+
+    # Get assessment type label
+    catalog = client_account.ASSESSMENT_DETAILS
+    assessment_label = catalog.get(assessment_type, {}).get('label', assessment_type.title())
+
+    # Build results URL
+    results_url = settings.SITE_URL.rstrip('/') + reverse(
+        'clients:assessment-detail',
+        kwargs={'assessment_type': assessment_type, 'session_uuid': session.uuid}
+    )
+
+    # Get score if available
+    score = None
+    if hasattr(session, 'overall_score') and session.overall_score is not None:
+        score = session.overall_score
+    elif hasattr(session, 'eligibility_score') and session.eligibility_score is not None:
+        score = session.eligibility_score
+
+    context = {
+        'client': client_account,
+        'full_name': client_account.full_name,
+        'company_name': client_account.company_name,
+        'candidate_id': session.candidate_id,
+        'assessment_type': assessment_label,
+        'score': score,
+        'results_url': results_url,
+        'site_url': settings.SITE_URL,
+    }
+
+    subject = f'Assessment Completed: {session.candidate_id} finished {assessment_label}'
+    html_body = render_to_string('emails/completion_alert.html', context)
+    text_body = strip_tags(html_body)
+
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[client_account.email],
+    )
+    email.attach_alternative(html_body, "text/html")
+
+    try:
+        email.send()
+        return True
+    except Exception as e:
+        print(f"Failed to send completion alert: {e}")
+        return False
+
+
+def send_new_candidate_alert(client_account, session, assessment_type):
+    """
+    Send email notification when a new candidate starts an assessment.
+
+    Args:
+        client_account: ClientAccount instance
+        session: Assessment session instance (Marketing, PM, or Behavioral)
+        assessment_type: String identifying the assessment type
+
+    Returns:
+        bool: True if email was sent successfully
+    """
+    if not client_account.receive_new_candidate_alerts:
+        return False
+
+    # Get assessment type label
+    catalog = client_account.ASSESSMENT_DETAILS
+    assessment_label = catalog.get(assessment_type, {}).get('label', assessment_type.title())
+
+    # Build manage URL
+    manage_url = settings.SITE_URL.rstrip('/') + reverse(
+        'clients:assessment-manage',
+        kwargs={'assessment_type': assessment_type}
+    )
+
+    context = {
+        'client': client_account,
+        'full_name': client_account.full_name,
+        'company_name': client_account.company_name,
+        'candidate_id': session.candidate_id,
+        'assessment_type': assessment_label,
+        'manage_url': manage_url,
+        'site_url': settings.SITE_URL,
+    }
+
+    subject = f'New Candidate: {session.candidate_id} started {assessment_label}'
+    html_body = render_to_string('emails/new_candidate_alert.html', context)
+    text_body = strip_tags(html_body)
+
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[client_account.email],
+    )
+    email.attach_alternative(html_body, "text/html")
+
+    try:
+        email.send()
+        return True
+    except Exception as e:
+        print(f"Failed to send new candidate alert: {e}")
+        return False

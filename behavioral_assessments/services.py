@@ -116,4 +116,10 @@ def evaluate_session(session: BehavioralAssessmentSession):
             "updated_at",
         ]
     )
+
+    # Send completion notification to client
+    if session.client:
+        from clients.services import send_completion_alert
+        send_completion_alert(session.client, session, "behavioral")
+
     return session

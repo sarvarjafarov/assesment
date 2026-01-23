@@ -73,6 +73,7 @@ class MarketingAssessmentView(FormView):
             )
         updates: list[str] = []
         now = timezone.now()
+        is_first_start = not self.session.started_at
         if not self.session.started_at:
             self.session.started_at = now
             updates.append("started_at")
@@ -84,6 +85,10 @@ class MarketingAssessmentView(FormView):
             updates.append("last_activity_at")
         if updates:
             self.session.save(update_fields=updates + ["updated_at"])
+            # Send new candidate notification on first start
+            if is_first_start and self.session.client:
+                from clients.services import send_new_candidate_alert
+                send_new_candidate_alert(self.session.client, self.session, "marketing")
         update_session_telemetry(self.session, request=request)
         duration_minutes = self.session.duration_minutes or 0
         if duration_minutes:

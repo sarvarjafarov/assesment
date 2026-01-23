@@ -215,4 +215,10 @@ def evaluate_session(session: ProductAssessmentSession):
             "submitted_at",
         ]
     )
+
+    # Send completion notification to client
+    if session.client:
+        from clients.services import send_completion_alert
+        send_completion_alert(session.client, session, "product")
+
     return session
