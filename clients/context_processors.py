@@ -31,7 +31,7 @@ def portal_navigation(request):
         return context
 
     # Check if user has a client account
-    if not hasattr(request.user, 'clientaccount'):
+    if not hasattr(request.user, 'client_account'):
         return context
 
     try:
@@ -40,7 +40,7 @@ def portal_navigation(request):
         from pm_assessments.models import ProductAssessmentSession
         from behavioral_assessments.models import BehavioralAssessmentSession
 
-        account = request.user.clientaccount
+        account = request.user.client_account
 
         # Add account and role to context for sidebar footer
         context['account'] = account
