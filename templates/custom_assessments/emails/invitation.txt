@@ -1,0 +1,32 @@
+Hi {{ candidate_name }},
+
+{{ company_name }} has invited you to complete the "{{ assessment_name }}" assessment.
+
+Assessment Details:
+- Questions: {{ question_count }}
+- Time Limit: {{ time_limit }} minutes
+- Level: {{ level }}
+{% if deadline_at %}
+DEADLINE: Please complete by {{ deadline_at|date:"F d, Y" }} at {{ deadline_at|date:"g:i A" }}
+{% endif %}
+{% if assessment_description %}
+About this assessment:
+{{ assessment_description }}
+{% endif %}
+
+Start your assessment here:
+{{ assessment_url }}
+
+Tips for success:
+- Find a quiet space with stable internet
+- Have {{ time_limit }} minutes of uninterrupted time
+- Read each question carefully before answering
+- Your progress is saved automatically
+
+Questions? Reply to this email and we'll help.
+
+Good luck!
+The {{ company_name }} Team
+
+---
+Powered by Evalon · evalon.tech

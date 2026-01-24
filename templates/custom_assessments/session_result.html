@@ -1,0 +1,468 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Results: {{ session.candidate_id }} - {{ session.assessment.name }} · Evalon{% endblock %}
+{% block meta_description %}View detailed assessment results{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <header class="dashboard-page-header">
+        <div>
+            <a href="{% url 'custom_assessments:detail' session.assessment.uuid %}" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to {{ session.assessment.name }}
+            </a>
+            <h1>{{ session.candidate_id }}</h1>
+            <p class="muted">
+                {{ session.candidate_email }}
+                {% if session.level %}
+                · <span class="level-badge level-{{ session.level }}">{{ session.get_level_display }}</span>
+                {% endif %}
+            </p>
+        </div>
+    </header>
+
+    {# Results Summary #}
+    <div class="results-summary">
+        <div class="score-card {% if session.passed %}passed{% else %}failed{% endif %}">
+            <div class="score-circle">
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                    <circle cx="50" cy="50" r="45" fill="none"
+                            stroke="{% if session.passed %}#10b981{% else %}#ef4444{% endif %}"
+                            stroke-width="8"
+                            stroke-dasharray="{% widthratio session.score 100 283 %} 283"
+                            stroke-linecap="round"
+                            transform="rotate(-90 50 50)"/>
+                </svg>
+                <div class="score-value">{{ session.score|floatformat:0 }}%</div>
+            </div>
+            <div class="score-details">
+                <div class="pass-fail-badge {% if session.passed %}passed{% else %}failed{% endif %}">
+                    {% if session.passed %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Passed
+                    {% else %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    Did Not Pass
+                    {% endif %}
+                </div>
+                <p class="score-context">
+                    {{ correct_count }} of {{ total_count }} questions correct
+                    <br>
+                    <span class="muted">Passing score: {{ session.assessment.passing_score }}%</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <div class="stat-value">
+                        {% if session.started_at and session.completed_at %}
+                            {% widthratio session.completed_at|timeuntil:session.started_at 60 1 as duration %}
+                            {{ session.completed_at|timeuntil:session.started_at }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Time Taken</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <div>
+                    <div class="stat-value">{{ session.completed_at|date:"M j, Y" }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 20h.01"></path>
+                        <path d="M7 20v-4"></path>
+                        <path d="M12 20v-8"></path>
+                        <path d="M17 20V8"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="stat-value">{{ session.get_level_display }}</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Question-by-Question Results #}
+    <div class="section-header">
+        <h2>Question Breakdown</h2>
+    </div>
+
+    <div class="questions-results">
+        {% for result in results %}
+        <div class="result-card {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
+            <div class="result-header">
+                <span class="question-number">Q{{ forloop.counter }}</span>
+                <span class="result-badge {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
+                    {% if result.is_correct %}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Correct
+                    {% else %}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Incorrect
+                    {% endif %}
+                </span>
+                {% if result.question.category %}
+                <span class="category-tag">{{ result.question.category }}</span>
+                {% endif %}
+            </div>
+
+            <p class="question-text">{{ result.question.question_text }}</p>
+
+            <div class="answers-grid">
+                {% for letter, text in result.question.get_options %}
+                <div class="answer-item
+                    {% if letter == result.question.correct_answer %}correct-answer{% endif %}
+                    {% if letter == result.selected and not result.is_correct %}wrong-answer{% endif %}
+                    {% if letter == result.selected %}selected{% endif %}">
+                    <span class="answer-letter">{{ letter }}</span>
+                    <span class="answer-text">{{ text }}</span>
+                    {% if letter == result.question.correct_answer %}
+                    <span class="answer-indicator correct">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    {% elif letter == result.selected and not result.is_correct %}
+                    <span class="answer-indicator wrong">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if result.question.explanation %}
+            <div class="explanation">
+                <strong>Explanation:</strong> {{ result.question.explanation }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+.back-link:hover { color: var(--navy); }
+
+.level-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.level-junior { background: #d1fae5; color: #059669; }
+.level-mid { background: #fef3c7; color: #d97706; }
+.level-senior { background: #fee2e2; color: #dc2626; }
+
+/* Results Summary */
+.results-summary {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+}
+
+.score-card {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--portal-border-color);
+    margin-bottom: 24px;
+}
+
+.score-circle {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
+}
+.score-circle svg {
+    width: 100%;
+    height: 100%;
+}
+.score-value {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.pass-fail-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.pass-fail-badge.passed {
+    background: #d1fae5;
+    color: #059669;
+}
+.pass-fail-badge.failed {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.score-context {
+    margin: 0;
+    color: var(--navy);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+.stat-item .stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+.stat-item .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Section Header */
+.section-header {
+    margin-bottom: 20px;
+}
+.section-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--navy);
+}
+
+/* Question Results */
+.questions-results {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.result-card {
+    background: #fff;
+    border: 2px solid var(--portal-border-color);
+    border-radius: 12px;
+    padding: 24px;
+}
+.result-card.correct {
+    border-left: 4px solid #10b981;
+}
+.result-card.incorrect {
+    border-left: 4px solid #ef4444;
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.question-number {
+    background: var(--navy);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+.result-badge.correct {
+    background: #d1fae5;
+    color: #059669;
+}
+.result-badge.incorrect {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.category-tag {
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.question-text {
+    font-size: 1rem;
+    color: var(--navy);
+    margin: 0 0 20px;
+    line-height: 1.6;
+}
+
+.answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.answer-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #f9fafb;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    position: relative;
+}
+.answer-item.correct-answer {
+    background: #d1fae5;
+    border-color: #10b981;
+}
+.answer-item.wrong-answer {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+.answer-item.selected:not(.correct-answer):not(.wrong-answer) {
+    border-color: var(--navy);
+}
+
+.answer-letter {
+    width: 24px;
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+.answer-item.correct-answer .answer-letter {
+    background: #10b981;
+    color: white;
+}
+.answer-item.wrong-answer .answer-letter {
+    background: #ef4444;
+    color: white;
+}
+
+.answer-text {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.answer-indicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+.answer-indicator.correct { color: #10b981; }
+.answer-indicator.wrong { color: #ef4444; }
+
+.explanation {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    padding: 14px 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .score-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    .stats-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .answers-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

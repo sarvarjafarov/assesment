@@ -107,7 +107,9 @@ class CustomAssessmentDetailView(LoginRequiredMixin, PremiumRequiredMixin, Detai
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["sessions"] = self.object.sessions.select_related("project").order_by("-created_at")
-        context["invite_form"] = InviteCandidateForm()
+        context["invite_form"] = InviteCandidateForm(
+            client_account=self.request.user.client_account
+        )
         return context
 
 
@@ -396,19 +398,34 @@ class InviteCandidateView(LoginRequiredMixin, PremiumRequiredMixin, View):
             status="published",
         )
 
-        form = InviteCandidateForm(request.POST)
+        form = InviteCandidateForm(
+            request.POST,
+            client_account=request.user.client_account
+        )
         if not form.is_valid():
             for error in form.errors.values():
                 messages.error(request, error.as_text())
             return redirect("custom_assessments:detail", uuid=uuid)
 
+        # Get project if selected
+        project = None
+        project_id = form.cleaned_data.get("project")
+        if project_id:
+            from clients.models import ClientProject
+            project = ClientProject.objects.filter(
+                pk=project_id,
+                client_account=request.user.client_account
+            ).first()
+
         # Create session
         session = CustomAssessmentSession.objects.create(
             assessment=assessment,
             client=request.user.client_account,
+            project=project,
             candidate_id=form.cleaned_data["candidate_id"],
             candidate_email=form.cleaned_data["candidate_email"],
             level=form.cleaned_data["level"],
+            deadline_at=form.cleaned_data.get("deadline_at"),
         )
 
         # Initialize question order

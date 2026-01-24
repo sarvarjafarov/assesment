@@ -8,6 +8,8 @@ from django.utils import timezone
 
 from assessments.constants import PIPELINE_STAGE_CHOICES
 
+from .constants import LEVEL_CHOICES, LEVEL_JUNIOR, LEVEL_MID, LEVEL_SENIOR
+
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -166,15 +168,6 @@ class CustomAssessmentSession(TimeStampedModel):
         (STATUS_DRAFT, "Draft"),
         (STATUS_IN_PROGRESS, "In Progress"),
         (STATUS_SUBMITTED, "Submitted"),
-    ]
-
-    LEVEL_JUNIOR = "junior"
-    LEVEL_MID = "mid"
-    LEVEL_SENIOR = "senior"
-    LEVEL_CHOICES = [
-        (LEVEL_JUNIOR, "Junior (0-2 years)"),
-        (LEVEL_MID, "Mid-Level (2-5 years)"),
-        (LEVEL_SENIOR, "Senior (5+ years)"),
     ]
 
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)

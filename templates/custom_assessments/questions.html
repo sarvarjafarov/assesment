@@ -529,6 +529,149 @@
     </div>
 </div>
 
+{# Edit Question Modal #}
+<div id="edit-modal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header manual-header">
+            <div class="modal-title-group">
+                <div class="modal-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2>Edit Question</h2>
+                    <p class="modal-subtitle">Update question details</p>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeModal('edit-modal')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form method="post" id="edit-question-form" action="">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">1</span>
+                        Question
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Question Text <span class="required">*</span></label>
+                        <textarea name="question_text" id="edit-question-text" class="form-textarea" rows="3" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">2</span>
+                        Answer Options
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-input-group">
+                            <span class="option-label required-option">A</span>
+                            <input type="text" name="option_a" id="edit-option-a" class="form-input" required>
+                        </div>
+                        <div class="option-input-group">
+                            <span class="option-label required-option">B</span>
+                            <input type="text" name="option_b" id="edit-option-b" class="form-input" required>
+                        </div>
+                        <div class="option-input-group">
+                            <span class="option-label">C</span>
+                            <input type="text" name="option_c" id="edit-option-c" class="form-input">
+                        </div>
+                        <div class="option-input-group">
+                            <span class="option-label">D</span>
+                            <input type="text" name="option_d" id="edit-option-d" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">3</span>
+                        Correct Answer & Details
+                    </div>
+                    <div class="form-row three-col">
+                        <div class="form-group">
+                            <label class="form-label">Correct Answer <span class="required">*</span></label>
+                            <div class="answer-selector">
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="A" id="edit-correct-a">
+                                    <span>A</span>
+                                </label>
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="B" id="edit-correct-b">
+                                    <span>B</span>
+                                </label>
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="C" id="edit-correct-c">
+                                    <span>C</span>
+                                </label>
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="D" id="edit-correct-d">
+                                    <span>D</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Difficulty</label>
+                            <select name="difficulty_level" id="edit-difficulty" class="form-select">
+                                <option value="1">1 - Very Easy</option>
+                                <option value="2">2 - Easy</option>
+                                <option value="3">3 - Medium</option>
+                                <option value="4">4 - Hard</option>
+                                <option value="5">5 - Very Hard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" name="category" id="edit-category" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Explanation</label>
+                        <textarea name="explanation" id="edit-explanation" class="form-textarea" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('edit-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Question Data for JavaScript #}
+<script type="application/json" id="questions-data">
+[{% for question in questions %}
+    {
+        "id": {{ question.pk }},
+        "question_text": "{{ question.question_text|escapejs }}",
+        "option_a": "{{ question.option_a|escapejs }}",
+        "option_b": "{{ question.option_b|escapejs }}",
+        "option_c": "{{ question.option_c|escapejs }}",
+        "option_d": "{{ question.option_d|escapejs }}",
+        "correct_answer": "{{ question.correct_answer }}",
+        "difficulty_level": {{ question.difficulty_level }},
+        "category": "{{ question.category|escapejs }}",
+        "explanation": "{{ question.explanation|escapejs }}"
+    }{% if not forloop.last %},{% endif %}
+{% endfor %}]
+</script>
+
 <style>
 .back-link {
     display: inline-flex;
@@ -1374,6 +1517,52 @@ function formatFileSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Edit question functionality
+function editQuestion(questionId) {
+    // Get questions data from JSON
+    const questionsDataEl = document.getElementById('questions-data');
+    if (!questionsDataEl) return;
+
+    let questions;
+    try {
+        questions = JSON.parse(questionsDataEl.textContent);
+    } catch (e) {
+        console.error('Failed to parse questions data:', e);
+        return;
+    }
+
+    // Find the question
+    const question = questions.find(q => q.id === questionId);
+    if (!question) {
+        console.error('Question not found:', questionId);
+        return;
+    }
+
+    // Populate the edit form
+    document.getElementById('edit-question-text').value = question.question_text;
+    document.getElementById('edit-option-a').value = question.option_a;
+    document.getElementById('edit-option-b').value = question.option_b;
+    document.getElementById('edit-option-c').value = question.option_c || '';
+    document.getElementById('edit-option-d').value = question.option_d || '';
+    document.getElementById('edit-difficulty').value = question.difficulty_level;
+    document.getElementById('edit-category').value = question.category || '';
+    document.getElementById('edit-explanation').value = question.explanation || '';
+
+    // Set the correct answer radio
+    const correctRadio = document.getElementById('edit-correct-' + question.correct_answer.toLowerCase());
+    if (correctRadio) {
+        correctRadio.checked = true;
+    }
+
+    // Update form action
+    const form = document.getElementById('edit-question-form');
+    const baseUrl = '{% url "custom_assessments:question-edit" assessment.uuid 0 %}'.replace('/0/', '/' + questionId + '/');
+    form.action = baseUrl;
+
+    // Open the modal
+    openModal('edit-modal');
 }
 </script>
 {% endblock %}

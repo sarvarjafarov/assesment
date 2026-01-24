@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 
+from .constants import LEVEL_DIFFICULTY_RANGES
+
 if TYPE_CHECKING:
     from .models import CustomAssessment, CustomAssessmentSession
 
@@ -301,15 +303,35 @@ def create_questions_from_data(assessment: "CustomAssessment", questions_data: l
 
 def initialize_session(session: "CustomAssessmentSession", shuffle: bool = True) -> None:
     """
-    Initialize a session with question order.
+    Initialize a session with question order, filtered by difficulty level.
 
     Args:
         session: CustomAssessmentSession to initialize
         shuffle: Whether to randomize question order
+
+    Questions are filtered by difficulty based on the session's level:
+    - Junior: difficulty 1-2 (foundational)
+    - Mid: difficulty 2-4 (applied knowledge)
+    - Senior: difficulty 3-5 (strategic/complex)
+
+    If not enough questions match the level, falls back to all questions.
     """
-    question_ids = list(
-        session.assessment.questions.values_list("pk", flat=True)
+    level = session.level
+    min_diff, max_diff = LEVEL_DIFFICULTY_RANGES.get(level, (1, 5))
+
+    # Try to get questions filtered by difficulty
+    filtered_questions = session.assessment.questions.filter(
+        difficulty_level__gte=min_diff,
+        difficulty_level__lte=max_diff
     )
+
+    # Fall back to all questions if not enough at the target level
+    if filtered_questions.count() < 3:
+        question_ids = list(
+            session.assessment.questions.values_list("pk", flat=True)
+        )
+    else:
+        question_ids = list(filtered_questions.values_list("pk", flat=True))
 
     if shuffle:
         random.shuffle(question_ids)

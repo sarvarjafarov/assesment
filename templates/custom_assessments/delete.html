@@ -1,0 +1,238 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% block title %}Delete {{ assessment.name }} · Evalon{% endblock %}
+{% block meta_description %}Confirm assessment deletion{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+    <div class="delete-container">
+        <div class="delete-card">
+            <div class="delete-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+            </div>
+
+            <h1>Delete Assessment</h1>
+            <p class="delete-message">
+                Are you sure you want to delete <strong>"{{ assessment.name }}"</strong>?
+            </p>
+
+            <div class="warning-box">
+                <div class="warning-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="warning-content">
+                    <strong>This action cannot be undone.</strong>
+                    <p>The assessment and all {{ assessment.question_count }} question{{ assessment.question_count|pluralize }} will be permanently deleted.</p>
+                </div>
+            </div>
+
+            <div class="assessment-info">
+                <div class="info-item">
+                    <span class="info-label">Questions</span>
+                    <span class="info-value">{{ assessment.question_count }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">
+                        <span class="status-badge status-{{ assessment.status }}">{{ assessment.get_status_display }}</span>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Created</span>
+                    <span class="info-value">{{ assessment.created_at|date:"M j, Y" }}</span>
+                </div>
+            </div>
+
+            <form method="post" class="delete-form">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <a href="{% url 'custom_assessments:detail' assessment.uuid %}" class="btn btn-ghost">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Delete Assessment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.delete-container {
+    max-width: 520px;
+    margin: 40px auto;
+}
+
+.delete-card {
+    background: #fff;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+}
+
+.delete-icon {
+    width: 80px;
+    height: 80px;
+    background: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    color: #dc2626;
+}
+
+.delete-card h1 {
+    margin: 0 0 12px;
+    font-size: 1.5rem;
+    color: var(--navy);
+}
+
+.delete-message {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+.delete-message strong {
+    color: var(--navy);
+}
+
+.warning-box {
+    display: flex;
+    gap: 14px;
+    padding: 16px 20px;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.warning-icon {
+    color: #d97706;
+    flex-shrink: 0;
+}
+
+.warning-content strong {
+    display: block;
+    color: #92400e;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.warning-content p {
+    margin: 0;
+    color: #92400e;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.assessment-info {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--navy);
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+.status-draft { background: #f3f4f6; color: #6b7280; }
+.status-published { background: #d1fae5; color: #059669; }
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-ghost {
+    background: none;
+    border: 2px solid #e5e7eb;
+    color: var(--navy);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+.btn-ghost:hover {
+    border-color: var(--navy);
+    background: #f9fafb;
+}
+
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+@media (max-width: 480px) {
+    .delete-card {
+        padding: 24px;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

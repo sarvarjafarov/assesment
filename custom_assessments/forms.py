@@ -3,6 +3,7 @@ Forms for Custom Assessments.
 """
 from django import forms
 
+from .constants import LEVEL_CHOICES
 from .models import CustomAssessment, CustomQuestion
 
 
@@ -63,11 +64,7 @@ class AIGenerationForm(forms.Form):
         help_text="Comma-separated list of skills and knowledge areas",
     )
     difficulty_level = forms.ChoiceField(
-        choices=[
-            ("junior", "Junior (0-2 years experience)"),
-            ("mid", "Mid-Level (2-5 years experience)"),
-            ("senior", "Senior (5+ years experience)"),
-        ],
+        choices=LEVEL_CHOICES,
         initial="mid",
         widget=forms.RadioSelect(attrs={"class": "level-radio"}),
         label="Difficulty Level",
@@ -236,12 +233,34 @@ class InviteCandidateForm(forms.Form):
         label="Candidate Name/ID",
     )
     level = forms.ChoiceField(
-        choices=[
-            ("junior", "Junior (0-2 years)"),
-            ("mid", "Mid-Level (2-5 years)"),
-            ("senior", "Senior (5+ years)"),
-        ],
+        choices=LEVEL_CHOICES,
         initial="mid",
         widget=forms.RadioSelect(attrs={"class": "level-radio"}),
         label="Assessment Level",
     )
+    deadline_at = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(attrs={
+            "class": "form-input",
+            "type": "datetime-local",
+        }),
+        label="Deadline (Optional)",
+        help_text="Set a deadline for the candidate to complete the assessment",
+    )
+    project = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Project (Optional)",
+    )
+
+    def __init__(self, *args, client_account=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if client_account:
+            from clients.models import ClientProject
+            projects = ClientProject.objects.filter(
+                client_account=client_account,
+                is_active=True
+            ).order_by("name")
+            choices = [("", "— No Project —")]
+            choices.extend([(str(p.pk), p.name) for p in projects])
+            self.fields["project"].choices = choices
