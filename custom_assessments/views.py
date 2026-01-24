@@ -20,6 +20,7 @@ from django.views.generic import (
 from .decorators import check_custom_assessment_limit, premium_required
 from .forms import (
     AIGenerationForm,
+    BulkInviteForm,
     CSVUploadForm,
     CustomAssessmentForm,
     CustomQuestionForm,
@@ -106,10 +107,53 @@ class CustomAssessmentDetailView(LoginRequiredMixin, PremiumRequiredMixin, Detai
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["sessions"] = self.object.sessions.select_related("project").order_by("-created_at")
+        sessions = self.object.sessions.select_related("project").order_by("-created_at")
+        context["sessions"] = sessions
+
+        # Analytics
+        total_sessions = sessions.count()
+        completed_sessions = sessions.filter(status="submitted")
+        completed_count = completed_sessions.count()
+
+        context["analytics"] = {
+            "total_invited": total_sessions,
+            "completed": completed_count,
+            "in_progress": sessions.filter(status="in_progress").count(),
+            "not_started": sessions.filter(status="draft").count(),
+            "completion_rate": round((completed_count / total_sessions) * 100) if total_sessions > 0 else 0,
+        }
+
+        # Score analytics for completed sessions
+        if completed_count > 0:
+            scores = [s.score for s in completed_sessions if s.score is not None]
+            if scores:
+                context["analytics"]["avg_score"] = round(sum(scores) / len(scores), 1)
+                context["analytics"]["highest_score"] = max(scores)
+                context["analytics"]["lowest_score"] = min(scores)
+                context["analytics"]["pass_rate"] = round(
+                    (completed_sessions.filter(passed=True).count() / completed_count) * 100
+                )
+
+            # Time analytics
+            time_taken = []
+            for session in completed_sessions:
+                if session.started_at and session.completed_at:
+                    duration = (session.completed_at - session.started_at).total_seconds() / 60
+                    time_taken.append(duration)
+            if time_taken:
+                context["analytics"]["avg_time_minutes"] = round(sum(time_taken) / len(time_taken), 1)
+
+        # Level breakdown
+        context["level_stats"] = {
+            "junior": sessions.filter(level="junior").count(),
+            "mid": sessions.filter(level="mid").count(),
+            "senior": sessions.filter(level="senior").count(),
+        }
+
         context["invite_form"] = InviteCandidateForm(
             client_account=self.request.user.client_account
         )
+        context["bulk_invite_form"] = BulkInviteForm()
         return context
 
 
@@ -298,18 +342,26 @@ class AIGenerateView(LoginRequiredMixin, PremiumRequiredMixin, View):
     """Generate questions using AI."""
 
     def post(self, request, uuid):
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"AIGenerateView.post called for assessment {uuid}")
+
         assessment = get_object_or_404(
             CustomAssessment,
             uuid=uuid,
             client=request.user.client_account,
             status="draft",
         )
+        logger.info(f"Assessment found: {assessment.name}")
 
         form = AIGenerationForm(request.POST)
         if not form.is_valid():
+            logger.warning(f"AI form validation failed: {form.errors}")
             for error in form.errors.values():
                 messages.error(request, error.as_text())
             return redirect("custom_assessments:questions", uuid=uuid)
+
+        logger.info(f"Form valid. Generating {form.cleaned_data['num_questions']} questions for: {form.cleaned_data['role_description']}")
 
         try:
             questions_data = generate_questions_with_ai(
@@ -318,6 +370,7 @@ class AIGenerateView(LoginRequiredMixin, PremiumRequiredMixin, View):
                 difficulty_level=form.cleaned_data["difficulty_level"],
                 num_questions=form.cleaned_data["num_questions"],
             )
+            logger.info(f"AI generated {len(questions_data)} questions")
 
             # Save AI generation metadata
             assessment.role_description = form.cleaned_data["role_description"]
@@ -329,10 +382,13 @@ class AIGenerateView(LoginRequiredMixin, PremiumRequiredMixin, View):
 
             created = create_questions_from_data(assessment, questions_data)
             messages.success(request, f"Generated {created} questions using AI.")
+            logger.info(f"Successfully saved {created} questions")
 
         except ValueError as e:
+            logger.error(f"ValueError in AI generation: {e}")
             messages.error(request, str(e))
         except Exception as e:
+            logger.error(f"Exception in AI generation: {e}", exc_info=True)
             messages.error(request, f"AI generation failed: {str(e)}")
 
         return redirect("custom_assessments:questions", uuid=uuid)
@@ -487,4 +543,147 @@ class SessionResultView(LoginRequiredMixin, PremiumRequiredMixin, DetailView):
         context["correct_count"] = sum(1 for r in results if r["is_correct"])
         context["total_count"] = len(results)
 
+        return context
+
+
+class BulkInviteView(LoginRequiredMixin, PremiumRequiredMixin, View):
+    """Bulk invite candidates via CSV upload."""
+
+    def post(self, request, uuid):
+        import csv
+        import io
+
+        assessment = get_object_or_404(
+            CustomAssessment,
+            uuid=uuid,
+            client=request.user.client_account,
+            status="published",
+        )
+
+        form = BulkInviteForm(request.POST, request.FILES)
+        if not form.is_valid():
+            for error in form.errors.values():
+                messages.error(request, error.as_text())
+            return redirect("custom_assessments:detail", uuid=uuid)
+
+        csv_file = form.cleaned_data["csv_file"]
+        level = form.cleaned_data["level"]
+        deadline_at = form.cleaned_data.get("deadline_at")
+
+        # Parse CSV
+        content = csv_file.read().decode("utf-8-sig")
+        reader = csv.DictReader(io.StringIO(content))
+
+        invited_count = 0
+        email_success = 0
+        errors = []
+
+        for row_num, row in enumerate(reader, start=2):
+            name = row.get("name", "").strip()
+            email = row.get("email", "").strip()
+
+            if not name or not email:
+                errors.append(f"Row {row_num}: Missing name or email")
+                continue
+
+            # Validate email format
+            from django.core.validators import validate_email
+            from django.core.exceptions import ValidationError
+            try:
+                validate_email(email)
+            except ValidationError:
+                errors.append(f"Row {row_num}: Invalid email '{email}'")
+                continue
+
+            # Check for duplicate session
+            existing = CustomAssessmentSession.objects.filter(
+                assessment=assessment,
+                candidate_email=email,
+            ).exists()
+            if existing:
+                errors.append(f"Row {row_num}: {email} already invited")
+                continue
+
+            # Create session
+            session = CustomAssessmentSession.objects.create(
+                assessment=assessment,
+                client=request.user.client_account,
+                candidate_id=name,
+                candidate_email=email,
+                level=level,
+                deadline_at=deadline_at,
+            )
+            initialize_session(session)
+            invited_count += 1
+
+            # Send email
+            assessment_url = request.build_absolute_uri(
+                reverse("candidate:custom-session", args=[session.uuid])
+            )
+            sent, _ = send_custom_assessment_invitation(session, assessment_url)
+            if sent:
+                email_success += 1
+
+        # Summary message
+        if invited_count > 0:
+            messages.success(
+                request,
+                f"Successfully invited {invited_count} candidates. "
+                f"Emails sent: {email_success}/{invited_count}."
+            )
+        if errors:
+            for error in errors[:5]:
+                messages.error(request, error)
+            if len(errors) > 5:
+                messages.error(request, f"... and {len(errors) - 5} more errors")
+
+        return redirect("custom_assessments:detail", uuid=uuid)
+
+
+class ExportQuestionsView(LoginRequiredMixin, PremiumRequiredMixin, View):
+    """Export assessment questions as CSV."""
+
+    def get(self, request, uuid):
+        import csv
+
+        assessment = get_object_or_404(
+            CustomAssessment,
+            uuid=uuid,
+            client=request.user.client_account,
+        )
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = f'attachment; filename="{assessment.name}_questions.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "question_text", "option_a", "option_b", "option_c", "option_d",
+            "correct_answer", "explanation", "difficulty_level", "category"
+        ])
+
+        for q in assessment.questions.all():
+            writer.writerow([
+                q.question_text, q.option_a, q.option_b, q.option_c or "",
+                q.option_d or "", q.correct_answer, q.explanation or "",
+                q.difficulty_level, q.category or ""
+            ])
+
+        return response
+
+
+class PreviewAssessmentView(LoginRequiredMixin, PremiumRequiredMixin, TemplateView):
+    """Preview how the assessment will look to candidates."""
+
+    template_name = "custom_assessments/preview.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        assessment = get_object_or_404(
+            CustomAssessment,
+            uuid=self.kwargs["uuid"],
+            client=self.request.user.client_account,
+        )
+        context["assessment"] = assessment
+        context["questions"] = list(assessment.questions.all())
+        context["total_questions"] = len(context["questions"])
         return context

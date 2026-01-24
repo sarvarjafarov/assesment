@@ -27,11 +27,16 @@ urlpatterns = [
     path("csv-template/", views.CSVTemplateDownloadView.as_view(), name="csv-template"),
 
     # Assessment actions
+    path("<uuid:uuid>/preview/", views.PreviewAssessmentView.as_view(), name="preview"),
     path("<uuid:uuid>/publish/", views.PublishView.as_view(), name="publish"),
     path("<uuid:uuid>/archive/", views.ArchiveView.as_view(), name="archive"),
     path("<uuid:uuid>/duplicate/", views.DuplicateView.as_view(), name="duplicate"),
 
     # Candidate management
     path("<uuid:uuid>/invite/", views.InviteCandidateView.as_view(), name="invite"),
+    path("<uuid:uuid>/bulk-invite/", views.BulkInviteView.as_view(), name="bulk-invite"),
     path("session/<uuid:session_uuid>/", views.SessionResultView.as_view(), name="session-result"),
+
+    # Export
+    path("<uuid:uuid>/export-questions/", views.ExportQuestionsView.as_view(), name="export-questions"),
 ]

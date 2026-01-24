@@ -1,0 +1,22 @@
+Assessment Completed
+
+{{ candidate_name }} has completed the "{{ assessment_name }}" assessment.
+
+RESULTS
+-------
+Score: {{ score }}%
+Status: {% if passed %}PASSED{% else %}DID NOT PASS{% endif %}
+
+DETAILS
+-------
+Candidate: {{ candidate_name }} ({{ candidate_email }})
+Assessment: {{ assessment_name }}
+Level: {{ level }}
+Time Taken: {{ time_taken }} minutes
+Completed: {{ completed_at|date:"F d, Y" }} at {{ completed_at|date:"g:i A" }}
+
+View full results:
+{{ results_url }}
+
+---
+Powered by Evalon · evalon.tech

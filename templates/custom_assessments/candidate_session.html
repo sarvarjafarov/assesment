@@ -27,13 +27,13 @@
                     <span class="stat-item">
                         <strong>{{ progress_percent }}%</strong>
                     </span>
-                    {% if remaining_minutes %}
-                    <span class="stat-item time-left">
+                    {% if remaining_seconds %}
+                    <span class="stat-item time-left" id="countdown-timer" data-seconds="{{ remaining_seconds }}">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        {{ remaining_minutes }} min
+                        <span id="timer-display">{{ remaining_minutes }}:00</span>
                     </span>
                     {% endif %}
                 </div>
@@ -203,6 +203,65 @@
 .time-left {
     color: #ff8a00;
     font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.time-left.warning {
+    color: #f59e0b;
+    animation: pulse 1s infinite;
+}
+
+.time-left.critical {
+    color: #ef4444;
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Time Warning Modal */
+.time-warning-toast {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 2000;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    animation: slideDown 0.3s ease;
+}
+
+.time-warning-toast.critical {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-color: #ef4444;
+}
+
+@keyframes slideDown {
+    from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+.time-warning-toast svg {
+    color: #f59e0b;
+    flex-shrink: 0;
+}
+
+.time-warning-toast.critical svg {
+    color: #ef4444;
+}
+
+.time-warning-toast span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0e1428;
 }
 
 /* Deadline Banner */
@@ -444,4 +503,83 @@
     }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const timerElement = document.getElementById('countdown-timer');
+    if (!timerElement) return;
+
+    let remainingSeconds = parseInt(timerElement.dataset.seconds, 10);
+    const timerDisplay = document.getElementById('timer-display');
+    const form = document.querySelector('.question-form-enhanced');
+
+    let warningShown = false;
+    let criticalShown = false;
+
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function showToast(message, isCritical) {
+        // Remove existing toast
+        const existing = document.querySelector('.time-warning-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `time-warning-toast ${isCritical ? 'critical' : ''}`;
+        toast.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 5000);
+    }
+
+    function updateTimer() {
+        if (remainingSeconds <= 0) {
+            timerDisplay.textContent = '0:00';
+            timerElement.classList.add('critical');
+
+            // Auto-submit the form
+            showToast('Time is up! Submitting your answers...', true);
+            setTimeout(() => {
+                if (form) form.submit();
+            }, 2000);
+            return;
+        }
+
+        remainingSeconds--;
+        timerDisplay.textContent = formatTime(remainingSeconds);
+
+        // Warning states
+        if (remainingSeconds <= 60) {
+            timerElement.classList.remove('warning');
+            timerElement.classList.add('critical');
+            if (!criticalShown) {
+                showToast('Less than 1 minute remaining!', true);
+                criticalShown = true;
+            }
+        } else if (remainingSeconds <= 300) {
+            timerElement.classList.add('warning');
+            if (!warningShown) {
+                showToast('5 minutes remaining. Please finish up!', false);
+                warningShown = true;
+            }
+        }
+    }
+
+    // Initial display
+    timerDisplay.textContent = formatTime(remainingSeconds);
+
+    // Start countdown
+    setInterval(updateTimer, 1000);
+});
+</script>
 {% endblock %}

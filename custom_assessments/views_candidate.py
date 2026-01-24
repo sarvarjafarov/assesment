@@ -17,6 +17,7 @@ from candidate.forms import CandidateFeedbackForm
 
 from .forms import CandidateAnswerForm
 from .models import CustomAssessmentSession, CustomQuestion
+from .services import send_completion_notification
 
 
 class CustomAssessmentView(FormView):
@@ -75,16 +76,23 @@ class CustomAssessmentView(FormView):
                 return redirect(
                     "candidate:custom-expired", session_uuid=self.session.uuid
                 )
-            self.remaining_minutes = max(
-                0, int((deadline - now).total_seconds() // 60)
-            )
+            self.remaining_seconds = max(0, int((deadline - now).total_seconds()))
+            self.remaining_minutes = max(0, int(self.remaining_seconds // 60))
         else:
+            self.remaining_seconds = None
             self.remaining_minutes = None
 
         # Get current question
         self.current_index = self.session.current_question_index
         if self.current_index >= len(self.session.question_order):
             self.session.submit()
+
+            # Send completion notification to client
+            results_url = request.build_absolute_uri(
+                reverse("custom_assessments:session-result", args=[self.session.uuid])
+            )
+            send_completion_notification(self.session, results_url)
+
             return redirect(
                 "candidate:custom-complete", session_uuid=self.session.uuid
             )
@@ -112,6 +120,7 @@ class CustomAssessmentView(FormView):
                 "total_steps": total,
                 "progress_percent": int((self.current_index / total) * 100),
                 "remaining_minutes": self.remaining_minutes,
+                "remaining_seconds": self.remaining_seconds,
                 "help_topics": DEFAULT_HELP_TOPICS,
             }
         )
@@ -151,6 +160,13 @@ class CustomAssessmentView(FormView):
         # Check if assessment is complete
         if self.session.current_question_index >= len(self.session.question_order):
             self.session.submit()
+
+            # Send completion notification to client
+            results_url = self.request.build_absolute_uri(
+                reverse("custom_assessments:session-result", args=[self.session.uuid])
+            )
+            send_completion_notification(self.session, results_url)
+
             return redirect(
                 "candidate:custom-complete", session_uuid=self.session.uuid
             )

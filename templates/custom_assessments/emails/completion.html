@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Completed</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f7fa;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f7fa; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #0e1428 0%, #1a2847 100%); padding: 40px 40px 30px; text-align: center;">
+                            <h1 style="margin: 0 0 10px; color: #ffffff; font-size: 28px; font-weight: 700;">
+                                Assessment Completed
+                            </h1>
+                            <p style="margin: 0; color: #cbd5e0; font-size: 16px;">
+                                {{ candidate_name }} has finished their assessment
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Main content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <p style="margin: 0 0 24px; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                                Good news! <strong style="color: #0e1428;">{{ candidate_name }}</strong> has completed the <strong style="color: #0e1428;">{{ assessment_name }}</strong> assessment.
+                            </p>
+
+                            <!-- Results Summary -->
+                            <div style="background: {% if passed %}linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981;{% else %}linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #ef4444;{% endif %} border-radius: 12px; padding: 24px; margin: 0 0 24px; text-align: center;">
+                                <p style="margin: 0 0 8px; font-size: 48px; font-weight: 700; color: {% if passed %}#059669{% else %}#dc2626{% endif %};">
+                                    {{ score }}%
+                                </p>
+                                <p style="margin: 0; font-size: 18px; font-weight: 600; color: {% if passed %}#059669{% else %}#dc2626{% endif %};">
+                                    {% if passed %}PASSED{% else %}DID NOT PASS{% endif %}
+                                </p>
+                            </div>
+
+                            <!-- Details -->
+                            <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 0 0 28px;">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #718096; font-size: 14px; width: 140px;">Candidate</td>
+                                        <td style="padding: 8px 0; color: #0e1428; font-size: 14px; font-weight: 600;">{{ candidate_name }} ({{ candidate_email }})</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #718096; font-size: 14px;">Assessment</td>
+                                        <td style="padding: 8px 0; color: #0e1428; font-size: 14px; font-weight: 600;">{{ assessment_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #718096; font-size: 14px;">Level</td>
+                                        <td style="padding: 8px 0; color: #0e1428; font-size: 14px; font-weight: 600;">{{ level }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #718096; font-size: 14px;">Time Taken</td>
+                                        <td style="padding: 8px 0; color: #0e1428; font-size: 14px; font-weight: 600;">{{ time_taken }} minutes</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #718096; font-size: 14px;">Completed At</td>
+                                        <td style="padding: 8px 0; color: #0e1428; font-size: 14px; font-weight: 600;">{{ completed_at|date:"F d, Y" }} at {{ completed_at|date:"g:i A" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- CTA Button -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ results_url }}" style="display: inline-block; background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%); color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-size: 17px; font-weight: 700; box-shadow: 0 4px 16px rgba(255, 138, 0, 0.3);">
+                                            View Full Results
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background: #f7fafc; padding: 30px 40px; border-top: 1px solid #e2e8f0;">
+                            <p style="margin: 0; color: #a0aec0; font-size: 13px; line-height: 1.5;">
+                                This notification was sent by <strong style="color: #ff8a00;">Evalon</strong> · <a href="https://www.evalon.tech" style="color: #ff8a00; text-decoration: none;">evalon.tech</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

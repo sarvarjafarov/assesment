@@ -264,3 +264,38 @@ class InviteCandidateForm(forms.Form):
             choices = [("", "— No Project —")]
             choices.extend([(str(p.pk), p.name) for p in projects])
             self.fields["project"].choices = choices
+
+
+class BulkInviteForm(forms.Form):
+    """Form for bulk inviting candidates via CSV."""
+
+    csv_file = forms.FileField(
+        widget=forms.FileInput(attrs={
+            "class": "form-file-input",
+            "accept": ".csv",
+        }),
+        label="CSV File",
+        help_text="CSV with columns: name, email (one candidate per row)",
+    )
+    level = forms.ChoiceField(
+        choices=LEVEL_CHOICES,
+        initial="mid",
+        widget=forms.RadioSelect(attrs={"class": "level-radio"}),
+        label="Assessment Level",
+    )
+    deadline_at = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(attrs={
+            "class": "form-input",
+            "type": "datetime-local",
+        }),
+        label="Deadline (Optional)",
+    )
+
+    def clean_csv_file(self):
+        file = self.cleaned_data["csv_file"]
+        if not file.name.endswith(".csv"):
+            raise forms.ValidationError("File must be a CSV file (.csv)")
+        if file.size > 1024 * 1024:  # 1MB limit
+            raise forms.ValidationError("File size must be less than 1MB")
+        return file

@@ -432,3 +432,104 @@ Good luck!
             "Failed to send custom assessment invite: %s", exc
         )
         return False, str(exc)
+
+
+def send_completion_notification(
+    session: "CustomAssessmentSession",
+    results_url: str,
+) -> tuple[bool, str | None]:
+    """
+    Send email notification to client when candidate completes assessment.
+
+    Args:
+        session: Completed CustomAssessmentSession
+        results_url: Full URL to view results
+
+    Returns:
+        Tuple of (success: bool, error_message: str | None)
+    """
+    import logging
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+
+    logger = logging.getLogger(__name__)
+
+    # Get client email - use primary user's email
+    client_email = None
+    if session.client:
+        primary_user = session.client.users.first()
+        if primary_user:
+            client_email = primary_user.email
+
+    if not client_email:
+        return False, "No client email found"
+
+    if not settings.EMAIL_ENABLED:
+        logger.info(
+            "EMAIL_ENABLED is False. Completion notification for %s skipped.",
+            session.candidate_id,
+        )
+        return True, None
+
+    # Calculate time taken
+    time_taken = None
+    if session.started_at and session.completed_at:
+        time_taken = round(
+            (session.completed_at - session.started_at).total_seconds() / 60, 1
+        )
+
+    context = {
+        "candidate_name": session.candidate_id,
+        "candidate_email": session.candidate_email,
+        "assessment_name": session.assessment.name,
+        "score": int(session.score) if session.score else 0,
+        "passed": session.passed,
+        "level": session.get_level_display(),
+        "time_taken": time_taken,
+        "completed_at": session.completed_at,
+        "results_url": results_url,
+        "company_name": session.client.company_name,
+    }
+
+    status_text = "passed" if session.passed else "completed"
+    subject = f"{session.candidate_id} has {status_text} the {session.assessment.name} assessment"
+
+    try:
+        text_body = render_to_string(
+            "custom_assessments/emails/completion.txt", context
+        )
+        html_body = render_to_string(
+            "custom_assessments/emails/completion.html", context
+        )
+    except Exception:
+        # Fallback to simple text if templates don't exist
+        text_body = f"""{session.candidate_id} has completed the {session.assessment.name} assessment.
+
+Score: {session.score}%
+Status: {'Passed' if session.passed else 'Did not pass'}
+
+View results: {results_url}
+"""
+        html_body = None
+
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+
+    try:
+        send_mail(
+            subject,
+            text_body,
+            from_email,
+            [client_email],
+            html_message=html_body,
+        )
+        logger.info(
+            "Completion notification sent to %s for candidate %s",
+            client_email,
+            session.candidate_id,
+        )
+        return True, None
+    except Exception as exc:
+        logger.warning(
+            "Failed to send completion notification: %s", exc
+        )
+        return False, str(exc)
