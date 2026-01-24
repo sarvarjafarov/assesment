@@ -9,9 +9,9 @@ from django.shortcuts import redirect
 
 def premium_required(view_func):
     """
-    Decorator to restrict access to premium/enterprise plan users.
+    Decorator to restrict access to pro/enterprise plan users.
 
-    Redirects non-premium users to dashboard with a message.
+    Redirects non-pro users to dashboard with a message.
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -23,11 +23,11 @@ def premium_required(view_func):
 
         account = request.user.client_account
 
-        # Check if user has premium or enterprise plan
-        if account.plan_slug not in ("premium", "enterprise"):
+        # Check if user has pro or enterprise plan
+        if account.plan_slug not in ("pro", "enterprise"):
             messages.warning(
                 request,
-                "Custom Assessments require a Premium or Enterprise plan. "
+                "Custom Assessments require a Pro or Enterprise plan. "
                 "Please upgrade to access this feature."
             )
             return redirect("clients:dashboard")
@@ -41,7 +41,7 @@ def check_custom_assessment_limit(view_func):
     """
     Decorator to check if user has reached their custom assessment limit.
 
-    Premium users: 10 assessments
+    Pro users: 10 assessments
     Enterprise users: Unlimited
     """
     @wraps(view_func)
@@ -55,8 +55,8 @@ def check_custom_assessment_limit(view_func):
         if account.plan_slug == "enterprise":
             return view_func(request, *args, **kwargs)
 
-        # Premium has limit of 10
-        if account.plan_slug == "premium":
+        # Pro has limit of 10
+        if account.plan_slug == "pro":
             from .models import CustomAssessment
 
             current_count = CustomAssessment.objects.filter(

@@ -50,8 +50,8 @@ def portal_navigation(request):
         context['is_manager'] = account.role == 'manager'
         context['can_manage_branding'] = account.role in ('manager', 'branding_manager')
 
-        # Check if user has access to custom assessments (premium/enterprise only)
-        context['has_custom_assessments'] = account.plan_slug in ('premium', 'enterprise')
+        # Check if user has access to custom assessments (pro/enterprise only)
+        context['has_custom_assessments'] = account.plan_slug in ('pro', 'enterprise')
 
         # Count assessments requiring review (completed sessions not yet reviewed)
         assessment_count = 0
