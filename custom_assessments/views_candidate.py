@@ -20,6 +20,44 @@ from .models import CustomAssessmentSession, CustomQuestion
 from .services import send_completion_notification
 
 
+class CustomAssessmentIntroView(TemplateView):
+    """Onboarding page shown before candidates start the assessment."""
+
+    template_name = "custom_assessments/candidate_intro.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.session = get_object_or_404(
+            CustomAssessmentSession, uuid=kwargs["session_uuid"]
+        )
+
+        # Redirect if already submitted
+        if self.session.status == "submitted":
+            return redirect(
+                "candidate:custom-complete", session_uuid=self.session.uuid
+            )
+
+        # Check deadline
+        if self.session.deadline_at and timezone.now() > self.session.deadline_at:
+            return redirect(
+                "candidate:custom-expired", session_uuid=self.session.uuid
+            )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["session"] = self.session
+        context["assessment"] = self.session.assessment
+        context["total_questions"] = self.session.assessment.questions.count()
+        context["has_started"] = self.session.started_at is not None
+
+        # Check deadline
+        if self.session.deadline_at:
+            context["is_past_deadline"] = timezone.now() > self.session.deadline_at
+
+        return context
+
+
 class CustomAssessmentView(FormView):
     """Main view for candidates taking a custom assessment."""
 
@@ -146,7 +184,7 @@ class CustomAssessmentView(FormView):
                 "You can no longer submit responses."
             )
             return redirect(
-                "candidate:custom-session", session_uuid=self.session.uuid
+                "candidate:custom-expired", session_uuid=self.session.uuid
             )
 
         # Record the answer
@@ -172,7 +210,7 @@ class CustomAssessmentView(FormView):
             )
 
         return redirect(
-            "candidate:custom-session", session_uuid=self.session.uuid
+            "candidate:custom-start", session_uuid=self.session.uuid
         )
 
 

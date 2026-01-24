@@ -163,8 +163,13 @@ urlpatterns = [
     # Custom Assessments
     path(
         "custom/<uuid:session_uuid>/",
-        custom_views.CustomAssessmentView.as_view(),
+        custom_views.CustomAssessmentIntroView.as_view(),
         name="custom-session",
+    ),
+    path(
+        "custom/<uuid:session_uuid>/start/",
+        custom_views.CustomAssessmentView.as_view(),
+        name="custom-start",
     ),
     path(
         "custom/<uuid:session_uuid>/complete/",
