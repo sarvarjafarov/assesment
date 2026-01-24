@@ -260,9 +260,9 @@ class InviteCandidateForm(forms.Form):
             from clients.models import ClientProject
             projects = ClientProject.objects.filter(
                 client=client_account
-            ).order_by("name")
+            ).order_by("title")
             choices = [("", "— No Project —")]
-            choices.extend([(str(p.pk), p.name) for p in projects])
+            choices.extend([(str(p.pk), p.title) for p in projects])
             self.fields["project"].choices = choices
 
 
