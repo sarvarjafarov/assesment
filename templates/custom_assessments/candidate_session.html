@@ -183,21 +183,24 @@
 .progress-stats-compact {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 16px;
+    justify-content: flex-end;
+    gap: 20px;
     font-size: 13px;
     color: #718096;
+    margin-top: 6px;
 }
 
 .stat-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
 }
 
 .stat-item strong {
     color: #0e1428;
     font-weight: 700;
+    margin-right: 2px;
 }
 
 .time-left {
