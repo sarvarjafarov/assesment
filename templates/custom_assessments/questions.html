@@ -168,43 +168,139 @@
 {# AI Generation Modal #}
 <div id="ai-modal" class="modal">
     <div class="modal-content modal-lg">
-        <div class="modal-header">
-            <h2>Generate Questions with AI</h2>
-            <button class="modal-close" onclick="closeModal('ai-modal')">&times;</button>
+        <div class="modal-header ai-header">
+            <div class="modal-title-group">
+                <div class="modal-icon ai-gradient">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2>Generate with AI</h2>
+                    <p class="modal-subtitle">Describe your requirements and let AI create questions</p>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeModal('ai-modal')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
         <form method="post" action="{% url 'custom_assessments:generate-ai' assessment.uuid %}">
             {% csrf_token %}
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Role/Position <span class="required">*</span></label>
-                    {{ ai_form.role_description }}
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                        </svg>
+                        Role / Position <span class="required">*</span>
+                    </label>
+                    <input type="text" name="role_description" class="form-input" placeholder="e.g., Senior Sales Representative, Marketing Manager" required>
+                    <span class="form-hint">The job role this assessment will evaluate</span>
                 </div>
+
                 <div class="form-group">
-                    <label>Skills to Test <span class="required">*</span></label>
-                    {{ ai_form.skills_to_test }}
-                    <span class="form-help">List the skills, knowledge areas, or competencies to assess</span>
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        Skills to Test <span class="required">*</span>
+                    </label>
+                    <textarea name="skills_to_test" class="form-textarea" rows="3" placeholder="e.g., cold calling, objection handling, CRM usage, closing techniques, negotiation skills" required></textarea>
+                    <span class="form-hint">List the skills, knowledge areas, or competencies to assess</span>
                 </div>
+
                 <div class="form-group">
-                    <label>Difficulty Level</label>
-                    <div class="level-options">
-                        {% for value, label in ai_form.difficulty_level.field.choices %}
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 20h.01"></path>
+                            <path d="M7 20v-4"></path>
+                            <path d="M12 20v-8"></path>
+                            <path d="M17 20V8"></path>
+                        </svg>
+                        Difficulty Level
+                    </label>
+                    <div class="level-selector">
                         <label class="level-option">
-                            <input type="radio" name="difficulty_level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
-                            <span class="level-card">
-                                <span class="level-name">{{ label }}</span>
-                            </span>
+                            <input type="radio" name="difficulty_level" value="junior">
+                            <div class="level-card">
+                                <div class="level-icon junior">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                                    </svg>
+                                </div>
+                                <span class="level-title">Junior</span>
+                                <span class="level-desc">0-2 years experience</span>
+                                <span class="level-detail">Foundational concepts</span>
+                            </div>
                         </label>
-                        {% endfor %}
+                        <label class="level-option">
+                            <input type="radio" name="difficulty_level" value="mid" checked>
+                            <div class="level-card recommended">
+                                <div class="level-badge">Recommended</div>
+                                <div class="level-icon mid">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <span class="level-title">Mid-Level</span>
+                                <span class="level-desc">2-5 years experience</span>
+                                <span class="level-detail">Applied knowledge</span>
+                            </div>
+                        </label>
+                        <label class="level-option">
+                            <input type="radio" name="difficulty_level" value="senior">
+                            <div class="level-card">
+                                <div class="level-icon senior">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                    </svg>
+                                </div>
+                                <span class="level-title">Senior</span>
+                                <span class="level-desc">5+ years experience</span>
+                                <span class="level-detail">Strategic thinking</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Number of Questions</label>
-                    {{ ai_form.num_questions }}
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Number of Questions
+                    </label>
+                    <div class="number-input-wrapper">
+                        <button type="button" class="number-btn" onclick="adjustNumber('num_questions', -5)">-5</button>
+                        <input type="number" name="num_questions" id="num_questions" class="form-input number-input" value="10" min="5" max="30">
+                        <button type="button" class="number-btn" onclick="adjustNumber('num_questions', 5)">+5</button>
+                    </div>
+                    <span class="form-hint">Between 5 and 30 questions</span>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeModal('ai-modal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Generate Questions</button>
+                <button type="button" class="btn btn-ghost" onclick="closeModal('ai-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-ai">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    Generate Questions
+                </button>
             </div>
         </form>
     </div>
@@ -213,32 +309,97 @@
 {# CSV Upload Modal #}
 <div id="csv-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h2>Upload CSV</h2>
-            <button class="modal-close" onclick="closeModal('csv-modal')">&times;</button>
+        <div class="modal-header csv-header">
+            <div class="modal-title-group">
+                <div class="modal-icon csv-gradient">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h2>Upload CSV</h2>
+                    <p class="modal-subtitle">Import questions from a spreadsheet</p>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeModal('csv-modal')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
-        <form method="post" action="{% url 'custom_assessments:upload-csv' assessment.uuid %}" enctype="multipart/form-data">
+        <form method="post" action="{% url 'custom_assessments:upload-csv' assessment.uuid %}" enctype="multipart/form-data" id="csv-form">
             {% csrf_token %}
             <div class="modal-body">
-                <p class="modal-description">
-                    Upload a CSV file with your questions. Each row should contain a question with options and the correct answer.
-                </p>
-                <a href="{% url 'custom_assessments:csv-template' %}" class="btn btn-outline btn-small" style="margin-bottom: 16px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="csv-info-box">
+                    <div class="csv-info-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </div>
+                    <div class="csv-info-content">
+                        <strong>CSV Format Requirements</strong>
+                        <p>Each row should contain: question, options A-D, correct answer, explanation (optional), difficulty, and category.</p>
+                    </div>
+                </div>
+
+                <a href="{% url 'custom_assessments:csv-template' %}" class="download-template-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                     Download Template
                 </a>
-                <div class="form-group">
-                    <label>CSV File <span class="required">*</span></label>
-                    {{ csv_form.csv_file }}
+
+                <div class="upload-zone" id="upload-zone">
+                    <input type="file" name="csv_file" id="csv-file" accept=".csv" class="file-input" required>
+                    <div class="upload-content">
+                        <div class="upload-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drop your CSV file here or <span class="upload-link">browse</span></p>
+                        <p class="upload-hint">Maximum file size: 1MB</p>
+                    </div>
+                    <div class="file-selected" id="file-selected" style="display: none;">
+                        <div class="file-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="file-info">
+                            <span class="file-name" id="file-name"></span>
+                            <span class="file-size" id="file-size"></span>
+                        </div>
+                        <button type="button" class="file-remove" onclick="clearFile()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeModal('csv-modal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Upload & Import</button>
+                <button type="button" class="btn btn-ghost" onclick="closeModal('csv-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-csv">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload & Import
+                </button>
             </div>
         </form>
     </div>
@@ -247,59 +408,122 @@
 {# Manual Question Modal #}
 <div id="manual-modal" class="modal">
     <div class="modal-content modal-lg">
-        <div class="modal-header">
-            <h2>Add Question</h2>
-            <button class="modal-close" onclick="closeModal('manual-modal')">&times;</button>
+        <div class="modal-header manual-header">
+            <div class="modal-title-group">
+                <div class="modal-icon manual-gradient">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h2>Add Question</h2>
+                    <p class="modal-subtitle">Create a multiple choice question</p>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeModal('manual-modal')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
         <form method="post" action="{% url 'custom_assessments:question-add' assessment.uuid %}">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Question Text <span class="required">*</span></label>
-                    {{ question_form.question_text }}
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Option A <span class="required">*</span></label>
-                        {{ question_form.option_a }}
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">1</span>
+                        Question
                     </div>
                     <div class="form-group">
-                        <label>Option B <span class="required">*</span></label>
-                        {{ question_form.option_b }}
+                        <label class="form-label">Question Text <span class="required">*</span></label>
+                        <textarea name="question_text" class="form-textarea" rows="3" placeholder="Enter your question here..." required></textarea>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Option C</label>
-                        {{ question_form.option_c }}
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">2</span>
+                        Answer Options
                     </div>
-                    <div class="form-group">
-                        <label>Option D</label>
-                        {{ question_form.option_d }}
+                    <div class="options-grid">
+                        <div class="option-input-group">
+                            <span class="option-label required-option">A</span>
+                            <input type="text" name="option_a" class="form-input" placeholder="First option (required)" required>
+                        </div>
+                        <div class="option-input-group">
+                            <span class="option-label required-option">B</span>
+                            <input type="text" name="option_b" class="form-input" placeholder="Second option (required)" required>
+                        </div>
+                        <div class="option-input-group">
+                            <span class="option-label">C</span>
+                            <input type="text" name="option_c" class="form-input" placeholder="Third option (optional)">
+                        </div>
+                        <div class="option-input-group">
+                            <span class="option-label">D</span>
+                            <input type="text" name="option_d" class="form-input" placeholder="Fourth option (optional)">
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Correct Answer <span class="required">*</span></label>
-                        {{ question_form.correct_answer }}
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">3</span>
+                        Correct Answer & Details
+                    </div>
+                    <div class="form-row three-col">
+                        <div class="form-group">
+                            <label class="form-label">Correct Answer <span class="required">*</span></label>
+                            <div class="answer-selector">
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="A" checked>
+                                    <span>A</span>
+                                </label>
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="B">
+                                    <span>B</span>
+                                </label>
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="C">
+                                    <span>C</span>
+                                </label>
+                                <label class="answer-option">
+                                    <input type="radio" name="correct_answer" value="D">
+                                    <span>D</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Difficulty</label>
+                            <select name="difficulty_level" class="form-select">
+                                <option value="1">1 - Very Easy</option>
+                                <option value="2">2 - Easy</option>
+                                <option value="3" selected>3 - Medium</option>
+                                <option value="4">4 - Hard</option>
+                                <option value="5">5 - Very Hard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" name="category" class="form-input" placeholder="e.g., Technical">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Difficulty</label>
-                        {{ question_form.difficulty_level }}
+                        <label class="form-label">Explanation</label>
+                        <textarea name="explanation" class="form-textarea" rows="2" placeholder="Explain why this is the correct answer (shown after submission)"></textarea>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    {{ question_form.category }}
-                </div>
-                <div class="form-group">
-                    <label>Explanation</label>
-                    {{ question_form.explanation }}
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeModal('manual-modal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Question</button>
+                <button type="button" class="btn btn-ghost" onclick="closeModal('manual-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-manual">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Question
+                </button>
             </div>
         </form>
     </div>
@@ -498,12 +722,13 @@
     color: #dc2626;
 }
 
-/* Modal Styles */
+/* Enhanced Modal Styles */
 .modal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(14, 20, 40, 0.6);
+    backdrop-filter: blur(4px);
     z-index: 1000;
     align-items: center;
     justify-content: center;
@@ -514,81 +739,143 @@
 }
 .modal-content {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     width: 100%;
-    max-width: 480px;
+    max-width: 520px;
     max-height: 90vh;
     overflow: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modalSlideIn 0.3s ease;
 }
 .modal-content.modal-lg {
-    max-width: 640px;
+    max-width: 680px;
 }
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
+    align-items: flex-start;
+    padding: 24px 28px 20px;
     border-bottom: 1px solid var(--portal-border-color);
 }
+.modal-title-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+.modal-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+.modal-icon.ai-gradient {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+.modal-icon.csv-gradient {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+.modal-icon.manual-gradient {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
 .modal-header h2 {
-    margin: 0;
+    margin: 0 0 4px 0;
     font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+.modal-subtitle {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
 }
 .modal-close {
     background: none;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
     color: var(--text-muted);
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
 }
 .modal-close:hover {
     background: #f3f4f6;
+    color: var(--navy);
 }
 .modal-body {
-    padding: 24px;
-}
-.modal-description {
-    color: var(--text-muted);
-    margin: 0 0 16px 0;
+    padding: 24px 28px;
 }
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    padding: 16px 24px;
+    padding: 20px 28px;
     border-top: 1px solid var(--portal-border-color);
+    background: #f9fafb;
+    border-radius: 0 0 20px 20px;
 }
 
+/* Form Styles */
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
-.form-group label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 6px;
+.form-group:last-child {
+    margin-bottom: 0;
+}
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 8px;
     color: var(--navy);
+    font-size: 0.9rem;
+}
+.form-label svg {
+    color: var(--text-muted);
 }
 .required { color: #dc2626; }
-.form-help {
+.form-hint {
     display: block;
     margin-top: 6px;
     font-size: 0.8rem;
     color: var(--text-muted);
 }
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+
+.form-input, .form-textarea, .form-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: white;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+.form-input::placeholder, .form-textarea::placeholder {
+    color: #9ca3af;
 }
 
-.level-options {
+/* Level Selector */
+.level-selector {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
@@ -599,22 +886,370 @@
 .level-option input {
     position: absolute;
     opacity: 0;
+    pointer-events: none;
 }
 .level-card {
-    display: block;
-    padding: 12px;
-    border: 2px solid var(--portal-border-color);
-    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
     text-align: center;
     transition: all 0.2s ease;
+    position: relative;
+}
+.level-card:hover {
+    border-color: #cbd5e1;
 }
 .level-option input:checked + .level-card {
     border-color: var(--orange);
-    background: rgba(255, 138, 0, 0.05);
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.05) 0%, rgba(255, 107, 0, 0.05) 100%);
 }
-.level-name {
-    font-size: 0.85rem;
+.level-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--orange);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.level-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+.level-icon.junior {
+    background: #d1fae5;
+    color: #059669;
+}
+.level-icon.mid {
+    background: #fef3c7;
+    color: #d97706;
+}
+.level-icon.senior {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.level-title {
+    font-weight: 600;
     color: var(--navy);
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+.level-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+.level-detail {
+    font-size: 0.7rem;
+    color: #9ca3af;
+}
+
+/* Number Input */
+.number-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 200px;
+}
+.number-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.number-btn:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+}
+.number-input {
+    width: 80px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* CSV Upload */
+.csv-info-box {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+.csv-info-icon {
+    color: #0ea5e9;
+    flex-shrink: 0;
+}
+.csv-info-content strong {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+.csv-info-content p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.download-template-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--navy);
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 20px;
+}
+.download-template-btn:hover {
+    border-color: #10b981;
+    color: #10b981;
+    background: #f0fdf4;
+}
+
+.upload-zone {
+    position: relative;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.2s;
+    background: #fafafa;
+}
+.upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--orange);
+    background: rgba(255, 138, 0, 0.02);
+}
+.file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.upload-icon {
+    color: #9ca3af;
+    margin-bottom: 12px;
+}
+.upload-text {
+    margin: 0 0 6px 0;
+    color: var(--navy);
+    font-size: 0.95rem;
+}
+.upload-link {
+    color: var(--orange);
+    font-weight: 600;
+}
+.upload-hint {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.file-selected {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 10px;
+    margin-top: 16px;
+}
+.file-icon {
+    color: #10b981;
+}
+.file-info {
+    flex: 1;
+}
+.file-name {
+    display: block;
+    font-weight: 600;
+    color: var(--navy);
+    font-size: 0.9rem;
+}
+.file-size {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+.file-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+.file-remove:hover {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+/* Manual Form */
+.form-section {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f3f4f6;
+}
+.form-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+}
+.section-number {
+    width: 24px;
+    height: 24px;
+    background: var(--navy);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.option-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.option-label {
+    width: 32px;
+    height: 32px;
+    background: #e5e7eb;
+    color: #6b7280;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.option-label.required-option {
+    background: var(--navy);
+    color: white;
+}
+.option-input-group .form-input {
+    flex: 1;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.form-row.three-col {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.answer-selector {
+    display: flex;
+    gap: 8px;
+}
+.answer-option {
+    cursor: pointer;
+}
+.answer-option input {
+    position: absolute;
+    opacity: 0;
+}
+.answer-option span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-weight: 700;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+.answer-option input:checked + span {
+    border-color: #10b981;
+    background: #d1fae5;
+    color: #059669;
+}
+.answer-option:hover span {
+    border-color: #10b981;
+}
+
+/* Buttons */
+.btn-ghost {
+    background: none;
+    border: 2px solid #e5e7eb;
+    color: var(--navy);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-ghost:hover {
+    border-color: var(--navy);
+    background: #f9fafb;
+}
+
+.btn-ai {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border: none;
+}
+.btn-ai:hover {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-csv {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+}
+.btn-csv:hover {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-manual {
+    background: linear-gradient(135deg, #ff8a00 0%, #d97706 100%);
+    border: none;
 }
 
 .empty-state {
@@ -644,10 +1279,13 @@
     .options-list {
         grid-template-columns: 1fr;
     }
-    .form-row {
+    .form-row, .form-row.three-col {
         grid-template-columns: 1fr;
     }
-    .level-options {
+    .level-selector {
+        grid-template-columns: 1fr;
+    }
+    .options-grid {
         grid-template-columns: 1fr;
     }
 }
@@ -683,5 +1321,59 @@ document.addEventListener('keydown', function(e) {
         document.body.style.overflow = '';
     }
 });
+
+// Number input adjustment
+function adjustNumber(inputId, delta) {
+    const input = document.getElementById(inputId);
+    let value = parseInt(input.value) + delta;
+    value = Math.max(parseInt(input.min), Math.min(parseInt(input.max), value));
+    input.value = value;
+}
+
+// File upload handling
+const fileInput = document.getElementById('csv-file');
+const uploadZone = document.getElementById('upload-zone');
+const fileSelected = document.getElementById('file-selected');
+const fileName = document.getElementById('file-name');
+const fileSize = document.getElementById('file-size');
+
+if (fileInput) {
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileSelected.style.display = 'flex';
+            uploadZone.querySelector('.upload-content').style.display = 'none';
+        }
+    });
+}
+
+if (uploadZone) {
+    uploadZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', function() {
+        this.classList.remove('dragover');
+    });
+    uploadZone.addEventListener('drop', function() {
+        this.classList.remove('dragover');
+    });
+}
+
+function clearFile() {
+    fileInput.value = '';
+    fileSelected.style.display = 'none';
+    uploadZone.querySelector('.upload-content').style.display = 'block';
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
 </script>
 {% endblock %}
