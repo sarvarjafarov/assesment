@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% block title %}Assessment Expired - {{ assessment.name }}{% endblock %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel expired-panel">
+        <div class="expired-content">
+            <div class="expired-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+
+            <h1 class="expired-title">Time's Up</h1>
+            <p class="expired-subtitle">The time limit for this assessment has expired</p>
+
+            <div class="expired-details">
+                <div class="detail-item">
+                    <span class="detail-label">Assessment</span>
+                    <span class="detail-value">{{ assessment.name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Time Limit</span>
+                    <span class="detail-value">{{ assessment.time_limit_minutes }} minutes</span>
+                </div>
+                {% if session.started_at %}
+                <div class="detail-item">
+                    <span class="detail-label">Started At</span>
+                    <span class="detail-value">{{ session.started_at|date:"F d, Y g:i A" }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="expired-message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <div>
+                    <p><strong>What happens now?</strong></p>
+                    <p>Your partially completed responses have been saved. The hiring team will be notified and may reach out to you regarding next steps.</p>
+                </div>
+            </div>
+
+            <div class="expired-contact">
+                <p>If you believe this is an error or need assistance, please contact the hiring team directly or email <a href="mailto:support@evalon.so">support@evalon.so</a>.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.expired-panel {
+    max-width: 560px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 48px 32px;
+}
+
+.expired-content {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.expired-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+}
+
+.expired-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0e1428;
+    margin: 0 0 12px;
+}
+
+.expired-subtitle {
+    font-size: 18px;
+    color: #718096;
+    margin: 0 0 32px;
+}
+
+.expired-details {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: #718096;
+    font-size: 14px;
+}
+
+.detail-value {
+    color: #0e1428;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.expired-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.expired-message svg {
+    flex-shrink: 0;
+    color: #f59e0b;
+    margin-top: 2px;
+}
+
+.expired-message p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+.expired-message p:last-child {
+    margin-bottom: 0;
+}
+
+.expired-message strong {
+    color: #0e1428;
+}
+
+.expired-contact {
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.expired-contact p {
+    margin: 0;
+    font-size: 14px;
+    color: #718096;
+}
+
+.expired-contact a {
+    color: #ff8a00;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.expired-contact a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .expired-panel {
+        padding: 32px 20px;
+    }
+
+    .expired-title {
+        font-size: 24px;
+    }
+}
+</style>
+{% endblock %}

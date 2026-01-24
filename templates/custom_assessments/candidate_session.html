@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}{{ assessment.name }} - Assessment{% endblock %}
+{% block content %}
+<div class="candidate-shell single-column assessment-session">
+    <!-- Sticky Progress Header -->
+    <div class="session-header">
+        <div class="session-header-content">
+            <div class="header-left">
+                <span class="assessment-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    {{ assessment.name }}
+                </span>
+            </div>
+            <div class="header-progress">
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: {{ progress_percent }}%"></div>
+                </div>
+                <div class="progress-stats-compact">
+                    <span class="stat-item">
+                        <strong>{{ step_number }}</strong>/{{ total_steps }}
+                    </span>
+                    <span class="stat-item">
+                        <strong>{{ progress_percent }}%</strong>
+                    </span>
+                    {% if remaining_minutes %}
+                    <span class="stat-item time-left">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        {{ remaining_minutes }} min
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="candidate-panel response-panel question-step-enhanced">
+        <!-- Deadline Banner -->
+        {% if deadline_at %}
+        <div class="deadline-banner {% if deadline_passed %}deadline-expired{% elif deadline_warning %}deadline-warning{% endif %}">
+            <div class="deadline-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+            <div class="deadline-content">
+                {% if deadline_passed %}
+                    <strong>Deadline Passed</strong>
+                    <p>This assessment was due on {{ deadline_at|date:"F d, Y" }} at {{ deadline_at|date:"g:i A" }}. You can no longer submit responses.</p>
+                {% elif deadline_warning %}
+                    <strong>Deadline Approaching</strong>
+                    <p>This assessment is due on {{ deadline_at|date:"F d, Y" }} at {{ deadline_at|date:"g:i A" }}. Please complete it soon.</p>
+                {% else %}
+                    <strong>Completion Deadline</strong>
+                    <p>Please submit this assessment by {{ deadline_at|date:"F d, Y" }} at {{ deadline_at|date:"g:i A" }}.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Main Question Form -->
+        <form method="post" class="question-form-enhanced">
+            {% csrf_token %}
+
+            <div class="question-card-enhanced">
+                <div class="question-header">
+                    {% if question.category %}
+                    <span class="question-category">{{ question.category }}</span>
+                    {% endif %}
+                    <span class="question-number">Question {{ step_number }} of {{ total_steps }}</span>
+                </div>
+
+                <h2 class="question-title">{{ question.question_text }}</h2>
+
+                <div class="question-input-enhanced">
+                    <p class="input-instruction">Select the best answer:</p>
+                    {{ form.answer }}
+                    {% for error in form.answer.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit-enhanced">
+                    {% if step_number == total_steps %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        Submit Assessment
+                    {% else %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"></path>
+                            <path d="m12 5 7 7-7 7"></path>
+                        </svg>
+                        Next Question
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+
+<style>
+/* Enhanced Assessment Session Styles */
+.assessment-session {
+    padding-top: 80px;
+}
+
+/* Sticky Progress Header */
+.session-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-bottom: 2px solid #e2e8f0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.session-header-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.header-left {
+    flex-shrink: 0;
+}
+
+.assessment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0e1428;
+}
+
+.assessment-badge svg {
+    color: #ff8a00;
+}
+
+.header-progress {
+    flex: 1;
+    min-width: 0;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff8a00 0%, #ff6b00 100%);
+    border-radius: 100px;
+    transition: width 0.3s ease;
+}
+
+.progress-stats-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: 13px;
+    color: #718096;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-item strong {
+    color: #0e1428;
+    font-weight: 700;
+}
+
+.time-left {
+    color: #ff8a00;
+    font-weight: 600;
+}
+
+/* Deadline Banner */
+.deadline-banner {
+    display: flex;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #bae6fd;
+    border-left: 4px solid #3b82f6;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.deadline-banner.deadline-warning {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 2px solid #fbbf24;
+    border-left: 4px solid #f59e0b;
+}
+
+.deadline-banner.deadline-expired {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 2px solid #fca5a5;
+    border-left: 4px solid #ef4444;
+}
+
+.deadline-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+}
+
+.deadline-icon svg {
+    color: #3b82f6;
+}
+
+.deadline-banner.deadline-warning .deadline-icon svg {
+    color: #f59e0b;
+}
+
+.deadline-banner.deadline-expired .deadline-icon svg {
+    color: #ef4444;
+}
+
+.deadline-content {
+    flex: 1;
+}
+
+.deadline-content strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0e1428;
+    margin-bottom: 4px;
+}
+
+.deadline-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+/* Enhanced Question Card */
+.question-card-enhanced {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.question-category {
+    display: inline-flex;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
+    border: 1px solid #ff8a00;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ff8a00;
+}
+
+.question-number {
+    font-size: 13px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.question-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0e1428;
+    line-height: 1.4;
+    margin: 0 0 24px;
+}
+
+.question-input-enhanced {
+    margin-top: 24px;
+}
+
+.input-instruction {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0e1428;
+    margin: 0 0 16px;
+}
+
+/* Radio Options Styling */
+.question-input-enhanced ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.question-input-enhanced ul li {
+    margin: 0;
+}
+
+.question-input-enhanced ul li label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    color: #0e1428;
+    line-height: 1.5;
+}
+
+.question-input-enhanced ul li label:hover {
+    border-color: #ff8a00;
+    background: #fff9f5;
+}
+
+.question-input-enhanced ul li input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #ff8a00;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.question-input-enhanced ul li label:has(input:checked) {
+    border-color: #ff8a00;
+    background: linear-gradient(135deg, #fff9f5 0%, #fff3e8 100%);
+}
+
+.field-error {
+    display: block;
+    margin-top: 8px;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-submit-enhanced {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.3);
+    transition: all 0.2s;
+}
+
+.btn-submit-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 138, 0, 0.4);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .assessment-session {
+        padding-top: 100px;
+    }
+
+    .session-header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .progress-stats-compact {
+        gap: 12px;
+        font-size: 12px;
+    }
+
+    .question-card-enhanced {
+        padding: 20px;
+    }
+
+    .question-title {
+        font-size: 18px;
+    }
+
+    .btn-submit-enhanced {
+        width: 100%;
+    }
+
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+</style>
+{% endblock %}

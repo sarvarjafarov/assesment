@@ -193,6 +193,30 @@ class CustomQuestionForm(forms.ModelForm):
         return cleaned_data
 
 
+class CandidateAnswerForm(forms.Form):
+    """Form for candidates answering a multiple choice question."""
+
+    answer = forms.ChoiceField(
+        widget=forms.RadioSelect(attrs={"class": "option-radio"}),
+        label="",
+    )
+
+    def __init__(self, *args, question=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if question:
+            self.question = question
+            # Build choices from question options
+            choices = [
+                ("A", question.option_a),
+                ("B", question.option_b),
+            ]
+            if question.option_c:
+                choices.append(("C", question.option_c))
+            if question.option_d:
+                choices.append(("D", question.option_d))
+            self.fields["answer"].choices = choices
+
+
 class InviteCandidateForm(forms.Form):
     """Form for inviting candidates to a custom assessment."""
 

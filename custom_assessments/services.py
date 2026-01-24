@@ -316,3 +316,97 @@ def initialize_session(session: "CustomAssessmentSession", shuffle: bool = True)
 
     session.question_order = question_ids
     session.save(update_fields=["question_order", "updated_at"])
+
+
+def send_custom_assessment_invitation(
+    session: "CustomAssessmentSession",
+    assessment_url: str,
+) -> tuple[bool, str | None]:
+    """
+    Send email invitation to candidate for custom assessment.
+
+    Args:
+        session: CustomAssessmentSession to invite for
+        assessment_url: Full URL to the assessment
+
+    Returns:
+        Tuple of (success: bool, error_message: str | None)
+    """
+    import logging
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+
+    logger = logging.getLogger(__name__)
+
+    if not session.candidate_email:
+        return False, "No candidate email provided"
+
+    if not settings.EMAIL_ENABLED:
+        logger.info(
+            "EMAIL_ENABLED is False. Assessment link for %s: %s",
+            session.candidate_email,
+            assessment_url,
+        )
+        return True, None  # Return success even if email disabled
+
+    context = {
+        "candidate_name": session.candidate_id,
+        "candidate_email": session.candidate_email,
+        "assessment_name": session.assessment.name,
+        "assessment_description": session.assessment.description,
+        "company_name": session.client.company_name,
+        "time_limit": session.assessment.time_limit_minutes,
+        "question_count": session.assessment.question_count(),
+        "assessment_url": assessment_url,
+        "level": session.get_level_display(),
+        "deadline_at": session.deadline_at,
+    }
+
+    subject = f"You've been invited to take: {session.assessment.name}"
+
+    try:
+        text_body = render_to_string(
+            "custom_assessments/emails/invitation.txt", context
+        )
+        html_body = render_to_string(
+            "custom_assessments/emails/invitation.html", context
+        )
+    except Exception:
+        # Fallback to simple text if templates don't exist
+        text_body = f"""Hi {session.candidate_id},
+
+You've been invited by {session.client.company_name} to complete an assessment.
+
+Assessment: {session.assessment.name}
+Time Limit: {session.assessment.time_limit_minutes} minutes
+Questions: {session.assessment.question_count()}
+
+Start your assessment here: {assessment_url}
+
+Good luck!
+
+- The {session.client.company_name} Team
+"""
+        html_body = None
+
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+
+    try:
+        send_mail(
+            subject,
+            text_body,
+            from_email,
+            [session.candidate_email],
+            html_message=html_body,
+        )
+        logger.info(
+            "Custom assessment invite sent to %s for %s",
+            session.candidate_email,
+            session.assessment.name,
+        )
+        return True, None
+    except Exception as exc:
+        logger.warning(
+            "Failed to send custom assessment invite: %s", exc
+        )
+        return False, str(exc)

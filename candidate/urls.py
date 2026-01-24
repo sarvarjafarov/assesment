@@ -3,6 +3,7 @@ from django.urls import path
 from marketing_assessments import views_candidate as marketing_views
 from pm_assessments import views_candidate as pm_views
 from behavioral_assessments import views_candidate as behavioral_views
+from custom_assessments import views_candidate as custom_views
 
 from . import views
 
@@ -158,5 +159,21 @@ urlpatterns = [
         "behavioral/<uuid:session_uuid>/send-link/",
         behavioral_views.BehavioralAssessmentSendLinkView.as_view(),
         name="behavioral-send-link",
+    ),
+    # Custom Assessments
+    path(
+        "custom/<uuid:session_uuid>/",
+        custom_views.CustomAssessmentView.as_view(),
+        name="custom-session",
+    ),
+    path(
+        "custom/<uuid:session_uuid>/complete/",
+        custom_views.CustomAssessmentCompleteView.as_view(),
+        name="custom-complete",
+    ),
+    path(
+        "custom/<uuid:session_uuid>/expired/",
+        custom_views.CustomAssessmentExpiredView.as_view(),
+        name="custom-expired",
     ),
 ]

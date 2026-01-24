@@ -33,6 +33,7 @@ from .services import (
     generate_questions_with_ai,
     initialize_session,
     parse_csv_questions,
+    send_custom_assessment_invitation,
 )
 
 
@@ -413,12 +414,25 @@ class InviteCandidateView(LoginRequiredMixin, PremiumRequiredMixin, View):
         # Initialize question order
         initialize_session(session)
 
-        # TODO: Send email invitation
-
-        messages.success(
-            request,
-            f"Invited {form.cleaned_data['candidate_id']} to take the assessment."
+        # Send email invitation
+        assessment_url = request.build_absolute_uri(
+            reverse("candidate:custom-session", args=[session.uuid])
         )
+        email_sent, error = send_custom_assessment_invitation(session, assessment_url)
+
+        if email_sent:
+            messages.success(
+                request,
+                f"Invited {form.cleaned_data['candidate_id']} to take the assessment. "
+                f"Invitation sent to {form.cleaned_data['candidate_email']}."
+            )
+        else:
+            messages.warning(
+                request,
+                f"Invited {form.cleaned_data['candidate_id']} but email could not be sent. "
+                f"Please share this link manually: {assessment_url}"
+            )
+
         return redirect("custom_assessments:detail", uuid=uuid)
 
 

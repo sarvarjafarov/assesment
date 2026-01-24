@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% block title %}Assessment Complete - {{ assessment.name }}{% endblock %}
+{% block content %}
+<div class="candidate-shell single-column">
+    <section class="candidate-panel completion-panel">
+        <div class="completion-content">
+            <div class="completion-icon success">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+
+            <h1 class="completion-title">Assessment Complete!</h1>
+            <p class="completion-subtitle">Thank you for completing the {{ assessment.name }}</p>
+
+            <div class="completion-stats">
+                <div class="stat-card">
+                    <span class="stat-label">Questions Answered</span>
+                    <span class="stat-value">{{ session.question_order|length }}</span>
+                </div>
+                {% if elapsed_minutes %}
+                <div class="stat-card">
+                    <span class="stat-label">Time Taken</span>
+                    <span class="stat-value">{{ elapsed_minutes }} min</span>
+                </div>
+                {% endif %}
+                <div class="stat-card">
+                    <span class="stat-label">Status</span>
+                    <span class="stat-value status-submitted">Submitted</span>
+                </div>
+            </div>
+
+            <div class="completion-message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <p>Your responses have been submitted and the hiring team has been notified. They will review your assessment and reach out to you with the next steps.</p>
+            </div>
+
+            <div class="completion-next-steps">
+                <h3>What happens next?</h3>
+                <ul>
+                    <li>
+                        <span class="step-number">1</span>
+                        <span>Your responses are being reviewed by the hiring team</span>
+                    </li>
+                    <li>
+                        <span class="step-number">2</span>
+                        <span>You'll receive feedback within the next few business days</span>
+                    </li>
+                    <li>
+                        <span class="step-number">3</span>
+                        <span>If selected, you'll be contacted for the next interview stage</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="completion-close">
+                <p>You can safely close this window now.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.completion-panel {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 48px 32px;
+}
+
+.completion-content {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.completion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 24px;
+}
+
+.completion-icon.success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #059669;
+}
+
+.completion-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0e1428;
+    margin: 0 0 12px;
+}
+
+.completion-subtitle {
+    font-size: 18px;
+    color: #718096;
+    margin: 0 0 32px;
+}
+
+.completion-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 24px;
+    min-width: 140px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 13px;
+    color: #718096;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: #0e1428;
+}
+
+.status-submitted {
+    color: #059669;
+    font-size: 18px;
+}
+
+.completion-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    text-align: left;
+}
+
+.completion-message svg {
+    flex-shrink: 0;
+    color: #3b82f6;
+    margin-top: 2px;
+}
+
+.completion-message p {
+    margin: 0;
+    font-size: 15px;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+.completion-next-steps {
+    text-align: left;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.completion-next-steps h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0e1428;
+    margin: 0 0 16px;
+}
+
+.completion-next-steps ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.completion-next-steps li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 15px;
+    color: #4a5568;
+}
+
+.completion-next-steps li:last-child {
+    border-bottom: none;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%);
+    color: white;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.completion-close {
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.completion-close p {
+    margin: 0;
+    font-size: 14px;
+    color: #718096;
+}
+
+@media (max-width: 640px) {
+    .completion-panel {
+        padding: 32px 20px;
+    }
+
+    .completion-title {
+        font-size: 24px;
+    }
+
+    .completion-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-card {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
