@@ -71,14 +71,15 @@ class AIGenerationForm(forms.Form):
     )
     num_questions = forms.IntegerField(
         min_value=5,
-        max_value=30,
-        initial=10,
+        max_value=10,
+        initial=5,
         widget=forms.NumberInput(attrs={
             "class": "form-input",
             "min": 5,
-            "max": 30,
+            "max": 10,
         }),
         label="Number of Questions",
+        help_text="5-10 questions per batch (generate multiple batches for more)",
     )
 
 
