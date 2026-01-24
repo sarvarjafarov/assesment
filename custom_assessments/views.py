@@ -470,7 +470,7 @@ class InviteCandidateView(LoginRequiredMixin, PremiumRequiredMixin, View):
             from clients.models import ClientProject
             project = ClientProject.objects.filter(
                 pk=project_id,
-                client_account=request.user.client_account
+                client=request.user.client_account
             ).first()
 
         # Create session
