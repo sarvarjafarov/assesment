@@ -456,10 +456,8 @@ def send_completion_notification(
 
     # Get client email - use primary user's email
     client_email = None
-    if session.client:
-        primary_user = session.client.users.first()
-        if primary_user:
-            client_email = primary_user.email
+    if session.client and session.client.user:
+        client_email = session.client.user.email
 
     if not client_email:
         return False, "No client email found"
