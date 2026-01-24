@@ -259,7 +259,7 @@ class InviteCandidateForm(forms.Form):
         if client_account:
             from clients.models import ClientProject
             projects = ClientProject.objects.filter(
-                client_account=client_account,
+                client=client_account,
                 is_active=True
             ).order_by("name")
             choices = [("", "— No Project —")]
