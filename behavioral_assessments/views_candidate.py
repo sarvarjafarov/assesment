@@ -51,8 +51,9 @@ class BehavioralAssessmentView(FormView):
             self.session.save(update_fields=updates + ["updated_at"])
             # Send new candidate notification on first start
             if is_first_start and self.session.client:
-                from clients.services import send_new_candidate_alert
+                from clients.services import send_new_candidate_alert, trigger_session_webhook
                 send_new_candidate_alert(self.session.client, self.session, "behavioral")
+                trigger_session_webhook(self.session, "session.started")
         update_session_telemetry(self.session, request=request)
         duration_minutes = self.session.duration_minutes or 0
         if duration_minutes:

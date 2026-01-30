@@ -202,7 +202,8 @@ def evaluate_session(session: DigitalMarketingAssessmentSession):
 
     # Send completion notification to client
     if session.client:
-        from clients.services import send_completion_alert
+        from clients.services import send_completion_alert, trigger_session_webhook
         send_completion_alert(session.client, session, "marketing")
+        trigger_session_webhook(session, "session.completed")
 
     return session

@@ -1113,6 +1113,12 @@ class ClientSettingsView(LoginRequiredMixin, View):
 
     def get_context_data(self):
         account = self.request.user.client_account
+
+        # Get recent webhook deliveries
+        recent_deliveries = []
+        if account.role in ROLE_BRANDING_ACCESS:
+            recent_deliveries = account.webhook_deliveries.order_by('-created_at')[:10]
+
         return {
             'account': account,
             'is_manager': account.role == 'manager',
@@ -1120,6 +1126,7 @@ class ClientSettingsView(LoginRequiredMixin, View):
             'role_label': dict(ClientAccount.ROLE_CHOICES).get(account.role, account.role.title()),
             'password_form': ClientPasswordChangeForm(user=self.request.user),
             'email_form': EmailPreferencesForm(instance=account),
+            'recent_deliveries': recent_deliveries,
         }
 
     def get(self, request, *args, **kwargs):
@@ -1155,6 +1162,126 @@ class ClientSettingsView(LoginRequiredMixin, View):
             else:
                 context['email_form'] = email_form
                 messages.error(request, "Please correct the errors below.")
+
+        elif action == "update_branding":
+            # Handle branding settings update
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "You don't have permission to modify branding settings.")
+                return redirect("clients:settings")
+
+            # Update color settings (available to all plans)
+            account.brand_primary_color = request.POST.get("brand_primary_color", "#ff8a00")
+            account.brand_secondary_color = request.POST.get("brand_secondary_color", "#0e1428")
+            account.brand_background_color = request.POST.get("brand_background_color", "#ffffff")
+
+            # Update text settings
+            account.custom_welcome_message = request.POST.get("custom_welcome_message", "").strip()
+            account.custom_footer_text = request.POST.get("custom_footer_text", "").strip()
+
+            # Pro/Enterprise only features
+            if account.can_use_white_labeling:
+                account.custom_email_sender_name = request.POST.get("custom_email_sender_name", "").strip()
+                account.hide_evalon_branding = request.POST.get("hide_evalon_branding") == "on"
+
+            account.save(update_fields=[
+                "brand_primary_color",
+                "brand_secondary_color",
+                "brand_background_color",
+                "custom_welcome_message",
+                "custom_footer_text",
+                "custom_email_sender_name",
+                "hide_evalon_branding",
+                "updated_at",
+            ])
+            messages.success(request, "Your branding settings have been saved.")
+            return redirect("clients:settings")
+
+        elif action == "update_webhooks":
+            # Handle webhook settings update
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "You don't have permission to modify webhook settings.")
+                return redirect("clients:settings")
+
+            webhook_url = request.POST.get("webhook_url", "").strip()
+            webhook_enabled = request.POST.get("webhook_enabled") == "on"
+            webhook_events = request.POST.getlist("webhook_events")
+
+            # Validate webhook URL if provided
+            if webhook_url and not webhook_url.startswith("https://"):
+                messages.error(request, "Webhook URL must use HTTPS for security.")
+                return redirect("clients:settings")
+
+            account.webhook_url = webhook_url
+            account.webhook_enabled = webhook_enabled and bool(webhook_url)
+            account.webhook_events = webhook_events
+
+            # Generate secret if enabling webhooks for first time
+            if account.webhook_enabled and not account.webhook_secret:
+                account.generate_webhook_secret()
+
+            account.save(update_fields=[
+                "webhook_url",
+                "webhook_enabled",
+                "webhook_events",
+                "webhook_secret",
+                "updated_at",
+            ])
+            messages.success(request, "Your webhook settings have been saved.")
+            return redirect("clients:settings")
+
+        elif action == "generate_webhook_secret":
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "You don't have permission to modify webhook settings.")
+                return redirect("clients:settings")
+
+            account.generate_webhook_secret()
+            messages.success(request, "A new webhook signing secret has been generated.")
+            return redirect("clients:settings")
+
+        elif action == "generate_api_key":
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "You don't have permission to generate API keys.")
+                return redirect("clients:settings")
+
+            api_key = account.generate_api_key()
+            messages.success(request, f"Your new API key has been generated: {api_key}")
+            return redirect("clients:settings")
+
+        elif action == "revoke_api_key":
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "You don't have permission to revoke API keys.")
+                return redirect("clients:settings")
+
+            account.api_key = ""
+            account.api_key_created_at = None
+            account.save(update_fields=["api_key", "api_key_created_at", "updated_at"])
+            messages.success(request, "Your API key has been revoked.")
+            return redirect("clients:settings")
+
+        elif action == "test_webhook":
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "You don't have permission to test webhooks.")
+                return redirect("clients:settings")
+
+            if not account.has_webhook_configured:
+                messages.error(request, "Please configure and save your webhook settings first.")
+                return redirect("clients:settings")
+
+            # Send a test webhook
+            from .services import send_webhook
+            test_data = {
+                "test": True,
+                "message": "This is a test webhook from Evalon",
+                "client": {
+                    "company_name": account.company_name,
+                },
+            }
+            success = send_webhook(account, "test.ping", test_data)
+            if success:
+                messages.success(request, "Test webhook sent successfully! Check your endpoint.")
+            else:
+                messages.error(request, "Failed to send test webhook. Please check your URL and try again.")
+            return redirect("clients:settings")
 
         return render(request, self.template_name, context)
 
@@ -1420,6 +1547,11 @@ class ClientAssessmentManageView(ClientAssessmentMixin, FormView):
             messages.error(self.request, "You do not have permission to create invites.")
             return redirect(self.get_success_url())
         session = form.save()
+
+        # Trigger webhook for session created
+        from clients.services import trigger_session_webhook
+        trigger_session_webhook(session, "session.created")
+
         if session.status == "in_progress":
             email_status = self._dispatch_candidate_invite_email(session)
         elif session.status == "draft" and session.scheduled_for:

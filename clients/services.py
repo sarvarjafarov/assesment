@@ -1,13 +1,24 @@
 """
 Email services for client account management.
 Handles verification emails, approval notifications, and welcome emails.
+Also includes webhook delivery services.
 """
 
+import hashlib
+import hmac
+import json
+import logging
+from datetime import datetime
+
+import requests
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import strip_tags
+
+logger = logging.getLogger(__name__)
 
 
 def send_verification_email(client_account):
@@ -278,3 +289,219 @@ def send_new_candidate_alert(client_account, session, assessment_type):
     except Exception as e:
         print(f"Failed to send new candidate alert: {e}")
         return False
+
+
+# =============================================================================
+# WEBHOOK SERVICES
+# =============================================================================
+
+def generate_webhook_signature(payload: str, secret: str) -> str:
+    """
+    Generate HMAC-SHA256 signature for webhook payload.
+
+    Args:
+        payload: JSON string of the webhook payload
+        secret: The webhook secret key
+
+    Returns:
+        Hex-encoded HMAC signature
+    """
+    return hmac.new(
+        secret.encode("utf-8"),
+        payload.encode("utf-8"),
+        hashlib.sha256
+    ).hexdigest()
+
+
+def send_webhook(client_account, event_type: str, data: dict) -> bool:
+    """
+    Send a webhook notification to the client's configured URL.
+
+    Args:
+        client_account: ClientAccount instance
+        event_type: The type of event (e.g., 'session.completed')
+        data: Dictionary containing the event data
+
+    Returns:
+        bool: True if webhook was sent successfully
+    """
+    from .models import WebhookDelivery
+
+    # Check if webhook should be triggered
+    if not client_account.should_trigger_webhook(event_type):
+        return False
+
+    # Build the payload
+    payload = {
+        "id": f"evt_{timezone.now().strftime('%Y%m%d%H%M%S')}_{client_account.pk}",
+        "type": event_type,
+        "created": timezone.now().isoformat(),
+        "data": data,
+    }
+
+    payload_json = json.dumps(payload, default=str)
+
+    # Create delivery record
+    delivery = WebhookDelivery.objects.create(
+        client=client_account,
+        event_type=event_type,
+        payload=payload,
+        status=WebhookDelivery.STATUS_PENDING,
+    )
+
+    # Generate signature
+    signature = generate_webhook_signature(payload_json, client_account.webhook_secret)
+
+    # Send the webhook
+    headers = {
+        "Content-Type": "application/json",
+        "X-Evalon-Signature": signature,
+        "X-Evalon-Event": event_type,
+        "X-Evalon-Delivery": str(delivery.pk),
+        "User-Agent": "Evalon-Webhook/1.0",
+    }
+
+    try:
+        response = requests.post(
+            client_account.webhook_url,
+            data=payload_json,
+            headers=headers,
+            timeout=30,
+        )
+
+        if response.status_code >= 200 and response.status_code < 300:
+            delivery.mark_success(response.status_code, response.text)
+            return True
+        else:
+            delivery.mark_failed(response.status_code, f"HTTP {response.status_code}")
+            return False
+
+    except requests.exceptions.Timeout:
+        delivery.mark_failed(error="Connection timeout")
+        return False
+    except requests.exceptions.ConnectionError as e:
+        delivery.mark_failed(error=f"Connection error: {str(e)}")
+        return False
+    except Exception as e:
+        logger.exception(f"Webhook delivery failed for client {client_account.pk}")
+        delivery.mark_failed(error=str(e))
+        return False
+
+
+def trigger_session_webhook(session, event_type: str):
+    """
+    Trigger a webhook for an assessment session event.
+
+    Args:
+        session: Assessment session instance
+        event_type: One of 'session.created', 'session.started', 'session.completed', 'session.expired'
+    """
+    client = getattr(session, "client", None)
+    if not client:
+        return
+
+    # Build session data payload
+    data = {
+        "session": {
+            "uuid": str(session.uuid),
+            "candidate_id": getattr(session, "candidate_id", None) or getattr(session, "candidate_email", ""),
+            "status": session.status,
+            "assessment_type": _get_assessment_type(session),
+            "started_at": session.started_at.isoformat() if session.started_at else None,
+            "completed_at": getattr(session, "completed_at", None),
+        },
+        "client": {
+            "company_name": client.company_name,
+        },
+    }
+
+    # Add score if completed
+    if event_type == "session.completed":
+        score = _get_session_score(session)
+        if score is not None:
+            data["session"]["score"] = score
+
+    # Add project info if available
+    project = getattr(session, "project", None)
+    if project:
+        data["session"]["project"] = {
+            "uuid": str(project.uuid),
+            "title": project.title,
+        }
+
+    send_webhook(client, event_type, data)
+
+
+def _get_assessment_type(session) -> str:
+    """Determine assessment type from session model."""
+    model_name = session.__class__.__name__.lower()
+    if "marketing" in model_name:
+        return "marketing"
+    elif "product" in model_name or "pm" in model_name:
+        return "product"
+    elif "behavioral" in model_name:
+        return "behavioral"
+    elif "custom" in model_name:
+        return "custom"
+    return "unknown"
+
+
+def _get_session_score(session):
+    """Get the score from a session if available."""
+    if hasattr(session, "overall_score") and session.overall_score is not None:
+        return float(session.overall_score)
+    if hasattr(session, "eligibility_score") and session.eligibility_score is not None:
+        return float(session.eligibility_score)
+    if hasattr(session, "score") and session.score is not None:
+        return float(session.score)
+    return None
+
+
+def retry_failed_webhooks():
+    """
+    Retry failed webhook deliveries that are due for retry.
+    Should be called periodically by a background task.
+    """
+    from .models import WebhookDelivery
+
+    now = timezone.now()
+    pending_retries = WebhookDelivery.objects.filter(
+        status=WebhookDelivery.STATUS_RETRYING,
+        next_retry_at__lte=now,
+    ).select_related("client")
+
+    for delivery in pending_retries:
+        client = delivery.client
+        if not client.has_webhook_configured:
+            delivery.status = WebhookDelivery.STATUS_FAILED
+            delivery.error_message = "Webhook configuration removed"
+            delivery.save(update_fields=["status", "error_message", "updated_at"])
+            continue
+
+        payload_json = json.dumps(delivery.payload, default=str)
+        signature = generate_webhook_signature(payload_json, client.webhook_secret)
+
+        headers = {
+            "Content-Type": "application/json",
+            "X-Evalon-Signature": signature,
+            "X-Evalon-Event": delivery.event_type,
+            "X-Evalon-Delivery": str(delivery.pk),
+            "X-Evalon-Retry": str(delivery.attempts),
+            "User-Agent": "Evalon-Webhook/1.0",
+        }
+
+        try:
+            response = requests.post(
+                client.webhook_url,
+                data=payload_json,
+                headers=headers,
+                timeout=30,
+            )
+
+            if response.status_code >= 200 and response.status_code < 300:
+                delivery.mark_success(response.status_code, response.text)
+            else:
+                delivery.mark_failed(response.status_code, f"HTTP {response.status_code}")
+
+        except Exception as e:
+            delivery.mark_failed(error=str(e))
