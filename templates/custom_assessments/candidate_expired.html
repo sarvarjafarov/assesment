@@ -1,9 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}Assessment Expired - {{ assessment.name }}{% endblock %}
 {% block content %}
-<div class="candidate-shell single-column">
+{# Apply client branding CSS variables #}
+{% if session.client %}
+<style>
+:root {
+    --brand-primary: {{ session.client.brand_primary_color|default:"#ff8a00" }};
+    --brand-secondary: {{ session.client.brand_secondary_color|default:"#0e1428" }};
+    --brand-background: {{ session.client.brand_background_color|default:"#ffffff" }};
+}
+</style>
+{% endif %}
+
+<div class="candidate-shell single-column" style="{% if session.client.brand_background_color %}background: {{ session.client.brand_background_color }};{% endif %}">
     <section class="candidate-panel expired-panel">
         <div class="expired-content">
+            {# Client Logo #}
+            {% if session.client and session.client.logo_data_url %}
+            <div class="client-logo" style="margin-bottom: 24px;">
+                <img src="{{ session.client.logo_data_url }}" alt="{{ session.client.company_name }}" style="max-width: 120px; max-height: 80px;">
+            </div>
+            {% endif %}
+
             <div class="expired-icon">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -46,6 +64,14 @@
             <div class="expired-contact">
                 <p>If you believe this is an error or need assistance, please contact the hiring team directly or email <a href="mailto:support@evalon.so">support@evalon.so</a>.</p>
             </div>
+
+            <p class="expired-footer" style="margin-top: 24px; font-size: 13px; color: #718096;">
+                {% if session.client %}
+                    {{ session.client.get_footer_text }}
+                {% else %}
+                    Powered by <strong style="color: var(--brand-primary, #ff8a00);">Evalon</strong> · Secure & confidential
+                {% endif %}
+            </p>
         </div>
     </section>
 </div>
@@ -167,7 +193,7 @@
 }
 
 .expired-contact a {
-    color: #ff8a00;
+    color: var(--brand-primary, #ff8a00);
     text-decoration: none;
     font-weight: 600;
 }

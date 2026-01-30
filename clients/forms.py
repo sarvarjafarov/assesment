@@ -670,3 +670,145 @@ class EmailPreferencesForm(forms.ModelForm):
             "receive_completion_alerts": "Get notified when a candidate completes an assessment.",
             "receive_new_candidate_alerts": "Get notified when a new candidate starts an assessment.",
         }
+
+
+class BrandingSettingsForm(forms.ModelForm):
+    """Form for managing white-labeling and branding settings."""
+
+    brand_primary_color = forms.CharField(
+        max_length=7,
+        widget=forms.TextInput(attrs={
+            "type": "color",
+            "class": "color-picker",
+        }),
+        label="Primary Color",
+        help_text="Main brand color used for buttons, links, and highlights",
+    )
+    brand_secondary_color = forms.CharField(
+        max_length=7,
+        widget=forms.TextInput(attrs={
+            "type": "color",
+            "class": "color-picker",
+        }),
+        label="Text Color",
+        help_text="Primary text and heading color",
+    )
+    brand_background_color = forms.CharField(
+        max_length=7,
+        widget=forms.TextInput(attrs={
+            "type": "color",
+            "class": "color-picker",
+        }),
+        label="Background Color",
+        help_text="Assessment page background color",
+    )
+
+    class Meta:
+        model = ClientAccount
+        fields = [
+            "brand_primary_color",
+            "brand_secondary_color",
+            "brand_background_color",
+            "custom_email_sender_name",
+            "custom_welcome_message",
+            "custom_footer_text",
+            "hide_evalon_branding",
+        ]
+        widgets = {
+            "custom_email_sender_name": forms.TextInput(attrs={
+                "placeholder": "e.g., Acme Hiring Team",
+            }),
+            "custom_welcome_message": forms.Textarea(attrs={
+                "rows": 3,
+                "placeholder": "Add a custom welcome message for candidates...",
+            }),
+            "custom_footer_text": forms.TextInput(attrs={
+                "placeholder": "e.g., Assessment powered by Acme Inc.",
+            }),
+            "hide_evalon_branding": forms.CheckboxInput(attrs={
+                "class": "toggle-checkbox",
+            }),
+        }
+        labels = {
+            "custom_email_sender_name": "Email Sender Name",
+            "custom_welcome_message": "Custom Welcome Message",
+            "custom_footer_text": "Custom Footer Text",
+            "hide_evalon_branding": "Hide Evalon Branding",
+        }
+        help_texts = {
+            "custom_email_sender_name": "Custom sender name for assessment invitation emails",
+            "custom_welcome_message": "Shown on the assessment intro page before candidates start",
+            "custom_footer_text": "Replaces 'Powered by Evalon' in candidate-facing pages",
+            "hide_evalon_branding": "Remove Evalon branding from candidate-facing pages (Pro/Enterprise only)",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Disable white-labeling fields for non-Pro/Enterprise plans
+        if self.instance and not self.instance.can_use_white_labeling:
+            self.fields["hide_evalon_branding"].disabled = True
+            self.fields["hide_evalon_branding"].help_text = (
+                "Upgrade to Pro or Enterprise to use this feature"
+            )
+            self.fields["custom_email_sender_name"].disabled = True
+            self.fields["custom_email_sender_name"].help_text = (
+                "Upgrade to Pro or Enterprise to customize email sender"
+            )
+
+
+class WebhookSettingsForm(forms.ModelForm):
+    """Form for managing webhook and API integration settings."""
+
+    WEBHOOK_EVENT_CHOICES = [
+        ("session.created", "Session Created - When a new assessment session is created"),
+        ("session.started", "Session Started - When a candidate starts an assessment"),
+        ("session.completed", "Session Completed - When a candidate completes an assessment"),
+        ("session.expired", "Session Expired - When an assessment session expires"),
+    ]
+
+    webhook_events = forms.MultipleChoiceField(
+        choices=WEBHOOK_EVENT_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "webhook-event-checkbox"}),
+        label="Webhook Events",
+        help_text="Select which events should trigger webhook notifications",
+    )
+
+    class Meta:
+        model = ClientAccount
+        fields = [
+            "webhook_enabled",
+            "webhook_url",
+            "webhook_events",
+        ]
+        widgets = {
+            "webhook_enabled": forms.CheckboxInput(attrs={"class": "toggle-checkbox"}),
+            "webhook_url": forms.URLInput(attrs={
+                "placeholder": "https://your-server.com/webhooks/evalon",
+                "class": "webhook-url-input",
+            }),
+        }
+        labels = {
+            "webhook_enabled": "Enable Webhooks",
+            "webhook_url": "Webhook URL",
+        }
+        help_texts = {
+            "webhook_enabled": "Enable or disable webhook notifications",
+            "webhook_url": "The URL where webhook payloads will be sent (must be HTTPS)",
+        }
+
+    def clean_webhook_url(self):
+        url = self.cleaned_data.get("webhook_url", "").strip()
+        if url and not url.startswith("https://"):
+            raise forms.ValidationError("Webhook URL must use HTTPS for security")
+        return url
+
+    def clean(self):
+        cleaned = super().clean()
+        enabled = cleaned.get("webhook_enabled")
+        url = cleaned.get("webhook_url")
+
+        if enabled and not url:
+            self.add_error("webhook_url", "Webhook URL is required when webhooks are enabled")
+
+        return cleaned

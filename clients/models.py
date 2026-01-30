@@ -147,6 +147,71 @@ class ClientAccount(TimeStampedModel):
         help_text="Tracks which steps user has completed: {step_1: true, step_2: false, ...}"
     )
 
+    # Webhook / API Integration
+    webhook_url = models.URLField(
+        blank=True,
+        help_text="URL to receive webhook notifications"
+    )
+    webhook_secret = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Secret key for signing webhook payloads"
+    )
+    webhook_enabled = models.BooleanField(
+        default=False,
+        help_text="Enable webhook notifications"
+    )
+    webhook_events = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of event types to trigger webhooks: ['session.created', 'session.started', 'session.completed']"
+    )
+    api_key = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="API key for programmatic access"
+    )
+    api_key_created_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When the API key was generated"
+    )
+
+    # White-labeling / Branding settings
+    brand_primary_color = models.CharField(
+        max_length=7,
+        default="#ff8a00",
+        help_text="Primary brand color (hex code, e.g., #ff8a00)"
+    )
+    brand_secondary_color = models.CharField(
+        max_length=7,
+        default="#0e1428",
+        help_text="Secondary/text color (hex code)"
+    )
+    brand_background_color = models.CharField(
+        max_length=7,
+        default="#ffffff",
+        help_text="Background color (hex code)"
+    )
+    custom_email_sender_name = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Custom sender name for assessment emails (e.g., 'Acme Hiring Team')"
+    )
+    custom_welcome_message = models.TextField(
+        blank=True,
+        help_text="Custom welcome message shown to candidates on assessment intro page"
+    )
+    custom_footer_text = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Custom footer text (replaces 'Powered by Evalon')"
+    )
+    hide_evalon_branding = models.BooleanField(
+        default=False,
+        help_text="Hide 'Powered by Evalon' badge (Pro/Enterprise only)"
+    )
+
     objects = ClientAccountQuerySet.as_manager()
 
     class Meta:
@@ -271,6 +336,67 @@ class ClientAccount(TimeStampedModel):
     @property
     def has_logo(self):
         return bool(self.logo_data_url)
+
+    @property
+    def can_use_white_labeling(self) -> bool:
+        """Check if the client's plan supports white-labeling features."""
+        return self.plan_slug in ("pro", "enterprise")
+
+    @property
+    def branding_css_vars(self) -> dict:
+        """Return CSS custom properties for client branding."""
+        return {
+            "--brand-primary": self.brand_primary_color or "#ff8a00",
+            "--brand-secondary": self.brand_secondary_color or "#0e1428",
+            "--brand-background": self.brand_background_color or "#ffffff",
+        }
+
+    def get_email_sender_name(self) -> str:
+        """Return the sender name for emails."""
+        if self.custom_email_sender_name and self.can_use_white_labeling:
+            return self.custom_email_sender_name
+        return f"{self.company_name} via Evalon"
+
+    def get_footer_text(self) -> str:
+        """Return the footer text for candidate-facing pages."""
+        if self.hide_evalon_branding and self.can_use_white_labeling:
+            return self.custom_footer_text or f"Assessment by {self.company_name}"
+        return "Powered by Evalon · Secure & confidential"
+
+    def generate_api_key(self) -> str:
+        """Generate a new API key for this client."""
+        key = f"evl_{uuid.uuid4().hex}"
+        self.api_key = key
+        self.api_key_created_at = timezone.now()
+        self.save(update_fields=["api_key", "api_key_created_at", "updated_at"])
+        return key
+
+    def generate_webhook_secret(self) -> str:
+        """Generate a new webhook signing secret."""
+        secret = f"whsec_{uuid.uuid4().hex}"
+        self.webhook_secret = secret
+        self.save(update_fields=["webhook_secret", "updated_at"])
+        return secret
+
+    def revoke_api_key(self):
+        """Revoke the current API key."""
+        self.api_key = ""
+        self.api_key_created_at = None
+        self.save(update_fields=["api_key", "api_key_created_at", "updated_at"])
+
+    @property
+    def has_webhook_configured(self) -> bool:
+        """Check if webhook is properly configured."""
+        return bool(self.webhook_enabled and self.webhook_url and self.webhook_secret)
+
+    def should_trigger_webhook(self, event_type: str) -> bool:
+        """Check if a webhook should be triggered for the given event type."""
+        if not self.has_webhook_configured:
+            return False
+        # If no specific events configured, trigger for all
+        if not self.webhook_events:
+            return True
+        return event_type in self.webhook_events
 
     def project_limit(self) -> int | None:
         limit = self.project_quota
@@ -413,6 +539,91 @@ class ClientProject(TimeStampedModel):
         pm_qs = getattr(self, "pm_sessions", None)
         pm_count = pm_qs.count() if pm_qs is not None else 0
         return self.marketing_sessions.count() + pm_count + self.behavioral_sessions.count()
+
+
+class WebhookDelivery(TimeStampedModel):
+    """Track webhook delivery attempts and their outcomes."""
+
+    STATUS_PENDING = "pending"
+    STATUS_SUCCESS = "success"
+    STATUS_FAILED = "failed"
+    STATUS_RETRYING = "retrying"
+    STATUS_CHOICES = [
+        (STATUS_PENDING, "Pending"),
+        (STATUS_SUCCESS, "Success"),
+        (STATUS_FAILED, "Failed"),
+        (STATUS_RETRYING, "Retrying"),
+    ]
+
+    EVENT_SESSION_CREATED = "session.created"
+    EVENT_SESSION_STARTED = "session.started"
+    EVENT_SESSION_COMPLETED = "session.completed"
+    EVENT_SESSION_EXPIRED = "session.expired"
+    EVENT_CHOICES = [
+        (EVENT_SESSION_CREATED, "Session Created"),
+        (EVENT_SESSION_STARTED, "Session Started"),
+        (EVENT_SESSION_COMPLETED, "Session Completed"),
+        (EVENT_SESSION_EXPIRED, "Session Expired"),
+    ]
+
+    client = models.ForeignKey(
+        ClientAccount,
+        related_name="webhook_deliveries",
+        on_delete=models.CASCADE,
+    )
+    event_type = models.CharField(max_length=50, choices=EVENT_CHOICES)
+    payload = models.JSONField(default=dict)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+    )
+    response_status_code = models.IntegerField(null=True, blank=True)
+    response_body = models.TextField(blank=True)
+    error_message = models.TextField(blank=True)
+    attempts = models.PositiveIntegerField(default=0)
+    next_retry_at = models.DateTimeField(null=True, blank=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = "Webhook Delivery"
+        verbose_name_plural = "Webhook Deliveries"
+
+    def __str__(self):
+        return f"{self.event_type} - {self.client.company_name} ({self.status})"
+
+    def mark_success(self, status_code: int, response_body: str = ""):
+        """Mark delivery as successful."""
+        self.status = self.STATUS_SUCCESS
+        self.response_status_code = status_code
+        self.response_body = response_body[:5000]  # Limit response body size
+        self.delivered_at = timezone.now()
+        self.save(update_fields=[
+            "status", "response_status_code", "response_body",
+            "delivered_at", "updated_at"
+        ])
+
+    def mark_failed(self, status_code: int = None, error: str = ""):
+        """Mark delivery as failed."""
+        self.attempts += 1
+        self.error_message = error[:2000]
+        self.response_status_code = status_code
+
+        # Retry logic: retry up to 3 times with exponential backoff
+        if self.attempts < 3:
+            self.status = self.STATUS_RETRYING
+            # 5 minutes, 30 minutes, 2 hours
+            delays = [300, 1800, 7200]
+            delay = delays[min(self.attempts - 1, len(delays) - 1)]
+            self.next_retry_at = timezone.now() + timezone.timedelta(seconds=delay)
+        else:
+            self.status = self.STATUS_FAILED
+
+        self.save(update_fields=[
+            "status", "attempts", "error_message", "response_status_code",
+            "next_retry_at", "updated_at"
+        ])
 
 
 class SupportRequest(TimeStampedModel):

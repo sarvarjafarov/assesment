@@ -49,10 +49,13 @@
     {% if can_manage_branding %}
     <section class="settings-section">
         <div class="settings-section-header">
-            <h2>Branding</h2>
-            <p class="muted">Customize assessment invitations with your company logo</p>
+            <h2>Branding & White-Labeling</h2>
+            <p class="muted">Customize assessment experience with your company branding</p>
         </div>
+
+        {# Logo Upload #}
         <div class="portal-card">
+            <h3 class="card-title">Company Logo</h3>
             <div class="branding-preview">
                 <div class="logo-preview">
                     {% if account.logo_data_url %}
@@ -98,6 +101,295 @@
             <p class="help-text">
                 Recommended: Square logo (PNG or JPG), minimum 200x200px. Maximum file size: 2MB.
             </p>
+        </div>
+
+        {# Brand Colors #}
+        <div class="portal-card" style="margin-top: 1rem;">
+            <h3 class="card-title">Brand Colors</h3>
+            <form method="post" class="settings-form" id="branding-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_branding">
+                <div class="color-picker-grid">
+                    <div class="form-group color-group">
+                        <label for="id_brand_primary_color">Primary Color</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="id_brand_primary_color" name="brand_primary_color"
+                                   value="{{ account.brand_primary_color|default:'#ff8a00' }}"
+                                   class="color-picker">
+                            <input type="text" class="color-hex-input" value="{{ account.brand_primary_color|default:'#ff8a00' }}"
+                                   maxlength="7" pattern="#[0-9A-Fa-f]{6}">
+                        </div>
+                        <span class="form-help">Buttons, links, highlights</span>
+                    </div>
+                    <div class="form-group color-group">
+                        <label for="id_brand_secondary_color">Text Color</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="id_brand_secondary_color" name="brand_secondary_color"
+                                   value="{{ account.brand_secondary_color|default:'#0e1428' }}"
+                                   class="color-picker">
+                            <input type="text" class="color-hex-input" value="{{ account.brand_secondary_color|default:'#0e1428' }}"
+                                   maxlength="7" pattern="#[0-9A-Fa-f]{6}">
+                        </div>
+                        <span class="form-help">Headings and text</span>
+                    </div>
+                    <div class="form-group color-group">
+                        <label for="id_brand_background_color">Background Color</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="id_brand_background_color" name="brand_background_color"
+                                   value="{{ account.brand_background_color|default:'#ffffff' }}"
+                                   class="color-picker">
+                            <input type="text" class="color-hex-input" value="{{ account.brand_background_color|default:'#ffffff' }}"
+                                   maxlength="7" pattern="#[0-9A-Fa-f]{6}">
+                        </div>
+                        <span class="form-help">Page background</span>
+                    </div>
+                </div>
+
+                {# Branding Preview #}
+                <div class="branding-preview-box" id="branding-preview">
+                    <p class="preview-label">Preview</p>
+                    <div class="preview-card">
+                        {% if account.logo_data_url %}
+                        <img src="{{ account.logo_data_url }}" alt="Logo" class="preview-logo">
+                        {% endif %}
+                        <h4 class="preview-title">Assessment Title</h4>
+                        <p class="preview-text">This is how your branded assessment will look to candidates.</p>
+                        <button type="button" class="preview-button">Start Assessment</button>
+                        <p class="preview-footer">{{ account.get_footer_text }}</p>
+                    </div>
+                </div>
+
+                {# Custom Text Settings #}
+                <div class="form-divider"></div>
+                <h4 class="subsection-title">Custom Text</h4>
+
+                <div class="form-group">
+                    <label for="id_custom_email_sender_name">Email Sender Name</label>
+                    <input type="text" id="id_custom_email_sender_name" name="custom_email_sender_name"
+                           value="{{ account.custom_email_sender_name }}"
+                           placeholder="e.g., Acme Hiring Team"
+                           {% if not account.can_use_white_labeling %}disabled{% endif %}>
+                    <span class="form-help">
+                        {% if account.can_use_white_labeling %}
+                        Custom sender name for assessment invitation emails
+                        {% else %}
+                        <span class="upgrade-badge">Pro/Enterprise</span> Upgrade to customize email sender
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_custom_welcome_message">Custom Welcome Message</label>
+                    <textarea id="id_custom_welcome_message" name="custom_welcome_message" rows="3"
+                              placeholder="Add a custom welcome message for candidates...">{{ account.custom_welcome_message }}</textarea>
+                    <span class="form-help">Shown on the assessment intro page before candidates start</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_custom_footer_text">Custom Footer Text</label>
+                    <input type="text" id="id_custom_footer_text" name="custom_footer_text"
+                           value="{{ account.custom_footer_text }}"
+                           placeholder="e.g., Assessment powered by Acme Inc.">
+                    <span class="form-help">Replaces 'Powered by Evalon' in candidate-facing pages</span>
+                </div>
+
+                <div class="settings-row toggle-row">
+                    <div class="setting-info">
+                        <h4>Hide Evalon Branding</h4>
+                        <p class="muted">
+                            {% if account.can_use_white_labeling %}
+                            Remove Evalon branding from candidate-facing pages
+                            {% else %}
+                            <span class="upgrade-badge">Pro/Enterprise</span> Upgrade to hide Evalon branding
+                            {% endif %}
+                        </p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="hide_evalon_branding"
+                               {% if account.hide_evalon_branding %}checked{% endif %}
+                               {% if not account.can_use_white_labeling %}disabled{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Branding Settings</button>
+                    <button type="button" class="btn btn-ghost" id="reset-branding">Reset to Defaults</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    {% endif %}
+
+    {# Webhook & API Integration - Pro/Enterprise only #}
+    {% if can_manage_branding %}
+    <section class="settings-section">
+        <div class="settings-section-header">
+            <h2>Webhook & API Integration</h2>
+            <p class="muted">Receive real-time notifications and access assessment data programmatically</p>
+        </div>
+
+        {# Webhooks Configuration #}
+        <div class="portal-card">
+            <h3 class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                Webhooks
+            </h3>
+            <form method="post" class="settings-form" id="webhook-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_webhooks">
+
+                <div class="settings-row toggle-row">
+                    <div class="setting-info">
+                        <h4>Enable Webhooks</h4>
+                        <p class="muted">Receive HTTP POST notifications when assessment events occur</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="webhook_enabled" id="webhook_enabled"
+                               {% if account.webhook_enabled %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="webhook-config" class="{% if not account.webhook_enabled %}hidden{% endif %}">
+                    <div class="form-group">
+                        <label for="webhook_url">Webhook URL</label>
+                        <input type="url" id="webhook_url" name="webhook_url"
+                               value="{{ account.webhook_url }}"
+                               placeholder="https://your-server.com/webhooks/evalon"
+                               pattern="https://.*">
+                        <span class="form-help">Must use HTTPS. We'll send a POST request with JSON payload for each event.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Webhook Secret</label>
+                        <div class="secret-display">
+                            {% if account.webhook_secret %}
+                            <code class="secret-value">{{ account.webhook_secret|slice:":8" }}••••••••</code>
+                            <button type="button" class="btn btn-ghost btn-sm" id="regenerate-webhook-secret">
+                                Regenerate
+                            </button>
+                            {% else %}
+                            <span class="muted">No secret configured</span>
+                            <button type="button" class="btn btn-outline btn-sm" id="generate-webhook-secret">
+                                Generate Secret
+                            </button>
+                            {% endif %}
+                        </div>
+                        <span class="form-help">Used to verify webhook signatures. Keep this secure!</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Webhook Events</label>
+                        <div class="webhook-events-grid">
+                            <label class="webhook-event-option">
+                                <input type="checkbox" name="webhook_events" value="session.created"
+                                       {% if "session.created" in account.webhook_events %}checked{% endif %}>
+                                <span class="event-card">
+                                    <strong>session.created</strong>
+                                    <span>When a new assessment session is created</span>
+                                </span>
+                            </label>
+                            <label class="webhook-event-option">
+                                <input type="checkbox" name="webhook_events" value="session.started"
+                                       {% if "session.started" in account.webhook_events %}checked{% endif %}>
+                                <span class="event-card">
+                                    <strong>session.started</strong>
+                                    <span>When a candidate starts an assessment</span>
+                                </span>
+                            </label>
+                            <label class="webhook-event-option">
+                                <input type="checkbox" name="webhook_events" value="session.completed"
+                                       {% if "session.completed" in account.webhook_events %}checked{% endif %}>
+                                <span class="event-card">
+                                    <strong>session.completed</strong>
+                                    <span>When a candidate completes an assessment</span>
+                                </span>
+                            </label>
+                            <label class="webhook-event-option">
+                                <input type="checkbox" name="webhook_events" value="session.expired"
+                                       {% if "session.expired" in account.webhook_events %}checked{% endif %}>
+                                <span class="event-card">
+                                    <strong>session.expired</strong>
+                                    <span>When an assessment session expires</span>
+                                </span>
+                            </label>
+                        </div>
+                        <span class="form-help">Leave all unchecked to receive all events</span>
+                    </div>
+
+                    {# Recent Webhook Deliveries #}
+                    {% if recent_webhooks %}
+                    <div class="webhook-history">
+                        <h4>Recent Deliveries</h4>
+                        <div class="webhook-history-list">
+                            {% for delivery in recent_webhooks %}
+                            <div class="webhook-delivery-item status-{{ delivery.status }}">
+                                <span class="delivery-event">{{ delivery.event_type }}</span>
+                                <span class="delivery-status">
+                                    {% if delivery.status == 'success' %}✓{% elif delivery.status == 'failed' %}✕{% else %}⋯{% endif %}
+                                </span>
+                                <span class="delivery-time">{{ delivery.created_at|timesince }} ago</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Webhook Settings</button>
+                    <button type="button" class="btn btn-ghost" id="test-webhook" {% if not account.webhook_url %}disabled{% endif %}>
+                        Send Test Webhook
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {# API Key #}
+        <div class="portal-card" style="margin-top: 1rem;">
+            <h3 class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                </svg>
+                API Key
+            </h3>
+            <p class="muted" style="margin-bottom: 1rem;">
+                Use an API key to access assessment data programmatically.
+            </p>
+
+            <div class="api-key-display">
+                {% if account.api_key %}
+                <div class="api-key-box">
+                    <code class="api-key-value" id="api-key-value">{{ account.api_key }}</code>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="copyApiKey()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <p class="form-help">Created {{ account.api_key_created_at|date:"F d, Y" }}</p>
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="revoke_api_key">
+                    <button type="submit" class="btn btn-ghost btn-danger" onclick="return confirm('Are you sure you want to revoke this API key? Any integrations using it will stop working.')">
+                        Revoke Key
+                    </button>
+                </form>
+                {% else %}
+                <p class="muted">No API key configured</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="generate_api_key">
+                    <button type="submit" class="btn btn-primary">Generate API Key</button>
+                </form>
+                {% endif %}
+            </div>
         </div>
     </section>
     {% endif %}
@@ -264,4 +556,501 @@
     </section>
 </div>
 
+<style>
+/* Branding Settings Styles */
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 1rem;
+}
+
+.subsection-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 1rem;
+}
+
+.form-divider {
+    height: 1px;
+    background: var(--portal-border-color);
+    margin: 1.5rem 0;
+}
+
+.color-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.color-group {
+    margin-bottom: 0;
+}
+
+.color-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.color-picker {
+    width: 48px;
+    height: 40px;
+    padding: 2px;
+    border: 2px solid var(--portal-border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.color-hex-input {
+    width: 90px;
+    padding: 0.5rem;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+}
+
+/* Branding Preview */
+.branding-preview-box {
+    background: #f7fafc;
+    border: 2px dashed var(--portal-border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.preview-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #718096;
+    margin: 0 0 1rem;
+}
+
+.preview-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.preview-logo {
+    max-width: 80px;
+    max-height: 80px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+.preview-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--brand-secondary, #0e1428);
+}
+
+.preview-text {
+    font-size: 0.9rem;
+    color: #4a5568;
+    margin: 0 0 1rem;
+}
+
+.preview-button {
+    background: var(--brand-primary, #ff8a00);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.preview-button:hover {
+    transform: translateY(-2px);
+}
+
+.preview-footer {
+    font-size: 0.8rem;
+    color: #718096;
+    margin: 1rem 0 0;
+}
+
+/* Upgrade Badge */
+.upgrade-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 0.25rem;
+}
+
+/* Form Improvements */
+.settings-form input[type="text"]:disabled,
+.settings-form textarea:disabled,
+.settings-form input[type="checkbox"]:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .color-picker-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .color-input-wrapper {
+        flex-wrap: wrap;
+    }
+
+    .color-hex-input {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Webhook & API Styles */
+.hidden {
+    display: none !important;
+}
+
+.webhook-events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.webhook-event-option {
+    cursor: pointer;
+}
+
+.webhook-event-option input {
+    position: absolute;
+    opacity: 0;
+}
+
+.event-card {
+    display: block;
+    padding: 1rem;
+    border: 2px solid var(--portal-border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.webhook-event-option input:checked + .event-card {
+    border-color: var(--orange);
+    background: rgba(255, 138, 0, 0.05);
+}
+
+.event-card strong {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--navy);
+    font-family: monospace;
+    margin-bottom: 0.25rem;
+}
+
+.event-card span {
+    font-size: 0.8rem;
+    color: #718096;
+}
+
+.secret-display {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.secret-value {
+    padding: 0.5rem 0.75rem;
+    background: #f7fafc;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.875rem;
+}
+
+.api-key-display {
+    margin-top: 1rem;
+}
+
+.api-key-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f7fafc;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.api-key-value {
+    flex: 1;
+    font-family: monospace;
+    font-size: 0.8rem;
+    word-break: break-all;
+    user-select: all;
+}
+
+.btn-danger {
+    color: #dc2626;
+}
+
+.btn-danger:hover {
+    background: #fef2f2;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.webhook-history {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--portal-border-color);
+}
+
+.webhook-history h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 0.75rem;
+}
+
+.webhook-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.webhook-delivery-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: #f7fafc;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.webhook-delivery-item.status-success {
+    background: #f0fdf4;
+}
+
+.webhook-delivery-item.status-failed {
+    background: #fef2f2;
+}
+
+.delivery-event {
+    font-family: monospace;
+    color: var(--navy);
+}
+
+.delivery-status {
+    font-weight: 600;
+}
+
+.status-success .delivery-status {
+    color: #16a34a;
+}
+
+.status-failed .delivery-status {
+    color: #dc2626;
+}
+
+.delivery-time {
+    margin-left: auto;
+    color: #718096;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Color picker synchronization
+    const colorGroups = document.querySelectorAll('.color-group');
+    colorGroups.forEach(group => {
+        const picker = group.querySelector('.color-picker');
+        const hexInput = group.querySelector('.color-hex-input');
+
+        if (picker && hexInput) {
+            // Sync picker to hex input
+            picker.addEventListener('input', function() {
+                hexInput.value = this.value.toUpperCase();
+                updatePreview();
+            });
+
+            // Sync hex input to picker
+            hexInput.addEventListener('input', function() {
+                let value = this.value;
+                if (!value.startsWith('#')) {
+                    value = '#' + value;
+                }
+                if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                    picker.value = value;
+                    updatePreview();
+                }
+            });
+
+            // Format on blur
+            hexInput.addEventListener('blur', function() {
+                let value = this.value.replace(/[^0-9A-Fa-f]/g, '');
+                if (value.length === 6) {
+                    this.value = '#' + value.toUpperCase();
+                    picker.value = this.value;
+                }
+            });
+        }
+    });
+
+    // Update preview in real-time
+    function updatePreview() {
+        const primaryColor = document.getElementById('id_brand_primary_color').value;
+        const secondaryColor = document.getElementById('id_brand_secondary_color').value;
+        const backgroundColor = document.getElementById('id_brand_background_color').value;
+
+        const preview = document.getElementById('branding-preview');
+        if (preview) {
+            const previewCard = preview.querySelector('.preview-card');
+            const previewTitle = preview.querySelector('.preview-title');
+            const previewButton = preview.querySelector('.preview-button');
+
+            if (previewCard) previewCard.style.background = backgroundColor;
+            if (previewTitle) previewTitle.style.color = secondaryColor;
+            if (previewButton) previewButton.style.background = primaryColor;
+        }
+    }
+
+    // Reset to defaults
+    const resetBtn = document.getElementById('reset-branding');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            if (confirm('Reset all branding settings to default Evalon colors?')) {
+                document.getElementById('id_brand_primary_color').value = '#ff8a00';
+                document.getElementById('id_brand_secondary_color').value = '#0e1428';
+                document.getElementById('id_brand_background_color').value = '#ffffff';
+
+                // Update hex inputs
+                document.querySelectorAll('.color-hex-input').forEach((input, index) => {
+                    const defaults = ['#FF8A00', '#0E1428', '#FFFFFF'];
+                    input.value = defaults[index];
+                });
+
+                updatePreview();
+            }
+        });
+    }
+
+    // Initial preview update
+    updatePreview();
+
+    // =============================================
+    // WEBHOOK SETTINGS
+    // =============================================
+
+    // Toggle webhook config visibility
+    const webhookEnabledCheckbox = document.getElementById('webhook_enabled');
+    const webhookConfig = document.getElementById('webhook-config');
+
+    if (webhookEnabledCheckbox && webhookConfig) {
+        webhookEnabledCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                webhookConfig.classList.remove('hidden');
+            } else {
+                webhookConfig.classList.add('hidden');
+            }
+        });
+    }
+
+    // Copy API key to clipboard
+    window.copyApiKey = function() {
+        const apiKeyValue = document.getElementById('api-key-value');
+        if (apiKeyValue) {
+            navigator.clipboard.writeText(apiKeyValue.textContent).then(() => {
+                // Show feedback
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+    };
+
+    // Generate webhook secret
+    const generateSecretBtn = document.getElementById('generate-webhook-secret');
+    const regenerateSecretBtn = document.getElementById('regenerate-webhook-secret');
+
+    function handleSecretGeneration() {
+        if (confirm('Generate a new webhook secret? This will invalidate any existing integrations using the old secret.')) {
+            // Submit form to generate secret
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
+                <input type="hidden" name="action" value="generate_webhook_secret">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    if (generateSecretBtn) {
+        generateSecretBtn.addEventListener('click', handleSecretGeneration);
+    }
+    if (regenerateSecretBtn) {
+        regenerateSecretBtn.addEventListener('click', handleSecretGeneration);
+    }
+
+    // Test webhook
+    const testWebhookBtn = document.getElementById('test-webhook');
+    if (testWebhookBtn) {
+        testWebhookBtn.addEventListener('click', function() {
+            const webhookUrl = document.getElementById('webhook_url').value;
+            if (!webhookUrl) {
+                alert('Please enter a webhook URL first.');
+                return;
+            }
+
+            this.disabled = true;
+            this.textContent = 'Sending...';
+
+            // Submit test webhook request
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
+                <input type="hidden" name="action" value="test_webhook">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        });
+    }
+});
+</script>
 {% endblock %}
