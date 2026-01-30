@@ -3,20 +3,29 @@ Candidate-facing views for custom assessments.
 """
 from __future__ import annotations
 
+import json
 from datetime import timedelta
 
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, TemplateView
 
 from candidate.constants import DEFAULT_HELP_TOPICS
 from candidate.forms import CandidateFeedbackForm
 
-from .forms import CandidateAnswerForm
-from .models import CustomAssessmentSession, CustomQuestion
+from .forms import (
+    CandidateAnswerForm,
+    CandidateFileUploadForm,
+    CandidateTextResponseForm,
+    CandidateVideoResponseForm,
+)
+from .models import CandidateResponse, CustomAssessmentSession, CustomQuestion
 from .services import send_completion_notification
 
 
@@ -95,10 +104,12 @@ class CustomAssessmentView(FormView):
 
             # Send new candidate notification
             if is_first_start and self.session.client:
-                from clients.services import send_new_candidate_alert
+                from clients.services import send_new_candidate_alert, trigger_session_webhook
                 send_new_candidate_alert(
                     self.session.client, self.session, "custom"
                 )
+                # Trigger webhook for session started
+                trigger_session_webhook(self.session, "session.started")
 
         # Check deadline
         if self.session.deadline_at and now > self.session.deadline_at:
@@ -125,11 +136,20 @@ class CustomAssessmentView(FormView):
         if self.current_index >= len(self.session.question_order):
             self.session.submit()
 
+            # Trigger AI scoring for text responses
+            from .services import trigger_ai_scoring_for_session
+            trigger_ai_scoring_for_session(self.session)
+
             # Send completion notification to client
             results_url = request.build_absolute_uri(
                 reverse("custom_assessments:session-result", args=[self.session.uuid])
             )
             send_completion_notification(self.session, results_url)
+
+            # Trigger webhook for session completed
+            if self.session.client:
+                from clients.services import trigger_session_webhook
+                trigger_session_webhook(self.session, "session.completed")
 
             return redirect(
                 "candidate:custom-complete", session_uuid=self.session.uuid
@@ -140,26 +160,60 @@ class CustomAssessmentView(FormView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    def get_form_class(self):
+        """Return the appropriate form class based on question type."""
+        qtype = self.current_question.question_type
+        if qtype == CustomQuestion.TYPE_MULTIPLE_CHOICE:
+            return CandidateAnswerForm
+        elif qtype in (CustomQuestion.TYPE_TEXT_SHORT, CustomQuestion.TYPE_TEXT_LONG):
+            return CandidateTextResponseForm
+        elif qtype == CustomQuestion.TYPE_VIDEO:
+            return CandidateVideoResponseForm
+        elif qtype == CustomQuestion.TYPE_FILE_UPLOAD:
+            return CandidateFileUploadForm
+        return CandidateAnswerForm
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["question"] = self.current_question
+        # Include files for video/file uploads
+        if self.current_question.question_type in (
+            CustomQuestion.TYPE_VIDEO,
+            CustomQuestion.TYPE_FILE_UPLOAD,
+        ):
+            kwargs["files"] = self.request.FILES
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         total = len(self.session.question_order)
 
+        assessment = self.session.assessment
         context.update(
             {
                 "session": self.session,
-                "assessment": self.session.assessment,
+                "assessment": assessment,
                 "question": self.current_question,
+                "question_type": self.current_question.question_type,
                 "step_number": self.current_index + 1,
                 "total_steps": total,
                 "progress_percent": int((self.current_index / total) * 100),
                 "remaining_minutes": self.remaining_minutes,
                 "remaining_seconds": self.remaining_seconds,
                 "help_topics": DEFAULT_HELP_TOPICS,
+                # Anti-cheating settings
+                "anti_cheat": {
+                    "require_fullscreen": assessment.require_fullscreen,
+                    "detect_tab_switches": assessment.detect_tab_switches,
+                    "prevent_copy_paste": assessment.prevent_copy_paste,
+                    "max_tab_switches": assessment.max_tab_switches,
+                },
+                # Question type constants for template
+                "TYPE_MULTIPLE_CHOICE": CustomQuestion.TYPE_MULTIPLE_CHOICE,
+                "TYPE_TEXT_SHORT": CustomQuestion.TYPE_TEXT_SHORT,
+                "TYPE_TEXT_LONG": CustomQuestion.TYPE_TEXT_LONG,
+                "TYPE_VIDEO": CustomQuestion.TYPE_VIDEO,
+                "TYPE_FILE_UPLOAD": CustomQuestion.TYPE_FILE_UPLOAD,
             }
         )
 
@@ -187,9 +241,45 @@ class CustomAssessmentView(FormView):
                 "candidate:custom-expired", session_uuid=self.session.uuid
             )
 
-        # Record the answer
-        answer = form.cleaned_data["answer"]
-        self.session.record_answer(self.current_question.pk, answer)
+        qtype = self.current_question.question_type
+
+        # Handle response based on question type
+        if qtype == CustomQuestion.TYPE_MULTIPLE_CHOICE:
+            # Multiple choice - store in session.answers
+            answer = form.cleaned_data["answer"]
+            self.session.record_answer(self.current_question.pk, answer)
+
+        elif qtype in (CustomQuestion.TYPE_TEXT_SHORT, CustomQuestion.TYPE_TEXT_LONG):
+            # Text response - store in CandidateResponse
+            text_response = form.cleaned_data["text_response"]
+            CandidateResponse.objects.update_or_create(
+                session=self.session,
+                question=self.current_question,
+                defaults={"text_response": text_response},
+            )
+
+        elif qtype == CustomQuestion.TYPE_VIDEO:
+            # Video response - store in CandidateResponse
+            video_file = form.cleaned_data.get("video_file")
+            if video_file:
+                CandidateResponse.objects.update_or_create(
+                    session=self.session,
+                    question=self.current_question,
+                    defaults={"video_file": video_file},
+                )
+
+        elif qtype == CustomQuestion.TYPE_FILE_UPLOAD:
+            # File upload - store in CandidateResponse
+            uploaded_file = form.cleaned_data.get("uploaded_file")
+            if uploaded_file:
+                CandidateResponse.objects.update_or_create(
+                    session=self.session,
+                    question=self.current_question,
+                    defaults={
+                        "uploaded_file": uploaded_file,
+                        "uploaded_file_name": uploaded_file.name,
+                    },
+                )
 
         # Move to next question
         self.session.current_question_index += 1
@@ -199,11 +289,20 @@ class CustomAssessmentView(FormView):
         if self.session.current_question_index >= len(self.session.question_order):
             self.session.submit()
 
+            # Trigger AI scoring for text responses
+            from .services import trigger_ai_scoring_for_session
+            trigger_ai_scoring_for_session(self.session)
+
             # Send completion notification to client
             results_url = self.request.build_absolute_uri(
                 reverse("custom_assessments:session-result", args=[self.session.uuid])
             )
             send_completion_notification(self.session, results_url)
+
+            # Trigger webhook for session completed
+            if self.session.client:
+                from clients.services import trigger_session_webhook
+                trigger_session_webhook(self.session, "session.completed")
 
             return redirect(
                 "candidate:custom-complete", session_uuid=self.session.uuid
@@ -257,3 +356,44 @@ class CustomAssessmentExpiredView(TemplateView):
         context["session"] = session
         context["assessment"] = session.assessment
         return context
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class TelemetryEventView(View):
+    """API endpoint to receive anti-cheating telemetry events from the frontend."""
+
+    def post(self, request, session_uuid):
+        session = get_object_or_404(CustomAssessmentSession, uuid=session_uuid)
+
+        # Only log events for in-progress sessions
+        if session.status != "in_progress":
+            return JsonResponse({"status": "ignored", "reason": "session not active"})
+
+        try:
+            data = json.loads(request.body)
+            event_type = data.get("event_type")
+            details = data.get("details", {})
+
+            if event_type not in (
+                "tab_switch",
+                "copy_attempt",
+                "paste_attempt",
+                "fullscreen_exit",
+                "fullscreen_enter",
+                "right_click",
+                "keyboard_shortcut",
+            ):
+                return JsonResponse({"status": "error", "reason": "invalid event type"}, status=400)
+
+            session.log_telemetry_event(event_type, details)
+
+            return JsonResponse({
+                "status": "ok",
+                "trust_score": session.trust_score,
+                "flagged": session.flagged_for_review,
+            })
+
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "reason": "invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"status": "error", "reason": str(e)}, status=500)

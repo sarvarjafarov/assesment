@@ -2,7 +2,23 @@
 {% load humanize %}
 {% block title %}{{ assessment.name }} - Assessment{% endblock %}
 {% block content %}
-<div class="candidate-shell single-column assessment-session">
+{# Apply client branding CSS variables #}
+{% if session.client %}
+<style>
+:root {
+    --brand-primary: {{ session.client.brand_primary_color|default:"#ff8a00" }};
+    --brand-secondary: {{ session.client.brand_secondary_color|default:"#0e1428" }};
+    --brand-background: {{ session.client.brand_background_color|default:"#ffffff" }};
+}
+.progress-bar-fill { background: var(--brand-primary, #ff8a00) !important; }
+.question-card-enhanced h2 { color: var(--brand-secondary, #0e1428); }
+.option-button.selected { border-color: var(--brand-primary, #ff8a00); background: rgba(255, 138, 0, 0.05); }
+.option-button.selected .option-radio::before { background: var(--brand-primary, #ff8a00); }
+.submit-btn { background: linear-gradient(135deg, var(--brand-primary, #ff8a00) 0%, var(--brand-primary, #ff6b00) 100%) !important; }
+</style>
+{% endif %}
+
+<div class="candidate-shell single-column assessment-session" style="{% if session.client.brand_background_color %}background: {{ session.client.brand_background_color }};{% endif %}">
     <!-- Sticky Progress Header -->
     <div class="session-header">
         <div class="session-header-content">
@@ -67,25 +83,150 @@
         {% endif %}
 
         <!-- Main Question Form -->
-        <form method="post" class="question-form-enhanced">
+        <form method="post" class="question-form-enhanced" enctype="multipart/form-data">
             {% csrf_token %}
 
             <div class="question-card-enhanced">
                 <div class="question-header">
-                    {% if question.category %}
-                    <span class="question-category">{{ question.category }}</span>
-                    {% endif %}
+                    <div class="header-tags">
+                        {% if question.category %}
+                        <span class="question-category">{{ question.category }}</span>
+                        {% endif %}
+                        <span class="question-type-badge type-{{ question_type }}">
+                            {% if question_type == TYPE_MULTIPLE_CHOICE %}
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                Multiple Choice
+                            {% elif question_type == TYPE_TEXT_SHORT %}
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="17" y1="10" x2="3" y2="10"></line>
+                                    <line x1="21" y1="6" x2="3" y2="6"></line>
+                                    <line x1="21" y1="14" x2="3" y2="14"></line>
+                                    <line x1="17" y1="18" x2="3" y2="18"></line>
+                                </svg>
+                                Short Answer
+                            {% elif question_type == TYPE_TEXT_LONG %}
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                Essay
+                            {% elif question_type == TYPE_VIDEO %}
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                </svg>
+                                Video Response
+                            {% elif question_type == TYPE_FILE_UPLOAD %}
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                File Upload
+                            {% endif %}
+                        </span>
+                    </div>
                     <span class="question-number">Question {{ step_number }} of {{ total_steps }}</span>
                 </div>
 
                 <h2 class="question-title">{{ question.question_text }}</h2>
 
                 <div class="question-input-enhanced">
-                    <p class="input-instruction">Select the best answer:</p>
-                    {{ form.answer }}
-                    {% for error in form.answer.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
+                    {% if question_type == TYPE_MULTIPLE_CHOICE %}
+                        {# Multiple Choice #}
+                        <p class="input-instruction">Select the best answer:</p>
+                        {{ form.answer }}
+                        {% for error in form.answer.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+
+                    {% elif question_type == TYPE_TEXT_SHORT or question_type == TYPE_TEXT_LONG %}
+                        {# Text Response #}
+                        <p class="input-instruction">
+                            {% if question_type == TYPE_TEXT_LONG %}
+                                Write your detailed response below:
+                            {% else %}
+                                Write your answer below:
+                            {% endif %}
+                        </p>
+                        <div class="text-response-container">
+                            {{ form.text_response }}
+                            <div class="char-counter" id="charCounter">
+                                <span id="currentChars">0</span> / {{ question.text_max_length }} characters
+                                {% if question.text_min_length > 0 %}
+                                <span class="min-chars">(minimum {{ question.text_min_length }})</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% for error in form.text_response.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+
+                    {% elif question_type == TYPE_VIDEO %}
+                        {# Video Response #}
+                        <p class="input-instruction">Record or upload a video response (max {{ question.video_max_duration_seconds }} seconds):</p>
+                        <div class="video-response-container">
+                            <div class="video-recorder" id="videoRecorder">
+                                <video id="videoPreview" autoplay muted playsinline></video>
+                                <video id="videoPlayback" controls style="display: none;"></video>
+                                <div class="recorder-controls">
+                                    <button type="button" id="startRecording" class="btn-record">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                        Start Recording
+                                    </button>
+                                    <button type="button" id="stopRecording" class="btn-stop" style="display: none;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <rect x="6" y="6" width="12" height="12"></rect>
+                                        </svg>
+                                        Stop Recording
+                                    </button>
+                                    <span id="recordingTimer" class="recording-timer" style="display: none;">00:00</span>
+                                </div>
+                            </div>
+                            <div class="upload-divider">
+                                <span>or upload a video file</span>
+                            </div>
+                            {{ form.video_file }}
+                            <p class="upload-hint">Allowed formats: MP4, WebM, MOV (max 100MB)</p>
+                        </div>
+                        {% for error in form.video_file.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+
+                    {% elif question_type == TYPE_FILE_UPLOAD %}
+                        {# File Upload #}
+                        <p class="input-instruction">Upload your file:</p>
+                        <div class="file-upload-container">
+                            <label class="file-upload-box" for="id_uploaded_file">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span class="upload-text">Click to upload or drag and drop</span>
+                                <span class="upload-formats">{{ form.uploaded_file.help_text }}</span>
+                            </label>
+                            {{ form.uploaded_file }}
+                            <div id="filePreview" class="file-preview" style="display: none;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                <span id="fileName"></span>
+                                <button type="button" id="removeFile" class="btn-remove-file">&times;</button>
+                            </div>
+                        </div>
+                        {% for error in form.uploaded_file.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
 
@@ -442,6 +583,296 @@
     font-size: 14px;
 }
 
+/* Question Type Badge */
+.header-tags {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.question-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.question-type-badge.type-multiple_choice {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #7dd3fc;
+}
+
+.question-type-badge.type-text_short,
+.question-type-badge.type-text_long {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #86efac;
+}
+
+.question-type-badge.type-video {
+    background: #fdf4ff;
+    color: #a855f7;
+    border: 1px solid #d8b4fe;
+}
+
+.question-type-badge.type-file_upload {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fcd34d;
+}
+
+/* Text Response Styles */
+.text-response-container {
+    position: relative;
+}
+
+.text-response-container textarea {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 120px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.text-response-container textarea:focus {
+    outline: none;
+    border-color: #ff8a00;
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+.char-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #718096;
+}
+
+.char-counter.warning {
+    color: #f59e0b;
+}
+
+.char-counter.error {
+    color: #dc2626;
+}
+
+.min-chars {
+    color: #9ca3af;
+}
+
+/* Video Response Styles */
+.video-response-container {
+    background: #f8fafc;
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.video-recorder {
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.video-recorder video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recorder-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.btn-record {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-record:hover {
+    background: #b91c1c;
+    transform: scale(1.05);
+}
+
+.btn-stop {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #374151;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.recording-timer {
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.recording-timer.recording {
+    color: #ef4444;
+    animation: pulse 1s infinite;
+}
+
+.upload-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 20px 0;
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.upload-divider::before,
+.upload-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.upload-hint {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* File Upload Styles */
+.file-upload-container {
+    position: relative;
+}
+
+.file-upload-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: #f8fafc;
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-upload-box:hover {
+    border-color: #ff8a00;
+    background: #fff9f5;
+}
+
+.file-upload-box svg {
+    color: #9ca3af;
+    margin-bottom: 16px;
+}
+
+.file-upload-box:hover svg {
+    color: #ff8a00;
+}
+
+.upload-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0e1428;
+    margin-bottom: 8px;
+}
+
+.upload-formats {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.file-upload-container input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+.file-preview svg {
+    color: #16a34a;
+    flex-shrink: 0;
+}
+
+.file-preview span {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #0e1428;
+    word-break: break-all;
+}
+
+.btn-remove-file {
+    width: 28px;
+    height: 28px;
+    background: #fee2e2;
+    border: none;
+    border-radius: 50%;
+    color: #dc2626;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove-file:hover {
+    background: #fecaca;
+}
+
 /* Form Actions */
 .form-actions {
     display: flex;
@@ -584,5 +1015,455 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start countdown
     setInterval(updateTimer, 1000);
 });
+
+// =====================================================
+// TEXT RESPONSE CHARACTER COUNTER
+// =====================================================
+(function() {
+    const textarea = document.querySelector('.candidate-text-response');
+    const charCounter = document.getElementById('charCounter');
+    const currentCharsEl = document.getElementById('currentChars');
+
+    if (textarea && charCounter && currentCharsEl) {
+        const maxLength = parseInt(textarea.getAttribute('maxlength')) || 5000;
+        const minLength = parseInt(textarea.getAttribute('minlength')) || 0;
+
+        function updateCounter() {
+            const length = textarea.value.length;
+            currentCharsEl.textContent = length;
+
+            charCounter.classList.remove('warning', 'error');
+            if (length > maxLength * 0.9) {
+                charCounter.classList.add('warning');
+            }
+            if (length >= maxLength) {
+                charCounter.classList.add('error');
+            }
+        }
+
+        textarea.addEventListener('input', updateCounter);
+        updateCounter(); // Initial count
+    }
+})();
+
+// =====================================================
+// VIDEO RECORDING
+// =====================================================
+(function() {
+    const videoPreview = document.getElementById('videoPreview');
+    const videoPlayback = document.getElementById('videoPlayback');
+    const startBtn = document.getElementById('startRecording');
+    const stopBtn = document.getElementById('stopRecording');
+    const timerEl = document.getElementById('recordingTimer');
+
+    if (!videoPreview || !startBtn) return;
+
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let timerInterval = null;
+    let recordingSeconds = 0;
+    const maxDuration = {{ question.video_max_duration_seconds|default:120 }};
+
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 1280, height: 720 },
+                audio: true
+            });
+            videoPreview.srcObject = stream;
+        } catch (err) {
+            console.error('Camera access denied:', err);
+            alert('Please allow camera access to record a video response.');
+        }
+    }
+
+    startBtn.addEventListener('click', async function() {
+        if (!videoPreview.srcObject) {
+            await startCamera();
+        }
+
+        recordedChunks = [];
+        recordingSeconds = 0;
+
+        const stream = videoPreview.srcObject;
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) {
+                recordedChunks.push(e.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            videoPlayback.src = url;
+            videoPlayback.style.display = 'block';
+            videoPreview.style.display = 'none';
+
+            // Create file input for upload
+            const file = new File([blob], 'video-response.webm', { type: 'video/webm' });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            const fileInput = document.querySelector('input[type="file"].video-upload');
+            if (fileInput) {
+                fileInput.files = dataTransfer.files;
+            }
+        };
+
+        mediaRecorder.start();
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'flex';
+        timerEl.style.display = 'block';
+        timerEl.classList.add('recording');
+
+        timerInterval = setInterval(() => {
+            recordingSeconds++;
+            const mins = Math.floor(recordingSeconds / 60);
+            const secs = recordingSeconds % 60;
+            timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            if (recordingSeconds >= maxDuration) {
+                stopRecording();
+            }
+        }, 1000);
+    });
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            clearInterval(timerInterval);
+            timerEl.classList.remove('recording');
+            stopBtn.style.display = 'none';
+
+            // Stop camera stream
+            const tracks = videoPreview.srcObject?.getTracks();
+            tracks?.forEach(track => track.stop());
+        }
+    }
+
+    if (stopBtn) {
+        stopBtn.addEventListener('click', stopRecording);
+    }
+
+    // Initialize camera preview
+    startCamera();
+})();
+
+// =====================================================
+// FILE UPLOAD PREVIEW
+// =====================================================
+(function() {
+    const fileInput = document.querySelector('.file-upload-container input[type="file"]');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const removeBtn = document.getElementById('removeFile');
+    const uploadBox = document.querySelector('.file-upload-box');
+
+    if (!fileInput || !filePreview) return;
+
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            fileName.textContent = file.name;
+            filePreview.style.display = 'flex';
+            if (uploadBox) uploadBox.style.display = 'none';
+        }
+    });
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            filePreview.style.display = 'none';
+            if (uploadBox) uploadBox.style.display = 'flex';
+        });
+    }
+
+    // Drag and drop support
+    if (uploadBox) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, () => {
+                uploadBox.style.borderColor = '#ff8a00';
+                uploadBox.style.background = '#fff9f5';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, () => {
+                uploadBox.style.borderColor = '#e2e8f0';
+                uploadBox.style.background = '#f8fafc';
+            });
+        });
+
+        uploadBox.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+})();
+
+// =====================================================
+// ANTI-CHEATING SYSTEM
+// =====================================================
+(function() {
+    const antiCheat = {{ anti_cheat|safe }};
+    const sessionUuid = '{{ session.uuid }}';
+    const telemetryUrl = '{% url "candidate:custom-telemetry" session.uuid %}';
+
+    let tabSwitchCount = 0;
+    let warningShown = false;
+
+    // Send telemetry event to server
+    function sendTelemetryEvent(eventType, details = {}) {
+        fetch(telemetryUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                event_type: eventType,
+                details: details
+            })
+        }).then(response => response.json())
+        .then(data => {
+            if (data.flagged && !warningShown) {
+                showAntiCheatWarning();
+                warningShown = true;
+            }
+        }).catch(err => console.warn('Telemetry error:', err));
+    }
+
+    // Show warning to user
+    function showAntiCheatWarning() {
+        const warning = document.createElement('div');
+        warning.className = 'anti-cheat-warning';
+        warning.innerHTML = `
+            <div class="warning-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span>Suspicious activity detected. Your session is being monitored.</span>
+                <button onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+        document.body.appendChild(warning);
+    }
+
+    // Tab switch / visibility detection
+    if (antiCheat.detect_tab_switches) {
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                tabSwitchCount++;
+                sendTelemetryEvent('tab_switch', {
+                    count: tabSwitchCount,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Show warning if max switches exceeded
+                if (antiCheat.max_tab_switches > 0 && tabSwitchCount >= antiCheat.max_tab_switches) {
+                    alert('Warning: You have switched tabs too many times. Your assessment may be flagged for review.');
+                }
+            }
+        });
+
+        // Also detect window blur (alt-tab, etc.)
+        window.addEventListener('blur', function() {
+            sendTelemetryEvent('tab_switch', {
+                type: 'window_blur',
+                timestamp: new Date().toISOString()
+            });
+        });
+    }
+
+    // Copy/paste prevention
+    if (antiCheat.prevent_copy_paste) {
+        // Prevent copying
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            sendTelemetryEvent('copy_attempt');
+        });
+
+        // Prevent cutting
+        document.addEventListener('cut', function(e) {
+            e.preventDefault();
+            sendTelemetryEvent('copy_attempt', { type: 'cut' });
+        });
+
+        // Prevent pasting (in answer fields is allowed, but logged)
+        document.addEventListener('paste', function(e) {
+            sendTelemetryEvent('paste_attempt');
+        });
+
+        // Prevent right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            sendTelemetryEvent('right_click');
+        });
+
+        // Prevent text selection on question content
+        const questionContent = document.querySelector('.question-text');
+        if (questionContent) {
+            questionContent.style.userSelect = 'none';
+            questionContent.style.webkitUserSelect = 'none';
+        }
+
+        // Detect keyboard shortcuts (Ctrl+C, Ctrl+V, etc.)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'a', 'p'].includes(e.key.toLowerCase())) {
+                if (e.key.toLowerCase() !== 'v') { // Allow paste in input fields
+                    e.preventDefault();
+                }
+                sendTelemetryEvent('keyboard_shortcut', { key: e.key });
+            }
+            // Prevent F12 (dev tools)
+            if (e.key === 'F12') {
+                e.preventDefault();
+                sendTelemetryEvent('keyboard_shortcut', { key: 'F12' });
+            }
+        });
+    }
+
+    // Fullscreen management
+    if (antiCheat.require_fullscreen) {
+        // Request fullscreen on page load
+        function requestFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Detect fullscreen exit
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement) {
+                sendTelemetryEvent('fullscreen_exit');
+                // Prompt to re-enter fullscreen
+                if (confirm('Please remain in fullscreen mode during the assessment. Click OK to re-enter fullscreen.')) {
+                    requestFullscreen();
+                }
+            } else {
+                sendTelemetryEvent('fullscreen_enter');
+            }
+        });
+
+        // Show fullscreen prompt if not already fullscreen
+        if (!document.fullscreenElement) {
+            const fullscreenBanner = document.createElement('div');
+            fullscreenBanner.className = 'fullscreen-banner';
+            fullscreenBanner.innerHTML = `
+                <div class="fullscreen-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg>
+                    <span>This assessment requires fullscreen mode for security.</span>
+                    <button onclick="requestFullscreen(); this.parentElement.parentElement.remove();" class="btn btn-primary">
+                        Enter Fullscreen
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(fullscreenBanner);
+            window.requestFullscreen = requestFullscreen;
+        }
+    }
+
+    // Log initial session start
+    sendTelemetryEvent('session_active', { userAgent: navigator.userAgent });
+})();
 </script>
+
+<style>
+/* Anti-cheat warning styles */
+.anti-cheat-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+    padding: 12px 20px;
+    z-index: 10000;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+.anti-cheat-warning .warning-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.anti-cheat-warning button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.fullscreen-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.fullscreen-content {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.fullscreen-content svg {
+    color: #ff8a00;
+    margin-bottom: 16px;
+}
+
+.fullscreen-content span {
+    display: block;
+    margin-bottom: 20px;
+    color: #4a5568;
+}
+
+/* Disable text selection on question content when copy prevention is on */
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+</style>
 {% endblock %}

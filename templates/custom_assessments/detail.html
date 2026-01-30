@@ -260,6 +260,29 @@
             </tbody>
         </table>
     </div>
+
+    {# Pagination Controls #}
+    {% if page_obj.has_other_pages %}
+    <nav class="pagination-nav" aria-label="Candidates pagination">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">&laquo; Previous</a>
+            {% else %}
+            <span class="pagination-btn disabled">&laquo; Previous</span>
+            {% endif %}
+
+            <span class="pagination-info">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">Next &raquo;</a>
+            {% else %}
+            <span class="pagination-btn disabled">Next &raquo;</span>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
     {% else %}
     <div class="empty-state">
         <div class="empty-icon">
@@ -955,6 +978,40 @@
     outline: none;
     border-color: var(--orange);
     box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+
+/* Pagination */
+.pagination-nav {
+    margin-bottom: 32px;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+.pagination-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--navy);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+.pagination-btn:hover:not(.disabled) {
+    border-color: var(--orange);
+    color: var(--orange);
+}
+.pagination-btn.disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+.pagination-info {
+    font-size: 0.875rem;
+    color: var(--text-muted);
 }
 
 .btn svg {
