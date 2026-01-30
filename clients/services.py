@@ -325,10 +325,18 @@ def send_webhook(client_account, event_type: str, data: dict) -> bool:
     Returns:
         bool: True if webhook was sent successfully
     """
-    from .models import WebhookDelivery
+    try:
+        from .models import WebhookDelivery
+    except Exception:
+        logger.warning("WebhookDelivery model not available, skipping webhook")
+        return False
 
-    # Check if webhook should be triggered
-    if not client_account.should_trigger_webhook(event_type):
+    try:
+        # Check if webhook should be triggered
+        if not client_account.should_trigger_webhook(event_type):
+            return False
+    except Exception:
+        # Fields may not exist in DB if migrations haven't run
         return False
 
     # Build the payload
@@ -391,45 +399,53 @@ def send_webhook(client_account, event_type: str, data: dict) -> bool:
 def trigger_session_webhook(session, event_type: str):
     """
     Trigger a webhook for an assessment session event.
+    Fails silently if webhook infrastructure is not available.
 
     Args:
         session: Assessment session instance
         event_type: One of 'session.created', 'session.started', 'session.completed', 'session.expired'
     """
-    client = getattr(session, "client", None)
-    if not client:
-        return
+    try:
+        client = getattr(session, "client", None)
+        if not client:
+            return
 
-    # Build session data payload
-    data = {
-        "session": {
-            "uuid": str(session.uuid),
-            "candidate_id": getattr(session, "candidate_id", None) or getattr(session, "candidate_email", ""),
-            "status": session.status,
-            "assessment_type": _get_assessment_type(session),
-            "started_at": session.started_at.isoformat() if session.started_at else None,
-            "completed_at": getattr(session, "completed_at", None),
-        },
-        "client": {
-            "company_name": client.company_name,
-        },
-    }
+        # Check if webhooks are configured before building payload
+        if not getattr(client, "webhook_enabled", False):
+            return
 
-    # Add score if completed
-    if event_type == "session.completed":
-        score = _get_session_score(session)
-        if score is not None:
-            data["session"]["score"] = score
-
-    # Add project info if available
-    project = getattr(session, "project", None)
-    if project:
-        data["session"]["project"] = {
-            "uuid": str(project.uuid),
-            "title": project.title,
+        # Build session data payload
+        data = {
+            "session": {
+                "uuid": str(session.uuid),
+                "candidate_id": getattr(session, "candidate_id", None) or getattr(session, "candidate_email", ""),
+                "status": session.status,
+                "assessment_type": _get_assessment_type(session),
+                "started_at": session.started_at.isoformat() if session.started_at else None,
+                "completed_at": getattr(session, "completed_at", None),
+            },
+            "client": {
+                "company_name": client.company_name,
+            },
         }
 
-    send_webhook(client, event_type, data)
+        # Add score if completed
+        if event_type == "session.completed":
+            score = _get_session_score(session)
+            if score is not None:
+                data["session"]["score"] = score
+
+        # Add project info if available
+        project = getattr(session, "project", None)
+        if project:
+            data["session"]["project"] = {
+                "uuid": str(project.uuid),
+                "title": project.title,
+            }
+
+        send_webhook(client, event_type, data)
+    except Exception:
+        logger.exception("Failed to trigger webhook for session %s event %s", getattr(session, "uuid", "?"), event_type)
 
 
 def _get_assessment_type(session) -> str:
