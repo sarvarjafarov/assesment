@@ -1,21 +1,27 @@
 """
 Services for Custom Assessments.
-Handles CSV parsing, AI question generation, and session management.
+Handles CSV parsing, AI question generation, AI scoring, and session management.
 """
 from __future__ import annotations
 
 import csv
 import io
 import json
+import logging
 import random
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.db import transaction
+from django.utils import timezone
 
 from .constants import LEVEL_DIFFICULTY_RANGES
 
 if TYPE_CHECKING:
-    from .models import CustomAssessment, CustomAssessmentSession
+    from .models import CandidateResponse, CustomAssessment, CustomAssessmentSession, CustomQuestion
+
+logger = logging.getLogger(__name__)
 
 
 class CSVValidationError(Exception):
@@ -243,7 +249,7 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no extra 
 ]"""
 
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model=getattr(settings, "ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
         max_tokens=4096,
         messages=[{"role": "user", "content": prompt}]
     )
@@ -267,6 +273,7 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no extra 
     return questions
 
 
+@transaction.atomic
 def create_questions_from_data(assessment: "CustomAssessment", questions_data: list[dict]) -> int:
     """
     Create CustomQuestion objects from question data.
@@ -454,10 +461,13 @@ def send_completion_notification(
 
     logger = logging.getLogger(__name__)
 
-    # Get client email - use primary user's email
+    # Get client email - try user's email first, fallback to account email
     client_email = None
-    if session.client and session.client.user:
-        client_email = session.client.user.email
+    if session.client:
+        if session.client.user:
+            client_email = session.client.user.email
+        if not client_email:
+            client_email = session.client.email
 
     if not client_email:
         return False, "No client email found"
@@ -531,3 +541,253 @@ View results: {results_url}
             "Failed to send completion notification: %s", exc
         )
         return False, str(exc)
+
+
+# =============================================================================
+# AI SCORING SERVICES
+# =============================================================================
+
+def score_text_response_with_ai(
+    response: "CandidateResponse",
+    question: "CustomQuestion",
+) -> dict:
+    """
+    Score a text response using Claude AI.
+
+    Args:
+        response: CandidateResponse with text_response
+        question: CustomQuestion being answered
+
+    Returns:
+        dict with keys: score (0-100), feedback (str), success (bool), error (str|None)
+    """
+    api_key = getattr(settings, "ANTHROPIC_API_KEY", "")
+    if not api_key:
+        return {
+            "success": False,
+            "score": None,
+            "feedback": "",
+            "error": "ANTHROPIC_API_KEY not configured",
+        }
+
+    try:
+        import anthropic
+    except ImportError:
+        return {
+            "success": False,
+            "score": None,
+            "feedback": "",
+            "error": "anthropic package not installed",
+        }
+
+    # Build the scoring prompt
+    ideal_answer = question.text_ideal_answer or ""
+    assessment_context = question.assessment.role_description or question.assessment.name
+
+    prompt = f"""You are an expert evaluator scoring candidate responses for a hiring assessment.
+
+CONTEXT:
+- Assessment: {assessment_context}
+- Question Type: {'Short Answer' if question.question_type == 'text_short' else 'Essay/Long Answer'}
+- Difficulty Level: {question.difficulty_level}/5
+
+QUESTION:
+{question.question_text}
+
+{f'IDEAL ANSWER REFERENCE:{chr(10)}{ideal_answer}{chr(10)}' if ideal_answer else ''}
+
+CANDIDATE'S RESPONSE:
+{response.text_response}
+
+SCORING INSTRUCTIONS:
+1. Score the response from 0 to 100 based on:
+   - Relevance and accuracy of the answer (40%)
+   - Completeness and depth of explanation (30%)
+   - Clarity and organization (20%)
+   - Professional communication (10%)
+
+2. Be fair but rigorous. A score of:
+   - 90-100: Exceptional, exceeds expectations
+   - 75-89: Good, meets expectations fully
+   - 60-74: Adequate, meets basic requirements
+   - 40-59: Below expectations, partial answer
+   - 0-39: Poor, doesn't address the question
+
+3. Provide constructive feedback (2-3 sentences) explaining the score.
+
+Return ONLY a valid JSON object (no markdown, no extra text):
+{{
+  "score": <number 0-100>,
+  "feedback": "<brief constructive feedback>"
+}}"""
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        ai_response = client.messages.create(
+            model=getattr(settings, "ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        response_text = ai_response.content[0].text.strip()
+
+        # Handle potential markdown code blocks
+        if response_text.startswith("```"):
+            lines = response_text.split("\n")
+            response_text = "\n".join(lines[1:-1])
+
+        result = json.loads(response_text)
+
+        score = int(result.get("score", 0))
+        score = max(0, min(100, score))  # Clamp to 0-100
+
+        return {
+            "success": True,
+            "score": score,
+            "feedback": result.get("feedback", ""),
+            "error": None,
+        }
+
+    except json.JSONDecodeError as e:
+        logger.error("AI scoring JSON parse error: %s", e)
+        return {
+            "success": False,
+            "score": None,
+            "feedback": "",
+            "error": f"Failed to parse AI response: {e}",
+        }
+    except Exception as e:
+        logger.exception("AI scoring failed for response %s", response.pk)
+        return {
+            "success": False,
+            "score": None,
+            "feedback": "",
+            "error": str(e),
+        }
+
+
+def score_session_responses_with_ai(session: "CustomAssessmentSession") -> dict:
+    """
+    Score all unscored text responses in a session using AI.
+
+    Args:
+        session: CustomAssessmentSession to score
+
+    Returns:
+        dict with keys: scored_count, failed_count, errors
+    """
+    from .models import CandidateResponse, CustomQuestion
+
+    results = {
+        "scored_count": 0,
+        "failed_count": 0,
+        "errors": [],
+    }
+
+    # Get all unscored text responses
+    text_types = [CustomQuestion.TYPE_TEXT_SHORT, CustomQuestion.TYPE_TEXT_LONG]
+    unscored_responses = CandidateResponse.objects.filter(
+        session=session,
+        question__question_type__in=text_types,
+        scored_by="pending",
+    ).select_related("question")
+
+    for response in unscored_responses:
+        # Skip empty responses
+        if not response.text_response or not response.text_response.strip():
+            response.score = Decimal("0")
+            response.score_feedback = "No response provided"
+            response.scored_by = "ai"
+            response.scored_at = timezone.now()
+            response.save(update_fields=[
+                "score", "score_feedback", "scored_by", "scored_at", "updated_at"
+            ])
+            results["scored_count"] += 1
+            continue
+
+        # Score with AI
+        ai_result = score_text_response_with_ai(response, response.question)
+
+        if ai_result["success"]:
+            response.score = Decimal(str(ai_result["score"]))
+            response.score_feedback = ai_result["feedback"]
+            response.scored_by = "ai"
+            response.scored_at = timezone.now()
+            response.save(update_fields=[
+                "score", "score_feedback", "scored_by", "scored_at", "updated_at"
+            ])
+            results["scored_count"] += 1
+        else:
+            results["failed_count"] += 1
+            results["errors"].append({
+                "question_id": response.question.pk,
+                "error": ai_result["error"],
+            })
+
+    # Recalculate session score if any responses were scored
+    if results["scored_count"] > 0:
+        session._calculate_score()
+        session.save(update_fields=["score", "passed", "updated_at"])
+
+    return results
+
+
+def trigger_ai_scoring_for_session(session: "CustomAssessmentSession") -> None:
+    """
+    Trigger AI scoring for a completed session.
+
+    This is meant to be called asynchronously after session submission.
+    For now, it runs synchronously but could be moved to a background task.
+
+    Args:
+        session: Completed CustomAssessmentSession
+    """
+    if session.status != "submitted":
+        logger.warning(
+            "Cannot score session %s - not submitted (status: %s)",
+            session.uuid,
+            session.status,
+        )
+        return
+
+    # Check if AI scoring is enabled (API key exists)
+    api_key = getattr(settings, "ANTHROPIC_API_KEY", "")
+    if not api_key:
+        logger.info("AI scoring skipped - no API key configured")
+        return
+
+    logger.info("Starting AI scoring for session %s", session.uuid)
+    results = score_session_responses_with_ai(session)
+    logger.info(
+        "AI scoring complete for session %s: %d scored, %d failed",
+        session.uuid,
+        results["scored_count"],
+        results["failed_count"],
+    )
+
+
+def manual_score_response(
+    response: "CandidateResponse",
+    score: int,
+    feedback: str = "",
+) -> None:
+    """
+    Manually score a candidate response.
+
+    Args:
+        response: CandidateResponse to score
+        score: Score 0-100
+        feedback: Optional feedback text
+    """
+    response.score = Decimal(str(max(0, min(100, score))))
+    response.score_feedback = feedback
+    response.scored_by = "manual"
+    response.scored_at = timezone.now()
+    response.save(update_fields=[
+        "score", "score_feedback", "scored_by", "scored_at", "updated_at"
+    ])
+
+    # Recalculate session score
+    session = response.session
+    session._calculate_score()
+    session.save(update_fields=["score", "passed", "updated_at"])

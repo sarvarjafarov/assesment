@@ -113,6 +113,109 @@
                 </div>
             </div>
         </div>
+
+        {# Trust Score & Anti-Cheating Report #}
+        <div class="trust-score-section">
+            <div class="trust-score-header">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    Integrity Report
+                </h3>
+                {% if session.flagged_for_review %}
+                <span class="flag-badge flagged">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Flagged for Review
+                </span>
+                {% else %}
+                <span class="flag-badge clean">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    No Issues Detected
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="trust-metrics">
+                <div class="trust-score-display {% if session.trust_score >= 80 %}high{% elif session.trust_score >= 50 %}medium{% else %}low{% endif %}">
+                    <div class="trust-score-circle">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="6"/>
+                            <circle cx="50" cy="50" r="40" fill="none"
+                                    stroke="{% if session.trust_score >= 80 %}#10b981{% elif session.trust_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %}"
+                                    stroke-width="6"
+                                    stroke-dasharray="{% widthratio session.trust_score 100 251 %} 251"
+                                    stroke-linecap="round"
+                                    transform="rotate(-90 50 50)"/>
+                        </svg>
+                        <span class="trust-value">{{ session.trust_score }}</span>
+                    </div>
+                    <div class="trust-label">Trust Score</div>
+                </div>
+
+                <div class="violation-counts">
+                    <div class="violation-item {% if session.tab_switch_count > 0 %}active{% endif %}">
+                        <div class="violation-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="9" y1="3" x2="9" y2="21"></line>
+                            </svg>
+                        </div>
+                        <div class="violation-details">
+                            <span class="violation-count">{{ session.tab_switch_count }}</span>
+                            <span class="violation-label">Tab Switches</span>
+                        </div>
+                    </div>
+
+                    <div class="violation-item {% if session.copy_attempt_count > 0 %}active{% endif %}">
+                        <div class="violation-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </div>
+                        <div class="violation-details">
+                            <span class="violation-count">{{ session.copy_attempt_count }}</span>
+                            <span class="violation-label">Copy Attempts</span>
+                        </div>
+                    </div>
+
+                    <div class="violation-item {% if session.fullscreen_exit_count > 0 %}active{% endif %}">
+                        <div class="violation-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+                            </svg>
+                        </div>
+                        <div class="violation-details">
+                            <span class="violation-count">{{ session.fullscreen_exit_count }}</span>
+                            <span class="violation-label">Fullscreen Exits</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if session.telemetry_log %}
+            <details class="telemetry-log">
+                <summary>View Activity Log ({{ session.telemetry_log|length }} events)</summary>
+                <div class="log-entries">
+                    {% for event in session.telemetry_log %}
+                    <div class="log-entry">
+                        <span class="log-time">{{ event.timestamp|slice:":19" }}</span>
+                        <span class="log-type">{{ event.type }}</span>
+                        <span class="log-question">Q{{ event.question_index|add:1 }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </details>
+            {% endif %}
+        </div>
     </div>
 
     {# Question-by-Question Results #}
@@ -122,9 +225,13 @@
 
     <div class="questions-results">
         {% for result in results %}
-        <div class="result-card {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
+        <div class="result-card {% if result.is_correct %}correct{% elif result.is_correct == False %}incorrect{% else %}pending{% endif %}">
             <div class="result-header">
                 <span class="question-number">Q{{ forloop.counter }}</span>
+                <span class="question-type-badge type-{{ result.question.question_type }}">
+                    {{ result.question.get_question_type_display }}
+                </span>
+                {% if result.question.question_type == 'multiple_choice' %}
                 <span class="result-badge {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
                     {% if result.is_correct %}
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -139,6 +246,24 @@
                     Incorrect
                     {% endif %}
                 </span>
+                {% elif result.response %}
+                    {% if result.response.score is not None %}
+                    <span class="result-badge score">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        {{ result.response.score|floatformat:0 }}%
+                    </span>
+                    {% else %}
+                    <span class="result-badge pending">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Awaiting Review
+                    </span>
+                    {% endif %}
+                {% endif %}
                 {% if result.question.category %}
                 <span class="category-tag">{{ result.question.category }}</span>
                 {% endif %}
@@ -146,6 +271,8 @@
 
             <p class="question-text">{{ result.question.question_text }}</p>
 
+            {% if result.question.question_type == 'multiple_choice' %}
+            {# Multiple Choice - Show options #}
             <div class="answers-grid">
                 {% for letter, text in result.question.get_options %}
                 <div class="answer-item
@@ -172,9 +299,98 @@
                 {% endfor %}
             </div>
 
+            {% elif result.response %}
+            {# Non-MC Questions - Show Response #}
+            <div class="candidate-response-box">
+                <div class="response-label">Candidate's Response:</div>
+                {% if result.question.question_type == 'text_short' or result.question.question_type == 'text_long' %}
+                <div class="text-response">{{ result.response.text_response }}</div>
+                {% elif result.question.question_type == 'video' %}
+                {% if result.response.video_file %}
+                <video controls class="video-response" preload="metadata">
+                    <source src="{{ result.response.video_file.url }}" type="video/webm">
+                    Your browser does not support video playback.
+                </video>
+                {% else %}
+                <div class="no-response">No video submitted</div>
+                {% endif %}
+                {% elif result.question.question_type == 'file_upload' %}
+                {% if result.response.uploaded_file %}
+                <div class="file-response">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>{{ result.response.uploaded_file_name }}</span>
+                    <a href="{{ result.response.uploaded_file.url }}" class="download-link" download>Download</a>
+                </div>
+                {% else %}
+                <div class="no-response">No file submitted</div>
+                {% endif %}
+                {% endif %}
+
+                {# Scoring section for non-MC questions #}
+                {% if result.response.score is not None %}
+                <div class="response-scoring">
+                    <div class="score-display">
+                        <strong>Score:</strong> {{ result.response.score|floatformat:0 }}/100
+                        {% if result.response.scored_by == 'ai' %}
+                        <span class="ai-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9l2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9l2.83-2.83"></path>
+                            </svg>
+                            AI Scored
+                        </span>
+                        {% elif result.response.scored_by == 'manual' %}
+                        <span class="manual-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Manual Score
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% if result.response.score_feedback %}
+                    <div class="score-feedback">
+                        <strong>Feedback:</strong> {{ result.response.score_feedback }}
+                    </div>
+                    {% endif %}
+                    <div class="scoring-actions">
+                        <button type="button" class="btn-edit-score" onclick="openScoreModal({{ result.response.pk }}, {{ result.response.score|floatformat:0 }}, '{{ result.response.score_feedback|escapejs }}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Edit Score
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                {# Pending scoring #}
+                {% if result.response.text_response or result.response.video_file or result.response.uploaded_file %}
+                <div class="response-scoring pending">
+                    <p class="muted">This response hasn't been scored yet.</p>
+                    <div class="scoring-actions">
+                        <button type="button" class="btn-score-now" onclick="openScoreModal({{ result.response.pk }}, 0, '')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            Score This Response
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="no-response">No response submitted</div>
+            {% endif %}
+
             {% if result.question.explanation %}
             <div class="explanation">
-                <strong>Explanation:</strong> {{ result.question.explanation }}
+                <strong>{% if result.question.question_type == 'multiple_choice' %}Explanation{% else %}Grading Guide{% endif %}:</strong> {{ result.question.explanation }}
             </div>
             {% endif %}
         </div>
@@ -451,6 +667,475 @@
     line-height: 1.5;
 }
 
+/* Question Type Badge */
+.question-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.question-type-badge.type-multiple_choice {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+.question-type-badge.type-text_short,
+.question-type-badge.type-text_long {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+.question-type-badge.type-video {
+    background: #fdf4ff;
+    color: #a855f7;
+}
+.question-type-badge.type-file_upload {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.result-badge.score {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+.result-badge.pending {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.result-card.pending {
+    border-left: 4px solid #6b7280;
+}
+
+/* Candidate Response Styles */
+.candidate-response-box {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.response-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.text-response {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--navy);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.video-response {
+    width: 100%;
+    max-width: 640px;
+    border-radius: 8px;
+    background: #000;
+}
+
+.file-response {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+.file-response svg {
+    color: var(--orange);
+    flex-shrink: 0;
+}
+.file-response span {
+    flex: 1;
+    font-weight: 500;
+    color: var(--navy);
+    word-break: break-all;
+}
+.download-link {
+    padding: 8px 16px;
+    background: var(--orange);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.download-link:hover {
+    background: #e67a00;
+}
+
+.no-response {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.response-scoring {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+.score-display {
+    font-size: 1rem;
+    color: var(--navy);
+    margin-bottom: 8px;
+}
+.scored-by {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+.score-feedback {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Trust Score Section */
+.trust-score-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--portal-border-color);
+}
+
+.trust-score-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.trust-score-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 1rem;
+    color: var(--navy);
+}
+
+.trust-score-header h3 svg {
+    color: var(--orange);
+}
+
+.flag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.flag-badge.flagged {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.flag-badge.clean {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.trust-metrics {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.trust-score-display {
+    text-align: center;
+}
+
+.trust-score-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 8px;
+}
+.trust-score-circle svg {
+    width: 100%;
+    height: 100%;
+}
+.trust-value {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+.trust-score-display.high .trust-value { color: #10b981; }
+.trust-score-display.medium .trust-value { color: #f59e0b; }
+.trust-score-display.low .trust-value { color: #ef4444; }
+
+.trust-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.violation-counts {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+}
+
+.violation-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 10px;
+    opacity: 0.5;
+}
+.violation-item.active {
+    opacity: 1;
+    background: #fef2f2;
+}
+
+.violation-icon {
+    width: 36px;
+    height: 36px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+.violation-item.active .violation-icon {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.violation-count {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+.violation-item.active .violation-count {
+    color: #dc2626;
+}
+
+.violation-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Telemetry Log */
+.telemetry-log {
+    margin-top: 16px;
+}
+.telemetry-log summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding: 8px 0;
+}
+.telemetry-log summary:hover {
+    color: var(--navy);
+}
+
+.log-entries {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+}
+
+.log-entry {
+    display: flex;
+    gap: 12px;
+    padding: 6px 0;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-time {
+    color: var(--text-muted);
+    font-family: monospace;
+}
+.log-type {
+    color: var(--navy);
+    font-weight: 500;
+    min-width: 100px;
+}
+.log-question {
+    color: var(--text-muted);
+}
+
+/* AI and Manual Score Badges */
+.ai-badge, .manual-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-left: 8px;
+}
+.ai-badge {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+.manual-badge {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.scoring-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit-score, .btn-score-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 6px;
+    background: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-edit-score:hover, .btn-score-now:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+}
+
+.btn-score-now {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+}
+.btn-score-now:hover {
+    background: #e67a00;
+    color: white;
+}
+
+.response-scoring.pending {
+    text-align: center;
+    padding: 20px;
+    background: #fef3c7;
+    border: 1px dashed #f59e0b;
+    border-radius: 8px;
+}
+.response-scoring.pending .muted {
+    margin: 0 0 12px;
+}
+
+/* Score Modal */
+.score-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.score-modal-overlay.active {
+    display: flex;
+}
+
+.score-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.score-modal h3 {
+    margin: 0 0 20px;
+    font-size: 1.1rem;
+    color: var(--navy);
+}
+
+.score-modal .form-group {
+    margin-bottom: 16px;
+}
+
+.score-modal label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+}
+
+.score-modal input[type="number"],
+.score-modal textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.score-modal textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.score-modal .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.score-modal .btn-cancel {
+    padding: 10px 20px;
+    border: 1px solid var(--portal-border-color);
+    border-radius: 8px;
+    background: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.score-modal .btn-save {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--orange);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 @media (max-width: 768px) {
     .score-card {
         flex-direction: column;
@@ -463,6 +1148,64 @@
     .answers-grid {
         grid-template-columns: 1fr;
     }
+    .trust-metrics {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .violation-counts {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }
 </style>
+
+{# Score Edit Modal #}
+<div class="score-modal-overlay" id="score-modal">
+    <div class="score-modal">
+        <h3>Edit Response Score</h3>
+        <form method="post" action="{% url 'custom_assessments:update-response-score' session.uuid %}">
+            {% csrf_token %}
+            <input type="hidden" name="response_id" id="modal-response-id">
+            <div class="form-group">
+                <label for="modal-score">Score (0-100)</label>
+                <input type="number" name="score" id="modal-score" min="0" max="100" required>
+            </div>
+            <div class="form-group">
+                <label for="modal-feedback">Feedback (optional)</label>
+                <textarea name="feedback" id="modal-feedback" placeholder="Add feedback for the candidate..."></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="closeScoreModal()">Cancel</button>
+                <button type="submit" class="btn-save">Save Score</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openScoreModal(responseId, currentScore, currentFeedback) {
+    document.getElementById('modal-response-id').value = responseId;
+    document.getElementById('modal-score').value = currentScore || '';
+    document.getElementById('modal-feedback').value = currentFeedback || '';
+    document.getElementById('score-modal').classList.add('active');
+}
+
+function closeScoreModal() {
+    document.getElementById('score-modal').classList.remove('active');
+}
+
+// Close modal on overlay click
+document.getElementById('score-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeScoreModal();
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeScoreModal();
+    }
+});
+</script>
 {% endblock %}
