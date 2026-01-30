@@ -36,6 +36,7 @@ urlpatterns = [
     path("<uuid:uuid>/invite/", views.InviteCandidateView.as_view(), name="invite"),
     path("<uuid:uuid>/bulk-invite/", views.BulkInviteView.as_view(), name="bulk-invite"),
     path("session/<uuid:session_uuid>/", views.SessionResultView.as_view(), name="session-result"),
+    path("session/<uuid:session_uuid>/update-score/", views.UpdateResponseScoreView.as_view(), name="update-response-score"),
 
     # Export
     path("<uuid:uuid>/export-questions/", views.ExportQuestionsView.as_view(), name="export-questions"),

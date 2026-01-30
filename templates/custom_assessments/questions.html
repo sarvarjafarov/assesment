@@ -95,6 +95,14 @@
         <div class="question-card">
             <div class="question-header">
                 <span class="question-number">Q{{ question.order }}</span>
+                <span class="question-type-tag type-{{ question.question_type }}">
+                    {% if question.question_type == 'multiple_choice' %}Multiple Choice
+                    {% elif question.question_type == 'text_short' %}Short Text
+                    {% elif question.question_type == 'text_long' %}Essay
+                    {% elif question.question_type == 'video' %}Video
+                    {% elif question.question_type == 'file_upload' %}File Upload
+                    {% else %}Multiple Choice{% endif %}
+                </span>
                 {% if question.ai_generated %}
                 <span class="ai-tag">AI Generated</span>
                 {% endif %}
@@ -104,10 +112,14 @@
                 <span class="difficulty-tag difficulty-{{ question.difficulty_level }}">
                     Difficulty {{ question.difficulty_level }}
                 </span>
+                {% if question.points > 1 %}
+                <span class="points-tag">{{ question.points }} pts</span>
+                {% endif %}
             </div>
 
             <p class="question-text">{{ question.question_text }}</p>
 
+            {% if question.question_type == 'multiple_choice' %}
             <div class="options-list">
                 <div class="option {% if question.correct_answer == 'A' %}correct{% endif %}">
                     <span class="option-letter">A</span>
@@ -130,10 +142,44 @@
                 </div>
                 {% endif %}
             </div>
+            {% elif question.question_type == 'text_short' or question.question_type == 'text_long' %}
+            <div class="question-settings">
+                <span class="setting-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="17" y1="10" x2="3" y2="10"></line>
+                        <line x1="21" y1="6" x2="3" y2="6"></line>
+                    </svg>
+                    {{ question.text_min_length }}-{{ question.text_max_length }} characters
+                </span>
+                {% if question.text_ideal_answer %}
+                <span class="setting-item has-reference">Has reference answer</span>
+                {% endif %}
+            </div>
+            {% elif question.question_type == 'video' %}
+            <div class="question-settings">
+                <span class="setting-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                        <rect x="1" y="5" width="15" height="14" rx="2"></rect>
+                    </svg>
+                    Max {{ question.video_max_duration_seconds }} seconds
+                </span>
+            </div>
+            {% elif question.question_type == 'file_upload' %}
+            <div class="question-settings">
+                <span class="setting-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    {{ question.file_allowed_extensions }} (max {{ question.file_max_size_mb }}MB)
+                </span>
+            </div>
+            {% endif %}
 
             {% if question.explanation %}
             <div class="explanation">
-                <strong>Explanation:</strong> {{ question.explanation }}
+                <strong>{% if question.question_type == 'multiple_choice' %}Explanation{% else %}Grading Guide{% endif %}:</strong> {{ question.explanation }}
             </div>
             {% endif %}
 
@@ -799,6 +845,60 @@
 .difficulty-1, .difficulty-2 { background: #d1fae5; color: #059669; }
 .difficulty-3 { background: #fef3c7; color: #d97706; }
 .difficulty-4, .difficulty-5 { background: #fee2e2; color: #dc2626; }
+
+.question-type-tag {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.question-type-tag.type-multiple_choice {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+.question-type-tag.type-text_short,
+.question-type-tag.type-text_long {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+.question-type-tag.type-video {
+    background: #fdf4ff;
+    color: #a855f7;
+}
+.question-type-tag.type-file_upload {
+    background: #fef3c7;
+    color: #d97706;
+}
+.points-tag {
+    background: var(--orange);
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.question-settings {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+.setting-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.setting-item svg {
+    color: var(--text-muted);
+}
+.setting-item.has-reference {
+    color: #16a34a;
+}
 
 .question-text {
     font-size: 1rem;

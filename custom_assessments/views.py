@@ -3,6 +3,7 @@ Views for Custom Assessments client portal.
 """
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -36,6 +37,31 @@ from .services import (
     parse_csv_questions,
     send_custom_assessment_invitation,
 )
+
+
+def mask_email(email: str) -> str:
+    """Mask an email address for display in error messages.
+
+    Example: john.doe@example.com -> j***e@e***e.com
+    """
+    if not email or "@" not in email:
+        return "***"
+    local, domain = email.split("@", 1)
+    if len(local) <= 2:
+        masked_local = local[0] + "***"
+    else:
+        masked_local = local[0] + "***" + local[-1]
+
+    if "." in domain:
+        domain_parts = domain.rsplit(".", 1)
+        domain_name = domain_parts[0]
+        domain_ext = domain_parts[1]
+        if len(domain_name) <= 2:
+            masked_domain = domain_name[0] + "***"
+        else:
+            masked_domain = domain_name[0] + "***" + domain_name[-1]
+        return f"{masked_local}@{masked_domain}.{domain_ext}"
+    return f"{masked_local}@***"
 
 
 class PremiumRequiredMixin:
@@ -108,7 +134,13 @@ class CustomAssessmentDetailView(LoginRequiredMixin, PremiumRequiredMixin, Detai
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         sessions = self.object.sessions.select_related("project").order_by("-created_at")
-        context["sessions"] = sessions
+
+        # Paginate sessions
+        paginator = Paginator(sessions, 25)  # 25 candidates per page
+        page_number = self.request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        context["sessions"] = page_obj
+        context["page_obj"] = page_obj
 
         # Analytics
         total_sessions = sessions.count()
@@ -341,10 +373,29 @@ class CSVTemplateDownloadView(LoginRequiredMixin, PremiumRequiredMixin, View):
 class AIGenerateView(LoginRequiredMixin, PremiumRequiredMixin, View):
     """Generate questions using AI."""
 
+    # Rate limit: 10 AI generation requests per hour per client
+    AI_RATE_LIMIT = 10
+    AI_RATE_PERIOD = 3600  # 1 hour in seconds
+
     def post(self, request, uuid):
         import logging
+        from django.core.cache import cache
+
         logger = logging.getLogger(__name__)
         logger.info(f"AIGenerateView.post called for assessment {uuid}")
+
+        # Rate limiting check
+        client_id = request.user.client_account.pk
+        cache_key = f"ai_generation_count_{client_id}"
+        current_count = cache.get(cache_key, 0)
+
+        if current_count >= self.AI_RATE_LIMIT:
+            messages.error(
+                request,
+                f"AI generation rate limit reached ({self.AI_RATE_LIMIT} requests per hour). "
+                "Please try again later or add questions manually."
+            )
+            return redirect("custom_assessments:questions", uuid=uuid)
 
         assessment = get_object_or_404(
             CustomAssessment,
@@ -383,6 +434,9 @@ class AIGenerateView(LoginRequiredMixin, PremiumRequiredMixin, View):
             created = create_questions_from_data(assessment, questions_data)
             messages.success(request, f"Generated {created} questions using AI.")
             logger.info(f"Successfully saved {created} questions")
+
+            # Increment rate limit counter
+            cache.set(cache_key, current_count + 1, self.AI_RATE_PERIOD)
 
         except ValueError as e:
             logger.error(f"ValueError in AI generation: {e}")
@@ -487,6 +541,10 @@ class InviteCandidateView(LoginRequiredMixin, PremiumRequiredMixin, View):
         # Initialize question order
         initialize_session(session)
 
+        # Trigger webhook for session created
+        from clients.services import trigger_session_webhook
+        trigger_session_webhook(session, "session.created")
+
         # Send email invitation
         assessment_url = request.build_absolute_uri(
             reverse("candidate:custom-session", args=[session.uuid])
@@ -529,21 +587,89 @@ class SessionResultView(LoginRequiredMixin, PremiumRequiredMixin, DetailView):
         # Build detailed results
         session = self.object
         questions = session.assessment.questions.all()
+
+        # Prefetch candidate responses for non-MC questions
+        responses = {
+            r.question_id: r
+            for r in session.responses.select_related("question").all()
+        }
+
         results = []
 
         for question in questions:
-            answer = session.answers.get(str(question.pk))
-            results.append({
+            result = {
                 "question": question,
-                "selected": answer,
-                "is_correct": question.is_correct(answer) if answer else False,
-            })
+                "selected": None,
+                "is_correct": None,
+                "response": None,
+            }
 
+            if question.is_auto_scoreable():
+                # Multiple choice - check session.answers
+                answer = session.answers.get(str(question.pk))
+                result["selected"] = answer
+                result["is_correct"] = question.is_correct(answer) if answer else False
+            else:
+                # Non-MC question - check CandidateResponse
+                response = responses.get(question.pk)
+                result["response"] = response
+                if response and response.score is not None:
+                    # Convert 0-100 score to pass/fail for display purposes
+                    result["is_correct"] = response.score >= 70
+
+            results.append(result)
+
+        # Calculate correct count only for scoreable questions
+        correct_count = sum(
+            1 for r in results
+            if r["is_correct"] is True
+        )
         context["results"] = results
-        context["correct_count"] = sum(1 for r in results if r["is_correct"])
+        context["correct_count"] = correct_count
         context["total_count"] = len(results)
 
         return context
+
+
+class UpdateResponseScoreView(LoginRequiredMixin, PremiumRequiredMixin, View):
+    """Update score for a candidate response (manual scoring)."""
+
+    def post(self, request, session_uuid):
+        from .models import CandidateResponse
+        from .services import manual_score_response
+
+        session = get_object_or_404(
+            CustomAssessmentSession,
+            uuid=session_uuid,
+            client=request.user.client_account,
+        )
+
+        response_id = request.POST.get("response_id")
+        score = request.POST.get("score")
+        feedback = request.POST.get("feedback", "")
+
+        if not response_id or not score:
+            messages.error(request, "Missing required fields")
+            return redirect("custom_assessments:session-result", session_uuid=session_uuid)
+
+        try:
+            score = int(score)
+            if score < 0 or score > 100:
+                raise ValueError("Score out of range")
+        except ValueError:
+            messages.error(request, "Invalid score. Must be 0-100.")
+            return redirect("custom_assessments:session-result", session_uuid=session_uuid)
+
+        response = get_object_or_404(
+            CandidateResponse,
+            pk=response_id,
+            session=session,
+        )
+
+        manual_score_response(response, score, feedback)
+        messages.success(request, "Score updated successfully.")
+
+        return redirect("custom_assessments:session-result", session_uuid=session_uuid)
 
 
 class BulkInviteView(LoginRequiredMixin, PremiumRequiredMixin, View):
@@ -592,7 +718,7 @@ class BulkInviteView(LoginRequiredMixin, PremiumRequiredMixin, View):
             try:
                 validate_email(email)
             except ValidationError:
-                errors.append(f"Row {row_num}: Invalid email '{email}'")
+                errors.append(f"Row {row_num}: Invalid email format")
                 continue
 
             # Check for duplicate session
@@ -601,7 +727,7 @@ class BulkInviteView(LoginRequiredMixin, PremiumRequiredMixin, View):
                 candidate_email=email,
             ).exists()
             if existing:
-                errors.append(f"Row {row_num}: {email} already invited")
+                errors.append(f"Row {row_num}: {mask_email(email)} already invited")
                 continue
 
             # Create session
@@ -615,6 +741,10 @@ class BulkInviteView(LoginRequiredMixin, PremiumRequiredMixin, View):
             )
             initialize_session(session)
             invited_count += 1
+
+            # Trigger webhook for session created
+            from clients.services import trigger_session_webhook
+            trigger_session_webhook(session, "session.created")
 
             # Send email
             assessment_url = request.build_absolute_uri(

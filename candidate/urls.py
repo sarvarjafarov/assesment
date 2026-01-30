@@ -181,4 +181,9 @@ urlpatterns = [
         custom_views.CustomAssessmentExpiredView.as_view(),
         name="custom-expired",
     ),
+    path(
+        "custom/<uuid:session_uuid>/telemetry/",
+        custom_views.TelemetryEventView.as_view(),
+        name="custom-telemetry",
+    ),
 ]
