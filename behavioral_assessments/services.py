@@ -53,6 +53,7 @@ def generate_question_set(level: str = "mid") -> list[int]:
             difficulty_level__gte=min_diff,
             difficulty_level__lte=max_diff,
         )
+        .values_list("id", flat=True)
         .order_by("?")[:pool_size]
     )
 
@@ -60,6 +61,7 @@ def generate_question_set(level: str = "mid") -> list[int]:
     if len(ids) < total_questions:
         ids = list(
             BehavioralQuestion.objects.published()
+            .values_list("id", flat=True)
             .order_by("?")[:pool_size]
         )
 
