@@ -22,36 +22,43 @@
     <!-- Sticky Progress Header -->
     <div class="session-header">
         <div class="session-header-content">
-            <div class="header-left">
+            <div class="header-top-row">
                 <span class="assessment-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                         <path d="M2 17l10 5 10-5"></path>
                         <path d="M2 12l10 5 10-5"></path>
                     </svg>
                     {{ assessment.name }}
                 </span>
+                <div class="header-stats">
+                    <div class="header-stat">
+                        <span class="header-stat-value">{{ step_number }}<span class="header-stat-sep">/</span>{{ total_steps }}</span>
+                        <span class="header-stat-label">Question</span>
+                    </div>
+                    <div class="header-stat-divider"></div>
+                    <div class="header-stat">
+                        <span class="header-stat-value">{{ progress_percent }}%</span>
+                        <span class="header-stat-label">Complete</span>
+                    </div>
+                    {% if remaining_seconds %}
+                    <div class="header-stat-divider"></div>
+                    <div class="header-stat stat-time">
+                        <span class="header-stat-value" id="countdown-timer" data-seconds="{{ remaining_seconds }}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span id="timer-display">{{ remaining_minutes }}:00</span>
+                        </span>
+                        <span class="header-stat-label">Remaining</span>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="header-progress">
+            <div class="header-progress-row">
                 <div class="progress-bar-container">
                     <div class="progress-bar-fill" style="width: {{ progress_percent }}%"></div>
-                </div>
-                <div class="progress-stats-compact">
-                    <span class="stat-item">
-                        <strong>{{ step_number }}</strong>/{{ total_steps }}
-                    </span>
-                    <span class="stat-item">
-                        <strong>{{ progress_percent }}%</strong>
-                    </span>
-                    {% if remaining_seconds %}
-                    <span class="stat-item time-left" id="countdown-timer" data-seconds="{{ remaining_seconds }}">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <span id="timer-display">{{ remaining_minutes }}:00</span>
-                    </span>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -254,7 +261,7 @@
 <style>
 /* Enhanced Assessment Session Styles */
 .assessment-session {
-    padding-top: 80px;
+    padding-top: 96px;
 }
 
 /* Sticky Progress Header */
@@ -264,98 +271,107 @@
     left: 0;
     right: 0;
     background: white;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
     z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .session-header-content {
     max-width: 800px;
     margin: 0 auto;
-    padding: 16px 20px;
+    padding: 12px 20px 0;
+}
+
+.header-top-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-}
-
-.header-left {
-    flex-shrink: 0;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
 .assessment-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 1px solid #bae6fd;
-    border-radius: 20px;
+    gap: 6px;
+    padding: 5px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
     color: #0e1428;
-}
-
-.assessment-badge svg {
-    color: #ff8a00;
-}
-
-.header-progress {
-    flex: 1;
-    min-width: 0;
-}
-
-.progress-bar-container {
-    width: 100%;
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: 100px;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff8a00 0%, #ff6b00 100%);
-    border-radius: 100px;
-    transition: width 0.3s ease;
-}
-
-.progress-stats-compact {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 20px;
-    font-size: 13px;
-    color: #718096;
-    margin-top: 6px;
-}
-
-.stat-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
     white-space: nowrap;
 }
 
-.stat-item strong {
-    color: #0e1428;
-    font-weight: 700;
-    margin-right: 2px;
+.assessment-badge svg {
+    color: var(--brand-primary, #ff8a00);
 }
 
-.time-left {
-    color: #ff8a00;
-    font-weight: 600;
+.header-stats {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.header-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 14px;
+}
+
+.header-stat-value {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0e1428;
+    line-height: 1.2;
+}
+
+.header-stat-sep {
+    font-weight: 400;
+    color: #94a3b8;
+}
+
+.header-stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.header-stat-divider {
+    width: 1px;
+    height: 28px;
+    background: #e2e8f0;
+    flex-shrink: 0;
+}
+
+.header-stat.stat-time .header-stat-value {
+    color: var(--brand-primary, #ff8a00);
     transition: all 0.3s ease;
 }
 
-.time-left.warning {
+.header-stat.stat-time .header-stat-value svg {
+    flex-shrink: 0;
+}
+
+.header-stat.stat-time .header-stat-label {
+    color: var(--brand-primary, #ff8a00);
+    opacity: 0.7;
+}
+
+.header-stat.stat-time .header-stat-value.warning {
     color: #f59e0b;
     animation: pulse 1s infinite;
 }
 
-.time-left.critical {
+.header-stat.stat-time .header-stat-value.critical {
     color: #ef4444;
     animation: pulse 0.5s infinite;
 }
@@ -363,6 +379,25 @@
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
+}
+
+.header-progress-row {
+    padding: 0;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-primary, #ff8a00) 0%, var(--brand-primary, #ff6b00) 100%);
+    border-radius: 0 4px 4px 0;
+    transition: width 0.4s ease;
+    min-width: 2px;
 }
 
 /* Time Warning Modal */
@@ -904,18 +939,41 @@
 /* Mobile Responsive */
 @media (max-width: 640px) {
     .assessment-session {
-        padding-top: 100px;
+        padding-top: 110px;
     }
 
     .session-header-content {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+        padding: 10px 16px 0;
     }
 
-    .progress-stats-compact {
-        gap: 12px;
-        font-size: 12px;
+    .header-top-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .assessment-badge {
+        align-self: flex-start;
+    }
+
+    .header-stats {
+        justify-content: center;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 8px 0;
+    }
+
+    .header-stat {
+        padding: 0 12px;
+    }
+
+    .header-stat-value {
+        font-size: 14px;
+    }
+
+    .header-stat-label {
+        font-size: 10px;
     }
 
     .question-card-enhanced {
