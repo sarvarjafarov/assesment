@@ -29,6 +29,7 @@ from assessments.constants import PIPELINE_STAGE_CHOICES
 from behavioral_assessments.models import BehavioralAssessmentSession
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from pm_assessments.models import ProductAssessmentSession
+from ux_assessments.models import UXDesignAssessmentSession
 
 from .forms import (
     ClientLogoForm,
@@ -39,6 +40,7 @@ from .forms import (
     ClientLoginForm,
     ClientMarketingInviteForm,
     ClientProductInviteForm,
+    ClientUXDesignInviteForm,
     ClientSignupForm,
     ClientSessionNoteForm,
     EmailPreferencesForm,
@@ -97,6 +99,7 @@ def build_dataset_map(account: ClientAccount):
         "marketing": DigitalMarketingAssessmentSession.objects.filter(client=account).select_related("project"),
         "product": ProductAssessmentSession.objects.filter(client=account).select_related("project"),
         "behavioral": BehavioralAssessmentSession.objects.filter(client=account).select_related("project"),
+        "ux_design": UXDesignAssessmentSession.objects.filter(client=account).select_related("project"),
     }
 
 
@@ -121,6 +124,7 @@ ASSESSMENT_MODEL_MAP = {
     "marketing": DigitalMarketingAssessmentSession,
     "product": ProductAssessmentSession,
     "behavioral": BehavioralAssessmentSession,
+    "ux_design": UXDesignAssessmentSession,
 }
 
 
@@ -1346,6 +1350,12 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             "form_class": ClientBehavioralInviteForm,
             "session_model": BehavioralAssessmentSession,
             "candidate_route": "candidate:behavioral-session",
+        },
+        "ux_design": {
+            "label": "UX/UI Design Assessment",
+            "form_class": ClientUXDesignInviteForm,
+            "session_model": UXDesignAssessmentSession,
+            "candidate_route": "candidate:ux-session",
         },
     }
 

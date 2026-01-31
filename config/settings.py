@@ -113,6 +113,7 @@ INSTALLED_APPS = [
     'pm_assessments',
     'behavioral_assessments',
     'custom_assessments',
+    'ux_assessments',
     'clients',
 ]
 

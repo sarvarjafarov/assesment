@@ -79,6 +79,10 @@ class ClientAccount(TimeStampedModel):
             "label": "Behavioral Assessment",
             "description": "Psychometric-backed signals covering teamwork and leadership.",
         },
+        "ux_design": {
+            "label": "UX/UI Design Assessment",
+            "description": "User research, interaction design, visual design, and accessibility scenarios for design hires.",
+        },
     }
     ASSESSMENT_CHOICES = [
         (code, meta["label"]) for code, meta in ASSESSMENT_DETAILS.items()

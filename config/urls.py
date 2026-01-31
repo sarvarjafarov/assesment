@@ -42,6 +42,7 @@ urlpatterns = [
     path('api/assessments/', include('assessments.urls')),
     path('api/marketing-assessment/', include('marketing_assessments.urls')),
     path('api/pm-assessment/', include('pm_assessments.urls')),
+    path('api/ux-assessment/', include('ux_assessments.urls')),
     path('marketing/', include('marketing.urls')),
 ]
 

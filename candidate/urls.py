@@ -4,6 +4,7 @@ from marketing_assessments import views_candidate as marketing_views
 from pm_assessments import views_candidate as pm_views
 from behavioral_assessments import views_candidate as behavioral_views
 from custom_assessments import views_candidate as custom_views
+from ux_assessments import views_candidate as ux_views
 
 from . import views
 
@@ -185,5 +186,41 @@ urlpatterns = [
         "custom/<uuid:session_uuid>/telemetry/",
         custom_views.TelemetryEventView.as_view(),
         name="custom-telemetry",
+    ),
+    # UX/UI Design Assessments
+    path(
+        "ux/<uuid:session_uuid>/",
+        ux_views.UXDesignAssessmentView.as_view(),
+        name="ux-session",
+    ),
+    path(
+        "ux/<uuid:session_uuid>/complete/",
+        ux_views.UXDesignAssessmentCompleteView.as_view(),
+        name="ux-complete",
+    ),
+    path(
+        "ux/<uuid:session_uuid>/expired/",
+        ux_views.UXDesignAssessmentExpiredView.as_view(),
+        name="ux-expired",
+    ),
+    path(
+        "ux/<uuid:session_uuid>/pause/",
+        ux_views.UXDesignSessionPauseView.as_view(),
+        name="ux-pause",
+    ),
+    path(
+        "ux/<uuid:session_uuid>/paused/",
+        ux_views.UXDesignSessionPausedView.as_view(),
+        name="ux-paused",
+    ),
+    path(
+        "ux/<uuid:session_uuid>/resume/",
+        ux_views.UXDesignSessionResumeView.as_view(),
+        name="ux-resume",
+    ),
+    path(
+        "ux/<uuid:session_uuid>/send-link/",
+        ux_views.UXDesignSessionSendLinkView.as_view(),
+        name="ux-send-link",
     ),
 ]

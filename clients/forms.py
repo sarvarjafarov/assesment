@@ -11,6 +11,8 @@ from marketing_assessments.models import DigitalMarketingAssessmentSession
 from marketing_assessments.services import generate_question_set as generate_marketing_question_set
 from pm_assessments.models import ProductAssessmentSession
 from pm_assessments.services import generate_question_set as generate_pm_question_set
+from ux_assessments.models import UXDesignAssessmentSession
+from ux_assessments.services import generate_question_set as generate_ux_question_set
 
 from .models import ClientAccount, ClientSessionNote, ClientProject
 
@@ -395,6 +397,52 @@ class ClientBehavioralInviteForm(BaseClientInviteForm):
         self.fields["duration_minutes"].initial = 15
 
     def save(self) -> BehavioralAssessmentSession:
+        candidate_id = self.cleaned_data["candidate_identifier"]
+        level = self.cleaned_data.get("level", "mid")
+        session, _ = self.model.objects.get_or_create(
+            candidate_id=candidate_id,
+            client=self.client,
+            defaults={"status": "draft"},
+        )
+        session.question_set = getattr(self, "question_set", None) or self.generate_question_set(level=level)
+        send_at = self.cleaned_data.get("send_at")
+        session.duration_minutes = self.cleaned_data["duration_minutes"]
+        session.started_at = None
+        session.client = self.client
+        session.project = self.cleaned_data["project"]
+        session.level = level
+        session.deadline_type = self.cleaned_data.get("deadline_type", "none")
+        session.deadline_days = self.cleaned_data.get("deadline_days")
+        session.deadline_at = self.cleaned_data.get("deadline_at")
+        if send_at:
+            session.status = "draft"
+            session.scheduled_for = send_at
+        else:
+            session.status = "in_progress"
+            session.scheduled_for = None
+        session.save(
+            update_fields=[
+                "question_set",
+                "status",
+                "scheduled_for",
+                "duration_minutes",
+                "started_at",
+                "client",
+                "project",
+                "level",
+                "deadline_type",
+                "deadline_days",
+                "deadline_at",
+            ]
+        )
+        return session
+
+
+class ClientUXDesignInviteForm(BaseClientInviteForm):
+    model = UXDesignAssessmentSession
+    generate_question_set = staticmethod(generate_ux_question_set)
+
+    def save(self) -> UXDesignAssessmentSession:
         candidate_id = self.cleaned_data["candidate_identifier"]
         level = self.cleaned_data.get("level", "mid")
         session, _ = self.model.objects.get_or_create(
