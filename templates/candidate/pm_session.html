@@ -910,5 +910,34 @@ function toggleHelp() {
     const panel = document.getElementById('helpPanel');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 }
+
+(function() {
+    const previewBody = document.querySelector('[data-preview-body]');
+    const charCount = document.querySelector('[data-char-count]');
+    if (!previewBody || !charCount) return;
+
+    const textarea = document.querySelector('.question-input-enhanced textarea');
+    if (!textarea) return;
+
+    const minLength = parseInt(charCount.dataset.minLength) || 150;
+    const placeholder = previewBody.dataset.placeholder || '';
+
+    function update() {
+        const text = textarea.value.trim();
+        const len = text.length;
+        previewBody.textContent = text || '';
+        if (!text) {
+            previewBody.style.color = '#94a3b8';
+            previewBody.textContent = placeholder;
+        } else {
+            previewBody.style.color = '#0e1428';
+        }
+        charCount.textContent = len + ' character' + (len !== 1 ? 's' : '');
+        charCount.style.color = len >= minLength ? '#10b981' : '#ff8a00';
+    }
+
+    textarea.addEventListener('input', update);
+    update();
+})();
 </script>
 {% endblock %}

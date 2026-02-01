@@ -76,6 +76,11 @@
         <!-- Feedback Section -->
         <div class="feedback-section">
             <div class="feedback-header">
+                <div class="feedback-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
                 <h3>How was your experience?</h3>
                 <p>Your feedback helps us improve the assessment experience for everyone</p>
             </div>
@@ -92,7 +97,6 @@
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 <div class="feedback-rating">
-                    {{ form.score.label_tag }}
                     <div class="rating-input">
                         {{ form.score }}
                     </div>
@@ -321,28 +325,42 @@
 }
 
 .feedback-section {
-    background: white;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 32px;
+    border-radius: 16px;
+    padding: 36px;
     margin-bottom: 24px;
+}
+
+.feedback-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.2);
 }
 
 .feedback-header {
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
 }
 
 .feedback-header h3 {
     margin: 0 0 8px;
-    font-size: 24px;
+    font-size: 22px;
+    font-weight: 700;
     color: #0e1428;
 }
 
 .feedback-header p {
     margin: 0;
     color: #718096;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .feedback-success {
@@ -366,71 +384,66 @@
     margin: 0 auto;
 }
 
-.feedback-rating {
-    margin-bottom: 24px;
-    text-align: center;
+.feedback-section .feedback-rating {
+    margin-bottom: 28px;
 }
 
-.feedback-rating > label {
-    display: block;
-    font-weight: 600;
-    color: #0e1428;
-    margin-bottom: 16px;
-    font-size: 15px;
-}
-
-.rating-input {
+.feedback-section .rating-input {
     display: flex;
     justify-content: center;
 }
 
-.rating-input ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: inline-flex;
-    flex-direction: column;
-    gap: 10px;
-    text-align: left;
-}
-
-.rating-input ul li {
-    margin: 0;
-}
-
-.rating-input ul li label {
+.feedback-section .rating-input > div {
     display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.feedback-section .rating-input > div > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.feedback-section .rating-input label {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 12px;
-    padding: 14px 24px;
-    background: #fff;
+    justify-content: center;
+    padding: 20px 8px 16px;
+    background: white;
     border: 2px solid #e2e8f0;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 15px;
-    font-weight: 500;
-    color: #0e1428;
-    min-width: 200px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    text-align: center;
+    width: 100%;
+    position: relative;
 }
 
-.rating-input ul li label:hover {
+.feedback-section .rating-input label:hover {
     border-color: #ff8a00;
-    background: #fff9f5;
+    background: #fffbf5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 138, 0, 0.1);
 }
 
-.rating-input ul li input[type="radio"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #ff8a00;
-    flex-shrink: 0;
-    margin: 0;
+.feedback-section .rating-input input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
 }
 
-.rating-input ul li label:has(input:checked) {
+.feedback-section .rating-input label:has(input:checked) {
     border-color: #ff8a00;
     background: linear-gradient(135deg, #fff9f5 0%, #fff3e8 100%);
-    font-weight: 600;
+    color: #0e1428;
+    box-shadow: 0 4px 12px rgba(255, 138, 0, 0.15);
+    transform: translateY(-2px);
 }
 
 .form-field {
@@ -568,7 +581,21 @@
     }
 
     .feedback-section {
-        padding: 20px;
+        padding: 24px 16px;
+    }
+
+    .feedback-section .rating-input > div {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .feedback-section .rating-input > div > div {
+        flex: 0 0 calc(33.333% - 6px);
+    }
+
+    .feedback-section .rating-input label {
+        padding: 14px 4px 12px;
+        font-size: 12px;
     }
 }
 </style>
