@@ -25,7 +25,7 @@ def home(request):
     hero_content = {
         "badge": "Hiring Assessment Platform",
         "title": "Hire better candidates with structured skill assessments",
-        "subtitle": "Pre-built tests for marketing, product, and behavioral roles with automated scoring, progress tracking, and clear reports your team can trust.",
+        "subtitle": "Pre-built tests for marketing, product, behavioral, design, HR, and finance roles with automated scoring, progress tracking, and clear reports your team can trust.",
         "primary_label": "Start free trial",
         "primary_url": reverse("clients:signup"),
         "secondary_label": "See how it works",
@@ -34,7 +34,7 @@ def home(request):
 
     suite_heading = {
         "title": "Ready-made assessments for key roles",
-        "subtitle": "Pre-built question banks covering marketing, product management, and behavioral skills. Each includes scoring rubrics and real-world scenarios.",
+        "subtitle": "Pre-built question banks covering marketing, product, behavioral, UX/UI design, HR, and finance roles. Each includes scoring rubrics and real-world scenarios.",
         "instructions": "Click any assessment to see sample questions and download the scoring rubric.",
     }
 
@@ -73,6 +73,42 @@ def home(request):
                 {"label": "Duration", "value": "15 minutes"},
                 {"label": "Signals", "value": "Integrity + engagement"},
                 {"label": "Deliverable", "value": "Guided debrief points"},
+            ],
+        },
+        {
+            "slug": "ux_design",
+            "label": "Design Eye",
+            "title": "UX/UI design",
+            "summary": "User research, interaction design, visual design, and accessibility scenarios for design hires.",
+            "focus": ["User Research", "Interaction Design", "Accessibility"],
+            "stats": [
+                {"label": "Question bank", "value": "40 real scenes"},
+                {"label": "Avg completion", "value": "35 minutes"},
+                {"label": "Benchmarks", "value": "Product design roles"},
+            ],
+        },
+        {
+            "slug": "hr",
+            "label": "People Ops",
+            "title": "HR & people strategy",
+            "summary": "Talent acquisition, employee relations, compliance, and people strategy scenarios for HR hires.",
+            "focus": ["Talent Acquisition", "Employee Relations", "People Strategy"],
+            "stats": [
+                {"label": "Question bank", "value": "40 real scenes"},
+                {"label": "Avg completion", "value": "35 minutes"},
+                {"label": "Benchmarks", "value": "HR & people roles"},
+            ],
+        },
+        {
+            "slug": "finance",
+            "label": "Finance IQ",
+            "title": "Finance management",
+            "summary": "Financial planning, budgeting, risk management, and strategic finance scenarios for finance hires.",
+            "focus": ["Financial Analysis", "Budgeting", "Strategic Finance"],
+            "stats": [
+                {"label": "Question bank", "value": "40 real scenes"},
+                {"label": "Avg completion", "value": "35 minutes"},
+                {"label": "Benchmarks", "value": "Finance & accounting roles"},
             ],
         },
     ]
@@ -165,7 +201,7 @@ def home(request):
             "cta_url": reverse("clients:signup"),
             "highlighted": False,
             "features": [
-                "Marketing, PM, and behavioral banks",
+                "All 6 assessment banks included",
                 "Basic reports & CSV export",
                 "Email support",
             ],
@@ -212,7 +248,7 @@ def home(request):
 
     pricing_helper = {
         "headline": "Simple, transparent pricing",
-        "subline": "Start free, upgrade when you need more projects and invites. All plans include all three assessment types.",
+        "subline": "Start free, upgrade when you need more projects and invites. All plans include all six assessment types.",
         "footnote": "All plans include unlimited team members. Annual billing saves 20% on Pro plan.",
     }
 

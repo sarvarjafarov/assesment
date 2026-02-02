@@ -1,0 +1,169 @@
+from __future__ import annotations
+
+import uuid
+
+from django.db import models
+from django.utils import timezone
+
+from assessments.constants import PIPELINE_STAGE_CHOICES
+
+
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class HRQuestionQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(is_active=True)
+
+
+class HRQuestion(TimeStampedModel):
+    TYPE_MULTIPLE = "multiple_choice"
+    TYPE_SCENARIO = "scenario"
+    TYPE_RANKING = "ranking"
+    TYPE_BEHAVIORAL_MOST = "behavioral_most"
+    TYPE_BEHAVIORAL_LEAST = "behavioral_least"
+    TYPE_REASONING = "reasoning"
+    QUESTION_TYPES = [
+        (TYPE_MULTIPLE, "Multiple choice"),
+        (TYPE_SCENARIO, "Scenario based"),
+        (TYPE_RANKING, "Ranking / Ordering"),
+        (TYPE_BEHAVIORAL_MOST, "Behavioral - most like me"),
+        (TYPE_BEHAVIORAL_LEAST, "Behavioral - least like me"),
+        (TYPE_REASONING, "Reasoning / open response"),
+    ]
+
+    CATEGORY_TALENT_ACQUISITION = "talent_acquisition"
+    CATEGORY_EMPLOYEE_RELATIONS = "employee_relations"
+    CATEGORY_COMPENSATION_BENEFITS = "compensation_benefits"
+    CATEGORY_LEARNING_DEVELOPMENT = "learning_development"
+    CATEGORY_HR_OPERATIONS = "hr_operations"
+    CATEGORY_PEOPLE_STRATEGY = "people_strategy"
+    CATEGORY_BEHAVIORAL = "behavioral"
+    CATEGORY_CHOICES = [
+        (CATEGORY_TALENT_ACQUISITION, "Talent Acquisition & Recruitment"),
+        (CATEGORY_EMPLOYEE_RELATIONS, "Employee Relations & Engagement"),
+        (CATEGORY_COMPENSATION_BENEFITS, "Compensation & Benefits"),
+        (CATEGORY_LEARNING_DEVELOPMENT, "Learning & Development"),
+        (CATEGORY_HR_OPERATIONS, "HR Operations & Compliance"),
+        (CATEGORY_PEOPLE_STRATEGY, "People Strategy"),
+        (CATEGORY_BEHAVIORAL, "Behavioral"),
+    ]
+
+    question_text = models.TextField()
+    question_type = models.CharField(max_length=32, choices=QUESTION_TYPES)
+    difficulty_level = models.PositiveSmallIntegerField(default=3)
+    category = models.CharField(max_length=32, choices=CATEGORY_CHOICES)
+    options = models.JSONField(default=dict, blank=True)
+    correct_answer = models.JSONField(blank=True, null=True)
+    scoring_weight = models.DecimalField(max_digits=5, decimal_places=2, default=1.0)
+    explanation = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+
+    objects = HRQuestionQuerySet.as_manager()
+
+    class Meta:
+        ordering = ("category", "-created_at")
+
+    def __str__(self):
+        return self.question_text[:80]
+
+
+class HRAssessmentSession(TimeStampedModel):
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("in_progress", "In progress"),
+        ("paused", "Paused"),
+        ("submitted", "Submitted"),
+    ]
+    DEADLINE_TYPE_CHOICES = [
+        ("none", "No deadline"),
+        ("relative", "Days from invite"),
+        ("absolute", "Specific date"),
+    ]
+    LEVEL_CHOICES = [
+        ("junior", "Junior (0-2 years)"),
+        ("mid", "Mid-Level (2-5 years)"),
+        ("senior", "Senior (5+ years)"),
+    ]
+    client = models.ForeignKey(
+        "clients.ClientAccount",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="hr_sessions",
+    )
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    candidate_id = models.CharField(max_length=120, db_index=True)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="draft")
+    question_set = models.JSONField(default=list)
+    responses = models.JSONField(default=list, blank=True)
+    hard_skill_score = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True
+    )
+    soft_skill_score = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True
+    )
+    overall_score = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True
+    )
+    category_breakdown = models.JSONField(default=dict, blank=True)
+    recommendations = models.JSONField(default=dict, blank=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    duration_minutes = models.PositiveIntegerField(default=30)
+    scheduled_for = models.DateTimeField(null=True, blank=True)
+    last_reminder_at = models.DateTimeField(null=True, blank=True)
+    reminder_count = models.PositiveIntegerField(default=0)
+    deadline_type = models.CharField(max_length=16, choices=DEADLINE_TYPE_CHOICES, default="none")
+    deadline_days = models.PositiveIntegerField(null=True, blank=True, help_text="Days from invite to complete")
+    deadline_at = models.DateTimeField(null=True, blank=True, help_text="Absolute deadline")
+    candidate_feedback_score = models.PositiveSmallIntegerField(null=True, blank=True)
+    candidate_feedback_comment = models.TextField(blank=True)
+    candidate_feedback_submitted_at = models.DateTimeField(null=True, blank=True)
+    candidate_feedback_email = models.EmailField(blank=True)
+    candidate_feedback_phone = models.CharField(max_length=120, blank=True)
+    candidate_feedback_opt_in = models.BooleanField(default=False)
+    paused_at = models.DateTimeField(null=True, blank=True)
+    total_paused_seconds = models.PositiveIntegerField(default=0)
+    last_activity_at = models.DateTimeField(null=True, blank=True)
+    telemetry_log = models.JSONField(default=dict, blank=True)
+    project = models.ForeignKey(
+        "clients.ClientProject",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="hr_sessions",
+    )
+    pipeline_stage = models.CharField(
+        max_length=32,
+        choices=PIPELINE_STAGE_CHOICES,
+        default="invited",
+    )
+    pipeline_stage_updated_at = models.DateTimeField(null=True, blank=True)
+    level = models.CharField(
+        max_length=10,
+        choices=LEVEL_CHOICES,
+        default="mid",
+        help_text="Target experience level for this assessment",
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["candidate_id"]),
+        ]
+
+    def mark_submitted(self):
+        self.status = "submitted"
+        self.submitted_at = timezone.now()
+        if self.pipeline_stage in (None, "", "invited", "in_progress"):
+            self.pipeline_stage = "submitted"
+            self.pipeline_stage_updated_at = timezone.now()
+        self.save(
+            update_fields=["status", "submitted_at", "pipeline_stage", "pipeline_stage_updated_at"]
+        )

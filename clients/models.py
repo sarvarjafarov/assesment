@@ -83,6 +83,14 @@ class ClientAccount(TimeStampedModel):
             "label": "UX/UI Design Assessment",
             "description": "User research, interaction design, visual design, and accessibility scenarios for design hires.",
         },
+        "hr": {
+            "label": "HR Assessment",
+            "description": "Talent acquisition, employee relations, compliance, and people strategy scenarios for HR hires.",
+        },
+        "finance": {
+            "label": "Finance Manager Assessment",
+            "description": "Financial planning, budgeting, risk management, and strategic finance scenarios for finance hires.",
+        },
     }
     ASSESSMENT_CHOICES = [
         (code, meta["label"]) for code, meta in ASSESSMENT_DETAILS.items()

@@ -43,6 +43,8 @@ urlpatterns = [
     path('api/marketing-assessment/', include('marketing_assessments.urls')),
     path('api/pm-assessment/', include('pm_assessments.urls')),
     path('api/ux-assessment/', include('ux_assessments.urls')),
+    path('api/hr-assessment/', include('hr_assessments.urls')),
+    path('api/finance-assessment/', include('finance_assessments.urls')),
     path('marketing/', include('marketing.urls')),
 ]
 

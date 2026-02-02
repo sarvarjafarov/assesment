@@ -722,6 +722,21 @@ img {
     color: #c2410c;
 }
 
+.accent-ux_design {
+    background: rgba(168, 85, 247, 0.12);
+    color: #7c3aed;
+}
+
+.accent-hr {
+    background: rgba(236, 72, 153, 0.12);
+    color: #db2777;
+}
+
+.accent-finance {
+    background: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+}
+
 @media (max-width: 900px) {
     .suite-map {
         grid-template-columns: 1fr;

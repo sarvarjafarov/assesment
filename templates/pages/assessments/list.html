@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize static %}
 {% block title %}{% if query %}Search: {{ query }} · {% endif %}Assessment Library · Evalon{% endblock %}
-{% block meta_description %}Browse Evalon's ready-made assessments for marketing, product, and behavioral roles. Pre-built question banks with automated scoring.{% endblock %}
+{% block meta_description %}Browse Evalon's ready-made assessments for marketing, product, behavioral, UX/UI design, HR, and finance roles. Pre-built question banks with automated scoring.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='assessments' %}
@@ -15,7 +15,7 @@
                     {% if query %}
                     Found {{ assessments.paginator.count }} assessment{{ assessments.paginator.count|pluralize }} matching your search.
                     {% else %}
-                    Pre-built question banks covering marketing, product management, and behavioral skills. Each includes scoring rubrics and real-world scenarios.
+                    Pre-built question banks covering marketing, product, behavioral, UX/UI design, HR, and finance roles. Each includes scoring rubrics and real-world scenarios.
                     {% endif %}
                 </p>
                 {% elif query %}

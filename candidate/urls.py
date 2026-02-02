@@ -5,6 +5,8 @@ from pm_assessments import views_candidate as pm_views
 from behavioral_assessments import views_candidate as behavioral_views
 from custom_assessments import views_candidate as custom_views
 from ux_assessments import views_candidate as ux_views
+from hr_assessments import views_candidate as hr_views
+from finance_assessments import views_candidate as finance_views
 
 from . import views
 
@@ -222,5 +224,77 @@ urlpatterns = [
         "ux/<uuid:session_uuid>/send-link/",
         ux_views.UXDesignSessionSendLinkView.as_view(),
         name="ux-send-link",
+    ),
+    # HR Assessments
+    path(
+        "hr/<uuid:session_uuid>/",
+        hr_views.HRAssessmentView.as_view(),
+        name="hr-session",
+    ),
+    path(
+        "hr/<uuid:session_uuid>/complete/",
+        hr_views.HRAssessmentCompleteView.as_view(),
+        name="hr-complete",
+    ),
+    path(
+        "hr/<uuid:session_uuid>/expired/",
+        hr_views.HRAssessmentExpiredView.as_view(),
+        name="hr-expired",
+    ),
+    path(
+        "hr/<uuid:session_uuid>/pause/",
+        hr_views.HRSessionPauseView.as_view(),
+        name="hr-pause",
+    ),
+    path(
+        "hr/<uuid:session_uuid>/paused/",
+        hr_views.HRSessionPausedView.as_view(),
+        name="hr-paused",
+    ),
+    path(
+        "hr/<uuid:session_uuid>/resume/",
+        hr_views.HRSessionResumeView.as_view(),
+        name="hr-resume",
+    ),
+    path(
+        "hr/<uuid:session_uuid>/send-link/",
+        hr_views.HRSessionSendLinkView.as_view(),
+        name="hr-send-link",
+    ),
+    # Finance Assessments
+    path(
+        "finance/<uuid:session_uuid>/",
+        finance_views.FinanceAssessmentView.as_view(),
+        name="finance-session",
+    ),
+    path(
+        "finance/<uuid:session_uuid>/complete/",
+        finance_views.FinanceAssessmentCompleteView.as_view(),
+        name="finance-complete",
+    ),
+    path(
+        "finance/<uuid:session_uuid>/expired/",
+        finance_views.FinanceAssessmentExpiredView.as_view(),
+        name="finance-expired",
+    ),
+    path(
+        "finance/<uuid:session_uuid>/pause/",
+        finance_views.FinanceSessionPauseView.as_view(),
+        name="finance-pause",
+    ),
+    path(
+        "finance/<uuid:session_uuid>/paused/",
+        finance_views.FinanceSessionPausedView.as_view(),
+        name="finance-paused",
+    ),
+    path(
+        "finance/<uuid:session_uuid>/resume/",
+        finance_views.FinanceSessionResumeView.as_view(),
+        name="finance-resume",
+    ),
+    path(
+        "finance/<uuid:session_uuid>/send-link/",
+        finance_views.FinanceSessionSendLinkView.as_view(),
+        name="finance-send-link",
     ),
 ]

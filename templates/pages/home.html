@@ -78,12 +78,35 @@
                                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
-                            {% else %}
+                            {% elif item.slug == 'behavioral' %}
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            {% elif item.slug == 'ux_design' %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="6"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                            </svg>
+                            {% elif item.slug == 'hr' %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <line x1="17" y1="11" x2="23" y2="11"></line>
+                                <line x1="20" y1="8" x2="20" y2="14"></line>
+                            </svg>
+                            {% elif item.slug == 'finance' %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            {% else %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
                             {% endif %}
                         </div>
@@ -485,6 +508,13 @@
     color: var(--orange);
     margin-bottom: 1.5rem;
 }
+
+.suite-card-icon.accent-marketing { background: rgba(14, 116, 144, 0.10); color: #0f766e; }
+.suite-card-icon.accent-product { background: rgba(78, 63, 156, 0.10); color: #4f3f9c; }
+.suite-card-icon.accent-behavioral { background: rgba(234, 88, 12, 0.10); color: #c2410c; }
+.suite-card-icon.accent-ux_design { background: rgba(168, 85, 247, 0.10); color: #7c3aed; }
+.suite-card-icon.accent-hr { background: rgba(236, 72, 153, 0.10); color: #db2777; }
+.suite-card-icon.accent-finance { background: rgba(34, 197, 94, 0.10); color: #16a34a; }
 
 .suite-card-v2 h3 {
     font-size: 1.5rem;

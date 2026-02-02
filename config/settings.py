@@ -114,6 +114,8 @@ INSTALLED_APPS = [
     'behavioral_assessments',
     'custom_assessments',
     'ux_assessments',
+    'hr_assessments',
+    'finance_assessments',
     'clients',
 ]
 

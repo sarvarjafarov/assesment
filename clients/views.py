@@ -30,6 +30,8 @@ from behavioral_assessments.models import BehavioralAssessmentSession
 from marketing_assessments.models import DigitalMarketingAssessmentSession
 from pm_assessments.models import ProductAssessmentSession
 from ux_assessments.models import UXDesignAssessmentSession
+from hr_assessments.models import HRAssessmentSession
+from finance_assessments.models import FinanceAssessmentSession
 
 from .forms import (
     ClientLogoForm,
@@ -41,6 +43,8 @@ from .forms import (
     ClientMarketingInviteForm,
     ClientProductInviteForm,
     ClientUXDesignInviteForm,
+    ClientHRInviteForm,
+    ClientFinanceInviteForm,
     ClientSignupForm,
     ClientSessionNoteForm,
     EmailPreferencesForm,
@@ -100,6 +104,8 @@ def build_dataset_map(account: ClientAccount):
         "product": ProductAssessmentSession.objects.filter(client=account).select_related("project"),
         "behavioral": BehavioralAssessmentSession.objects.filter(client=account).select_related("project"),
         "ux_design": UXDesignAssessmentSession.objects.filter(client=account).select_related("project"),
+        "hr": HRAssessmentSession.objects.filter(client=account).select_related("project"),
+        "finance": FinanceAssessmentSession.objects.filter(client=account).select_related("project"),
     }
 
 
@@ -125,6 +131,8 @@ ASSESSMENT_MODEL_MAP = {
     "product": ProductAssessmentSession,
     "behavioral": BehavioralAssessmentSession,
     "ux_design": UXDesignAssessmentSession,
+    "hr": HRAssessmentSession,
+    "finance": FinanceAssessmentSession,
 }
 
 
@@ -1356,6 +1364,18 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             "form_class": ClientUXDesignInviteForm,
             "session_model": UXDesignAssessmentSession,
             "candidate_route": "candidate:ux-session",
+        },
+        "hr": {
+            "label": "HR Assessment",
+            "form_class": ClientHRInviteForm,
+            "session_model": HRAssessmentSession,
+            "candidate_route": "candidate:hr-session",
+        },
+        "finance": {
+            "label": "Finance Manager Assessment",
+            "form_class": ClientFinanceInviteForm,
+            "session_model": FinanceAssessmentSession,
+            "candidate_route": "candidate:finance-session",
         },
     }
 
