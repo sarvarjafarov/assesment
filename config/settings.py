@@ -83,7 +83,13 @@ env_csrf_origins = [
 ]
 CSRF_TRUSTED_ORIGINS = list({*DEFAULT_CSRF_TRUSTED_ORIGINS, *env_csrf_origins})
 
-
+# Session cookie: must be sent when Google redirects back (SameSite=Lax, Secure on HTTPS)
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "0" if DEBUG else "1") == "1"
+SESSION_COOKIE_SAMESITE = "Lax"  # allow cookie on redirect from Google back to us
 # Application definition
 
 INSTALLED_APPS = [

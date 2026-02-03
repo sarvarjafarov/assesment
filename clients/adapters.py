@@ -134,10 +134,19 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         if extra_context is None:
             extra_context = {}
         # Surface the actual error so site owners can fix it (e.g. invalid_grant, missing env)
+        from allauth.socialaccount.providers.base.constants import AuthError as AuthErrorEnum
         if exception is not None:
             extra_context["error_summary"] = str(exception)
         elif error is not None:
-            extra_context["error_summary"] = str(error)
+            err_str = str(error)
+            if err_str == "unknown" or error == AuthErrorEnum.UNKNOWN:
+                extra_context["error_summary"] = (
+                    "Session lost (cookies not sent on redirect). "
+                    "Try again: open the sign-in page on this site, then click Sign in with Google. "
+                    "Use the same browser and allow cookies for this domain."
+                )
+            else:
+                extra_context["error_summary"] = err_str
         # Add troubleshooting hint for Google OAuth (common: redirect_uri / credentials)
         if provider_id == "google":
             # Use the request so we show the exact callback URL that was used
