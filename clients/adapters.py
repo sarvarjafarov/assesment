@@ -133,6 +133,11 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         )
         if extra_context is None:
             extra_context = {}
+        # Surface the actual error so site owners can fix it (e.g. invalid_grant, missing env)
+        if exception is not None:
+            extra_context["error_summary"] = str(exception)
+        elif error is not None:
+            extra_context["error_summary"] = str(error)
         # Add troubleshooting hint for Google OAuth (common: redirect_uri / credentials)
         if provider_id == "google":
             # Use the request so we show the exact callback URL that was used
