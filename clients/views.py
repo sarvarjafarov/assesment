@@ -374,7 +374,16 @@ class ClientSignupView(FormView):
     success_url = reverse_lazy("clients:signup-complete")
 
     def form_valid(self, form):
-        account = form.save()
+        try:
+            account = form.save()
+        except Exception as e:
+            logger.exception("Client signup failed: %s", e)
+            if isinstance(e, ValidationError):
+                msg_list = getattr(e, "messages", None) or getattr(e, "message_list", None)
+                msg = msg_list[0] if msg_list else str(e)
+                form.add_error(None, msg)
+                return self.form_invalid(form)
+            raise
         # Send verification email with new service
         email_sent = send_verification_email(account)
         if email_sent:

@@ -2,6 +2,8 @@
 Custom social account adapter for django-allauth.
 Integrates social authentication with the ClientAccount model.
 """
+import logging
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -12,6 +14,7 @@ from allauth.account.adapter import DefaultAccountAdapter
 from .models import ClientAccount
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -49,7 +52,11 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         Called when creating a new user from social login.
         Creates the associated ClientAccount record.
         """
-        user = super().save_user(request, sociallogin, form)
+        try:
+            user = super().save_user(request, sociallogin, form)
+        except Exception as e:
+            logger.exception("Social signup: save_user failed: %s", e)
+            raise
 
         # IMPORTANT: Keep user active for social auth (they need to complete profile)
         user.is_active = True
@@ -64,9 +71,17 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         else:
             auth_provider = 'email'
 
-        # Extract user info from social account
-        extra_data = sociallogin.account.extra_data
-        email = extra_data.get('email', user.email)
+        # Extract user info from social account (support different provider key names)
+        extra_data = sociallogin.account.extra_data or {}
+        email = (
+            extra_data.get('email')
+            or getattr(user, 'email', None)
+            or (getattr(user, 'username', None) if getattr(user, 'username', None) and '@' in str(getattr(user, 'username', '')) else None)
+        )
+        if not email or not str(email).strip():
+            logger.error("Social signup: no email from provider %s for user id=%s", provider, getattr(user, 'pk', None))
+            raise ValueError("Your account did not provide an email address. Please sign up with email instead.")
+        email = str(email).strip().lower()
         full_name = self._get_full_name(extra_data, provider)
 
         # Check if ClientAccount already exists (edge case)
@@ -76,32 +91,30 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
             if not client.user:
                 client.user = user
                 client.auth_provider = auth_provider
-                # Use update to avoid triggering save() which would deactivate user
                 ClientAccount.objects.filter(pk=client.pk).update(
                     user=user, auth_provider=auth_provider
                 )
-            # Re-activate user after ClientAccount link
             user.is_active = True
             user.save(update_fields=['is_active'])
         except ClientAccount.DoesNotExist:
             # Create new ClientAccount with placeholder data
-            # Use direct insert to avoid save() deactivating the user
             client = ClientAccount(
                 user=user,
                 email=email,
-                full_name=full_name or email.split('@')[0],
+                full_name=full_name or (email.split('@')[0] if email else ''),
                 company_name='',  # Will be completed in profile
                 phone_number='',  # Will be completed in profile
                 employee_size='1-10',  # Default, will be updated
                 auth_provider=auth_provider,
                 status='pending',  # Still requires admin approval
             )
-            # Save without triggering the user deactivation
-            client.save()
-            # Re-activate user after ClientAccount creation
+            try:
+                client.save()
+            except Exception as e:
+                logger.exception("Social signup: ClientAccount save failed: %s", e)
+                raise
             user.is_active = True
             user.save(update_fields=['is_active'])
-            # Mark email as verified (social providers verify emails)
             client.mark_email_verified()
 
         return user

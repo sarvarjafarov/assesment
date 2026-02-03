@@ -140,21 +140,35 @@ class ClientSignupForm(forms.ModelForm):
         return _validate_logo_file(logo)
 
     def save(self, commit=True) -> ClientAccount:
-        account = super().save(commit=False)
         from django.contrib.auth import get_user_model
+        from django.db import IntegrityError
 
+        account = super().save(commit=False)
         UserModel = get_user_model()
-        user = UserModel.objects.create_user(
-            username=account.email,
-            email=account.email,
-            password=self.cleaned_data["password1"],
-            first_name=account.full_name.split(" ")[0],
-        )
+
+        # Safe first name: handle empty or single-word full_name
+        full_name = (account.full_name or "").strip()
+        parts = full_name.split()
+        first_name = parts[0] if parts else (account.email or "user").split("@")[0] or "User"
+
+        try:
+            user = UserModel.objects.create_user(
+                username=account.email,
+                email=account.email,
+                password=self.cleaned_data["password1"],
+                first_name=first_name,
+            )
+        except IntegrityError:
+            # User with this email/username already exists (e.g. from social auth or partial signup)
+            raise forms.ValidationError(
+                "An account with this email already exists. Try signing in or use a different email."
+            )
+
         user.is_active = False
         user.save(update_fields=["is_active"])
         account.user = user
         account.requested_assessments = self.cleaned_data.get("requested_assessments", [])
-        objectives = self.cleaned_data.get('objectives', '').strip()
+        objectives = self.cleaned_data.get("objectives", "").strip()
         if objectives:
             account.notes = f"Objectives: {objectives}"
         if commit:
