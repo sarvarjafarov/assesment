@@ -35,17 +35,17 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         if sociallogin.is_existing:
             return
 
-        email = sociallogin.account.extra_data.get('email')
+        email = (sociallogin.account.extra_data or {}).get('email')
         if not email:
             return
 
-        # Check if a User exists with this email
+        # Check if a User exists with this email (at most one)
         try:
-            existing_user = User.objects.get(email__iexact=email)
-            # Connect this social account to the existing user
-            sociallogin.connect(request, existing_user)
-        except User.DoesNotExist:
-            pass
+            existing_user = User.objects.filter(email__iexact=email).first()
+            if existing_user:
+                sociallogin.connect(request, existing_user)
+        except Exception as e:
+            logger.warning("pre_social_login: could not link by email %s: %s", email, e)
 
     def save_user(self, request, sociallogin, form=None):
         """
@@ -71,11 +71,11 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         else:
             auth_provider = 'email'
 
-        # Extract user info from social account (support different provider key names)
+        # Extract user info: allauth often sets user.email from the provider; fall back to extra_data
         extra_data = sociallogin.account.extra_data or {}
         email = (
-            extra_data.get('email')
-            or getattr(user, 'email', None)
+            getattr(user, 'email', None)
+            or extra_data.get('email')
             or (getattr(user, 'username', None) if getattr(user, 'username', None) and '@' in str(getattr(user, 'username', '')) else None)
         )
         if not email or not str(email).strip():
@@ -118,6 +118,33 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
             client.mark_email_verified()
 
         return user
+
+    def on_authentication_error(
+        self, request, provider, error=None, exception=None, extra_context=None
+    ):
+        """Log the error and add troubleshooting context for site owners."""
+        provider_id = getattr(provider, "id", str(provider))
+        logger.warning(
+            "Social auth error: provider=%s error=%s exception=%s",
+            provider_id,
+            error,
+            exception,
+            exc_info=exception is not None,
+        )
+        if extra_context is None:
+            extra_context = {}
+        # Add troubleshooting hint for Google OAuth (common: redirect_uri / credentials)
+        if provider_id == "google":
+            # Use the request so we show the exact callback URL that was used
+            callback_url = request.build_absolute_uri("/accounts/google/login/callback/")
+            extra_context["oauth_troubleshooting"] = {
+                "provider": "Google",
+                "callback_url": callback_url,
+                "hint": "Ensure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set on Heroku, and that the Authorized redirect URI in Google Cloud Console includes this exact URL.",
+            }
+        super().on_authentication_error(
+            request, provider, error=error, exception=exception, extra_context=extra_context
+        )
 
     def _get_full_name(self, extra_data, provider):
         """Extract full name from social provider data."""

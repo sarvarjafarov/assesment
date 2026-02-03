@@ -24,6 +24,20 @@
                 <li>There was a temporary connection issue</li>
             </ul>
 
+            {% if oauth_troubleshooting %}
+            <div class="auth-troubleshooting">
+                <p class="auth-troubleshooting__title">Site owners: fix Google sign-in</p>
+                <p class="auth-troubleshooting__hint">{{ oauth_troubleshooting.hint }}</p>
+                <p class="auth-troubleshooting__url"><strong>Redirect URI to add in Google Cloud Console:</strong><br>
+                    <code>{{ oauth_troubleshooting.callback_url }}</code></p>
+                <p class="auth-troubleshooting__steps">In Google Cloud Console → APIs &amp; Credentials → your OAuth 2.0 Client → Authorized redirect URIs, add the URL above. Also set <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> in your Heroku config.</p>
+            </div>
+            {% endif %}
+
+            {% if auth_error.exception and request.user.is_staff %}
+            <p class="auth-debug"><strong>Debug (staff only):</strong> {{ auth_error.exception }}</p>
+            {% endif %}
+
             <div class="auth-actions">
                 <a class="btn btn-pill" href="{% url 'clients:login' %}">Try again</a>
                 <a class="btn btn-outline" href="{% url 'clients:signup' %}">Create account</a>
@@ -122,6 +136,48 @@
 .auth-help a {
     color: var(--orange);
     font-weight: 600;
+}
+
+.auth-troubleshooting {
+    text-align: left;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 0 0 1.5rem;
+    font-size: 0.875rem;
+}
+
+.auth-troubleshooting__title {
+    font-weight: 700;
+    color: #92400e;
+    margin: 0 0 0.5rem;
+}
+
+.auth-troubleshooting__hint,
+.auth-troubleshooting__url,
+.auth-troubleshooting__steps {
+    color: #78350f;
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.auth-troubleshooting code {
+    background: rgba(0,0,0,0.06);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    word-break: break-all;
+}
+
+.auth-debug {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    word-break: break-all;
 }
 
 @media (max-width: 640px) {
