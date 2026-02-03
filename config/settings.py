@@ -90,6 +90,10 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "0" if DEBUG else "1") == "1"
 SESSION_COOKIE_SAMESITE = "Lax"  # allow cookie on redirect from Google back to us
+# Set SESSION_COOKIE_DOMAIN=.evalon.tech on Heroku when using www.evalon.tech so the session cookie
+# is sent when Google redirects back (fixes "unknown" / session lost for both login and sign-up).
+_session_domain = os.environ.get("SESSION_COOKIE_DOMAIN", "").strip()
+SESSION_COOKIE_DOMAIN = _session_domain or None
 # Application definition
 
 INSTALLED_APPS = [

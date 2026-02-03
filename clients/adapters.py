@@ -141,20 +141,23 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
             err_str = str(error)
             if err_str == "unknown" or error == AuthErrorEnum.UNKNOWN:
                 extra_context["error_summary"] = (
-                    "Session lost (cookies not sent on redirect). "
-                    "Try again: open the sign-in page on this site, then click Sign in with Google. "
-                    "Use the same browser and allow cookies for this domain."
+                    "Session lost (OAuth state not found). This affects both login and sign-up with Google. "
+                    "Fix: (1) Open this site’s login or sign-up page in this browser, then click “Sign in with Google”—don’t open the Google link in a new tab. "
+                    "(2) Allow cookies for this domain. "
+                    "(3) If you use www.evalon.tech, set SESSION_COOKIE_DOMAIN=.evalon.tech in Heroku so the session cookie is sent when Google redirects back."
                 )
             else:
                 extra_context["error_summary"] = err_str
-        # Add troubleshooting hint for Google OAuth (common: redirect_uri / credentials)
+        # Add troubleshooting hint for Google OAuth (common: redirect_uri / credentials / session)
         if provider_id == "google":
-            # Use the request so we show the exact callback URL that was used
             callback_url = request.build_absolute_uri("/accounts/google/login/callback/")
+            hint = "Ensure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set on Heroku, and that the Authorized redirect URI in Google Cloud Console includes this exact URL."
+            if error == AuthErrorEnum.UNKNOWN:
+                hint += " For «session lost» (login and sign-up both fail): set SESSION_COOKIE_DOMAIN=.evalon.tech on Heroku so the session cookie is sent when Google redirects back to www.evalon.tech."
             extra_context["oauth_troubleshooting"] = {
                 "provider": "Google",
                 "callback_url": callback_url,
-                "hint": "Ensure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set on Heroku, and that the Authorized redirect URI in Google Cloud Console includes this exact URL.",
+                "hint": hint,
             }
         super().on_authentication_error(
             request, provider, error=error, exception=exception, extra_context=extra_context
