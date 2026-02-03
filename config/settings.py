@@ -209,6 +209,20 @@ def _configure_test_database():
 
 _configure_test_database()
 
+# Cache for OAuth state fallback when session cookie is lost on redirect (e.g. Google callback).
+# State is stashed in session AND in cache; callback can restore from cache if session is missing.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "default",
+    },
+    "oauth_state": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "oauth_state_cache",
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+        "TIMEOUT": 600,  # 10 minutes
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
