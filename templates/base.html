@@ -15,7 +15,8 @@
     </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {% with seo_meta=seo_metadata|default:{} default_title=seo_meta.meta_title|default:marketing_settings.meta_title|default:"Evalon Assessments" default_description=seo_meta.meta_description|default:marketing_settings.meta_description|default:"Evalon helps recruitment teams design, deliver, and score behavioral assessments." default_image=seo_meta.image_url|default:marketing_meta_image_url default_og_type=seo_meta.og_type|default:"website" %}
+    {% with seo_meta=seo_metadata %}
+    {% with default_title=seo_meta.meta_title|default:marketing_settings.meta_title|default:"Evalon Assessments" default_description=seo_meta.meta_description|default:marketing_settings.meta_description|default:"Evalon helps recruitment teams design, deliver, and score behavioral assessments." default_image=seo_meta.image_url|default:marketing_meta_image_url default_og_type=seo_meta.og_type|default:"website" %}
     <title>{% block title %}{{ default_title }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}{{ default_description }}{% endblock %}">
     <meta property="og:title" content="{% block og_title %}{{ seo_meta.og_title|default:default_title }}{% endblock %}">
@@ -31,6 +32,7 @@
     {% if seo_meta.noindex %}
     <meta name="robots" content="noindex,follow">
     {% endif %}
+    {% endwith %}
     {% endwith %}
     {% if marketing_settings and marketing_settings.meta_keywords %}
     <meta name="keywords" content="{{ marketing_settings.meta_keywords }}">
