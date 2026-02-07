@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     'hr_assessments',
     'finance_assessments',
     'clients',
+    'seo',
 ]
 
 SITE_ID = 1
@@ -163,6 +164,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'marketing.context_processors.marketing_settings',
+                'seo.context_processors.seo_metadata',
                 'clients.context_processors.portal_navigation',
             ],
         },

@@ -69,3 +69,9 @@ heroku config:set \
 ```
 
 After configuring, every invite (marketing CTA, console, API) automatically emails the candidate with their unique assessment link.
+
+## SEO Module
+
+- Populate `SeoPage` entries in the Django admin to cover each marketing/assessment path. Each entry controls the canonical URL, on-page metadata, social headlines, Open Graph/Twitter imagery, schema type, and optional structured data payload that now renders via the new `render_seo_jsonld` template tag.
+- The `seo_metadata` context processor merges those overrides with the marketing defaults so every template can reference `seo_metadata.*` (and the base layout now injects the canonical link, robots directive, and JSON-LD automatically).
+- Run `python manage.py seo_audit` after adding or updating entries to catch missing titles/descriptions or duplicate paths.
