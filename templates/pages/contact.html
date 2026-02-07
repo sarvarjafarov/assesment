@@ -27,7 +27,12 @@
                             <li>{{ detail }}</li>
                             {% endfor %}
                         </ul>
-                        <a class="btn btn-pill" href="mailto:{{ channel.email }}">Email {{ channel.label|lower }}</a>
+                        <a class="btn btn-pill"
+                           href="mailto:{{ channel.email }}"
+                           data-gtag-click="contact_email_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ channel.label|lower }}"
+                           data-gtag-params='{"channel":"{{ channel.label|escapejs }}"}'>Email {{ channel.label|lower }}</a>
                     </article>
                     {% endfor %}
                 </div>

@@ -22,7 +22,12 @@
                         <h3>{{ section.title }}</h3>
                         <p>{{ section.body }}</p>
                         {% if section.cta_label %}
-                        <a class="btn btn-pill" href="{{ section.cta_url }}">{{ section.cta_label }}</a>
+                        <a class="btn btn-pill"
+                           href="{{ section.cta_url }}"
+                           data-gtag-click="resources_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ section.cta_label }}"
+                           data-gtag-params='{"section":"{{ section.title|escapejs }}"}'>{{ section.cta_label }}</a>
                         {% endif %}
                     </article>
                     {% endfor %}
@@ -45,9 +50,21 @@
                         <p class="muted">{{ asset.version|default:"v1" }}</p>
                         <div class="resource-actions">
                             {% if asset.external_url %}
-                            <a class="btn btn-outline" href="{{ asset.external_url }}" target="_blank">Open</a>
+                            <a class="btn btn-outline"
+                               href="{{ asset.external_url }}"
+                               target="_blank"
+                               data-gtag-click="resource_asset_click"
+                               data-gtag-category="resource"
+                               data-gtag-label="open_{{ asset.title }}"
+                               data-gtag-params='{"asset":"{{ asset.title|escapejs }}","format":"external"}'>Open</a>
                             {% else %}
-                            <a class="btn btn-outline" href="{{ asset.file.url }}" download>Download</a>
+                            <a class="btn btn-outline"
+                               href="{{ asset.file.url }}"
+                               download
+                               data-gtag-click="resource_asset_click"
+                               data-gtag-category="resource"
+                               data-gtag-label="download_{{ asset.title }}"
+                               data-gtag-params='{"asset":"{{ asset.title|escapejs }}","format":"download"}'>Download</a>
                             {% endif %}
                         </div>
                     </article>

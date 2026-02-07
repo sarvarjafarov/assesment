@@ -36,7 +36,12 @@
                         </ul>
                         {% endif %}
                         {% if section.cta_label %}
-                        <a class="btn btn-pill" href="{{ section.cta_url }}">{{ section.cta_label }}</a>
+                        <a class="btn btn-pill"
+                           href="{{ section.cta_url }}"
+                           data-gtag-click="page_builder_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ section.cta_label }}"
+                           data-gtag-params='{"section":"{{ section.title|escapejs }}"}'>{{ section.cta_label }}</a>
                         {% endif %}
                     </article>
                     {% endfor %}

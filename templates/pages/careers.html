@@ -45,7 +45,12 @@
                                 <p>{{ role.tag }}</p>
                             </div>
                             <p class="role-meta">{{ role.location }} · {{ role.type }}</p>
-                            <a class="btn btn-pill" href="mailto:careers@evalon.so?subject={{ role.title|urlencode }}">Apply</a>
+                            <a class="btn btn-pill"
+                               href="mailto:careers@evalon.so?subject={{ role.title|urlencode }}"
+                               data-gtag-click="careers_apply_click"
+                               data-gtag-category="engagement"
+                               data-gtag-label="{{ role.title|lower }}"
+                               data-gtag-params='{"role":"{{ role.title|escapejs }}"}'>Apply</a>
                         </article>
                         {% endfor %}
                     </div>

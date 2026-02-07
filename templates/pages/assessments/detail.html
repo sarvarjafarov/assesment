@@ -68,8 +68,18 @@
                             </div>
                         </div>
                         <div class="hero-cta">
-                            <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}" class="btn btn-pill">{{ assessment.cta_label }}</a>
-                            <a href="{% url 'pages:contact' %}" class="btn btn-outline-white">Contact sales</a>
+                            <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
+                               class="btn btn-pill"
+                               data-gtag-click="assessment_detail_cta_click"
+                               data-gtag-category="engagement"
+                               data-gtag-label="{{ assessment.slug }}"
+                               data-gtag-params='{"section":"hero"}'>{{ assessment.cta_label }}</a>
+                            <a href="{% url 'pages:contact' %}"
+                               class="btn btn-outline-white"
+                               data-gtag-click="contact_sales_click"
+                               data-gtag-category="engagement"
+                               data-gtag-label="assessment_contact_sales"
+                               data-gtag-params='{"assessment":"{{ assessment.slug }}"}'>Contact sales</a>
                         </div>
                     </div>
                     <div class="hero-visual">
@@ -237,8 +247,18 @@
                     <h2>Ready to assess candidates with {{ assessment.label }}?</h2>
                     <p>Start your free trial and send assessments to candidates in minutes.</p>
                     <div class="cta-buttons">
-                        <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}" class="btn btn-pill">{{ assessment.cta_label }}</a>
-                        <a href="{% url 'pages:contact' %}" class="btn btn-outline-white">Talk to sales</a>
+                        <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
+                           class="btn btn-pill"
+                           data-gtag-click="assessment_detail_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ assessment.slug }}"
+                           data-gtag-params='{"section":"footer"}'>{{ assessment.cta_label }}</a>
+                        <a href="{% url 'pages:contact' %}"
+                           class="btn btn-outline-white"
+                           data-gtag-click="contact_sales_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="assessment_contact_sales_footer"
+                           data-gtag-params='{"assessment":"{{ assessment.slug }}"}'>Talk to sales</a>
                     </div>
                 </div>
             </section>
@@ -253,7 +273,11 @@
                         {% for related in related_assessments %}
                         <article class="related-card">
                             <span class="pill subtle">{{ related.label }}</span>
-                            <h3><a href="{{ related.get_absolute_url }}">{{ related.title }}</a></h3>
+                            <h3><a href="{{ related.get_absolute_url }}"
+                                    data-gtag-click="related_assessment_click"
+                                    data-gtag-category="engagement"
+                                    data-gtag-label="{{ related.slug }}"
+                                    data-gtag-params='{"assessment":"{{ related.slug }}","source":"related_list"}'>{{ related.title }}</a></h3>
                             <p>{{ related.summary|truncatewords:20 }}</p>
                             <div class="related-meta">
                                 <span>{{ related.duration_minutes }} min</span>

@@ -15,7 +15,7 @@
                     <p class="hero-subtitle">{{ hero_content.subtitle }}</p>
                     <div class="hero-cta">
                         <a class="btn btn-pill" href="{{ hero_content.primary_url }}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
-                        <a class="btn btn-outline" href="{{ hero_content.secondary_url }}">{{ hero_content.secondary_label }}</a>
+                        <a class="btn btn-outline" href="{{ hero_content.secondary_url }}" data-gtag-click="hero_secondary_click" data-gtag-category="engagement" data-gtag-label="hero_secondary" data-gtag-params='{"cta":"hero_secondary"}'>{{ hero_content.secondary_label }}</a>
                     </div>
                     <div class="hero-trust">
                         <p class="muted small">Trusted by hiring teams at</p>
@@ -129,15 +129,29 @@
                             {% endfor %}
                         </div>
                         {% if item.url %}
-                        <a class="btn btn-outline small" href="{{ item.url }}">Learn more</a>
+                        <a class="btn btn-outline small"
+                           href="{{ item.url }}"
+                           data-gtag-click="suite_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ item.slug }}_learn_more"
+                           data-gtag-params='{"suite":"{{ item.slug }}","context":"home_suite_list"}'>Learn more</a>
                         {% else %}
-                        <a class="btn btn-outline small" href="mailto:hello@evalon.so?subject={{ item.label|urlencode }}%20rubric">Download rubric</a>
+                        <a class="btn btn-outline small"
+                           href="mailto:hello@evalon.so?subject={{ item.label|urlencode }}%20rubric"
+                           data-gtag-click="suite_download_rubric"
+                           data-gtag-category="lead"
+                           data-gtag-label="{{ item.slug }}_download_rubric"
+                           data-gtag-params='{"suite":"{{ item.slug }}","context":"home_suite_list"}'>Download rubric</a>
                         {% endif %}
                     </article>
                     {% endfor %}
                 </div>
                 <div class="suite-see-all">
-                    <a href="{% url 'pages:assessment_list' %}" class="btn btn-outline">See all assessments</a>
+                    <a href="{% url 'pages:assessment_list' %}"
+                       class="btn btn-outline"
+                       data-gtag-click="see_all_assessments"
+                       data-gtag-category="engagement"
+                       data-gtag-label="see_all_assessments">See all assessments</a>
                 </div>
             </div>
         </section>
@@ -231,7 +245,12 @@
                             {% endfor %}
                         </ul>
                         <div class="pricing-cta">
-                            <a class="btn {% if tier.highlighted %}btn-pill{% else %}btn-outline{% endif %}" href="{{ tier.cta_url }}">{{ tier.cta_label }}</a>
+                            <a class="btn {% if tier.highlighted %}btn-pill{% else %}btn-outline{% endif %}"
+                               href="{{ tier.cta_url }}"
+                               data-gtag-click="pricing_plan_click"
+                               data-gtag-category="pricing"
+                               data-gtag-label="{{ tier.slug }}"
+                               data-gtag-params='{"plan":"{{ tier.slug }}","plan_name":"{{ tier.name|escapejs }}"}'>{{ tier.cta_label }}</a>
                         </div>
                     </article>
                     {% endfor %}
@@ -320,7 +339,11 @@
                         {{ invite_form.notes.label_tag }}
                         {{ invite_form.notes }}
                     </div>
-                    <button type="submit" class="btn btn-pill">Request a Demo</button>
+                    <button type="submit"
+                            class="btn btn-pill"
+                            data-gtag-click="request_demo_button_click"
+                            data-gtag-category="lead"
+                            data-gtag-label="home_demo_request">Request a Demo</button>
                 </form>
             </div>
         </section>

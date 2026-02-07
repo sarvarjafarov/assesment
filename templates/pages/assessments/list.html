@@ -25,7 +25,11 @@
 
             {# Search bar #}
             <section class="assessments-search-bar">
-                <form action="{% url 'pages:assessment_list' %}" method="get" class="search-form">
+                <form action="{% url 'pages:assessment_list' %}" method="get" class="search-form"
+                      data-gtag-submit="assessment_search"
+                      data-gtag-category="search"
+                      data-gtag-label="assessment_library"
+                      data-gtag-params='{"source":"assessment_library"}'>
                     <input type="search" name="q" value="{{ query }}" placeholder="Search assessments..." aria-label="Search assessments">
                     <button type="submit" class="btn btn-pill">Search</button>
                 </form>
@@ -59,19 +63,32 @@
                         <span>{{ assessment.question_count }} questions</span>
                         <span>{{ assessment.get_difficulty_level_display }}</span>
                     </div>
-                    <a class="btn btn-outline small" href="{{ assessment.get_absolute_url }}">Learn more</a>
+                    <a class="btn btn-outline small"
+                       href="{{ assessment.get_absolute_url }}"
+                       data-gtag-click="assessment_cta_click"
+                       data-gtag-category="engagement"
+                       data-gtag-label="{{ assessment.slug }}"
+                       data-gtag-params='{"assessment":"{{ assessment.slug }}"}'>Learn more</a>
                 </article>
                 {% empty %}
-                <div class="empty-state-box">
-                    <h3>No assessments found</h3>
-                    <p>{% if query %}Try adjusting your search or <a href="{% url 'pages:assessment_list' %}">browse all assessments</a>.{% else %}Check back soon for new assessments.{% endif %}</p>
-                </div>
+                    <div class="empty-state-box">
+                        <h3>No assessments found</h3>
+                        <p>{% if query %}Try adjusting your search or <a href="{% url 'pages:assessment_list' %}"
+                                                                    data-gtag-click="assessment_library_reset"
+                                                                    data-gtag-category="engagement"
+                                                                    data-gtag-label="browse_all_assessments">browse all assessments</a>.{% else %}Check back soon for new assessments.{% endif %}</p>
+                    </div>
                 {% endfor %}
             </section>
 
             {% if is_paginated and page_obj.has_next %}
             <div class="assessments-load-more">
-                <a class="btn btn-pill secondary" href="?{% if query %}q={{ query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Load more</a>
+                <a class="btn btn-pill secondary"
+                   href="?{% if query %}q={{ query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}"
+                   data-gtag-click="assessment_load_more_click"
+                   data-gtag-category="engagement"
+                   data-gtag-label="load_more"
+                   data-gtag-params='{"page":{{ page_obj.next_page_number }}}'>Load more</a>
             </div>
             {% endif %}
         </div>
