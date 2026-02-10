@@ -810,7 +810,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                    'X-CSRFToken': (form.querySelector('[name=csrfmiddlewaretoken]') || {}).value || ''
                 },
                 body: JSON.stringify(formData)
             });

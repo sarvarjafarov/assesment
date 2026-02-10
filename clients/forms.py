@@ -3,6 +3,7 @@ from __future__ import annotations
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import AuthenticationForm
+from django.db import transaction
 from django.utils import timezone
 
 from behavioral_assessments.models import BehavioralAssessmentSession
@@ -279,11 +280,15 @@ class BaseClientInviteForm(forms.Form):
         if not question_set:
             raise forms.ValidationError("No questions are active right now.")
         self.question_set = question_set
-        remaining = self.client.invites_remaining()
-        if remaining is not None and remaining <= 0:
-            raise forms.ValidationError(
-                "You've reached your monthly invite quota. Upgrade your plan to send more invites."
-            )
+        # Recheck quota under a row lock to prevent TOCTOU race conditions
+        with transaction.atomic():
+            from .models import ClientAccount
+            locked = ClientAccount.objects.select_for_update().get(pk=self.client.pk)
+            remaining = locked.invites_remaining()
+            if remaining is not None and remaining <= 0:
+                raise forms.ValidationError(
+                    "You've reached your monthly invite quota. Upgrade your plan to send more invites."
+                )
 
         # Validate deadline fields
         deadline_type = cleaned.get("deadline_type")

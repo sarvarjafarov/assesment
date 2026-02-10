@@ -204,10 +204,11 @@
 </div>
 
 {% if analytics.total_invites > 0 %}
+{{ chart_payload|json_script:"chart-data" }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function() {
-    const chartData = {{ chart_payload|safe }};
+    const chartData = JSON.parse(document.getElementById('chart-data').textContent);
     const colors = {
         primary: 'rgba(255, 138, 0, 1)',
         primaryLight: 'rgba(255, 138, 0, 0.1)',

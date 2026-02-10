@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import mimetypes
+import secrets
 from datetime import datetime
 import uuid
 
@@ -244,7 +245,7 @@ class ClientAccount(TimeStampedModel):
         return [catalog.get(code, {}).get("label", code.title()) for code in self.requested_assessments or []]
 
     def generate_verification_token(self) -> str:
-        token = uuid.uuid4().hex
+        token = secrets.token_urlsafe(32)
         self.verification_token = token
         self.verification_sent_at = timezone.now()
         self.save(update_fields=["verification_token", "verification_sent_at"])
@@ -445,11 +446,15 @@ class ClientAccount(TimeStampedModel):
         window_start = self._invite_window_start()
         tz = timezone.get_current_timezone()
         start_dt = timezone.make_aware(datetime.combine(window_start, datetime.min.time()), tz)
-        return (
-            self.marketing_sessions.filter(created_at__gte=start_dt).count()
-            + getattr(self, "pm_sessions").filter(created_at__gte=start_dt).count()
-            + self.behavioral_sessions.filter(created_at__gte=start_dt).count()
-        )
+        total = 0
+        for rel in (
+            "marketing_sessions", "pm_sessions", "behavioral_sessions",
+            "ux_sessions", "hr_sessions", "finance_sessions",
+        ):
+            qs = getattr(self, rel, None)
+            if qs is not None:
+                total += qs.filter(created_at__gte=start_dt).count()
+        return total
 
     def invites_remaining(self) -> int | None:
         limit = self.invite_limit()
@@ -548,9 +553,15 @@ class ClientProject(TimeStampedModel):
         return f"{self.title} ({self.client.company_name})"
 
     def total_sessions(self):
-        pm_qs = getattr(self, "pm_sessions", None)
-        pm_count = pm_qs.count() if pm_qs is not None else 0
-        return self.marketing_sessions.count() + pm_count + self.behavioral_sessions.count()
+        total = 0
+        for rel in (
+            "marketing_sessions", "pm_sessions", "behavioral_sessions",
+            "ux_sessions", "hr_sessions", "finance_sessions",
+        ):
+            qs = getattr(self, rel, None)
+            if qs is not None:
+                total += qs.count()
+        return total
 
 
 class WebhookDelivery(TimeStampedModel):

@@ -736,9 +736,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         marketing_sessions = dataset_map["marketing"]
         product_sessions = dataset_map["product"]
         behavioral_sessions = dataset_map["behavioral"]
-        total_candidates = (
-            marketing_sessions.count() + product_sessions.count() + behavioral_sessions.count()
-        )
+        total_candidates = sum(qs.count() for qs in dataset_map.values())
 
         breakdown = []
         scores: list[float] = []
@@ -753,9 +751,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 if duration is not None:
                     durations.append(float(duration))
 
-        _append_scores(marketing_sessions)
-        _append_scores(product_sessions)
-        _append_scores(behavioral_sessions, score_field="eligibility_score")
+        for code, qs in dataset_map.items():
+            sf = "eligibility_score" if code == "behavioral" else "overall_score"
+            _append_scores(qs, score_field=sf)
 
         for code in account.approved_assessments:
             label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
@@ -783,9 +781,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         avg_score = sum(scores) / len(scores) if scores else None
         avg_duration = sum(durations) / len(durations) if durations else None
 
-        recent = list(marketing_sessions.order_by("-created_at")[:5])
-        recent += list(product_sessions.order_by("-created_at")[:5])
-        recent += list(behavioral_sessions.order_by("-created_at")[:5])
+        recent = []
+        for qs in dataset_map.values():
+            recent += list(qs.order_by("-created_at")[:5])
         recent.sort(key=lambda session: session.created_at or session.updated_at)
         recent = recent[-5:]
 
@@ -850,6 +848,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             (DigitalMarketingAssessmentSession.objects.all(), "overall_score"),
             (ProductAssessmentSession.objects.all(), "overall_score"),
             (BehavioralAssessmentSession.objects.all(), "eligibility_score"),
+            (UXDesignAssessmentSession.objects.all(), "overall_score"),
+            (HRAssessmentSession.objects.all(), "overall_score"),
+            (FinanceAssessmentSession.objects.all(), "overall_score"),
         )
         for queryset, score_field in datasets:
             total_invites += queryset.count()
@@ -964,7 +965,7 @@ class ClientAnalyticsView(LoginRequiredMixin, TemplateView):
             'is_manager': account.role == 'manager',
             'analytics': analytics_data,
             'selected_period': period,
-            'chart_payload': json.dumps(analytics_data['chart_data'], cls=DjangoJSONEncoder),
+            'chart_payload': analytics_data['chart_data'],
         })
         return context
 
@@ -1264,8 +1265,8 @@ class ClientSettingsView(LoginRequiredMixin, View):
                 messages.error(request, "You don't have permission to generate API keys.")
                 return redirect("clients:settings")
 
-            api_key = account.generate_api_key()
-            messages.success(request, f"Your new API key has been generated: {api_key}")
+            account.generate_api_key()
+            messages.success(request, "Your new API key has been generated. Copy it now from the field below — it won't be shown again.")
             return redirect("clients:settings")
 
         elif action == "revoke_api_key":
@@ -1464,7 +1465,7 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             status="draft",
             scheduled_for__isnull=False,
             scheduled_for__lte=now,
-        )
+        )[:50]  # batch limit to avoid long request blocking
         for session in scheduled:
             session.status = "in_progress"
             session.scheduled_for = None
@@ -2250,7 +2251,7 @@ def build_activity_timeline(session):
 def build_comparative_insights(session):
     if not session.client or not session.client.approved_assessments:
         return {}
-    queryset = session.__class__.objects.filter(status="submitted")
+    queryset = session.__class__.objects.filter(status="submitted", client=session.client)
     total_assessment = queryset.count()
     recent = queryset.filter(created_at__gte=timezone.now() - timedelta(days=30)).count()
     score_field = "overall_score"
@@ -2411,8 +2412,9 @@ class OnboardingCompleteView(LoginRequiredMixin, View):
             return JsonResponse({'success': True, 'message': 'Onboarding completed!'})
 
         elif action == 'complete_step':
-            step_id = request.POST.get('step_id')
-            if step_id:
+            VALID_STEPS = {'step_1', 'step_2', 'step_3', 'step_4', 'step_5'}
+            step_id = request.POST.get('step_id', '')
+            if step_id and step_id in VALID_STEPS:
                 account.onboarding_step_data[step_id] = True
                 account.save(update_fields=['onboarding_step_data'])
                 return JsonResponse({'success': True, 'step': step_id})
@@ -2666,8 +2668,11 @@ class SupportRequestCreateView(LoginRequiredMixin, View):
             data = request.POST
 
         # Validate required fields
+        valid_types = {c[0] for c in SupportRequest.TYPE_CHOICES}
         request_type = data.get("request_type", "billing")
-        subject = data.get("subject", "").strip()
+        if request_type not in valid_types:
+            request_type = "other"
+        subject = data.get("subject", "").strip()[:200]
         message = data.get("message", "").strip()
 
         if not subject:

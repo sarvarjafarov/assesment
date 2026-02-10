@@ -48,13 +48,15 @@ load_env_file(BASE_DIR / ".env")
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-!ff578td7c0)r&pz9!d0bdq#yam$cd!im8%!v!h_*@*l@^se1=",
-)
+_default_insecure_key = "django-insecure-!ff578td7c0)r&pz9!d0bdq#yam$cd!im8%!v!h_*@*l@^se1="
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", _default_insecure_key)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+
+# Reject insecure secret key in production
+if not DEBUG and SECRET_KEY == _default_insecure_key:
+    raise ValueError("DJANGO_SECRET_KEY must be set in production (DEBUG=False).")
 
 DEFAULT_ALLOWED_HOSTS = [
     "localhost",
@@ -94,6 +96,16 @@ SESSION_COOKIE_SAMESITE = "Lax"  # allow cookie on redirect from Google back to 
 # is sent when Google redirects back (fixes "unknown" / session lost for both login and sign-up).
 _session_domain = os.environ.get("SESSION_COOKIE_DOMAIN", "").strip()
 SESSION_COOKIE_DOMAIN = _session_domain or None
+
+# Security headers (enabled in production only)
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+
 # Application definition
 
 INSTALLED_APPS = [
