@@ -30,7 +30,8 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         """
         Called after social auth but before login.
-        Links social account to existing ClientAccount if email matches.
+        Links social account to existing ClientAccount if email matches AND
+        the existing account has a verified email (prevents account takeover).
         """
         if sociallogin.is_existing:
             return
@@ -39,11 +40,22 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
         if not email:
             return
 
-        # Check if a User exists with this email (at most one)
         try:
             existing_user = User.objects.filter(email__iexact=email).first()
             if existing_user:
-                sociallogin.connect(request, existing_user)
+                # Only auto-link if the existing ClientAccount has a verified email
+                try:
+                    client = existing_user.client_account
+                    if client.is_email_verified:
+                        sociallogin.connect(request, existing_user)
+                    else:
+                        logger.warning(
+                            "pre_social_login: refusing to link %s — email not verified on existing account",
+                            email,
+                        )
+                except ClientAccount.DoesNotExist:
+                    # User exists but has no ClientAccount — safe to link
+                    sociallogin.connect(request, existing_user)
         except Exception as e:
             logger.warning("pre_social_login: could not link by email %s: %s", email, e)
 

@@ -89,7 +89,7 @@ CSRF_TRUSTED_ORIGINS = list({*DEFAULT_CSRF_TRUSTED_ORIGINS, *env_csrf_origins})
 # Session cookie: must be sent when Google redirects back (SameSite=Lax, Secure on HTTPS)
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 1209600  # 2 weeks
-SESSION_SAVE_EVERY_REQUEST = True
+SESSION_SAVE_EVERY_REQUEST = False  # Don't extend session on every request (defeats timeout)
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "0" if DEBUG else "1") == "1"
 SESSION_COOKIE_SAMESITE = "Lax"  # allow cookie on redirect from Google back to us
@@ -339,7 +339,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 SOCIALACCOUNT_ADAPTER = 'clients.adapters.ClientSocialAccountAdapter'
-SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_LOGIN_ON_GET = False  # Require POST for social login (CSRF protection)
 SOCIALACCOUNT_STORE_TOKENS = True
 
 LOGIN_URL = 'clients:login'

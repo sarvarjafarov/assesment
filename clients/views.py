@@ -83,6 +83,12 @@ def parse_activity_filters(params):
 
 
 def send_client_verification_email(account: ClientAccount, request):
+    # Rate limit: don't resend if last verification was sent within 2 minutes
+    if account.verification_sent_at:
+        elapsed = (timezone.now() - account.verification_sent_at).total_seconds()
+        if elapsed < 120:
+            logger.info("Verification email rate-limited for %s (sent %ds ago)", account.email, elapsed)
+            return
     try:
         token = account.generate_verification_token()
         verify_url = request.build_absolute_uri(reverse("clients:verify-email", args=[account.pk, token]))
@@ -411,38 +417,61 @@ class ClientSignupCompleteView(TemplateView):
 class ClientVerifyEmailView(TemplateView):
     template_name = "clients/verify_email.html"
 
+    def post(self, request, *args, **kwargs):
+        """Handle verification via POST to prevent state-change on GET."""
+        context = self._verify(kwargs)
+        return self.render_to_response(context)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         token = kwargs.get("token")
         account_id = kwargs.get("account_id")
-        status = "invalid"
-        account = None
 
-        # Try to find account by account_id and token first, then by token only
+        # On GET, look up the account to show confirmation page but don't verify yet
+        account = None
         if token and account_id:
             account = ClientAccount.objects.filter(pk=account_id, verification_token=token).first()
-        if not account and token:
-            account = ClientAccount.objects.filter(verification_token=token).first()
 
-        # Process verification if account found
-        if account:
-            if account.is_email_verified:
-                status = "already"
-            else:
-                # Mark email as verified
-                account.mark_email_verified()
-                status = "verified"
+        if not account:
+            context["status"] = "invalid"
+        elif account.is_email_verified:
+            context["status"] = "already"
+        elif not account.is_verification_token_valid():
+            context["status"] = "expired"
+        else:
+            # Token is valid — show a confirm button (POST will do the actual verification)
+            context["status"] = "confirm"
 
-                # Send admin notification for approval
-                admin_notified = send_approval_notification(account)
-                if admin_notified:
-                    logger.info(f"Admin notification sent for account: {account.email}")
-                else:
-                    logger.warning(f"Failed to send admin notification for: {account.email}")
-
-        context["status"] = status
         context["account"] = account
         return context
+
+    def _verify(self, kwargs):
+        token = kwargs.get("token")
+        account_id = kwargs.get("account_id")
+        account = None
+        status = "invalid"
+
+        if token and account_id:
+            account = ClientAccount.objects.filter(pk=account_id, verification_token=token).first()
+
+        if not account:
+            status = "invalid"
+        elif account.is_email_verified:
+            status = "already"
+        elif not account.is_verification_token_valid():
+            status = "expired"
+        else:
+            account.mark_email_verified()
+            status = "verified"
+            logger.info("Email verified for account id=%s email=%s", account.pk, account.email)
+
+            admin_notified = send_approval_notification(account)
+            if admin_notified:
+                logger.info("Admin notification sent for account: %s", account.email)
+            else:
+                logger.warning("Failed to send admin notification for: %s", account.email)
+
+        return {"status": status, "account": account}
 
 
 class ClientLoginView(FormView):
@@ -453,7 +482,13 @@ class ClientLoginView(FormView):
     def form_valid(self, form):
         user = form.get_user()
         login(self.request, user)
+        logger.info("Login success: user=%s ip=%s", user.email, self.request.META.get("REMOTE_ADDR"))
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        email = form.data.get("username", "")
+        logger.warning("Login failed: email=%s ip=%s", email, self.request.META.get("REMOTE_ADDR"))
+        return super().form_invalid(form)
 
 
 class ClientLogoutView(LoginRequiredMixin, TemplateView):

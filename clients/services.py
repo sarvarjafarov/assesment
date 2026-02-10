@@ -68,7 +68,7 @@ def send_verification_email(client_account):
         return True
     except Exception as e:
         # Log error in production
-        print(f"Failed to send verification email: {e}")
+        logger.error("Failed to send verification email to %s: %s", client_account.email, e)
         return False
 
 
@@ -113,7 +113,7 @@ def send_approval_notification(client_account):
         email.send()
         return True
     except Exception as e:
-        print(f"Failed to send admin notification: {e}")
+        logger.error("Failed to send admin notification for %s: %s", client_account.email, e)
         return False
 
 
@@ -169,7 +169,7 @@ def send_welcome_email(client_account):
         email.send()
         return True
     except Exception as e:
-        print(f"Failed to send welcome email: {e}")
+        logger.error("Failed to send welcome email to %s: %s", client_account.email, e)
         return False
 
 
@@ -232,7 +232,7 @@ def send_completion_alert(client_account, session, assessment_type):
         email.send()
         return True
     except Exception as e:
-        print(f"Failed to send completion alert: {e}")
+        logger.error("Failed to send completion alert for %s: %s", client_account.email, e)
         return False
 
 
@@ -287,7 +287,7 @@ def send_new_candidate_alert(client_account, session, assessment_type):
         email.send()
         return True
     except Exception as e:
-        print(f"Failed to send new candidate alert: {e}")
+        logger.error("Failed to send new candidate alert for %s: %s", client_account.email, e)
         return False
 
 

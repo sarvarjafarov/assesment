@@ -115,17 +115,18 @@ class ClientSignupForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower().strip()
-        # Allow any email domain (removed company email restriction)
-        # if email.split("@")[-1] in PUBLIC_EMAIL_DOMAINS:
-        #     raise forms.ValidationError("Please use your company email address.")
-        if ClientAccount.objects.filter(email=email).exists():
-            raise forms.ValidationError("An account with this email already exists.")
+        if ClientAccount.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError(
+                "Unable to create account with this email. It may already be registered."
+            )
         return email
 
     def clean_password1(self):
         password = self.cleaned_data.get("password1")
         if password and len(password) < 8:
             raise forms.ValidationError("Password must be at least 8 characters long.")
+        # Run Django's full password validators (common passwords, similarity, numeric-only)
+        password_validation.validate_password(password)
         return password
 
     def clean(self):
@@ -152,33 +153,38 @@ class ClientSignupForm(forms.ModelForm):
         parts = full_name.split()
         first_name = parts[0] if parts else (account.email or "user").split("@")[0] or "User"
 
-        try:
-            user = UserModel.objects.create_user(
-                username=account.email,
-                email=account.email,
-                password=self.cleaned_data["password1"],
-                first_name=first_name,
-            )
-        except IntegrityError:
-            # User with this email/username already exists (e.g. from social auth or partial signup)
-            raise forms.ValidationError(
-                "An account with this email already exists. Try signing in or use a different email."
-            )
+        # Wrap User + ClientAccount creation in a transaction to prevent orphaned users
+        with transaction.atomic():
+            try:
+                user = UserModel.objects.create_user(
+                    username=account.email,
+                    email=account.email,
+                    password=self.cleaned_data["password1"],
+                    first_name=first_name,
+                )
+            except IntegrityError:
+                raise forms.ValidationError(
+                    "Unable to create account with this email. It may already be registered."
+                )
 
-        user.is_active = False
-        user.save(update_fields=["is_active"])
-        account.user = user
-        account.requested_assessments = self.cleaned_data.get("requested_assessments", [])
-        objectives = self.cleaned_data.get("objectives", "").strip()
-        if objectives:
-            account.notes = f"Objectives: {objectives}"
-        if commit:
-            account.save()
+            user.is_active = False
+            user.save(update_fields=["is_active"])
+            account.user = user
+            account.requested_assessments = self.cleaned_data.get("requested_assessments", [])
+            objectives = self.cleaned_data.get("objectives", "").strip()
+            if objectives:
+                account.notes = f"Objectives: {objectives}"
+            if commit:
+                account.save()
         return account
 
 
 class ClientLoginForm(AuthenticationForm):
     username = forms.EmailField(label="Email address")
+
+    def clean_username(self):
+        """Normalize email to lowercase to prevent case-sensitive login issues."""
+        return self.cleaned_data.get("username", "").lower().strip()
 
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)

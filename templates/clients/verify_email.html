@@ -21,6 +21,20 @@
             <p class="eyebrow">Already verified</p>
             <h1>You're all set</h1>
             <p class="lede">This email was already confirmed. We'll reach out once your workspace is live.</p>
+            {% elif status == "confirm" %}
+            <div class="confirmation-icon">✉</div>
+            <p class="eyebrow">Almost there</p>
+            <h1>Confirm your email</h1>
+            <p class="lede">Click the button below to verify your email address for {{ account.email }}.</p>
+            <form method="post" style="margin-top: 1.5rem;">
+                {% csrf_token %}
+                <button class="btn btn-pill" type="submit">Verify my email</button>
+            </form>
+            {% elif status == "expired" %}
+            <div class="confirmation-icon error">⏰</div>
+            <p class="eyebrow">Link expired</p>
+            <h1>Verification link has expired</h1>
+            <p class="lede">This verification link has expired (valid for 48 hours). Please sign up again or contact support to request a new link.</p>
             {% else %}
             <div class="confirmation-icon error">!</div>
             <p class="eyebrow">Link invalid</p>

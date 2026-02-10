@@ -256,6 +256,13 @@ class ClientAccount(TimeStampedModel):
         self.verification_token = ""
         self.save(update_fields=["email_verified_at", "verification_token"])
 
+    def is_verification_token_valid(self) -> bool:
+        """Check if the verification token is still within the 48-hour expiry window."""
+        if not self.verification_token or not self.verification_sent_at:
+            return False
+        from datetime import timedelta
+        return timezone.now() - self.verification_sent_at < timedelta(hours=48)
+
     @property
     def is_email_verified(self) -> bool:
         return bool(self.email_verified_at)
