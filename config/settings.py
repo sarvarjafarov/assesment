@@ -54,8 +54,9 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", _default_insecure_key)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-# Reject insecure secret key in production
-if not DEBUG and SECRET_KEY == _default_insecure_key:
+# Reject insecure secret key in production (skip during collectstatic build)
+_is_collectstatic = len(sys.argv) > 1 and sys.argv[1] == "collectstatic"
+if not DEBUG and SECRET_KEY == _default_insecure_key and not _is_collectstatic:
     raise ValueError("DJANGO_SECRET_KEY must be set in production (DEBUG=False).")
 
 DEFAULT_ALLOWED_HOSTS = [
