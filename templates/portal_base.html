@@ -44,7 +44,7 @@
         </div>
 
         <nav class="sidebar-nav" aria-label="Main navigation">
-            <a href="{% url 'clients:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <a href="{% url 'clients:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"></rect>
                     <rect x="14" y="3" width="7" height="7"></rect>
@@ -54,7 +54,7 @@
                 <span class="nav-label">Dashboard</span>
             </a>
 
-            <a href="{% url 'clients:project-list' %}" class="nav-item {% if request.resolver_match.url_name == 'project-list' or request.resolver_match.url_name == 'project-detail' or request.resolver_match.url_name == 'project-clone' %}active{% endif %}">
+            <a href="{% url 'clients:project-list' %}" class="nav-item {% if request.resolver_match.url_name == 'project-list' or request.resolver_match.url_name == 'project-detail' or request.resolver_match.url_name == 'project-clone' %}active{% endif %}" {% if request.resolver_match.url_name == 'project-list' or request.resolver_match.url_name == 'project-detail' or request.resolver_match.url_name == 'project-clone' %}aria-current="page"{% endif %}>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
@@ -64,7 +64,7 @@
                 {% endif %}
             </a>
 
-            <a href="{% url 'clients:assessments' %}" class="nav-item {% if request.resolver_match.url_name == 'assessments' or request.resolver_match.url_name == 'assessment-manage' or request.resolver_match.url_name == 'assessment-detail' %}active{% endif %}">
+            <a href="{% url 'clients:assessments' %}" class="nav-item {% if request.resolver_match.url_name == 'assessments' or request.resolver_match.url_name == 'assessment-manage' or request.resolver_match.url_name == 'assessment-detail' %}active{% endif %}" {% if request.resolver_match.url_name == 'assessments' or request.resolver_match.url_name == 'assessment-manage' or request.resolver_match.url_name == 'assessment-detail' %}aria-current="page"{% endif %}>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -79,7 +79,7 @@
             </a>
 
             {% if has_custom_assessments %}
-            <a href="{% url 'custom_assessments:list' %}" class="nav-item {% if 'custom_assessments' in request.resolver_match.app_name %}active{% endif %}">
+            <a href="{% url 'custom_assessments:list' %}" class="nav-item {% if 'custom_assessments' in request.resolver_match.app_name %}active{% endif %}" {% if 'custom_assessments' in request.resolver_match.app_name %}aria-current="page"{% endif %}>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                     <path d="M2 17l10 5 10-5"></path>
@@ -90,7 +90,7 @@
             </a>
             {% endif %}
 
-            <a href="{% url 'clients:analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+            <a href="{% url 'clients:analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" {% if request.resolver_match.url_name == 'analytics' %}aria-current="page"{% endif %}>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="20" x2="12" y2="10"></line>
                     <line x1="18" y1="20" x2="18" y2="4"></line>
@@ -99,7 +99,7 @@
                 <span class="nav-label">Analytics</span>
             </a>
 
-            <a href="{% url 'clients:billing' %}" class="nav-item {% if request.resolver_match.url_name == 'billing' %}active{% endif %}">
+            <a href="{% url 'clients:billing' %}" class="nav-item {% if request.resolver_match.url_name == 'billing' %}active{% endif %}" {% if request.resolver_match.url_name == 'billing' %}aria-current="page"{% endif %}>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="2" y="5" width="20" height="14" rx="2"></rect>
                     <line x1="2" y1="10" x2="22" y2="10"></line>
@@ -107,7 +107,7 @@
                 <span class="nav-label">Billing</span>
             </a>
 
-            <a href="{% url 'clients:settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+            <a href="{% url 'clients:settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" {% if request.resolver_match.url_name == 'settings' %}aria-current="page"{% endif %}>
                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
