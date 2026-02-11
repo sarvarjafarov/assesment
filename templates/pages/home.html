@@ -149,56 +149,41 @@
         </section>
 
         {# PRICING #}
-        <section class="pricing reveal" id="pricing">
+        <section class="pricing-v2 reveal" id="pricing">
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
                     <p class="eyebrow">Pricing</p>
                     <h2>{{ pricing_helper.headline }}</h2>
-                    <p class="lede">{{ pricing_helper.subline }}</p>
                 </div>
-                <div class="pricing-grid">
+                <div class="pricing-grid-v2">
                     {% for tier in pricing_tiers %}
-                    <article class="pricing-card theme-{{ tier.slug }} {% if tier.highlighted %}is-highlighted{% endif %}">
-                        <div class="pricing-card-head">
-                            <div class="plan-badge">
-                                <span>{{ tier.badge }}</span>
+                    <article class="price-card {% if tier.highlighted %}price-card--popular{% endif %}">
+                        {% if tier.highlighted %}<div class="price-card-ribbon">Most popular</div>{% endif %}
+                        <div class="price-card-top">
+                            <h3 class="price-card-name">{{ tier.name }}</h3>
+                            <div class="price-card-price">
+                                <span class="price-amount">{{ tier.price }}</span>
+                                <span class="price-freq">{{ tier.frequency }}</span>
                             </div>
-                            <h3>{{ tier.name }}</h3>
-                            <p class="plan-description">{{ tier.description }}</p>
+                            <p class="price-card-limits">{{ tier.projects }} · {{ tier.invites }}</p>
                         </div>
-                        <div class="pricing-price">
-                            <span class="amount">{{ tier.price }}</span>
-                            <span class="frequency">{{ tier.frequency }}</span>
-                        </div>
-                        <div class="pricing-meta">
-                            <p><strong>{{ tier.projects }}</strong></p>
-                            <p><strong>{{ tier.invites }}</strong></p>
-                            {% if tier.overage %}
-                            <p>{{ tier.overage }}</p>
-                            {% endif %}
-                        </div>
-                        <ul class="pricing-feature-list">
+                        <ul class="price-card-features">
                             {% for feature in tier.features %}
                             <li>
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
-                                <span>{{ feature }}</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                {{ feature }}
                             </li>
                             {% endfor %}
                         </ul>
-                        <div class="pricing-cta">
-                            <a class="btn {% if tier.highlighted %}btn-pill{% else %}btn-outline{% endif %}"
-                               href="{{ tier.cta_url }}"
-                               data-gtag-click="pricing_plan_click"
-                               data-gtag-category="pricing"
-                               data-gtag-label="{{ tier.slug }}"
-                               data-gtag-params='{"plan":"{{ tier.slug }}","plan_name":"{{ tier.name|escapejs }}"}'>{{ tier.cta_label }}</a>
-                        </div>
+                        <a class="price-card-cta {% if tier.highlighted %}price-card-cta--filled{% endif %}"
+                           href="{{ tier.cta_url }}"
+                           data-gtag-click="pricing_plan_click"
+                           data-gtag-category="pricing"
+                           data-gtag-label="{{ tier.slug }}">{{ tier.cta_label }}</a>
                     </article>
                     {% endfor %}
                 </div>
-                <p class="pricing-footnote">{{ pricing_helper.footnote }}</p>
+                <p class="pricing-footnote-v2">{{ pricing_helper.footnote }}</p>
             </div>
         </section>
 
