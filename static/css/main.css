@@ -11776,169 +11776,259 @@ main {
    PUBLIC ASSESSMENTS - List and Detail Pages
    ======================================================================== */
 
-/* Assessments List Page */
-.assessments-shell {
-    max-width: 1200px;
+/* ── Assessment List V2 — clean minimal cards ── */
+.al-shell {
+    max-width: 1140px;
     margin: 0 auto;
-    padding: 2rem 2rem 4rem;
+    padding: 0 2rem 5rem;
 }
 
-.assessments-hero {
+.al-hero {
     text-align: center;
-    padding: 4rem 0 2rem;
-}
-
-.assessments-hero .eyebrow {
-    color: var(--color-orange);
-    font-weight: 600;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1rem;
-}
-
-.assessments-hero h1 {
-    font-size: clamp(2rem, 4vw, 2.75rem);
-    font-weight: 700;
-    color: var(--color-navy);
-    margin: 0 0 1rem;
-    line-height: 1.2;
-}
-
-.assessments-hero .lede {
-    font-size: 1.125rem;
-    color: var(--text-body);
-    max-width: 700px;
+    padding: 3.5rem 0 2.5rem;
+    max-width: 640px;
     margin: 0 auto;
-    line-height: 1.6;
 }
 
-/* Search Bar */
-.assessments-search-bar {
-    max-width: 600px;
-    margin: 2rem auto 3rem;
-}
-
-.assessments-search-bar .search-form {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.assessments-search-bar input[type="search"] {
-    flex: 1;
-    padding: 0.875rem 1.25rem;
-    border: 1px solid #e8eaed;
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    background: var(--color-white);
-    transition: all var(--transition-base);
-}
-
-.assessments-search-bar input[type="search"]:focus {
-    outline: none;
-    border-color: var(--color-orange);
-    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
-}
-
-/* Assessments Grid */
-.assessments-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 2rem;
-}
-
-.assessment-card {
-    background: var(--color-white);
-    padding: 2rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid #e8eaed;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    transition: all var(--transition-slow);
-    display: flex;
-    flex-direction: column;
-}
-
-.assessment-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.assessment-card-icon {
-    width: 56px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 138, 0, 0.08);
-    border-radius: var(--radius-lg);
+.al-eyebrow {
     color: var(--color-orange);
-    margin-bottom: 1.25rem;
-}
-
-.assessment-card-icon svg {
-    width: 28px;
-    height: 28px;
-}
-
-.assessment-card .pill {
-    align-self: flex-start;
-    margin-bottom: 0.75rem;
-}
-
-.assessment-card h3 {
-    font-size: 1.25rem;
     font-weight: 600;
-    color: var(--color-navy);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     margin: 0 0 0.75rem;
 }
 
-.assessment-card h3 a {
-    color: inherit;
-    text-decoration: none;
+.al-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    font-weight: 800;
+    color: var(--color-navy);
+    margin: 0 0 0.75rem;
+    line-height: 1.15;
 }
 
-.assessment-card h3 a:hover {
+.al-desc {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0 0 2rem;
+    line-height: 1.6;
+}
+
+/* Search — inline with icon */
+.al-search {
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.al-search-field {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e2e5ea;
+    border-radius: 12px;
+    background: #f8f9fa;
+    padding: 0 1rem;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.al-search-field:focus-within {
+    border-color: var(--color-orange);
+    background: var(--color-white);
+}
+
+.al-search-icon {
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+
+.al-search-field input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.7rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--color-navy);
+    outline: none;
+}
+
+.al-search-field input::placeholder {
+    color: #9ca3af;
+}
+
+/* Grid */
+.al-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+/* Card — entire thing is a link */
+.al-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-white);
+    border: 1px solid #ebedf0;
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.al-card:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.08);
+}
+
+.al-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.al-card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 138, 0, 0.07);
+    border-radius: 10px;
     color: var(--color-orange);
 }
 
-.assessment-summary {
-    color: var(--text-body);
-    line-height: 1.6;
-    margin: 0 0 1rem;
+.al-card-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.al-card-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.al-card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+}
+
+.al-card-summary {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.55;
+    margin: 0;
     flex: 1;
 }
 
-.assessment-card .focus-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1rem;
+.al-card-footer {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f1f3;
 }
 
-.assessment-card .focus-list li {
-    padding: 0.3rem 0.6rem;
-    background: rgba(255, 138, 0, 0.08);
-    border-radius: var(--radius-sm);
-    font-size: 0.8125rem;
-    color: var(--color-orange);
+.al-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
     font-weight: 500;
 }
 
-.assessment-meta {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem 0;
-    margin-bottom: 1rem;
-    border-top: 1px solid #e8eaed;
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
+.al-meta-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #d1d5db;
 }
 
-.assessments-load-more {
+.al-card-arrow {
+    color: #d1d5db;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.al-card:hover .al-card-arrow {
+    color: var(--color-orange);
+    transform: translateX(3px);
+}
+
+/* Empty state */
+.al-empty {
+    grid-column: 1 / -1;
     text-align: center;
-    margin-top: 3rem;
+    padding: 3rem 1rem;
+}
+
+.al-empty h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+}
+
+.al-empty p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.al-empty a {
+    color: var(--color-orange);
+}
+
+/* Load more */
+.al-load-more {
+    text-align: center;
+    margin-top: 2.5rem;
+}
+
+.al-load-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.5rem;
+    border: 1px solid #e2e5ea;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-navy);
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.al-load-btn:hover {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .al-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .al-shell {
+        padding: 0 1.25rem 3rem;
+    }
+
+    .al-hero {
+        padding: 2rem 0 1.5rem;
+    }
+
+    .al-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
 }
 
 /* Homepage "See All" Link */
@@ -12618,18 +12708,10 @@ main {
 }
 
 @media (max-width: 640px) {
-    .assessments-shell,
+    /* Old assessment classes — now using .al-* prefix */
     .assessment-section {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
-    }
-
-    .assessments-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .assessments-search-bar .search-form {
-        flex-direction: column;
     }
 
     .hero-stats {

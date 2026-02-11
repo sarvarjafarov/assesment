@@ -6,89 +6,80 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='assessments' %}
     <main>
-        <div class="assessments-shell" data-assessment-list-shell>
-            <section class="assessments-hero">
-                <p class="eyebrow">Assessment Library</p>
-                <h1>{% if query %}Results for "{{ query }}"{% else %}Ready-made assessments for key roles{% endif %}</h1>
+        <div class="al-shell" data-assessment-list-shell>
+            <section class="al-hero">
+                <p class="al-eyebrow">Assessment Library</p>
+                <h1 class="al-title">{% if query %}Results for "{{ query }}"{% else %}Find the right assessment for every role{% endif %}</h1>
                 {% if assessments %}
-                <p class="lede">
+                <p class="al-desc">
                     {% if query %}
                     Found {{ assessments.paginator.count }} assessment{{ assessments.paginator.count|pluralize }} matching your search.
                     {% else %}
-                    Pre-built question banks covering marketing, product, behavioral, UX/UI design, HR, and finance roles. Each includes scoring rubrics and real-world scenarios.
+                    Pre-built question banks with scoring rubrics and real-world scenarios — covering marketing, product, behavioral, UX, HR, and finance.
                     {% endif %}
                 </p>
                 {% elif query %}
-                <p class="lede">No assessments found. Try a different search term.</p>
+                <p class="al-desc">No assessments found. Try a different search term.</p>
                 {% endif %}
-            </section>
 
-            {# Search bar #}
-            <section class="assessments-search-bar">
-                <form action="{% url 'pages:assessment_list' %}" method="get" class="search-form"
+                <form action="{% url 'pages:assessment_list' %}" method="get" class="al-search"
                       data-gtag-submit="assessment_search"
                       data-gtag-category="search"
-                      data-gtag-label="assessment_library"
-                      data-gtag-params='{"source":"assessment_library"}'>
-                    <input type="search" name="q" value="{{ query }}" placeholder="Search assessments..." aria-label="Search assessments">
-                    <button type="submit" class="btn btn-pill">Search</button>
+                      data-gtag-label="assessment_library">
+                    <div class="al-search-field">
+                        <svg class="al-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="search" name="q" value="{{ query }}" placeholder="Search assessments..." aria-label="Search assessments">
+                    </div>
                 </form>
             </section>
 
-            <section class="assessments-grid" id="grid">
+            <section class="al-grid" id="grid">
                 {% for assessment in assessments %}
-                <article class="assessment-card" data-assessment-card>
-                    <div class="assessment-card-icon">
-                        {% if assessment.icon_svg %}
-                        {{ assessment.icon_svg|safe }}
-                        {% else %}
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 11l3 3L22 4"></path>
-                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                        </svg>
-                        {% endif %}
+                <a class="al-card" href="{{ assessment.get_absolute_url }}"
+                   data-assessment-card
+                   data-gtag-click="assessment_cta_click"
+                   data-gtag-category="engagement"
+                   data-gtag-label="{{ assessment.slug }}">
+                    <div class="al-card-header">
+                        <div class="al-card-icon">
+                            {% if assessment.icon_svg %}
+                            {{ assessment.icon_svg|safe }}
+                            {% else %}
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                            {% endif %}
+                        </div>
+                        <span class="al-card-label">{{ assessment.label }}</span>
                     </div>
-                    <span class="pill subtle">{{ assessment.label }}</span>
-                    <h3><a href="{{ assessment.get_absolute_url }}">{{ assessment.title }}</a></h3>
-                    <p class="assessment-summary">{{ assessment.summary }}</p>
-                    {% if assessment.focus_list %}
-                    <ul class="focus-list">
-                        {% for focus in assessment.focus_list %}
-                        <li>{{ focus }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                    <div class="assessment-meta">
-                        <span>{{ assessment.duration_minutes }} min</span>
-                        <span>{{ assessment.question_count }} questions</span>
-                        <span>{{ assessment.get_difficulty_level_display }}</span>
+                    <h3 class="al-card-title">{{ assessment.title }}</h3>
+                    <p class="al-card-summary">{{ assessment.summary }}</p>
+                    <div class="al-card-footer">
+                        <div class="al-card-meta">
+                            <span>{{ assessment.duration_minutes }} min</span>
+                            <span class="al-meta-dot"></span>
+                            <span>{{ assessment.question_count }} Qs</span>
+                            <span class="al-meta-dot"></span>
+                            <span>{{ assessment.get_difficulty_level_display }}</span>
+                        </div>
+                        <span class="al-card-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </span>
                     </div>
-                    <a class="btn btn-outline small"
-                       href="{{ assessment.get_absolute_url }}"
-                       data-gtag-click="assessment_cta_click"
-                       data-gtag-category="engagement"
-                       data-gtag-label="{{ assessment.slug }}"
-                       data-gtag-params='{"assessment":"{{ assessment.slug }}"}'>Learn more</a>
-                </article>
+                </a>
                 {% empty %}
-                    <div class="empty-state-box">
+                    <div class="al-empty">
                         <h3>No assessments found</h3>
-                        <p>{% if query %}Try adjusting your search or <a href="{% url 'pages:assessment_list' %}"
-                                                                    data-gtag-click="assessment_library_reset"
-                                                                    data-gtag-category="engagement"
-                                                                    data-gtag-label="browse_all_assessments">browse all assessments</a>.{% else %}Check back soon for new assessments.{% endif %}</p>
+                        <p>{% if query %}Try adjusting your search or <a href="{% url 'pages:assessment_list' %}">browse all assessments</a>.{% else %}Check back soon for new assessments.{% endif %}</p>
                     </div>
                 {% endfor %}
             </section>
 
             {% if is_paginated and page_obj.has_next %}
-            <div class="assessments-load-more">
-                <a class="btn btn-pill secondary"
+            <div class="al-load-more">
+                <a class="al-load-btn"
                    href="?{% if query %}q={{ query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}"
                    data-gtag-click="assessment_load_more_click"
                    data-gtag-category="engagement"
-                   data-gtag-label="load_more"
-                   data-gtag-params='{"page":{{ page_obj.next_page_number }}}'>Load more</a>
+                   data-gtag-label="load_more">Load more assessments</a>
             </div>
             {% endif %}
         </div>
