@@ -6230,6 +6230,58 @@ main {
     font-weight: 600;
 }
 .lg-footer-text a:hover { text-decoration: underline; }
+.lg-provider-icon--error { background: #fef2f2; color: #dc2626; }
+.lg-provider-icon--warning { background: #fffbeb; color: #d97706; }
+.lg-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+.lg-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.5rem;
+    background: transparent;
+    color: var(--color-navy);
+    border: 1px solid #ebedf0;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+}
+.lg-btn-outline:hover {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+}
+.lg-troubleshoot {
+    text-align: left;
+    border: 1px solid #ebedf0;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+.lg-troubleshoot-label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-orange);
+    margin-bottom: 0.5rem;
+}
+.lg-troubleshoot code {
+    font-size: 0.8rem;
+    background: #f3f4f6;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    word-break: break-all;
+}
+.lg-troubleshoot p { margin: 0.35rem 0; }
 @media (max-width: 640px) {
     .lg-main { padding: 2rem 1rem; }
     .lg-card { padding: 2rem 1.25rem; }

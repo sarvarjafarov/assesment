@@ -2,58 +2,52 @@
 {% load static %}
 {% block title %}Login Error · Evalon{% endblock %}
 {% block content %}
-<div class="page-shell apply-page">
+<div class="page-shell">
     {% include 'includes/site_header.html' %}
 
-    <main class="apply-main auth-main">
-        <section class="panel auth-panel">
-            <div class="auth-icon auth-icon--error">
-                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+    <main class="lg-main">
+        <section class="lg-card" style="text-align:center;">
+            <div class="lg-provider-icon lg-provider-icon--error">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="15" y1="9" x2="9" y2="15"/>
                     <line x1="9" y1="9" x2="15" y2="15"/>
                 </svg>
             </div>
-            <p class="eyebrow">Authentication Error</p>
-            <h1>Unable to sign in</h1>
-            <p class="lede">We encountered an issue while trying to authenticate your account. This can happen if:</p>
-
-            <ul class="error-reasons">
-                <li>The login was cancelled or timed out</li>
-                <li>Your social account doesn't have a verified email</li>
-                <li>There was a temporary connection issue</li>
-            </ul>
+            <p class="lg-eyebrow">Authentication error</p>
+            <h1 class="lg-title">Unable to sign in</h1>
+            <p class="lg-desc">This can happen if the login was cancelled, timed out, or your social account doesn't have a verified email.</p>
 
             {% if error_summary %}
-            <p class="auth-error-summary"><strong>Error:</strong> <code>{{ error_summary }}</code></p>
+            <div class="lg-error" style="text-align:left;">
+                <p><strong>Error:</strong> <code>{{ error_summary }}</code></p>
+            </div>
             {% endif %}
 
             {% if oauth_troubleshooting %}
-            <div class="auth-troubleshooting">
-                <p class="auth-troubleshooting__title">Site owners: fix Google sign-in</p>
-                <p class="auth-troubleshooting__hint">{{ oauth_troubleshooting.hint }}</p>
-                <p class="auth-troubleshooting__url"><strong>Redirect URI to add in Google Cloud Console:</strong><br>
-                    <code>{{ oauth_troubleshooting.callback_url }}</code></p>
-                <p class="auth-troubleshooting__steps">In Google Cloud Console → APIs &amp; Credentials → your OAuth 2.0 Client → Authorized redirect URIs, add the URL above. Also set <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> in your Heroku config.</p>
+            <div class="lg-troubleshoot">
+                <span class="lg-troubleshoot-label">Site owners</span>
+                <p>{{ oauth_troubleshooting.hint }}</p>
+                <p><strong>Redirect URI:</strong><br><code>{{ oauth_troubleshooting.callback_url }}</code></p>
             </div>
             {% endif %}
 
             {% if auth_error.exception and request.user.is_staff %}
-            <p class="auth-debug"><strong>Debug (staff only):</strong> {{ auth_error.exception }}</p>
+            <div class="lg-error" style="text-align:left;">
+                <p><strong>Debug:</strong> {{ auth_error.exception }}</p>
+            </div>
             {% endif %}
 
-            <div class="auth-actions">
-                <a class="btn btn-pill" href="{% url 'clients:login' %}">Try again</a>
-                <a class="btn btn-outline" href="{% url 'clients:signup' %}">Create account</a>
+            <div class="lg-actions">
+                <a class="lg-btn" href="{% url 'clients:login' %}">Try again</a>
+                <a class="lg-btn-outline" href="{% url 'clients:signup' %}">Create account</a>
             </div>
 
-            <p class="auth-help">
-                Still having trouble? <a href="mailto:support@evalon.tech">Contact support</a>
-            </p>
+            <p class="lg-footer-text">Still having trouble? <a href="mailto:support@evalon.tech">Contact support</a></p>
         </section>
     </main>
-
-    {% include 'includes/site_footer.html' %}
 </div>
-
+{% endblock %}
+{% block site_footer %}
+    {% include 'includes/site_footer.html' %}
 {% endblock %}

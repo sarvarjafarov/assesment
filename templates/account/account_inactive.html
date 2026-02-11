@@ -2,30 +2,30 @@
 {% load static %}
 {% block title %}Account Pending · Evalon{% endblock %}
 {% block content %}
-<div class="page-shell apply-page">
+<div class="page-shell">
     {% include 'includes/site_header.html' %}
 
-    <main class="apply-main auth-main">
-        <section class="panel auth-panel">
-            <div class="auth-icon auth-icon--warning">
-                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+    <main class="lg-main">
+        <section class="lg-card" style="text-align:center;">
+            <div class="lg-provider-icon lg-provider-icon--warning">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="12" y1="8" x2="12" y2="12"/>
                     <line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
             </div>
-            <p class="eyebrow">Account Status</p>
-            <h1>Your account is pending approval</h1>
-            <p class="lede">Your account has been created but is awaiting admin approval. You'll receive an email at your registered address once your workspace is ready.</p>
+            <p class="lg-eyebrow">Account status</p>
+            <h1 class="lg-title">Pending approval</h1>
+            <p class="lg-desc">Your account has been created but is awaiting admin approval. You'll receive an email once your workspace is ready.</p>
 
-            <div class="auth-actions">
-                <a class="btn btn-pill" href="{% url 'pages:home' %}">Return home</a>
-                <a class="btn btn-outline" href="mailto:support@evalon.tech">Contact support</a>
+            <div class="lg-actions">
+                <a class="lg-btn" href="{% url 'pages:home' %}">Return home</a>
+                <a class="lg-btn-outline" href="mailto:support@evalon.tech">Contact support</a>
             </div>
         </section>
     </main>
-
-    {% include 'includes/site_footer.html' %}
 </div>
-
+{% endblock %}
+{% block site_footer %}
+    {% include 'includes/site_footer.html' %}
 {% endblock %}
