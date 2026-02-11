@@ -15898,86 +15898,92 @@ main {
 /* Suite Section */
 .suite-v2 {
     padding: 6rem 2rem;
+    background: #fafafa;
 }
 
 .suite-grid-v2 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
     margin-top: 3rem;
 }
 
 .suite-card-v2 {
+    display: flex;
+    flex-direction: column;
     background: var(--color-white);
-    padding: 2.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 1.75rem;
+    border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
-    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--transition-base), transform var(--transition-base);
 }
 
 .suite-card-v2:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: var(--color-orange);
+    transform: translateY(-2px);
+}
+
+.suite-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
 }
 
 .suite-card-icon {
-    width: 64px;
-    height: 64px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: var(--radius-md);
     background: rgba(255, 138, 0, 0.08);
-    border-radius: var(--radius-lg);
     color: var(--color-orange);
-    margin-bottom: 1.5rem;
+    flex-shrink: 0;
 }
 
-.suite-card-icon.accent-marketing { background: rgba(14, 116, 144, 0.10); color: #0f766e; }
-.suite-card-icon.accent-product { background: rgba(78, 63, 156, 0.10); color: #4f3f9c; }
-.suite-card-icon.accent-behavioral { background: rgba(234, 88, 12, 0.10); color: #c2410c; }
-.suite-card-icon.accent-ux_design { background: rgba(168, 85, 247, 0.10); color: #7c3aed; }
-.suite-card-icon.accent-hr { background: rgba(236, 72, 153, 0.10); color: #db2777; }
-.suite-card-icon.accent-finance { background: rgba(34, 197, 94, 0.10); color: #16a34a; }
+.suite-card-icon.accent-marketing { background: rgba(14, 116, 144, 0.08); color: #0f766e; }
+.suite-card-icon.accent-product { background: rgba(78, 63, 156, 0.08); color: #4f3f9c; }
+.suite-card-icon.accent-behavioral { background: rgba(234, 88, 12, 0.08); color: #c2410c; }
+.suite-card-icon.accent-ux_design { background: rgba(168, 85, 247, 0.08); color: #7c3aed; }
+.suite-card-icon.accent-hr { background: rgba(236, 72, 153, 0.08); color: #db2777; }
+.suite-card-icon.accent-finance { background: rgba(34, 197, 94, 0.08); color: #16a34a; }
 
-.suite-card-v2 h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-navy);
-    margin: 0.75rem 0 1rem;
-}
-
-.suite-summary {
-    margin: 0 0 1.5rem;
-    line-height: 1.6;
-}
-
-.suite-focus-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.suite-focus-list li {
-    padding: 0.35rem 0.75rem;
-    background: rgba(255, 138, 0, 0.08);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    color: var(--color-orange);
+.suite-card-duration {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
     font-weight: 500;
 }
 
-.suite-stats-compact {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    padding: 1.5rem 0;
-    margin-bottom: 1.5rem;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
+.suite-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+}
+
+.suite-card-summary {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    margin: 0 0 1.25rem;
+    flex: 1;
+}
+
+.suite-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-orange);
+    transition: gap var(--transition-base);
+}
+
+.suite-card-v2:hover .suite-card-link {
+    gap: 0.6rem;
 }
 
 /* Outcomes Section */
@@ -16622,7 +16628,7 @@ main {
     }
 
     .suite-grid-v2 {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .testimonials-v2 {
@@ -16680,6 +16686,10 @@ main {
         max-width: 320px;
         margin-left: auto;
         margin-right: auto;
+    }
+
+    .suite-grid-v2 {
+        grid-template-columns: 1fr;
     }
 }
 

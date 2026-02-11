@@ -34,8 +34,8 @@ def home(request):
     }
 
     suite_heading = {
-        "title": "Ready-made assessments for key roles",
-        "subtitle": "Pre-built question banks covering marketing, product, behavioral, UX/UI design, HR, and finance roles. Each includes scoring rubrics and real-world scenarios.",
+        "title": "Assessments for every role",
+        "subtitle": "Six ready-made question banks with scoring rubrics and real-world scenarios.",
         "instructions": "Click any assessment to see sample questions and download the scoring rubric.",
     }
 
@@ -43,74 +43,44 @@ def home(request):
         {
             "slug": "marketing",
             "label": "Marketing IQ",
-            "title": "Digital marketing",
-            "summary": "Real scenarios covering paid media, SEO, analytics, and copywriting.",
-            "focus": ["Paid media", "SEO", "Analytics"],
-            "stats": [
-                {"label": "Question bank", "value": "40 real scenes"},
-                {"label": "Avg completion", "value": "32 minutes"},
-                {"label": "Benchmarks", "value": "Marketing & growth roles"},
-            ],
+            "title": "Digital Marketing",
+            "summary": "Paid media, SEO, analytics, and copywriting scenarios.",
+            "duration": "32 min",
         },
         {
             "slug": "product",
             "label": "Product Sense",
-            "title": "Product management",
-            "summary": "Hands-on reasoning, estimation, prioritization, and UX critiques for PM hires.",
-            "focus": ["Prioritization", "Estimation", "UX critique"],
-            "stats": [
-                {"label": "Prompt mix", "value": "Reasoning + scenario"},
-                {"label": "Difficulty", "value": "Adjusts by seniority"},
-                {"label": "Perspectives", "value": "Power-user & broad view"},
-            ],
+            "title": "Product Management",
+            "summary": "Reasoning, estimation, prioritization, and UX critiques.",
+            "duration": "30 min",
         },
         {
             "slug": "behavioral",
             "label": "Behavioral DNA",
-            "title": "Leadership & soft skills",
-            "summary": "Short reflections that show teamwork style, risk comfort, and coaching needs.",
-            "focus": ["Collaboration", "Risk posture", "Coaching"],
-            "stats": [
-                {"label": "Duration", "value": "15 minutes"},
-                {"label": "Signals", "value": "Integrity + engagement"},
-                {"label": "Deliverable", "value": "Guided debrief points"},
-            ],
+            "title": "Leadership & Culture",
+            "summary": "Teamwork style, risk comfort, and coaching reflections.",
+            "duration": "15 min",
         },
         {
             "slug": "ux_design",
             "label": "Design Eye",
-            "title": "UX/UI design",
-            "summary": "User research, interaction design, visual design, and accessibility scenarios for design hires.",
-            "focus": ["User Research", "Interaction Design", "Accessibility"],
-            "stats": [
-                {"label": "Question bank", "value": "40 real scenes"},
-                {"label": "Avg completion", "value": "35 minutes"},
-                {"label": "Benchmarks", "value": "Product design roles"},
-            ],
+            "title": "UX/UI Design",
+            "summary": "User research, interaction design, and accessibility.",
+            "duration": "35 min",
         },
         {
             "slug": "hr",
             "label": "People Ops",
-            "title": "HR & people strategy",
-            "summary": "Talent acquisition, employee relations, compliance, and people strategy scenarios for HR hires.",
-            "focus": ["Talent Acquisition", "Employee Relations", "People Strategy"],
-            "stats": [
-                {"label": "Question bank", "value": "40 real scenes"},
-                {"label": "Avg completion", "value": "35 minutes"},
-                {"label": "Benchmarks", "value": "HR & people roles"},
-            ],
+            "title": "HR & People Strategy",
+            "summary": "Talent acquisition, compliance, and people strategy.",
+            "duration": "35 min",
         },
         {
             "slug": "finance",
             "label": "Finance IQ",
-            "title": "Finance management",
-            "summary": "Financial planning, budgeting, risk management, and strategic finance scenarios for finance hires.",
-            "focus": ["Financial Analysis", "Budgeting", "Strategic Finance"],
-            "stats": [
-                {"label": "Question bank", "value": "40 real scenes"},
-                {"label": "Avg completion", "value": "35 minutes"},
-                {"label": "Benchmarks", "value": "Finance & accounting roles"},
-            ],
+            "title": "Finance Management",
+            "summary": "Budgeting, risk management, and strategic finance.",
+            "duration": "35 min",
         },
     ]
 

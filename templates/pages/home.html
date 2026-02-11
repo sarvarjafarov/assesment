@@ -69,87 +69,36 @@
                 </div>
                 <div class="suite-grid-v2">
                     {% for item in suite %}
-                    <article class="suite-card-v2">
-                        <div class="suite-card-icon accent-{{ item.slug }}">
-                            {% if item.icon_svg %}
-                            {{ item.icon_svg|safe }}
-                            {% elif item.slug == 'marketing' %}
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                                <path d="M2 17l10 5 10-5"></path>
-                                <path d="M2 12l10 5 10-5"></path>
-                            </svg>
-                            {% elif item.slug == 'product' %}
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                            {% elif item.slug == 'behavioral' %}
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                            {% elif item.slug == 'ux_design' %}
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <circle cx="12" cy="12" r="6"></circle>
-                                <circle cx="12" cy="12" r="2"></circle>
-                            </svg>
-                            {% elif item.slug == 'hr' %}
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <line x1="17" y1="11" x2="23" y2="11"></line>
-                                <line x1="20" y1="8" x2="20" y2="14"></line>
-                            </svg>
-                            {% elif item.slug == 'finance' %}
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="1" x2="12" y2="23"></line>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                            </svg>
-                            {% else %}
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                            </svg>
-                            {% endif %}
-                        </div>
-                        <p class="pill subtle accent-{{ item.slug }}">{{ item.label }}</p>
-                        <h3>{{ item.title }}</h3>
-                        <p class="suite-summary">{{ item.summary }}</p>
-                        {% if item.focus %}
-                        <ul class="suite-focus-list">
-                            {% for focus in item.focus %}
-                            <li>{{ focus }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                        <div class="suite-stats-compact">
-                            {% for stat in item.stats %}
-                            <div class="stat-item">
-                                <span class="stat-label">{{ stat.label }}</span>
-                                <span class="stat-value">{{ stat.value }}</span>
+                    <a class="suite-card-v2" href="{{ item.url|default:'#' }}"
+                       data-gtag-click="suite_cta_click"
+                       data-gtag-category="engagement"
+                       data-gtag-label="{{ item.slug }}_learn_more">
+                        <div class="suite-card-top">
+                            <div class="suite-card-icon accent-{{ item.slug }}">
+                                {% if item.icon_svg %}
+                                {{ item.icon_svg|safe }}
+                                {% elif item.slug == 'marketing' %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                                {% elif item.slug == 'product' %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                {% elif item.slug == 'behavioral' %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                {% elif item.slug == 'ux_design' %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                {% elif item.slug == 'hr' %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="17" y1="11" x2="23" y2="11"></line><line x1="20" y1="8" x2="20" y2="14"></line></svg>
+                                {% elif item.slug == 'finance' %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                {% else %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                {% endif %}
                             </div>
-                            {% endfor %}
+                            {% if item.duration %}<span class="suite-card-duration">{{ item.duration }}</span>{% endif %}
                         </div>
-                        {% if item.url %}
-                        <a class="btn btn-outline small"
-                           href="{{ item.url }}"
-                           data-gtag-click="suite_cta_click"
-                           data-gtag-category="engagement"
-                           data-gtag-label="{{ item.slug }}_learn_more"
-                           data-gtag-params='{"suite":"{{ item.slug }}","context":"home_suite_list"}'>Learn more</a>
-                        {% else %}
-                        <a class="btn btn-outline small"
-                           href="mailto:hello@evalon.so?subject={{ item.label|urlencode }}%20rubric"
-                           data-gtag-click="suite_download_rubric"
-                           data-gtag-category="lead"
-                           data-gtag-label="{{ item.slug }}_download_rubric"
-                           data-gtag-params='{"suite":"{{ item.slug }}","context":"home_suite_list"}'>Download rubric</a>
-                        {% endif %}
-                    </article>
+                        <h3 class="suite-card-title">{{ item.title }}</h3>
+                        <p class="suite-card-summary">{{ item.summary }}</p>
+                        <span class="suite-card-link">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                    </a>
                     {% endfor %}
                 </div>
                 <div class="suite-see-all">
