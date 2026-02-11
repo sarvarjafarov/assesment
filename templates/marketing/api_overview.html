@@ -329,7 +329,8 @@
                     </div>
                     <p class="ap-section-lede ap-lede--light">Pick your language to see a ready-to-copy snippet.</p>
                 </div>
-                <div class="ap-code-tabs" role="tablist" data-language-switcher>
+                <div data-language-switcher>
+                <div class="ap-code-tabs" role="tablist">
                     {% for sample in samples %}
                     <button class="ap-code-tab {% if forloop.first %}is-active{% endif %}" type="button" data-language-tab="{{ forloop.counter0 }}">
                         <span class="ap-code-token">{{ sample.title|slice:":1"|upper }}</span>
@@ -350,6 +351,7 @@
                         <pre><code id="languageSnippet{{ forloop.counter }}">{{ sample.code }}</code></pre>
                     </article>
                     {% endfor %}
+                </div>
                 </div>
             </div>
         </section>

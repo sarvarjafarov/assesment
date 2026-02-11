@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .toString(36)
             .slice(2, 10)}`;
 
-    const tokenButtons = document.querySelectorAll(".token-generate");
+    const tokenButtons = document.querySelectorAll("[data-token-target]");
     tokenButtons.forEach((button) => {
         button.addEventListener("click", () => {
             const targetSelector = button.dataset.tokenTarget;
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const copyButtons = document.querySelectorAll(".copy-trigger");
+    const copyButtons = document.querySelectorAll("[data-copy-target]");
     copyButtons.forEach((btn) => {
         const defaultLabel = btn.dataset.copyLabel || btn.textContent.trim();
         const successLabel = btn.dataset.copySuccess || "Copied!";
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseEl = playgroundContainer.querySelector("[data-playground-response]");
             const statusEl = playgroundContainer.querySelector("[data-playground-status]");
             const runButton = playgroundContainer.querySelector("[data-playground-run]");
-            const responseCard = responseEl?.closest(".playground-card");
+            const responseCard = responseEl?.closest(".ap-playground-card");
             const formatJson = (value) => {
                 if (value === null || typeof value === "undefined") {
                     return "—";
