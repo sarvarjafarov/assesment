@@ -1,22 +1,21 @@
 {# Newsletter signup CTA for blog posts #}
-<aside class="article-newsletter">
-    <div class="newsletter-content">
+<aside class="bd-newsletter">
+    <div class="bd-newsletter-content">
         <h3>Stay ahead of hiring trends</h3>
-        <p>Get monthly insights on assessments, interviewing, and building great teams. No spam, unsubscribe anytime.</p>
+        <p>Get monthly insights on assessments, interviewing, and building great teams.</p>
     </div>
-    <form class="newsletter-form" data-newsletter-form>
-        <div class="newsletter-input-group">
+    <form class="bd-newsletter-form" data-newsletter-form>
+        <div class="bd-newsletter-field">
             <input type="email"
                    name="email"
                    placeholder="you@company.com"
                    required
                    aria-label="Email address">
-            <button type="submit" class="btn btn-pill">Subscribe</button>
+            <button type="submit">Subscribe</button>
         </div>
-        <p class="newsletter-status" data-newsletter-status></p>
+        <p class="bd-newsletter-status" data-newsletter-status></p>
     </form>
 </aside>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -42,14 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const data = await response.json();
                 status.textContent = data.message;
-                status.className = 'newsletter-status ' + (data.success ? 'success' : 'error');
+                status.className = 'bd-newsletter-status ' + (data.success ? 'success' : 'error');
 
                 if (data.success) {
                     this.querySelector('input[name="email"]').value = '';
                 }
             } catch (err) {
                 status.textContent = 'Something went wrong. Please try again.';
-                status.className = 'newsletter-status error';
+                status.className = 'bd-newsletter-status error';
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Subscribe';

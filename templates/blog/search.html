@@ -6,56 +6,59 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='blog' %}
     <main>
-        <div class="blog-shell simple" data-blog-list-shell>
-            <section class="blog-simple-hero">
-                <p class="eyebrow">Search</p>
-                <h1>{% if query %}Results for "{{ query }}"{% else %}Search articles{% endif %}</h1>
+        <div class="bl-shell">
+            <section class="bl-hero">
+                <p class="bl-eyebrow">Search</p>
+                <h1 class="bl-title">{% if query %}Results for "{{ query }}"{% else %}Search articles{% endif %}</h1>
                 {% if posts %}
-                <p class="lede">Found {{ posts|length }} article{{ posts|length|pluralize }}{% if query %} matching your search{% endif %}.</p>
+                <p class="bl-desc">Found {{ posts|length }} article{{ posts|length|pluralize }}{% if query %} matching your search{% endif %}.</p>
                 {% elif query %}
-                <p class="lede">No articles found. Try a different search term.</p>
+                <p class="bl-desc">No articles found. Try a different search term.</p>
                 {% else %}
-                <p class="lede">Enter a search term to find articles.</p>
+                <p class="bl-desc">Enter a search term to find articles.</p>
                 {% endif %}
-            </section>
-
-            {# Search bar #}
-            <section class="blog-search-bar">
-                <form action="{% url 'blog:search' %}" method="get" class="search-form">
-                    <input type="search" name="q" value="{{ query }}" placeholder="Search articles..." aria-label="Search articles" autofocus>
-                    <button type="submit" class="btn btn-pill">Search</button>
+                <form action="{% url 'blog:search' %}" method="get" class="bl-search">
+                    <div class="bl-search-field">
+                        <svg class="bl-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="search" name="q" value="{{ query }}" placeholder="Search articles..." aria-label="Search articles" autofocus>
+                    </div>
                 </form>
             </section>
 
-            {# Category navigation #}
             {% if categories %}
-            <nav class="blog-categories" aria-label="Browse by category">
-                <a href="{% url 'blog:list' %}" class="category-pill">All articles</a>
+            <nav class="bl-categories" aria-label="Browse by category">
+                <a href="{% url 'blog:list' %}" class="bl-cat-pill">All articles</a>
                 {% for cat in categories %}
-                <a href="{% url 'blog:list' %}?category={{ cat.slug }}" class="category-pill">{{ cat.name }}</a>
+                <a href="{% url 'blog:list' %}?category={{ cat.slug }}" class="bl-cat-pill">{{ cat.name }}</a>
                 {% endfor %}
             </nav>
             {% endif %}
 
-            <section class="blog-grid simple-grid" id="grid">
+            <section class="bl-grid" id="grid">
                 {% for post in posts %}
-                <article class="blog-card simple-card" data-blog-card>
-                    <div class="meta-row">
+                <a class="bl-card" href="{{ post.get_absolute_url }}" data-blog-card>
+                    <div class="bl-card-meta">
                         {% if post.category %}
-                        <a href="{% url 'blog:list' %}?category={{ post.category.slug }}" class="pill {{ post.pill_style }}">{{ post.category.name }}</a>
+                        <span class="bl-card-cat">{{ post.category.name }}</span>
                         {% else %}
-                        <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
+                        <span class="bl-card-cat">{{ post.pill_label }}</span>
                         {% endif %}
-                        <span class="date">{{ post.published_at|date:"M j, Y" }}</span>
-                        <span class="read-time">{{ post.estimated_read_minutes }} min read</span>
+                        <span class="bl-meta-dot"></span>
+                        <span>{{ post.published_at|date:"M j, Y" }}</span>
+                        <span class="bl-meta-dot"></span>
+                        <span>{{ post.estimated_read_minutes }} min read</span>
                     </div>
-                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-                    <p>{{ post.excerpt }}</p>
-                    <div class="author">By {{ post.display_author }}</div>
-                    <a class="outline-link" href="{{ post.get_absolute_url }}">Read article</a>
-                </article>
+                    <h3 class="bl-card-title">{{ post.title }}</h3>
+                    <p class="bl-card-excerpt">{{ post.excerpt }}</p>
+                    <div class="bl-card-footer">
+                        <span class="bl-card-author">{{ post.display_author }}</span>
+                        <span class="bl-card-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </span>
+                    </div>
+                </a>
                 {% empty %}
-                <div class="empty-state-box">
+                <div class="bl-empty">
                     <h3>No results found</h3>
                     <p>Try adjusting your search or <a href="{% url 'blog:list' %}">browse all articles</a>.</p>
                 </div>
@@ -63,8 +66,8 @@
             </section>
 
             {% if is_paginated and page_obj.has_next %}
-            <div class="blog-load-more">
-                <a class="btn btn-pill secondary" href="?q={{ query|urlencode }}&page={{ page_obj.next_page_number }}">Load more</a>
+            <div class="bl-load-more">
+                <a class="bl-load-btn" href="?q={{ query|urlencode }}&page={{ page_obj.next_page_number }}">Load more</a>
             </div>
             {% endif %}
         </div>

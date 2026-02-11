@@ -42,88 +42,76 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='blog' %}
     <main>
-<div class="blog-shell blog-shell-detail">
-    <header class="hero-card detail-hero" data-article-hero>
-        <div class="hero-copy">
-            <div class="breadcrumb">
-                <a href="{% url 'blog:list' %}">← All articles</a>
-            </div>
-            <span class="pill {{ post.pill_style }}">{{ post.pill_label }}</span>
-            <h1>{{ post.title }}</h1>
-            <p class="meta">Published {{ post.published_at|date:"F j, Y" }} · {{ post.display_author }}</p>
-            <div class="reading-meta">
-                <span>{{ post.estimated_read_minutes }} min read</span>
-                <span>Updated {{ post.updated_at|date:"M j, Y" }}</span>
-            </div>
-            <div class="reading-progress" data-reading-progress>
-                <span></span>
-            </div>
-            {% if preview_mode %}
-            <div class="preview-banner">
-                <strong>Preview mode</strong>
-                <span>Only visible with a valid preview link.</span>
-            </div>
-            {% endif %}
-        </div>
-        {% if post.hero_image %}
-        <figure class="article-hero">
-            <img src="{{ post.hero_image }}" alt="{{ post.title }}">
-        </figure>
-        {% endif %}
-    </header>
-
-    <article class="blog-article">
-        <aside class="article-toc" id="articleToc">
-            <p>Jump to section</p>
-            <nav>
-                <ul data-article-toc></ul>
-            </nav>
-        </aside>
-        <div class="article-body" data-article-body>
-            {{ post.body|linebreaks }}
-        </div>
-
-        {# Social share buttons #}
-        {% include 'blog/includes/share_buttons.html' %}
-    </article>
-
-    {# Newsletter signup CTA #}
-    {% include 'blog/includes/newsletter_cta.html' %}
-
-    {% if recent_posts %}
-    <section class="blog-related">
-        <div class="section-heading align-left">
-            <h2>Keep reading</h2>
-            <p class="lede">More ideas from teams building with Evalon.</p>
-        </div>
-        <div class="reading-carousel" data-related-slider>
-            <div class="reading-track" data-related-track>
-            {% for related in recent_posts %}
-            <article class="blog-card compact" data-related-slide>
-                <div class="meta-row">
-                    <span class="pill {{ related.pill_style }}">{{ related.pill_label }}</span>
-                    <span class="date">{{ related.published_at|date:"M j, Y" }}</span>
+        <div class="bd-shell">
+            <header class="bd-hero">
+                <div class="bd-hero-inner">
+                    <div class="bd-breadcrumb">
+                        <a href="{% url 'blog:list' %}">Blog</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span>{{ post.pill_label }}</span>
+                    </div>
+                    {% if preview_mode %}
+                    <div class="bd-preview-banner">Preview mode — only visible with a valid preview link.</div>
+                    {% endif %}
+                    <h1 class="bd-title">{{ post.title }}</h1>
+                    <div class="bd-meta">
+                        <span>{{ post.display_author }}</span>
+                        <span class="bd-meta-dot"></span>
+                        <span>{{ post.published_at|date:"F j, Y" }}</span>
+                        <span class="bd-meta-dot"></span>
+                        <span>{{ post.estimated_read_minutes }} min read</span>
+                    </div>
+                    <div class="bd-progress" data-reading-progress>
+                        <span></span>
+                    </div>
                 </div>
-                <h3><a href="{{ related.get_absolute_url }}">{{ related.title }}</a></h3>
-                <p>{{ related.excerpt }}</p>
-                <div class="author">By {{ related.display_author }}</div>
-                <div class="related-tags">
-                    <a href="{% url 'blog:list' %}?pillar={{ related.pill_label|urlencode }}">More {{ related.pill_label }}</a>
-                    {% for tag in related.tag_list %}
-                    <a href="{% url 'blog:list' %}?tag={{ tag|urlencode }}">#{{ tag }}</a>
+            </header>
+
+            {% if post.hero_image %}
+            <figure class="bd-hero-image">
+                <img src="{{ post.hero_image }}" alt="{{ post.title }}">
+            </figure>
+            {% endif %}
+
+            <div class="bd-layout">
+                <aside class="bd-toc" id="articleToc">
+                    <p class="bd-toc-heading">On this page</p>
+                    <nav>
+                        <ul data-article-toc></ul>
+                    </nav>
+                </aside>
+                <article class="bd-body" data-article-body>
+                    {{ post.body|linebreaks }}
+                </article>
+            </div>
+
+            {% include 'blog/includes/share_buttons.html' %}
+            {% include 'blog/includes/newsletter_cta.html' %}
+
+            {% if recent_posts %}
+            <section class="bd-related">
+                <h2 class="bd-related-title">Keep reading</h2>
+                <div class="bd-related-grid">
+                    {% for related in recent_posts %}
+                    <a class="bl-card" href="{{ related.get_absolute_url }}">
+                        <div class="bl-card-meta">
+                            <span class="bl-card-cat">{{ related.pill_label }}</span>
+                            <span class="bl-meta-dot"></span>
+                            <span>{{ related.published_at|date:"M j, Y" }}</span>
+                        </div>
+                        <h3 class="bl-card-title">{{ related.title }}</h3>
+                        <p class="bl-card-excerpt">{{ related.excerpt }}</p>
+                        <div class="bl-card-footer">
+                            <span class="bl-card-author">{{ related.display_author }}</span>
+                            <span class="bl-card-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </span>
+                        </div>
+                    </a>
                     {% endfor %}
                 </div>
-                <a class="outline-link" href="{{ related.get_absolute_url }}">Read</a>
-            </article>
-            {% endfor %}
-            </div>
-        </div>
-        <div class="reading-carousel-controls">
-            <button type="button" class="slider-btn" data-related-prev aria-label="Previous recommendation">←</button>
-            <button type="button" class="slider-btn" data-related-next aria-label="Next recommendation">→</button>
-        </div>
-    </section>
-    {% endif %}
+            </section>
+            {% endif %}
         </div>
     </main>
 </div>
