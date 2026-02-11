@@ -6,25 +6,26 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='api' %}
 
-    <main class="api-shell">
-        <section class="panel hero api-hero">
-            <div>
-                <p class="eyebrow">API integration</p>
-                <h1>Connect every Evalon assessment to your stack.</h1>
-                <p class="lede">Behavioral, digital marketing, and future role modules run through one secure REST API.</p>
+    <main class="ap-shell">
+        {# Hero #}
+        <section class="ap-hero">
+            <div class="ap-hero-inner">
+                <p class="ap-eyebrow">API Integration</p>
+                <h1 class="ap-hero-title">Connect every Evalon assessment to your stack.</h1>
+                <p class="ap-hero-desc">Behavioral, digital marketing, and future role modules run through one secure REST API.</p>
+                <ul class="ap-hero-tags">
+                    {% for use_case in hero_use_cases %}
+                    <li>{{ use_case }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="ap-hero-actions">
+                    <a class="ap-btn-primary" href="#api-request">Request API access</a>
+                    <a class="ap-btn-secondary" href="#section-endpoints">View endpoints</a>
+                </div>
             </div>
-            <ul class="api-hero-list">
-                {% for use_case in hero_use_cases %}
-                <li>{{ use_case }}</li>
-                {% endfor %}
-            </ul>
-            <div class="hero-cta">
-                <a class="btn btn-pill" href="#api-request">Request API access</a>
-                <a class="btn btn-outline" href="#section-endpoints">View endpoints</a>
-            </div>
-            <div class="api-hero-metrics">
+            <div class="ap-hero-metrics">
                 {% for metric in hero_metrics %}
-                <article>
+                <article class="ap-metric">
                     <strong>{{ metric.value }}</strong>
                     <span>{{ metric.label }}</span>
                 </article>
@@ -32,63 +33,47 @@
             </div>
         </section>
 
-        <section class="panel hero-loop-panel">
-            <div class="loop-grid">
-                <div class="loop-copy">
-                    <p class="eyebrow">See the loop</p>
-                    <h2>Invite → complete → sync in 30 seconds.</h2>
-                    <p class="lede">Share this clip with your engineers or vendor managers when you need to explain how Evalon fits into your hiring stack.</p>
-                    <ul class="loop-steps">
-                        {% for step in loop_steps %}
-                        <li>
-                            <span class="step-index">0{{ forloop.counter }}</span>
-                            <div>
-                                <strong>{{ step.title }}</strong>
-                                <p>{{ step.detail }}</p>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="loop-visual">
-                    <div class="loop-visual-header">
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                        <p>Live flow preview</p>
+        {# Flow loop #}
+        <section class="ap-section ap-section--dark" id="section-flow-preview">
+            <div class="ap-section-inner">
+                <div class="ap-flow-grid">
+                    <div class="ap-flow-copy">
+                        <p class="ap-eyebrow ap-eyebrow--light">See the loop</p>
+                        <h2 class="ap-flow-title">Invite → complete → sync in 30 seconds.</h2>
+                        <p class="ap-flow-desc">Share this with your engineers when you need to explain how Evalon fits into your hiring stack.</p>
+                        <ul class="ap-flow-steps">
+                            {% for step in loop_steps %}
+                            <li>
+                                <span class="ap-step-num">0{{ forloop.counter }}</span>
+                                <div>
+                                    <strong>{{ step.title }}</strong>
+                                    <p>{{ step.detail }}</p>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                    <div class="loop-track">
-                        <div class="loop-node is-invite">
-                            <strong>Invite API</strong>
-                            <small>POST /start</small>
+                    <div class="ap-flow-visual">
+                        <div class="ap-flow-header">
+                            <span class="ap-dot"></span>
+                            <span class="ap-dot"></span>
+                            <span class="ap-dot"></span>
+                            <p>Live flow preview</p>
                         </div>
-                        <div class="loop-arrow"></div>
-                        <div class="loop-node is-session">
-                            <strong>Candidate UX</strong>
-                            <small>Mobile & desktop</small>
-                        </div>
-                        <div class="loop-arrow"></div>
-                        <div class="loop-node is-webhook">
-                            <strong>Webhook</strong>
-                            <small>Score payload</small>
-                        </div>
-                    </div>
-                    <div class="loop-video">
-                        <div class="loop-video-screen">
-                            <div class="loop-video-header">
-                                <span>POST /start</span>
-                                <span>→</span>
-                                <span>Candidate completes</span>
-                                <span>→</span>
-                                <span>Webhook delivered</span>
+                        <div class="ap-flow-track">
+                            <div class="ap-flow-node">
+                                <strong>Invite API</strong>
+                                <small>POST /start</small>
                             </div>
-                            <div class="loop-video-wave">
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                            <div class="ap-flow-arrow"></div>
+                            <div class="ap-flow-node">
+                                <strong>Candidate UX</strong>
+                                <small>Mobile & desktop</small>
                             </div>
-                            <div class="loop-video-footer">
-                                <p>Telemetry captured · scoring completed · payload sent</p>
+                            <div class="ap-flow-arrow"></div>
+                            <div class="ap-flow-node">
+                                <strong>Webhook</strong>
+                                <small>Score payload</small>
                             </div>
                         </div>
                     </div>
@@ -96,39 +81,43 @@
             </div>
         </section>
 
-        <nav class="api-mini-nav" aria-label="API page navigation" data-spy-nav>
+        {# Sticky nav #}
+        <nav class="ap-nav" aria-label="API page navigation" data-spy-nav>
             <ul>
                 <li><a href="#section-downloads">Resources</a></li>
                 <li><a href="#section-environment">Environment</a></li>
                 <li><a href="#section-endpoints">Endpoints</a></li>
                 <li><a href="#section-playground">Playground</a></li>
-                <li><a href="#section-auth">Authentication</a></li>
+                <li><a href="#section-auth">Auth</a></li>
                 <li><a href="#section-architecture">Flow</a></li>
-                <li><a href="#section-sdks">SDKs & samples</a></li>
+                <li><a href="#section-sdks">SDKs</a></li>
                 {% if partner_highlights %}<li><a href="#section-partners">Partners</a></li>{% endif %}
                 <li><a href="#section-changelog">Changelog</a></li>
                 <li><a href="#api-request">Access</a></li>
             </ul>
         </nav>
 
-        <section class="panel download-panel" id="section-downloads">
-            <div class="download-card">
-                <div class="download-copy">
-                    <p class="eyebrow">Your starter kit</p>
-                    <h2>{{ download_bundle.headline }}</h2>
-                    <p class="lede">{{ download_bundle.description }}</p>
+        {# Downloads #}
+        <section class="ap-section" id="section-downloads">
+            <div class="ap-section-inner">
+                <div class="ap-section-header">
+                    <div>
+                        <p class="ap-eyebrow">Your starter kit</p>
+                        <h2>{{ download_bundle.headline }}</h2>
+                    </div>
+                    <p class="ap-section-lede">{{ download_bundle.description }}</p>
                 </div>
-                <ul class="download-list">
+                <ul class="ap-downloads">
                     {% for resource in download_bundle.resources %}
-                    <li>
+                    <li class="ap-download-item">
                         <div>
                             <strong>{{ resource.label }}</strong>
                             <p>{{ resource.description }}</p>
                         </div>
                         {% if resource.href %}
-                        <a class="btn btn-pill" href="{{ resource.href }}" target="_blank" rel="noopener">Download</a>
+                        <a class="ap-btn-small" href="{{ resource.href }}" target="_blank" rel="noopener">Download</a>
                         {% else %}
-                        <a class="btn btn-pill secondary" href="#api-request">Request access</a>
+                        <a class="ap-btn-small ap-btn-small--muted" href="#api-request">Request access</a>
                         {% endif %}
                     </li>
                     {% endfor %}
@@ -136,166 +125,178 @@
             </div>
         </section>
 
-        <section class="panel env-panel" id="section-environment">
-            <header class="panel-heading">
-                <div>
-                    <p class="eyebrow">Environment & security</p>
-                    <h2>Ready for production on day one.</h2>
-                </div>
-                <p class="lede">Use dedicated keys per workspace, ship via sandbox, then flip to production.</p>
-            </header>
-            <div class="env-grid">
-                {% for item in environment_details %}
-                <article>
-                    <p class="label">{{ item.label }}</p>
-                    <strong>{{ item.value }}</strong>
-                </article>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section class="panel endpoint-panel" id="section-endpoints">
-            <header class="panel-heading">
-                <div>
-                    <p class="eyebrow">Endpoints</p>
-                    <h2>REST endpoints</h2>
-                </div>
-                <p class="lede">Call these endpoints with your <code>X-API-Key</code> header.</p>
-            </header>
-            <div class="api-endpoints">
-                {% for endpoint in rest_endpoints %}
-                <article class="endpoint-card">
-                    <div class="method">{{ endpoint.method }}</div>
-                    <div class="path">{{ endpoint.path }}</div>
-                    <p>{{ endpoint.description }}</p>
-                    {% if endpoint.request_schema_pretty %}
-                    <details class="endpoint-schema">
-                        <summary>Request schema</summary>
-                        <pre>{{ endpoint.request_schema_pretty }}</pre>
-                    </details>
-                    {% endif %}
-                    {% if endpoint.response_schema_pretty %}
-                    <details class="endpoint-schema">
-                        <summary>Response schema</summary>
-                        <pre>{{ endpoint.response_schema_pretty }}</pre>
-                    </details>
-                    {% endif %}
-                </article>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section class="panel playground-panel" id="section-playground">
-            <div class="section-heading align-left">
-                <div>
-                    <p class="eyebrow">Interactive docs</p>
-                    <h2>Test the flow without leaving the page.</h2>
-                </div>
-                <p class="lede">Switch between common calls and preview the headers, payloads, and responses teams use most often.</p>
-            </div>
-            <div class="playground-shell" data-playground>
-                <aside class="playground-sidebar" role="tablist" aria-label="Playground examples">
-                    {% for example in playground_examples %}
-                    <button
-                        class="playground-tab {% if forloop.first %}is-active{% endif %}"
-                        type="button"
-                        data-playground-tab="{{ example.slug }}"
-                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-                    >
-                        <span class="method">{{ example.method }}</span>
-                        <span class="path">{{ example.path }}</span>
-                        <p>{{ example.description }}</p>
-                    </button>
-                    {% endfor %}
-                </aside>
-                <div class="playground-body">
-                    <div class="playground-card">
-                        <header>
-                            <p class="label">Request</p>
-                            <span data-playground-method></span>
-                            <code data-playground-path></code>
-                        </header>
-                        <div class="playground-meta">
-                            <strong>Headers</strong>
-                            <pre data-playground-headers></pre>
-                        </div>
-                        <div class="playground-meta">
-                            <strong>Body</strong>
-                            <pre data-playground-request></pre>
-                        </div>
+        {# Environment #}
+        <section class="ap-section ap-section--alt" id="section-environment">
+            <div class="ap-section-inner">
+                <div class="ap-section-header">
+                    <div>
+                        <p class="ap-eyebrow">Environment & security</p>
+                        <h2>Ready for production on day one.</h2>
                     </div>
-                    <div class="playground-card">
-                        <header>
-                            <p class="label">Response</p>
-                            <span>Status <strong data-playground-status></strong></span>
-                        </header>
-                        <div class="playground-meta">
-                            <strong>Body</strong>
-                            <pre data-playground-response></pre>
+                    <p class="ap-section-lede">Use dedicated keys per workspace, ship via sandbox, then flip to production.</p>
+                </div>
+                <div class="ap-env-grid">
+                    {% for item in environment_details %}
+                    <article class="ap-env-card">
+                        <span class="ap-env-label">{{ item.label }}</span>
+                        <strong>{{ item.value }}</strong>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        {# Endpoints #}
+        <section class="ap-section" id="section-endpoints">
+            <div class="ap-section-inner">
+                <div class="ap-section-header">
+                    <div>
+                        <p class="ap-eyebrow">Endpoints</p>
+                        <h2>REST endpoints</h2>
+                    </div>
+                    <p class="ap-section-lede">Call these endpoints with your <code>X-API-Key</code> header.</p>
+                </div>
+                <div class="ap-endpoints">
+                    {% for endpoint in rest_endpoints %}
+                    <article class="ap-endpoint">
+                        <div class="ap-endpoint-method">{{ endpoint.method }}</div>
+                        <div class="ap-endpoint-path">{{ endpoint.path }}</div>
+                        <p class="ap-endpoint-desc">{{ endpoint.description }}</p>
+                        {% if endpoint.request_schema_pretty %}
+                        <details class="ap-schema">
+                            <summary>Request schema</summary>
+                            <pre>{{ endpoint.request_schema_pretty }}</pre>
+                        </details>
+                        {% endif %}
+                        {% if endpoint.response_schema_pretty %}
+                        <details class="ap-schema">
+                            <summary>Response schema</summary>
+                            <pre>{{ endpoint.response_schema_pretty }}</pre>
+                        </details>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        {# Playground #}
+        <section class="ap-section ap-section--dark" id="section-playground">
+            <div class="ap-section-inner">
+                <div class="ap-section-header">
+                    <div>
+                        <p class="ap-eyebrow ap-eyebrow--light">Interactive docs</p>
+                        <h2 class="ap-dark-title">Test the flow without leaving the page.</h2>
+                    </div>
+                    <p class="ap-section-lede ap-lede--light">Switch between common calls and preview the headers, payloads, and responses.</p>
+                </div>
+                <div class="ap-playground" data-playground>
+                    <aside class="ap-playground-sidebar" role="tablist" aria-label="Playground examples">
+                        {% for example in playground_examples %}
+                        <button
+                            class="ap-playground-tab {% if forloop.first %}is-active{% endif %}"
+                            type="button"
+                            data-playground-tab="{{ example.slug }}"
+                            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                        >
+                            <span class="ap-playground-method">{{ example.method }}</span>
+                            <span class="ap-playground-path">{{ example.path }}</span>
+                            <p>{{ example.description }}</p>
+                        </button>
+                        {% endfor %}
+                    </aside>
+                    <div class="ap-playground-body">
+                        <div class="ap-playground-card">
+                            <header>
+                                <span class="ap-playground-label">Request</span>
+                                <span data-playground-method></span>
+                                <code data-playground-path></code>
+                            </header>
+                            <div class="ap-playground-meta">
+                                <strong>Headers</strong>
+                                <pre data-playground-headers></pre>
+                            </div>
+                            <div class="ap-playground-meta">
+                                <strong>Body</strong>
+                                <pre data-playground-request></pre>
+                            </div>
                         </div>
-                        <button class="btn btn-pill playground-run" type="button" data-playground-run>Run mock call</button>
-                        <p class="playground-tip">We animate the payload to show how fast responses arrive.</p>
+                        <div class="ap-playground-card">
+                            <header>
+                                <span class="ap-playground-label">Response</span>
+                                <span>Status <strong data-playground-status></strong></span>
+                            </header>
+                            <div class="ap-playground-meta">
+                                <strong>Body</strong>
+                                <pre data-playground-response></pre>
+                            </div>
+                            <button class="ap-btn-primary ap-playground-run" type="button" data-playground-run>Run mock call</button>
+                            <p class="ap-playground-tip">We animate the payload to show how fast responses arrive.</p>
+                        </div>
                     </div>
                 </div>
             </div>
             {{ playground_examples|json_script:"playground-data" }}
         </section>
 
-        <section class="panel token-panel" id="section-auth">
-            <div class="section-heading align-left">
+        {# Auth #}
+        <section class="ap-section" id="section-auth">
+            <div class="ap-section-inner">
                 <h2>Authentication & tokens</h2>
-                <p class="lede">Use the API key we issue per workspace. Rotate tokens anytime.</p>
-            </div>
-            <div class="token-card">
-                <div>
-                    <p class="label">Example header</p>
-                    <pre><code id="tokenSample">X-API-Key: sk_live_a1b2c3d4e5f6</code></pre>
-                </div>
-                <div class="token-actions">
-                    <button class="btn btn-pill secondary token-generate" type="button" data-token-target="#tokenSample">Generate mock token</button>
-                    <button class="btn btn-pill copy-trigger" type="button" data-copy-target="#tokenSample" data-copy-label="Copy header" data-copy-success="Copied!">Copy header</button>
-                </div>
-            </div>
-        </section>
-
-        <section class="panel architecture-panel" id="section-architecture">
-            <div class="section-heading align-left">
-                <p class="eyebrow">How it fits</p>
-                <h2>Simple three-step flow.</h2>
-                <p class="lede">Evalon handles the candidate experience, scoring, and telemetry. You control invites and reporting.</p>
-            </div>
-            <div class="arch-grid">
-                {% for flow in architecture_flows %}
-                <article class="arch-card">
-                    <h3>{{ flow.title }}</h3>
-                    <p>{{ flow.description|safe }}</p>
-                </article>
-                {% endfor %}
-            </div>
-        </section>
-
-{% with samples=language_examples %}
-        <section class="panel language-info-panel" id="section-sdks">
-            <div class="language-flex">
-                <div class="language-copy">
-                    <p class="eyebrow">Language examples</p>
-                    <h2>Built for any stack and ready in minutes.</h2>
-                    <p class="lede">Use the snippets below to launch assessments directly from your product, workflow tools, or ATS.</p>
-                    <div class="language-pill-row">
-                        {% for sample in language_examples %}
-                        <span class="language-pill">{{ sample.title }}</span>
-                        {% endfor %}
+                <p class="ap-section-lede" style="margin-bottom:1.5rem;">Use the API key we issue per workspace. Rotate tokens anytime.</p>
+                <div class="ap-token-card">
+                    <div>
+                        <span class="ap-token-label">Example header</span>
+                        <pre><code id="tokenSample">X-API-Key: sk_live_a1b2c3d4e5f6</code></pre>
                     </div>
-                    <ul class="language-highlights">
-                        <li>Single API key powers behavioral & digital marketing modules.</li>
-                        <li>Safe retries + idempotency tokens keep submissions intact.</li>
-                        <li>Webhook callbacks notify you when candidates finish.</li>
-                    </ul>
+                    <div class="ap-token-actions">
+                        <button class="ap-btn-small" type="button" data-token-target="#tokenSample">Generate mock token</button>
+                        <button class="ap-btn-small ap-btn-small--muted" type="button" data-copy-target="#tokenSample" data-copy-label="Copy header" data-copy-success="Copied!">Copy header</button>
+                    </div>
                 </div>
-                <div class="language-aside">
-                    <div class="language-aside-card">
-                        <p class="label">Reliability snapshot</p>
-                        <div class="language-stats">
+            </div>
+        </section>
+
+        {# Architecture #}
+        <section class="ap-section ap-section--alt" id="section-architecture">
+            <div class="ap-section-inner">
+                <p class="ap-eyebrow">How it fits</p>
+                <h2>Simple three-step flow.</h2>
+                <p class="ap-section-lede" style="margin-bottom:1.5rem;">Evalon handles the candidate experience, scoring, and telemetry. You control invites and reporting.</p>
+                <div class="ap-arch-grid">
+                    {% for flow in architecture_flows %}
+                    <article class="ap-arch-card">
+                        <h3>{{ flow.title }}</h3>
+                        <p>{{ flow.description|safe }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        {# Language examples #}
+{% with samples=language_examples %}
+        <section class="ap-section" id="section-sdks">
+            <div class="ap-section-inner">
+                <div class="ap-lang-grid">
+                    <div class="ap-lang-copy">
+                        <p class="ap-eyebrow">Language examples</p>
+                        <h2>Built for any stack and ready in minutes.</h2>
+                        <p class="ap-lang-desc">Use the snippets below to launch assessments directly from your product, workflow tools, or ATS.</p>
+                        <div class="ap-lang-pills">
+                            {% for sample in language_examples %}
+                            <span class="ap-lang-pill">{{ sample.title }}</span>
+                            {% endfor %}
+                        </div>
+                        <ul class="ap-lang-highlights">
+                            <li>Single API key powers behavioral & digital marketing modules.</li>
+                            <li>Safe retries + idempotency tokens keep submissions intact.</li>
+                            <li>Webhook callbacks notify you when candidates finish.</li>
+                        </ul>
+                    </div>
+                    <div class="ap-lang-stats-card">
+                        <span class="ap-lang-stats-label">Reliability snapshot</span>
+                        <div class="ap-lang-stats">
                             <article>
                                 <strong>{{ language_examples|length }}</strong>
                                 <span>Ready-made snippets</span>
@@ -309,7 +310,7 @@
                                 <span>Uptime SLA</span>
                             </article>
                         </div>
-                        <ul class="language-aside-list">
+                        <ul class="ap-lang-stats-list">
                             <li>Webhook retry strategy with exponential backoff.</li>
                             <li>Idempotency safeguards prevent duplicate sessions.</li>
                             <li>Role-scoped keys so each workspace stays isolated.</li>
@@ -318,211 +319,219 @@
                 </div>
             </div>
         </section>
-        <section class="panel language-code-panel" data-language-switcher>
-            <header class="panel-heading">
-                <div>
-                    <p class="eyebrow">Client libraries</p>
-                    <h2>Plug Evalon into any stack.</h2>
-                </div>
-                <p class="lede">Pick your language to see a ready-to-copy snippet.</p>
-            </header>
-            <div class="language-tabs" role="tablist">
-                {% for sample in samples %}
-                <button class="language-tab {% if forloop.first %}is-active{% endif %}" type="button" data-language-tab="{{ forloop.counter0 }}">
-                    <span class="language-token">{{ sample.title|slice:":1"|upper }}</span>
-                    <span>{{ sample.title }}</span>
-                </button>
-                {% endfor %}
-            </div>
-            <div class="language-card-stack">
-                {% for sample in samples %}
-                <article class="snippet-card language-card {% if forloop.first %}is-active{% endif %}" data-language-panel="{{ forloop.counter0 }}">
-                    <div class="snippet-header">
-                        <div>
-                            <p class="label">Client library</p>
-                            <strong>{{ sample.title }}</strong>
-                        </div>
-                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#languageSnippet{{ forloop.counter }}" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+
+        <section class="ap-section ap-section--dark" id="section-code">
+            <div class="ap-section-inner">
+                <div class="ap-section-header">
+                    <div>
+                        <p class="ap-eyebrow ap-eyebrow--light">Client libraries</p>
+                        <h2 class="ap-dark-title">Plug Evalon into any stack.</h2>
                     </div>
-                    <pre><code id="languageSnippet{{ forloop.counter }}">{{ sample.code }}</code></pre>
-                </article>
-                {% endfor %}
+                    <p class="ap-section-lede ap-lede--light">Pick your language to see a ready-to-copy snippet.</p>
+                </div>
+                <div class="ap-code-tabs" role="tablist" data-language-switcher>
+                    {% for sample in samples %}
+                    <button class="ap-code-tab {% if forloop.first %}is-active{% endif %}" type="button" data-language-tab="{{ forloop.counter0 }}">
+                        <span class="ap-code-token">{{ sample.title|slice:":1"|upper }}</span>
+                        <span>{{ sample.title }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+                <div class="ap-code-stack">
+                    {% for sample in samples %}
+                    <article class="ap-code-card {% if forloop.first %}is-active{% endif %}" data-language-panel="{{ forloop.counter0 }}">
+                        <div class="ap-code-card-header">
+                            <div>
+                                <span class="ap-code-card-label">Client library</span>
+                                <strong>{{ sample.title }}</strong>
+                            </div>
+                            <button class="ap-btn-small" type="button" data-copy-target="#languageSnippet{{ forloop.counter }}" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                        </div>
+                        <pre><code id="languageSnippet{{ forloop.counter }}">{{ sample.code }}</code></pre>
+                    </article>
+                    {% endfor %}
+                </div>
             </div>
         </section>
 {% endwith %}
 
-        <section class="panel integration-panel stacks-panel panel-contained section-tight">
-            <div class="stacks-intro">
-                <p class="eyebrow">Integrations</p>
+        {# Stacks #}
+        <section class="ap-section ap-section--alt">
+            <div class="ap-section-inner">
+                <p class="ap-eyebrow">Integrations</p>
                 <h2>Stacks & sample payloads</h2>
-                <p class="lede">Use our REST interface across any stack, or drop these request/response samples to speed up QA.</p>
-            </div>
-            <div class="stacks-grid">
-                <div class="stack-card">
-                <h2>Stacks we support</h2>
-                <p class="lede">Embed Evalon into any workflow or automation platform.</p>
-                <ul>
-                    <li><span>Python</span> (requests, Django, FastAPI)</li>
-                    <li><span>Node.js</span> (fetch, Axios, Nest)</li>
-                    <li><span>Ruby, Go, Java</span> and more</li>
-                    <li><span>Automation</span> Zapier, Make, Workato</li>
-                    <li><span>ATS partners</span> Lever, Greenhouse, Ashby</li>
-                </ul>
-            </div>
-            <div class="stacks-note">
-                <p class="label">How teams use this</p>
-                <ul>
-                    <li>ATS sync: auto-create candidate entries when a new session starts.</li>
-                    <li>Workflow automations: route high-scorers into Calendly/HubSpot.</li>
-                    <li>Custom dashboards: pull JSON payloads into BI tools for reporting.</li>
-                </ul>
-            </div>
-            </div>
+                <p class="ap-section-lede" style="margin-bottom:1.5rem;">Use our REST interface across any stack, or drop these request/response samples to speed up QA.</p>
+                <div class="ap-stacks-grid">
+                    <div class="ap-stacks-card">
+                        <h3>Stacks we support</h3>
+                        <p>Embed Evalon into any workflow or automation platform.</p>
+                        <ul>
+                            <li><span>Python</span> (requests, Django, FastAPI)</li>
+                            <li><span>Node.js</span> (fetch, Axios, Nest)</li>
+                            <li><span>Ruby, Go, Java</span> and more</li>
+                            <li><span>Automation</span> Zapier, Make, Workato</li>
+                            <li><span>ATS partners</span> Lever, Greenhouse, Ashby</li>
+                        </ul>
+                    </div>
+                    <div class="ap-stacks-note">
+                        <span class="ap-stacks-note-label">How teams use this</span>
+                        <ul>
+                            <li>ATS sync: auto-create candidate entries when a new session starts.</li>
+                            <li>Workflow automations: route high-scorers into Calendly/HubSpot.</li>
+                            <li>Custom dashboards: pull JSON payloads into BI tools for reporting.</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="panel sample-panel panel-contained section-tight" id="section-samples">
-            <div class="sample-intro">
-                <div class="sample-copy">
-                    <p class="eyebrow">Sample requests & responses</p>
-                    <h2>Drop-in payloads for your QA team.</h2>
-                    <p class="lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
-                </div>
-                <div class="sample-note">
-                    <p>Poll session status or integrate with your existing workflow tools.</p>
-                </div>
-            </div>
-            <div class="sample-flow">
-                <article class="sample-card is-start">
-                    <span class="step-badge">01</span>
-                    <div class="sample-card-header">
-                        <div>
-                            <p class="label">Create invitation</p>
-                            <strong>POST /api/assessments/invitations/</strong>
-                        </div>
-                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode1" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+        {# Samples #}
+        <section class="ap-section" id="section-samples">
+            <div class="ap-section-inner">
+                <div class="ap-section-header">
+                    <div>
+                        <p class="ap-eyebrow">Sample requests & responses</p>
+                        <h2>Drop-in payloads for your QA team.</h2>
                     </div>
+                    <p class="ap-section-lede">Start, submit, and fetch results with predictable JSON bodies and idempotent endpoints.</p>
+                </div>
+                <div class="ap-samples">
+                    <article class="ap-sample-card">
+                        <span class="ap-sample-num">01</span>
+                        <div class="ap-sample-header">
+                            <div>
+                                <span class="ap-sample-label">Create invitation</span>
+                                <strong>POST /api/assessments/invitations/</strong>
+                            </div>
+                            <button class="ap-btn-small" type="button" data-copy-target="#sampleCode1" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
+                        </div>
 <pre><code id="sampleCode1">{
   "email": "candidate@example.com",
   "full_name": "Jane Doe",
   "assessment_slug": "sales-behavioral"
 }
 → { "session_uuid": "uuid", "email_sent": true }</code></pre>
-                </article>
-                <article class="sample-card is-process">
-                    <span class="step-badge">02</span>
-                    <div class="sample-card-header">
-                        <div>
-                            <p class="label">Get results</p>
-                            <strong>GET /api/assessments/sessions/&lt;uuid&gt;/responses/</strong>
+                    </article>
+                    <article class="ap-sample-card">
+                        <span class="ap-sample-num">02</span>
+                        <div class="ap-sample-header">
+                            <div>
+                                <span class="ap-sample-label">Get results</span>
+                                <strong>GET /api/assessments/sessions/&lt;uuid&gt;/responses/</strong>
+                            </div>
+                            <button class="ap-btn-small" type="button" data-copy-target="#sampleCode2" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
                         </div>
-                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode2" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
-                    </div>
 <pre><code id="sampleCode2">{
   "status": "submitted",
   "overall_score": 84.2,
   "score_breakdown": {...},
   "behavioral_profile": {...}
 }</code></pre>
-                </article>
-                <article class="sample-card is-complete">
-                    <span class="step-badge">03</span>
-                    <div class="sample-card-header">
-                        <div>
-                            <p class="label">List categories</p>
-                            <strong>GET /api/assessments/categories/</strong>
+                    </article>
+                    <article class="ap-sample-card">
+                        <span class="ap-sample-num">03</span>
+                        <div class="ap-sample-header">
+                            <div>
+                                <span class="ap-sample-label">List categories</span>
+                                <strong>GET /api/assessments/categories/</strong>
+                            </div>
+                            <button class="ap-btn-small" type="button" data-copy-target="#sampleCode3" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
                         </div>
-                        <button class="btn btn-pill copy-trigger dark" type="button" data-copy-target="#sampleCode3" data-copy-label="Copy" data-copy-success="Copied!">Copy</button>
-                    </div>
 <pre><code id="sampleCode3">{
   "categories": [
     {"name": "Sales", "slug": "sales", "assessments": [...]}
   ]
 }</code></pre>
-                </article>
+                    </article>
+                </div>
             </div>
         </section>
 
+        {# Partners #}
         {% if partner_highlights %}
-        <section class="panel partner-panel panel-contained" id="section-partners">
-            <div class="section-heading align-left">
-                <p class="eyebrow">Partners shipping on Evalon</p>
+        <section class="ap-section ap-section--alt" id="section-partners">
+            <div class="ap-section-inner">
+                <p class="ap-eyebrow">Partners shipping on Evalon</p>
                 <h2>Trusted by talent platforms and GTM tooling.</h2>
-            </div>
-            <div class="partner-grid">
-                {% for partner in partner_highlights %}
-                <article>
-                    <p class="partner-name">{{ partner.name }}</p>
-                    <blockquote>{{ partner.quote }}</blockquote>
-                </article>
-                {% endfor %}
+                <div class="ap-partners">
+                    {% for partner in partner_highlights %}
+                    <article class="ap-partner-card">
+                        <p class="ap-partner-name">{{ partner.name }}</p>
+                        <blockquote>{{ partner.quote }}</blockquote>
+                    </article>
+                    {% endfor %}
+                </div>
             </div>
         </section>
         {% endif %}
 
-        <section class="panel changelog-panel panel-contained" id="section-changelog">
-            <div class="section-heading align-left">
-                <p class="eyebrow">Changelog</p>
+        {# Changelog #}
+        <section class="ap-section" id="section-changelog">
+            <div class="ap-section-inner">
+                <p class="ap-eyebrow">Changelog</p>
                 <h2>Always improving.</h2>
+                <ul class="ap-changelog">
+                    {% for item in changelog %}
+                    <li>
+                        <span class="ap-changelog-date">{{ item.date }}</span>
+                        <p>{{ item.entry }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
-            <ul class="changelog-list">
-                {% for item in changelog %}
-                <li>
-                    <span>{{ item.date }}</span>
-                    <p>{{ item.entry }}</p>
-                </li>
-                {% endfor %}
-            </ul>
         </section>
 
-        <section class="panel request-panel panel-contained" id="api-request">
-            <div class="request-intro">
-                <div class="request-copy">
-                    <p class="eyebrow">Access request</p>
-                    <h2>Request access</h2>
-                    <p class="lede">Need credentials? Tell us how you plan to use the API and we’ll send a token within one business day.</p>
-                </div>
-                <div class="request-note">
-                    <p class="label">What to include</p>
-                    <ul>
-                        <li>Describe your integration target (ATS, CRM, internal tooling).</li>
-                        <li>Share required assessment types or expected volume.</li>
-                        <li>List teammates who need read/write keys.</li>
-                    </ul>
+        {# Request form #}
+        <section class="ap-section ap-section--alt" id="api-request">
+            <div class="ap-section-inner">
+                <div class="ap-request-grid">
+                    <div class="ap-request-copy">
+                        <p class="ap-eyebrow">Access request</p>
+                        <h2>Request access</h2>
+                        <p class="ap-request-desc">Need credentials? Tell us how you plan to use the API and we'll send a token within one business day.</p>
+                        <div class="ap-request-note">
+                            <span class="ap-request-note-label">What to include</span>
+                            <ul>
+                                <li>Describe your integration target (ATS, CRM, internal tooling).</li>
+                                <li>Share required assessment types or expected volume.</li>
+                                <li>List teammates who need read/write keys.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <form method="post"
+                          class="ap-request-form"
+                          data-gtag-submit="generate_lead"
+                          data-gtag-category="lead"
+                          data-gtag-label="api_access_request"
+                          data-gtag-params='{"form_name":"api_access_request"}'>
+                        {% csrf_token %}
+                        <div class="ap-form-row">
+                            <div class="ap-form-field">
+                                {{ form.company_name.label_tag }}
+                                {{ form.company_name }}
+                                {% for error in form.company_name.errors %}
+                                <span class="ap-field-error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="ap-form-field">
+                                {{ form.contact_email.label_tag }}
+                                {{ form.contact_email }}
+                                {% for error in form.contact_email.errors %}
+                                <span class="ap-field-error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="ap-form-field">
+                            {{ form.use_case.label_tag }}
+                            {{ form.use_case }}
+                            {% for error in form.use_case.errors %}
+                            <span class="ap-field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <button class="ap-btn-primary" type="submit">Submit request</button>
+                    </form>
                 </div>
             </div>
-            <form method="post"
-                  class="form-stack request-form"
-                  data-gtag-submit="generate_lead"
-                  data-gtag-category="lead"
-                  data-gtag-label="api_access_request"
-                  data-gtag-params='{"form_name":"api_access_request"}'>
-                {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-field">
-                        {{ form.company_name.label_tag }}
-                        {{ form.company_name }}
-                        {% for error in form.company_name.errors %}
-                        <span class="field-error">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    <div class="form-field">
-                        {{ form.contact_email.label_tag }}
-                        {{ form.contact_email }}
-                        {% for error in form.contact_email.errors %}
-                        <span class="field-error">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="form-field">
-                    {{ form.use_case.label_tag }}
-                    {{ form.use_case }}
-                    {% for error in form.use_case.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <button class="btn btn-pill" type="submit">Submit request</button>
-            </form>
         </section>
     </main>
 </div>
