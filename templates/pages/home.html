@@ -188,91 +188,69 @@
         </section>
 
         {# FINAL CTA #}
-        <section class="cta panel-contained reveal" id="cta">
-            <div class="cta-card">
-                <p class="eyebrow">Ready to improve your hiring?</p>
-                <h2>Start using Evalon today</h2>
-                <p>Get started with our free plan or schedule a demo to see how Evalon can transform your hiring process.</p>
-                <div class="cta-highlights">
-                    <article>
-                        <p class="highlight-value">4.9/5</p>
-                        <p class="highlight-label">Customer satisfaction</p>
-                    </article>
-                    <article>
-                        <p class="highlight-value">10 min</p>
-                        <p class="highlight-label">Setup time</p>
-                    </article>
-                    <article>
-                        <p class="highlight-value">37%</p>
-                        <p class="highlight-label">Faster hiring</p>
-                    </article>
+        <section class="final-cta reveal" id="cta">
+            <div class="section-shell">
+                <div class="final-cta-grid">
+                    <div class="final-cta-text">
+                        <h2>Ready to hire with confidence?</h2>
+                        <p class="final-cta-desc">Start free — no credit card required. Set up your first assessment in under 10 minutes.</p>
+                        <ul class="final-cta-list">
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> All six assessment types included</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Automated scoring and reports</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited team members</li>
+                        </ul>
+                        <a class="final-cta-btn" href="{% url 'clients:signup' %}" data-gtag-click="final_cta_signup">Get Started Free</a>
+                    </div>
+                    <div class="final-cta-form-wrap">
+                        <form class="final-cta-form"
+                              method="post"
+                              action="{% url 'pages:home' %}#cta"
+                              data-gtag-submit="generate_lead"
+                              data-gtag-category="lead"
+                              data-gtag-label="home_demo_request">
+                            {% csrf_token %}
+                            <h3 class="final-cta-form-title">Request a demo</h3>
+                            {% if invite_form.non_field_errors %}
+                            <div class="form-error">
+                                {% for error in invite_form.non_field_errors %}
+                                <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-row">
+                                <div class="form-field">
+                                    {{ invite_form.full_name.label_tag }}
+                                    {{ invite_form.full_name }}
+                                    {% for error in invite_form.full_name.errors %}
+                                    <span class="field-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="form-field">
+                                    {{ invite_form.email.label_tag }}
+                                    {{ invite_form.email }}
+                                    {% for error in invite_form.email.errors %}
+                                    <span class="field-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-field">
+                                    {{ invite_form.company.label_tag }}
+                                    {{ invite_form.company }}
+                                </div>
+                                <div class="form-field">
+                                    {{ invite_form.focus_area.label_tag }}
+                                    {{ invite_form.focus_area }}
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                {{ invite_form.notes.label_tag }}
+                                {{ invite_form.notes }}
+                            </div>
+                            <button type="submit" class="final-cta-submit">Request a Demo</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="cta-checks">
-                    <ul>
-                        <li>Free plan available, no credit card required</li>
-                        <li>All assessment types included</li>
-                        <li>Unlimited team members</li>
-                    </ul>
-                    <ul>
-                        <li>Automated scoring and reports</li>
-                        <li>Dedicated support team</li>
-                        <li>Cancel anytime</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="cta-form-card">
-                <form class="cta-form"
-                      method="post"
-                      action="{% url 'pages:home' %}#cta"
-                      data-gtag-submit="generate_lead"
-                      data-gtag-category="lead"
-                      data-gtag-label="home_demo_request"
-                      data-gtag-params='{"form_name":"home_demo_request"}'>
-                    {% csrf_token %}
-                    <label>Request a demo</label>
-                    {% if invite_form.non_field_errors %}
-                    <div class="form-error">
-                        {% for error in invite_form.non_field_errors %}
-                        <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    <div class="form-row">
-                        <div class="form-field">
-                            {{ invite_form.full_name.label_tag }}
-                            {{ invite_form.full_name }}
-                            {% for error in invite_form.full_name.errors %}
-                            <span class="field-error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="form-field">
-                            {{ invite_form.email.label_tag }}
-                            {{ invite_form.email }}
-                            {% for error in invite_form.email.errors %}
-                            <span class="field-error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-field">
-                            {{ invite_form.company.label_tag }}
-                            {{ invite_form.company }}
-                        </div>
-                        <div class="form-field">
-                            {{ invite_form.focus_area.label_tag }}
-                            {{ invite_form.focus_area }}
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        {{ invite_form.notes.label_tag }}
-                        {{ invite_form.notes }}
-                    </div>
-                    <button type="submit"
-                            class="btn btn-pill"
-                            data-gtag-click="request_demo_button_click"
-                            data-gtag-category="lead"
-                            data-gtag-label="home_demo_request">Request a Demo</button>
-                </form>
             </div>
         </section>
     </main>
