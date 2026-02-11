@@ -111,37 +111,29 @@
             </div>
         </section>
 
-        {# OUTCOMES + SOCIAL PROOF - Combined #}
-        <section class="outcomes-v2" id="results">
+        {# SOCIAL PROOF — stats strip + clean testimonials #}
+        <section class="social-proof reveal" id="results">
             <div class="section-shell">
-                <div class="section-heading">
-                    <p class="eyebrow">Proven Results</p>
-                    <h2>Better hires, faster decisions, happier candidates</h2>
-                    <p class="lede">Teams using Evalon see measurable improvements across their hiring process.</p>
-                </div>
-                <div class="outcome-grid-v2">
-                    <article class="metric-card-v2">
-                        <p class="metric-value">37%</p>
-                        <p class="metric-label">Faster time-to-hire</p>
-                        <p class="muted small">Automated scoring cuts review time from days to minutes</p>
-                    </article>
-                    <article class="metric-card-v2">
-                        <p class="metric-value">4.8/5</p>
-                        <p class="metric-label">Candidate satisfaction</p>
-                        <p class="muted small">Clear instructions and progress tracking improve experience</p>
-                    </article>
-                    <article class="metric-card-v2">
-                        <p class="metric-value">2x</p>
-                        <p class="metric-label">Better hiring confidence</p>
-                        <p class="muted small">Structured scoring helps teams make data-driven decisions</p>
-                    </article>
+                <div class="stats-strip">
+                    <div class="stat-block">
+                        <span class="stat-num">37%</span>
+                        <span class="stat-lbl">Faster time-to-hire</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-num">4.8/5</span>
+                        <span class="stat-lbl">Candidate satisfaction</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-num">2x</span>
+                        <span class="stat-lbl">Hiring confidence</span>
+                    </div>
                 </div>
 
-                {# Customer Testimonials #}
                 <div class="testimonials-v2">
                     {% for testimonial in testimonials %}
                     <article class="testimonial-card-v2">
-                        <div class="testimonial-header">
+                        <blockquote class="testimonial-quote">"{{ testimonial.quote }}"</blockquote>
+                        <div class="testimonial-footer">
                             <div class="testimonial-avatar">
                                 <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
                             </div>
@@ -149,11 +141,7 @@
                                 <p class="testimonial-name">{{ testimonial.name }}</p>
                                 <p class="testimonial-role">{{ testimonial.role }}</p>
                             </div>
-                            <div class="testimonial-metric">
-                                <span class="pill subtle">{{ testimonial.metric }}</span>
-                            </div>
                         </div>
-                        <blockquote class="testimonial-quote">"{{ testimonial.quote }}"</blockquote>
                     </article>
                     {% endfor %}
                 </div>
