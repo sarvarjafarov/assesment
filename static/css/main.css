@@ -15833,60 +15833,66 @@ main {
 /* How It Works */
 .how-it-works {
     padding: 6rem 2rem;
-    background: #f8f9fa;
-}
-
-.how-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
-}
-
-.how-card {
     background: var(--color-white);
-    padding: 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
 }
 
-.how-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+.how-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 3.5rem;
+    position: relative;
 }
 
-.how-number {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--color-orange) 0%, #ff6b00 100%);
-    color: var(--color-white);
-    border-radius: 50%;
-    display: flex;
+/* Connecting line across all steps */
+.how-steps::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: calc(12.5% + 16px);
+    right: calc(12.5% + 16px);
+    height: 2px;
+    background: var(--color-border);
+}
+
+.how-step {
+    text-align: center;
+    padding: 0 1.5rem;
+    position: relative;
+}
+
+.how-step-num {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--color-orange);
+    background: var(--color-white);
+    color: var(--color-orange);
+    font-size: 0.9rem;
     font-weight: 700;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    z-index: 1;
 }
 
-.how-card h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
+.how-step-title {
+    font-size: 1.05rem;
+    font-weight: 700;
     color: var(--color-navy);
-    margin: 0 0 0.75rem;
+    margin: 0 0 0.5rem;
 }
 
-.how-description {
+.how-step-desc {
     color: var(--color-text-muted);
-    margin: 0 0 1rem;
-    font-size: 0.95rem;
-}
-
-.how-benefit {
+    font-size: 0.9rem;
+    line-height: 1.55;
     margin: 0;
-    line-height: 1.6;
-    font-size: 0.95rem;
+    max-width: 220px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Suite Section */
@@ -16606,7 +16612,15 @@ main {
         font-size: 1.1rem;
     }
 
-    .how-grid,
+    .how-steps {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.5rem 0;
+    }
+
+    .how-steps::before {
+        display: none;
+    }
+
     .suite-grid-v2 {
         grid-template-columns: 1fr;
     }
@@ -16658,6 +16672,14 @@ main {
     .orb-two {
         width: 220px;
         height: 220px;
+    }
+
+    .how-steps {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 

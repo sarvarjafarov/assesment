@@ -117,27 +117,23 @@ def home(request):
     features = [
         {
             "slug": "create",
-            "title": "1. Create project",
-            "description": "Choose an assessment and configure your project",
-            "benefit": "Pick from pre-built assessments for marketing, product, or behavioral roles. Set deadlines and customize instructions in minutes.",
+            "title": "Create project",
+            "description": "Pick an assessment, set deadlines, and customize instructions in minutes.",
         },
         {
             "slug": "invite",
-            "title": "2. Invite candidates",
-            "description": "Send assessment invitations to your candidates",
-            "benefit": "Candidates receive a clear email with instructions, timeline, and a link to start. They can work at their own pace with auto-save.",
+            "title": "Invite candidates",
+            "description": "Candidates get a clear email with a link to start at their own pace.",
         },
         {
             "slug": "review",
-            "title": "3. Auto-score & review",
-            "description": "See scored results with detailed breakdowns",
-            "benefit": "Evalon automatically scores submissions using structured rubrics. Review side-by-side comparisons and see who performed best.",
+            "title": "Auto-score & review",
+            "description": "Structured rubrics score every submission so you can compare side-by-side.",
         },
         {
             "slug": "decide",
-            "title": "4. Make decisions",
-            "description": "Advance top candidates or share reports",
-            "benefit": "Download clean reports for hiring managers. Track all decisions in one place with full audit trails.",
+            "title": "Make decisions",
+            "description": "Download clean reports and track all hiring decisions in one place.",
         },
     ]
 

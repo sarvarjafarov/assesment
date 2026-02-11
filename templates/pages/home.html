@@ -40,22 +40,20 @@
             <div class="hero-shape shape-dot shape-8"></div>
         </div>
 
-        {# HOW IT WORKS - New simplified section #}
+        {# HOW IT WORKS — clean horizontal steps #}
         <section class="how-it-works reveal" id="how-it-works">
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
-                    <p class="eyebrow">Simple Process</p>
-                    <h2>Four steps from candidate invite to hire decision</h2>
-                    <p class="lede">Evalon handles the heavy lifting so you can focus on finding great candidates.</p>
+                    <p class="eyebrow">How it works</p>
+                    <h2>From invite to hire in four simple steps</h2>
                 </div>
-                <div class="how-grid">
+                <div class="how-steps">
                     {% for feature in features %}
-                    <article class="how-card">
-                        <div class="how-number">{{ forloop.counter }}</div>
-                        <h3>{{ feature.title }}</h3>
-                        <p class="how-description">{{ feature.description }}</p>
-                        <p class="how-benefit">{{ feature.benefit }}</p>
-                    </article>
+                    <div class="how-step">
+                        <span class="how-step-num">{{ forloop.counter }}</span>
+                        <h3 class="how-step-title">{{ feature.title }}</h3>
+                        <p class="how-step-desc">{{ feature.description }}</p>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
