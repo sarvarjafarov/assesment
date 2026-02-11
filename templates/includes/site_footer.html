@@ -1,63 +1,71 @@
 {% load static %}
-<footer class="site-footer">
-    <div class="footer-shell">
-        <div class="footer-brand">
-            <a class="brand" href="{% url 'pages:home' %}">
-                <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
-                <span class="sr-only">Evalon</span>
-            </a>
-            <p>Assess marketing, product, and behavioral talent with a guided console for teams and candidates.</p>
-            <a class="btn btn-outline small" href="{% url 'clients:signup' %}" data-gtag-click="get_started_click">Get Started</a>
-        </div>
-        <nav class="footer-nav" aria-label="Footer navigation">
-            <div>
-                <p class="footer-heading">Platform</p>
-                <ul>
-                    <li><a href="#suite">Assessment suite</a></li>
-                    <li><a href="#workflow">How it works</a></li>
-                    <li><a href="#journey">Candidate experience</a></li>
-                </ul>
+<footer class="site-footer-v2">
+    <div class="footer-main">
+        <div class="footer-main-inner">
+            <div class="footer-brand-v2">
+                <a class="footer-logo" href="{% url 'pages:home' %}">
+                    <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
+                </a>
+                <p class="footer-tagline">Structured hiring assessments for modern teams. Evaluate real skills, reduce bias, and hire with confidence.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Twitter" class="footer-social-link">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                    <a href="#" aria-label="LinkedIn" class="footer-social-link">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    </a>
+                </div>
             </div>
-            <div>
-                <p class="footer-heading">Resources</p>
-                <ul>
-                    <li><a href="#resources">Blog &amp; insights</a></li>
-                    <li><a href="#caseStories">Customer stories</a></li>
-                    <li><a href="{% url 'marketing_assessments:api' %}">API docs</a></li>
-                </ul>
+            <nav class="footer-nav-v2" aria-label="Footer navigation">
+                <div class="footer-col">
+                    <p class="footer-col-heading">Platform</p>
+                    <ul>
+                        <li><a href="#assessments">Assessment suite</a></li>
+                        <li><a href="#how-it-works">How it works</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <p class="footer-col-heading">Resources</p>
+                    <ul>
+                        <li><a href="#resources">Blog &amp; insights</a></li>
+                        <li><a href="#results">Customer stories</a></li>
+                        <li><a href="{% url 'marketing_assessments:api' %}">API docs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <p class="footer-col-heading">Company</p>
+                    <ul>
+                        <li><a href="#cta">Contact us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="footer-subscribe">
+                <p class="footer-col-heading">Stay in the loop</p>
+                <p class="footer-subscribe-desc">Monthly updates on product releases and interview best practices.</p>
+                <form class="footer-subscribe-form" data-newsletter-form action="{% url 'pages:newsletter_subscribe' %}">
+                    <div class="footer-subscribe-field">
+                        <input type="email" name="email" placeholder="you@company.com" aria-label="Email address" required>
+                        <button type="submit"
+                                data-gtag-click="generate_lead"
+                                data-gtag-category="lead"
+                                data-gtag-label="footer_subscribe"
+                                data-gtag-params='{"form_name":"footer_subscribe"}'>Subscribe</button>
+                    </div>
+                </form>
+                <p class="footer-form-message" data-newsletter-message style="display: none;"></p>
             </div>
-            <div>
-                <p class="footer-heading">Company</p>
-                <ul>
-                    <li><a href="#cta">Contact us</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Security</a></li>
-                </ul>
-            </div>
-        </nav>
-        <div class="footer-newsletter">
-            <p class="footer-heading">Stay in the loop</p>
-            <p>Monthly updates on product releases and interview best practices.</p>
-            <form class="footer-form" data-newsletter-form action="{% url 'pages:newsletter_subscribe' %}">
-                <input type="email" name="email" placeholder="you@company.com" aria-label="Email address" required>
-                <button type="submit"
-                        data-gtag-click="generate_lead"
-                        data-gtag-category="lead"
-                        data-gtag-label="footer_subscribe"
-                        data-gtag-params='{"form_name":"footer_subscribe"}'>Subscribe</button>
-            </form>
-            <p class="footer-form-message" data-newsletter-message style="display: none;"></p>
         </div>
     </div>
-    <div class="footer-bottom">
-        <div class="footer-bottom-inner">
-            <span>© {% now "Y" %} Evalon</span>
-            <div class="footer-links">
+    <div class="footer-bar">
+        <div class="footer-bar-inner">
+            <span class="footer-copyright">&copy; {% now "Y" %} Evalon. All rights reserved.</span>
+            <div class="footer-legal">
                 <a href="#">Privacy Policy</a>
                 <a href="#">Terms of Service</a>
-                <a href="#resources">Resources</a>
             </div>
-            <span>Made with <span class="heart">♥</span> by Evalon</span>
         </div>
     </div>
 </footer>
