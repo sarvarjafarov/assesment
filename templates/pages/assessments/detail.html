@@ -31,87 +31,62 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='assessments' %}
     <main>
-        <div class="assessment-detail-shell">
-            {# Hero Section #}
-            <header class="assessment-detail-hero">
-                <div class="assessment-detail-hero-inner">
-                    <div class="hero-content">
-                        <div class="breadcrumb">
-                            <a href="{% url 'pages:assessment_list' %}">Assessment Library</a>
-                            <span>/</span>
-                            <span>{{ assessment.label }}</span>
+        <div class="ad-shell">
+            {# Hero #}
+            <header class="ad-hero">
+                <div class="ad-hero-inner">
+                    <div class="ad-breadcrumb">
+                        <a href="{% url 'pages:assessment_list' %}">Assessments</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span>{{ assessment.label }}</span>
+                    </div>
+                    {% if preview_mode %}
+                    <div class="ad-preview-banner">Preview mode — only visible with a valid preview link.</div>
+                    {% endif %}
+                    <span class="ad-label">{{ assessment.label }}</span>
+                    <h1 class="ad-title">{{ assessment.title }}</h1>
+                    {% if assessment.subtitle %}
+                    <p class="ad-subtitle">{{ assessment.subtitle }}</p>
+                    {% endif %}
+                    <p class="ad-summary">{{ assessment.summary }}</p>
+                    <div class="ad-meta-row">
+                        <div class="ad-meta-item">
+                            <span class="ad-meta-val">{{ assessment.duration_minutes }} min</span>
+                            <span class="ad-meta-lbl">Duration</span>
                         </div>
-                        {% if preview_mode %}
-                        <div class="preview-banner">
-                            <strong>Preview mode</strong>
-                            <span>Only visible with a valid preview link.</span>
+                        <div class="ad-meta-item">
+                            <span class="ad-meta-val">{{ assessment.question_count }}</span>
+                            <span class="ad-meta-lbl">Questions</span>
                         </div>
-                        {% endif %}
-                        <span class="pill">{{ assessment.label }}</span>
-                        <h1>{{ assessment.title }}</h1>
-                        {% if assessment.subtitle %}
-                        <p class="subtitle">{{ assessment.subtitle }}</p>
-                        {% endif %}
-                        <p class="summary">{{ assessment.summary }}</p>
-                        <div class="hero-stats">
-                            <div class="stat">
-                                <span class="stat-value">{{ assessment.duration_minutes }} min</span>
-                                <span class="stat-label">Duration</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value">{{ assessment.question_count }}</span>
-                                <span class="stat-label">Questions</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value">{{ assessment.get_difficulty_level_display }}</span>
-                                <span class="stat-label">Difficulty</span>
-                            </div>
-                        </div>
-                        <div class="hero-cta">
-                            <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
-                               class="btn btn-pill"
-                               data-gtag-click="assessment_detail_cta_click"
-                               data-gtag-category="engagement"
-                               data-gtag-label="{{ assessment.slug }}"
-                               data-gtag-params='{"section":"hero"}'>{{ assessment.cta_label }}</a>
-                            <a href="{% url 'pages:contact' %}"
-                               class="btn btn-outline-white"
-                               data-gtag-click="contact_sales_click"
-                               data-gtag-category="engagement"
-                               data-gtag-label="assessment_contact_sales"
-                               data-gtag-params='{"assessment":"{{ assessment.slug }}"}'>Contact sales</a>
+                        <div class="ad-meta-item">
+                            <span class="ad-meta-val">{{ assessment.get_difficulty_level_display }}</span>
+                            <span class="ad-meta-lbl">Difficulty</span>
                         </div>
                     </div>
-                    <div class="hero-visual">
-                        {% if assessment.featured_image %}
-                        <figure class="hero-image">
-                            <img src="{{ assessment.featured_image }}" alt="{{ assessment.title }}">
-                        </figure>
-                        {% else %}
-                        <div class="hero-icon-large">
-                            {% if assessment.icon_svg %}
-                            {{ assessment.icon_svg|safe }}
-                            {% else %}
-                            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                                <path d="M9 12h6M9 16h6"></path>
-                            </svg>
-                            {% endif %}
-                        </div>
-                        {% endif %}
+                    <div class="ad-hero-actions">
+                        <a class="ad-btn-primary"
+                           href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
+                           data-gtag-click="assessment_detail_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ assessment.slug }}">{{ assessment.cta_label }}</a>
+                        <a class="ad-btn-secondary"
+                           href="{% url 'pages:contact' %}"
+                           data-gtag-click="contact_sales_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="assessment_contact_sales">Contact sales</a>
                     </div>
                 </div>
             </header>
 
-            {# Overview Section #}
+            {# Overview #}
             {% if assessment.description or assessment.overview_content %}
-            <section class="assessment-section" id="overview">
-                <div class="section-content">
-                    <h2>Overview</h2>
+            <section class="ad-section" id="overview">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Overview</h2>
                     {% if assessment.overview_content %}
-                    <div class="rich-content">{{ assessment.overview_content|safe }}</div>
+                    <div class="ad-prose">{{ assessment.overview_content|safe }}</div>
                     {% else %}
-                    <p>{{ assessment.description }}</p>
+                    <div class="ad-prose"><p>{{ assessment.description }}</p></div>
                     {% endif %}
                 </div>
             </section>
@@ -119,13 +94,13 @@
 
             {# Focus Areas #}
             {% if assessment.focus_areas %}
-            <section class="assessment-section bg-light" id="focus">
-                <div class="section-content">
-                    <h2>Focus Areas</h2>
-                    <p class="section-lede">This assessment covers the following key areas to evaluate candidate proficiency.</p>
-                    <div class="focus-tags">
+            <section class="ad-section ad-section--alt" id="focus">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Focus Areas</h2>
+                    <p class="ad-section-desc">Key areas evaluated in this assessment.</p>
+                    <div class="ad-tags">
                         {% for area in assessment.focus_areas %}
-                        <span class="focus-tag">{{ area }}</span>
+                        <span class="ad-tag">{{ area }}</span>
                         {% endfor %}
                     </div>
                 </div>
@@ -134,16 +109,16 @@
 
             {# Skills Tested #}
             {% if assessment.skills_tested %}
-            <section class="assessment-section" id="skills">
-                <div class="section-content">
-                    <h2>Skills Tested</h2>
-                    <p class="section-lede">Each candidate is evaluated across these core competencies.</p>
-                    <div class="skills-grid">
+            <section class="ad-section" id="skills">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Skills Tested</h2>
+                    <p class="ad-section-desc">Core competencies evaluated for each candidate.</p>
+                    <div class="ad-skills">
                         {% for skill in assessment.skills_tested %}
-                        <article class="skill-card">
+                        <div class="ad-skill">
                             <h3>{{ skill.name }}</h3>
                             <p>{{ skill.description }}</p>
-                        </article>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -152,19 +127,19 @@
 
             {# Sample Questions #}
             {% if assessment.sample_questions %}
-            <section class="assessment-section bg-light" id="samples">
-                <div class="section-content">
-                    <h2>Sample Questions</h2>
-                    <p class="section-lede">Get a preview of the types of questions candidates will encounter.</p>
-                    <div class="assessment-samples-list">
+            <section class="ad-section ad-section--alt" id="samples">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Sample Questions</h2>
+                    <p class="ad-section-desc">Preview the types of questions candidates encounter.</p>
+                    <div class="ad-samples">
                         {% for sample in assessment.sample_questions %}
-                        <article class="assessment-sample-card">
-                            <div class="sample-number">{{ forloop.counter }}</div>
-                            <div class="sample-body">
-                                <span class="sample-type-badge">{{ sample.type|default:"Scenario" }}</span>
-                                <p class="sample-question-text">{{ sample.question }}</p>
+                        <div class="ad-sample">
+                            <span class="ad-sample-num">{{ forloop.counter }}</span>
+                            <div class="ad-sample-body">
+                                <span class="ad-sample-type">{{ sample.type|default:"Scenario" }}</span>
+                                <p>{{ sample.question }}</p>
                             </div>
-                        </article>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -173,24 +148,24 @@
 
             {# Scoring Rubric #}
             {% if assessment.scoring_rubric %}
-            <section class="assessment-section" id="scoring">
-                <div class="section-content">
-                    <h2>Scoring Methodology</h2>
-                    <div class="rich-content">{{ assessment.scoring_rubric|linebreaks }}</div>
+            <section class="ad-section" id="scoring">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Scoring Methodology</h2>
+                    <div class="ad-prose">{{ assessment.scoring_rubric|linebreaks }}</div>
                 </div>
             </section>
             {% endif %}
 
             {# Stats #}
             {% if assessment.stats %}
-            <section class="assessment-section bg-gradient" id="stats">
-                <div class="section-content">
-                    <h2 class="stats-title">Assessment at a Glance</h2>
-                    <div class="stats-grid">
+            <section class="ad-section ad-section--alt" id="stats">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">At a Glance</h2>
+                    <div class="ad-stats-row">
                         {% for stat in assessment.stats %}
-                        <div class="stat-box">
-                            <span class="stat-value">{{ stat.value }}</span>
-                            <span class="stat-label">{{ stat.label }}</span>
+                        <div class="ad-stat">
+                            <span class="ad-stat-val">{{ stat.value }}</span>
+                            <span class="ad-stat-lbl">{{ stat.label }}</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -200,24 +175,18 @@
 
             {# Use Cases #}
             {% if assessment.use_cases %}
-            <section class="assessment-section" id="use-cases">
-                <div class="section-content">
-                    <h2>When to Use This Assessment</h2>
-                    <p class="section-lede">Common hiring scenarios where this assessment provides the most value.</p>
-                    <div class="use-cases-grid">
+            <section class="ad-section" id="use-cases">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">When to Use This Assessment</h2>
+                    <div class="ad-usecases">
                         {% for case in assessment.use_cases %}
-                        <article class="use-case-card">
-                            <div class="use-case-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                </svg>
-                            </div>
-                            <div class="use-case-content">
+                        <div class="ad-usecase">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div>
                                 <h3>{{ case.title }}</h3>
                                 <p>{{ case.description }}</p>
                             </div>
-                        </article>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -226,14 +195,14 @@
 
             {# FAQs #}
             {% if assessment.faqs %}
-            <section class="assessment-section bg-light" id="faqs">
-                <div class="section-content">
-                    <h2>Frequently Asked Questions</h2>
-                    <div class="faq-list">
+            <section class="ad-section ad-section--alt" id="faqs">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Frequently Asked Questions</h2>
+                    <div class="ad-faqs">
                         {% for faq in assessment.faqs %}
-                        <details class="faq-item">
+                        <details class="ad-faq">
                             <summary>{{ faq.question }}</summary>
-                            <div class="faq-answer">{{ faq.answer }}</div>
+                            <div class="ad-faq-answer">{{ faq.answer }}</div>
                         </details>
                         {% endfor %}
                     </div>
@@ -241,49 +210,46 @@
             </section>
             {% endif %}
 
-            {# Final CTA #}
-            <section class="assessment-cta">
-                <div class="cta-content">
-                    <h2>Ready to assess candidates with {{ assessment.label }}?</h2>
-                    <p>Start your free trial and send assessments to candidates in minutes.</p>
-                    <div class="cta-buttons">
-                        <a href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
-                           class="btn btn-pill"
+            {# CTA #}
+            <section class="ad-cta">
+                <div class="ad-cta-inner">
+                    <h2>Ready to assess {{ assessment.label }} candidates?</h2>
+                    <p>Start free and send assessments in minutes.</p>
+                    <div class="ad-cta-actions">
+                        <a class="ad-btn-primary"
+                           href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
                            data-gtag-click="assessment_detail_cta_click"
                            data-gtag-category="engagement"
-                           data-gtag-label="{{ assessment.slug }}"
-                           data-gtag-params='{"section":"footer"}'>{{ assessment.cta_label }}</a>
-                        <a href="{% url 'pages:contact' %}"
-                           class="btn btn-outline-white"
+                           data-gtag-label="{{ assessment.slug }}">{{ assessment.cta_label }}</a>
+                        <a class="ad-btn-secondary"
+                           href="{% url 'pages:contact' %}"
                            data-gtag-click="contact_sales_click"
                            data-gtag-category="engagement"
-                           data-gtag-label="assessment_contact_sales_footer"
-                           data-gtag-params='{"assessment":"{{ assessment.slug }}"}'>Talk to sales</a>
+                           data-gtag-label="assessment_contact_sales_footer">Talk to sales</a>
                     </div>
                 </div>
             </section>
 
-            {# Related Assessments #}
+            {# Related #}
             {% if related_assessments %}
-            <section class="assessment-section" id="related">
-                <div class="section-content">
-                    <h2>Explore More Assessments</h2>
-                    <p class="section-lede">Discover other assessments that might fit your hiring needs.</p>
-                    <div class="related-grid">
+            <section class="ad-section" id="related">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Explore More Assessments</h2>
+                    <div class="ad-related">
                         {% for related in related_assessments %}
-                        <article class="related-card">
-                            <span class="pill subtle">{{ related.label }}</span>
-                            <h3><a href="{{ related.get_absolute_url }}"
-                                    data-gtag-click="related_assessment_click"
-                                    data-gtag-category="engagement"
-                                    data-gtag-label="{{ related.slug }}"
-                                    data-gtag-params='{"assessment":"{{ related.slug }}","source":"related_list"}'>{{ related.title }}</a></h3>
-                            <p>{{ related.summary|truncatewords:20 }}</p>
-                            <div class="related-meta">
+                        <a class="ad-related-card" href="{{ related.get_absolute_url }}"
+                           data-gtag-click="related_assessment_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ related.slug }}">
+                            <span class="ad-related-label">{{ related.label }}</span>
+                            <h3>{{ related.title }}</h3>
+                            <p>{{ related.summary|truncatewords:18 }}</p>
+                            <div class="ad-related-meta">
                                 <span>{{ related.duration_minutes }} min</span>
-                                <span>{{ related.question_count }} questions</span>
+                                <span class="al-meta-dot"></span>
+                                <span>{{ related.question_count }} Qs</span>
                             </div>
-                        </article>
+                        </a>
                         {% endfor %}
                     </div>
                 </div>
