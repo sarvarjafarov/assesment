@@ -15762,7 +15762,7 @@ main {
 
 /* Headline — large bold with accent word */
 .hero-v2 .hero-title {
-    font-size: clamp(3rem, 6vw, 4.5rem);
+    font-size: clamp(2.4rem, 5vw, 3.5rem);
     font-weight: 800;
     color: var(--color-navy);
     margin: 0 0 1.5rem;
@@ -16147,6 +16147,152 @@ main {
     75% { transform: translate(-15px, 25px) scale(1.05); }
 }
 
+/* Floating Animated Shapes */
+.hero-shape {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.shape-circle-outline {
+    border-radius: 50%;
+    border: 2px solid rgba(255, 158, 44, 0.25);
+    background: transparent;
+}
+
+.shape-dot {
+    border-radius: 50%;
+    background: rgba(255, 148, 20, 0.35);
+}
+
+.shape-ring {
+    border-radius: 50%;
+    border: 2px solid rgba(14, 20, 40, 0.08);
+    background: transparent;
+}
+
+/* Individual shape positions & sizes */
+.shape-1 {
+    width: 44px;
+    height: 44px;
+    top: 18%;
+    left: 8%;
+    animation: drift-1 14s ease-in-out infinite;
+}
+
+.shape-2 {
+    width: 10px;
+    height: 10px;
+    top: 28%;
+    right: 12%;
+    animation: drift-2 11s ease-in-out infinite;
+}
+
+.shape-3 {
+    width: 60px;
+    height: 60px;
+    bottom: 30%;
+    right: 6%;
+    animation: drift-3 16s ease-in-out infinite;
+}
+
+.shape-4 {
+    width: 8px;
+    height: 8px;
+    top: 55%;
+    left: 15%;
+    animation: drift-4 9s ease-in-out infinite;
+}
+
+.shape-5 {
+    width: 32px;
+    height: 32px;
+    bottom: 18%;
+    right: 18%;
+    animation: drift-5 13s ease-in-out infinite;
+}
+
+.shape-6 {
+    width: 6px;
+    height: 6px;
+    top: 15%;
+    right: 25%;
+    animation: drift-6 10s ease-in-out infinite;
+}
+
+.shape-7 {
+    width: 48px;
+    height: 48px;
+    bottom: 22%;
+    left: 10%;
+    animation: drift-7 15s ease-in-out infinite;
+}
+
+.shape-8 {
+    width: 12px;
+    height: 12px;
+    top: 40%;
+    left: 30%;
+    animation: drift-8 12s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.7; }
+    25% { transform: translate(30px, -20px) rotate(45deg); opacity: 1; }
+    50% { transform: translate(-15px, 30px) rotate(90deg); opacity: 0.5; }
+    75% { transform: translate(20px, 10px) rotate(135deg); opacity: 0.8; }
+}
+
+@keyframes drift-2 {
+    0%, 100% { transform: translate(0, 0); opacity: 0.6; }
+    33% { transform: translate(-25px, 35px); opacity: 1; }
+    66% { transform: translate(20px, -15px); opacity: 0.4; }
+}
+
+@keyframes drift-3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.5; }
+    25% { transform: translate(-20px, -25px) rotate(-30deg); opacity: 0.8; }
+    50% { transform: translate(25px, 15px) rotate(-60deg); opacity: 0.4; }
+    75% { transform: translate(-10px, 30px) rotate(-90deg); opacity: 0.7; }
+}
+
+@keyframes drift-4 {
+    0%, 100% { transform: translate(0, 0); opacity: 0.8; }
+    33% { transform: translate(35px, -25px); opacity: 0.4; }
+    66% { transform: translate(-20px, 20px); opacity: 1; }
+}
+
+@keyframes drift-5 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.6; }
+    33% { transform: translate(20px, 25px) rotate(60deg); opacity: 0.9; }
+    66% { transform: translate(-25px, -10px) rotate(120deg); opacity: 0.4; }
+}
+
+@keyframes drift-6 {
+    0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+    50% { transform: translate(-30px, 25px); opacity: 1; }
+}
+
+@keyframes drift-7 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.4; }
+    25% { transform: translate(15px, -30px) rotate(40deg); opacity: 0.7; }
+    50% { transform: translate(-25px, -10px) rotate(80deg); opacity: 0.3; }
+    75% { transform: translate(20px, 20px) rotate(120deg); opacity: 0.6; }
+}
+
+@keyframes drift-8 {
+    0%, 100% { transform: translate(0, 0); opacity: 0.7; }
+    33% { transform: translate(-20px, -30px); opacity: 0.3; }
+    66% { transform: translate(30px, 15px); opacity: 1; }
+}
+
+/* Hide smaller shapes on mobile */
+@media (max-width: 640px) {
+    .shape-3, .shape-5, .shape-7 {
+        display: none;
+    }
+}
+
 /* ========================================================================
    AUTH COMMON PANELS
    ======================================================================== */
@@ -16453,7 +16599,7 @@ main {
     }
 
     .hero-v2 .hero-title {
-        font-size: clamp(2.2rem, 5vw, 3rem);
+        font-size: clamp(2rem, 4.5vw, 2.8rem);
     }
 
     .hero-v2 .hero-subtitle {
