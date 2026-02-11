@@ -4,52 +4,51 @@
 {% block title %}Client Login · Evalon{% endblock %}
 {% block meta_description %}Sign in to your Evalon client workspace to invite candidates, review projects, and manage assessments.{% endblock %}
 {% block content %}
-<div class="page-shell apply-page"
+<div class="page-shell"
      data-gtag-load="login_view"
      data-gtag-category="lifecycle"
      data-gtag-label="client_portal_login"
      data-gtag-params='{"stage":"form_view"}'>
     {% include 'includes/site_header.html' %}
 
-    <main class="apply-main auth-main">
-        <section class="panel auth-panel">
-            <p class="eyebrow">Client portal</p>
-            <h1>Sign in to your workspace</h1>
-            <p class="lede">Use the email associated with your approved Evalon account.</p>
+    <main class="lg-main">
+        <section class="lg-card">
+            <p class="lg-eyebrow">Client portal</p>
+            <h1 class="lg-title">Sign in to your workspace</h1>
+            <p class="lg-desc">Use the email associated with your approved Evalon account.</p>
+
             <form method="post"
-                  class="form-stack"
+                  class="lg-form"
                   data-gtag-submit="login"
                   data-gtag-category="engagement"
                   data-gtag-label="client_portal_login"
                   data-gtag-params='{"method":"client_portal"}'>
                 {% csrf_token %}
                 {% if form.non_field_errors %}
-                <div class="form-error">
+                <div class="lg-error">
                     {% for error in form.non_field_errors %}
                     <p>{{ error }}</p>
                     {% endfor %}
                 </div>
                 {% endif %}
                 {% for field in form %}
-                <div class="form-field">
+                <div class="lg-field">
                     {{ field.label_tag }}
                     {{ field }}
                     {% for error in field.errors %}
-                    <span class="field-error">{{ error }}</span>
+                    <span class="lg-field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
                 {% endfor %}
-                <button class="btn btn-pill" type="submit">Access dashboard</button>
-                <p class="muted mt-3"><a class="link" href="{% url 'password_reset' %}">Forgot your password?</a></p>
+                <button class="lg-btn" type="submit">Access dashboard</button>
+                <p class="lg-forgot"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
             </form>
 
-            <div class="social-auth-divider">
-                <span>or continue with</span>
-            </div>
+            <div class="lg-divider"><span>or continue with</span></div>
 
-            <div class="social-auth-buttons">
-                <a href="{% provider_login_url 'google' %}" class="btn btn-social btn-google">
-                    <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20">
+            <div class="lg-social">
+                <a href="{% provider_login_url 'google' %}" class="lg-social-btn lg-social-google">
+                    <svg class="lg-social-icon" viewBox="0 0 24 24" width="20" height="20">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -57,18 +56,17 @@
                     </svg>
                     Continue with Google
                 </a>
-                <a href="{% provider_login_url 'linkedin_oauth2' %}" class="btn btn-social btn-linkedin">
-                    <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20">
-                        <path fill="#0A66C2" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                <a href="{% provider_login_url 'linkedin_oauth2' %}" class="lg-social-btn lg-social-linkedin">
+                    <svg class="lg-social-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                     </svg>
                     Continue with LinkedIn
                 </a>
             </div>
 
-            <p class="muted">Need an account? <a class="link" href="{% url 'clients:signup' %}">Apply for access</a>.</p>
+            <p class="lg-footer-text">Need an account? <a href="{% url 'clients:signup' %}">Apply for access</a>.</p>
         </section>
     </main>
-
 </div>
 {% endblock %}
 {% block site_footer %}
