@@ -6,30 +6,30 @@
     {% include 'includes/site_header.html' %}
 
     <main>
-        {# HERO SECTION - Simplified with animated orbs #}
+        {# HERO SECTION — Minimal sira-style with soft orbs #}
         <div class="hero-wrapper">
             <section class="hero-v2 reveal">
                 <div class="hero-v2-inner">
-                    <div class="hero-badge">{{ hero_content.badge }}</div>
-                    <h1 class="hero-title">{{ hero_content.title }}</h1>
+                    <a class="hero-badge" href="#how-it-works">
+                        <span class="hero-badge-dot"></span>
+                        {{ hero_content.badge }}
+                        <svg class="hero-badge-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+                    <h1 class="hero-title">
+                        {{ hero_content.title }}<br>
+                        {% if hero_content.title_accent %}<span class="hero-title-accent">{{ hero_content.title_accent }}</span>{% endif %}
+                    </h1>
                     <p class="hero-subtitle">{{ hero_content.subtitle }}</p>
                     <div class="hero-cta">
-                        <a class="btn btn-pill" href="{{ hero_content.primary_url }}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
-                        <a class="btn btn-outline" href="{{ hero_content.secondary_url }}" data-gtag-click="hero_secondary_click" data-gtag-category="engagement" data-gtag-label="hero_secondary" data-gtag-params='{"cta":"hero_secondary"}'>{{ hero_content.secondary_label }}</a>
+                        <a class="hero-btn-outline" href="{{ hero_content.primary_url }}" data-gtag-click="get_started_click">{{ hero_content.primary_label }}</a>
                     </div>
-                    <div class="hero-trust">
-                        <p class="muted small">Trusted by hiring teams at</p>
-                        <div class="trust-logos">
-                            <span>Stripe</span>
-                            <span>Lattice</span>
-                            <span>Notion</span>
-                            <span>Atlassian</span>
-                        </div>
-                    </div>
+                    <a class="hero-secondary-link" href="{{ hero_content.secondary_link_url }}" data-gtag-click="hero_secondary_click" data-gtag-category="engagement" data-gtag-label="hero_secondary">{{ hero_content.secondary_link_label }}</a>
                 </div>
             </section>
             <div class="hero-orb orb-one"></div>
             <div class="hero-orb orb-two"></div>
+            <div class="hero-orb orb-three"></div>
+            <div class="hero-orb orb-four"></div>
         </div>
 
         {# HOW IT WORKS - New simplified section #}

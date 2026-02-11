@@ -24,12 +24,13 @@ def home(request):
     """Render the marketing landing page."""
     hero_content = {
         "badge": "Hiring Assessment Platform",
-        "title": "Hire better candidates with structured skill assessments",
-        "subtitle": "Pre-built tests for marketing, product, behavioral, design, HR, and finance roles with automated scoring, progress tracking, and clear reports your team can trust.",
-        "primary_label": "Start free trial",
+        "title": "Hire better candidates with",
+        "title_accent": "structured assessments",
+        "subtitle": "Pre-built skill tests for every role \u2014 with automated scoring, progress tracking, and reports your team can trust.",
+        "primary_label": "Get Started Free",
         "primary_url": reverse("clients:signup"),
-        "secondary_label": "See how it works",
-        "secondary_url": "#how-it-works",
+        "secondary_link_label": "See how it works \u2192",
+        "secondary_link_url": "#how-it-works",
     }
 
     suite_heading = {
@@ -265,11 +266,12 @@ def home(request):
             {
                 "badge": hero_block.badge or hero_content["badge"],
                 "title": hero_block.title or hero_content["title"],
+                # title_accent not yet CMS-overridable
                 "subtitle": hero_block.body or hero_content["subtitle"],
                 "primary_label": hero_block.cta_label or hero_content["primary_label"],
                 "primary_url": hero_block.cta_url or hero_content["primary_url"],
-                "secondary_label": hero_block.secondary_cta_label or hero_content["secondary_label"],
-                "secondary_url": hero_block.secondary_cta_url or hero_content["secondary_url"],
+                "secondary_link_label": hero_block.secondary_cta_label or hero_content["secondary_link_label"],
+                "secondary_link_url": hero_block.secondary_cta_url or hero_content["secondary_link_url"],
             }
         )
 
