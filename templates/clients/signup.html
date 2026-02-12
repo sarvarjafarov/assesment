@@ -3,273 +3,241 @@
 {% block title %}Client Signup · Evalon{% endblock %}
 {% block meta_description %}Apply for an Evalon client workspace and request marketing, product, or behavioral assessments for your team.{% endblock %}
 {% block content %}
-<div class="page-shell apply-page"
+<div class="page-shell"
      data-gtag-load="sign_up_start"
      data-gtag-category="lifecycle"
      data-gtag-label="client_signup_flow"
      data-gtag-params='{"stage":"form_view","method":"client_portal"}'>
     {% include 'includes/site_header.html' %}
-    <main class="apply-main">
-    <section class="panel request-panel request-panel--glass panel-contained">
-        <div class="request-intro">
-            <div class="request-copy">
-                <p class="eyebrow">Become a hiring partner</p>
-                <h1>Create your client workspace</h1>
-                <p class="lede">Tell us about your company, how large your talent team is, and which assessments you need. We'll review within one business day.</p>
-                <p class="signup-login-link">Already have an account? <a href="{% url 'clients:login' %}">Sign in here</a></p>
 
-                <div class="social-auth-section">
-                    <div class="social-auth-divider social-auth-divider--light">
-                        <span>or sign up with</span>
-                    </div>
-                    <div class="social-auth-buttons social-auth-buttons--horizontal">
-                        <a href="{% provider_login_url 'google' %}" class="btn btn-social btn-google">
-                            <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            Google
-                        </a>
-                        <a href="{% provider_login_url 'linkedin_oauth2' %}" class="btn btn-social btn-linkedin">
-                            <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20">
-                                <path fill="#0A66C2" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                            </svg>
-                            LinkedIn
-                        </a>
-                    </div>
+    <main class="su-main">
+        <div class="su-header">
+            <p class="su-eyebrow">Become a hiring partner</p>
+            <h1 class="su-title">Create your client workspace</h1>
+            <p class="su-desc">Tell us about your company, how large your talent team is, and which assessments you need. We'll review within one business day.</p>
+
+            <div class="su-social">
+                <div class="su-divider"><span>or sign up with</span></div>
+                <div class="su-social-row">
+                    <a href="{% provider_login_url 'google' %}" class="lg-social-btn lg-social-google">
+                        <svg class="lg-social-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </a>
+                    <a href="{% provider_login_url 'linkedin_oauth2' %}" class="lg-social-btn lg-social-linkedin">
+                        <svg class="lg-social-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        Continue with LinkedIn
+                    </a>
                 </div>
             </div>
-            <div class="request-note">
-                <p class="label">What happens next?</p>
-                <ul>
-                    <li>We verify that you're using a company domain.</li>
-                    <li>Our team approves the assessments you requested.</li>
-                    <li>You'll receive an approval email with dashboard access.</li>
-                </ul>
+
+            <p class="su-login-link">Already have an account? <a href="{% url 'clients:login' %}">Sign in here</a></p>
+        </div>
+
+        <div class="su-steps">
+            <div class="su-step">
+                <span class="su-step-num">1</span>
+                <span>We verify your company domain</span>
+            </div>
+            <div class="su-step">
+                <span class="su-step-num">2</span>
+                <span>Our team approves your assessments</span>
+            </div>
+            <div class="su-step">
+                <span class="su-step-num">3</span>
+                <span>You get dashboard access via email</span>
             </div>
         </div>
+
         <form method="post"
               enctype="multipart/form-data"
-              class="request-form"
+              class="su-form"
               data-gtag-submit="sign_up"
               data-gtag-category="engagement"
               data-gtag-label="client_portal_signup"
               data-gtag-params='{"method":"client_portal","form_name":"client_signup"}'>
             {% csrf_token %}
 
-            {# Personal Information Section #}
-            <div class="form-section">
-                <h3 class="form-section-title">Personal & Company Information</h3>
-                <div class="form-row">
-                    <div class="form-field">
-                        <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }} <span class="required">*</span></label>
+            <fieldset class="su-section">
+                <legend class="su-section-title">Personal & Company Information</legend>
+                <div class="su-row">
+                    <div class="su-field">
+                        <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }} <span class="su-req">*</span></label>
                         {{ form.full_name }}
                         {% for error in form.full_name.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
-                    <div class="form-field">
-                        <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }} <span class="required">*</span></label>
+                    <div class="su-field">
+                        <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }} <span class="su-req">*</span></label>
                         {{ form.company_name }}
                         {% for error in form.company_name.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                 </div>
-                <div class="form-row single">
-                    <div class="form-field">
+                <div class="su-row su-row--single">
+                    <div class="su-field">
                         {{ form.logo.label_tag }}
                         {{ form.logo }}
-                        {% if form.logo.help_text %}<small class="field-help">{{ form.logo.help_text }}</small>{% endif %}
+                        {% if form.logo.help_text %}<small class="su-help">{{ form.logo.help_text }}</small>{% endif %}
                         {% for error in form.logo.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
+            </fieldset>
 
-            {# Contact Information Section #}
-            <div class="form-section">
-                <h3 class="form-section-title">Contact Information</h3>
-                <div class="form-row">
-                    <div class="form-field">
-                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="required">*</span></label>
+            <fieldset class="su-section">
+                <legend class="su-section-title">Contact Information</legend>
+                <div class="su-row">
+                    <div class="su-field">
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="su-req">*</span></label>
                         {{ form.email }}
-                        <small class="field-help">We'll send a verification link to this email address</small>
+                        <small class="su-help">We'll send a verification link to this email address</small>
                         {% for error in form.email.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
-                    <div class="form-field">
-                        <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }} <span class="required">*</span></label>
+                    <div class="su-field">
+                        <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }} <span class="su-req">*</span></label>
                         {{ form.phone_number }}
-                        <small class="field-help">International format: +1 (555) 123-4567</small>
+                        <small class="su-help">International format: +1 (555) 123-4567</small>
                         {% for error in form.phone_number.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
+            </fieldset>
 
-            {# Company Details Section #}
-            <div class="form-section">
-                <h3 class="form-section-title">Company Details</h3>
-                <div class="form-row single">
-                    <div class="form-field">
-                        <label for="{{ form.employee_size.id_for_label }}">{{ form.employee_size.label }} <span class="required">*</span></label>
+            <fieldset class="su-section">
+                <legend class="su-section-title">Company Details</legend>
+                <div class="su-row su-row--single">
+                    <div class="su-field">
+                        <label for="{{ form.employee_size.id_for_label }}">{{ form.employee_size.label }} <span class="su-req">*</span></label>
                         {{ form.employee_size }}
                         {% for error in form.employee_size.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                 </div>
-                <div class="form-row single">
-                    <div class="form-field">
+                <div class="su-row su-row--single">
+                    <div class="su-field">
                         {{ form.objectives.label_tag }}
-                        <div class="textarea-wrapper">
+                        <div class="su-textarea-wrap">
                             {{ form.objectives }}
-                            <div class="char-counter">
-                                <span class="char-count">0</span> / 500
+                            <div class="su-char-counter">
+                                <span class="su-char-count">0</span> / 500
                             </div>
                         </div>
-                        {% if form.objectives.help_text %}<small class="field-help">{{ form.objectives.help_text }}</small>{% endif %}
+                        {% if form.objectives.help_text %}<small class="su-help">{{ form.objectives.help_text }}</small>{% endif %}
                         {% for error in form.objectives.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
-            {# Assessments Section #}
-            <div class="form-section">
-                <h3 class="form-section-title">Assessment Selection</h3>
-                <div class="assessment-section">
-                    <div class="assessment-section__header">
-                        <label for="{{ form.requested_assessments.id_for_label }}">Select assessments <span class="required">*</span></label>
-                        <p>Choose one or more products to pilot with your team.</p>
-                    </div>
-                    <div class="assessment-grid">
-                        {% for checkbox in form.requested_assessments %}
-                        {% with detail=assessment_details|dict_get:checkbox.data.value %}
-                        <label class="assessment-card">
-                            {{ checkbox.tag }}
-                            <div>
-                                <strong>{{ detail.label|default:checkbox.choice_label }}</strong>
-                                <p>{{ detail.description|default:"Pick this assessment to evaluate candidates in this discipline." }}</p>
-                            </div>
-                        </label>
-                        {% endwith %}
-                        {% endfor %}
-                    </div>
-                    {% for error in form.requested_assessments.errors %}
-                    <span class="field-error">{{ error }}</span>
+            </fieldset>
+
+            <fieldset class="su-section">
+                <legend class="su-section-title">Assessment Selection</legend>
+                <div class="su-assess-header">
+                    <label for="{{ form.requested_assessments.id_for_label }}">Select assessments <span class="su-req">*</span></label>
+                    <p>Choose one or more products to pilot with your team.</p>
+                </div>
+                <div class="su-assess-grid">
+                    {% for checkbox in form.requested_assessments %}
+                    {% with detail=assessment_details|dict_get:checkbox.data.value %}
+                    <label class="su-assess-card">
+                        {{ checkbox.tag }}
+                        <div>
+                            <strong>{{ detail.label|default:checkbox.choice_label }}</strong>
+                            <p>{{ detail.description|default:"Pick this assessment to evaluate candidates in this discipline." }}</p>
+                        </div>
+                    </label>
+                    {% endwith %}
                     {% endfor %}
                 </div>
-            </div>
+                {% for error in form.requested_assessments.errors %}
+                <span class="su-field-error">{{ error }}</span>
+                {% endfor %}
+            </fieldset>
 
-            {# Account Security Section #}
-            <div class="form-section">
-                <h3 class="form-section-title">Account Security</h3>
-                <div class="form-row">
-                    <div class="form-field">
-                        <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }} <span class="required">*</span></label>
+            <fieldset class="su-section">
+                <legend class="su-section-title">Account Security</legend>
+                <div class="su-row">
+                    <div class="su-field">
+                        <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }} <span class="su-req">*</span></label>
                         {{ form.password1 }}
-                        {% if form.password1.help_text %}<small class="field-help">{{ form.password1.help_text }}</small>{% endif %}
+                        {% if form.password1.help_text %}<small class="su-help">{{ form.password1.help_text }}</small>{% endif %}
                         {% for error in form.password1.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
-                    <div class="form-field">
-                        <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }} <span class="required">*</span></label>
+                    <div class="su-field">
+                        <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }} <span class="su-req">*</span></label>
                         {{ form.password2 }}
                         {% for error in form.password2.errors %}
-                        <span class="field-error">{{ error }}</span>
+                        <span class="su-field-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
+            </fieldset>
 
-            <div class="form-footer">
-                <p class="required-note"><span class="required">*</span> Required fields</p>
-                <button class="btn btn-pill" type="submit">Submit application</button>
+            <div class="su-footer">
+                <button class="su-submit" type="submit">Submit application</button>
+                <p class="su-req-note"><span class="su-req">*</span> Required fields</p>
             </div>
         </form>
-    </section>
     </main>
 </div>
 
-
 <script>
-// Character counter for textarea
 document.addEventListener('DOMContentLoaded', function() {
-    const textarea = document.querySelector('[name="objectives"]');
-    const charCount = document.querySelector('.char-count');
-    const charCounter = document.querySelector('.char-counter');
+    var textarea = document.querySelector('[name="objectives"]');
+    var charCount = document.querySelector('.su-char-count');
+    var charCounter = document.querySelector('.su-char-counter');
 
     if (textarea && charCount) {
-        // Update counter on input
         textarea.addEventListener('input', function() {
-            const currentLength = this.value.length;
-            const maxLength = parseInt(this.getAttribute('maxlength')) || 500;
-
-            charCount.textContent = currentLength;
-
-            // Visual feedback
+            var len = this.value.length;
+            var max = parseInt(this.getAttribute('maxlength')) || 500;
+            charCount.textContent = len;
             charCounter.classList.remove('warning', 'error');
-            if (currentLength > maxLength * 0.9) {
-                charCounter.classList.add('error');
-            } else if (currentLength > maxLength * 0.75) {
-                charCounter.classList.add('warning');
-            }
+            if (len > max * 0.9) charCounter.classList.add('error');
+            else if (len > max * 0.75) charCounter.classList.add('warning');
         });
-
-        // Initialize counter with existing content
-        const event = new Event('input');
-        textarea.dispatchEvent(event);
+        textarea.dispatchEvent(new Event('input'));
     }
 
-    // Phone number formatting hint
-    const phoneInput = document.querySelector('[name="phone_number"]');
+    var phoneInput = document.querySelector('[name="phone_number"]');
     if (phoneInput) {
         phoneInput.addEventListener('blur', function() {
-            const value = this.value.trim();
-            // Basic validation - just check if it starts with + for international format
-            if (value && !value.startsWith('+') && !value.match(/^\(\d{3}\)/)) {
-                // Show a subtle hint if no international format detected
-                const helpText = this.parentElement.querySelector('.field-help');
-                if (helpText && !helpText.classList.contains('highlighted')) {
-                    helpText.style.color = '#e67e22';
-                    helpText.classList.add('highlighted');
-                    setTimeout(() => {
-                        helpText.style.color = '';
-                        helpText.classList.remove('highlighted');
-                    }, 3000);
+            var v = this.value.trim();
+            if (v && !v.startsWith('+') && !v.match(/^\(\d{3}\)/)) {
+                var h = this.parentElement.querySelector('.su-help');
+                if (h && !h.classList.contains('hl')) {
+                    h.style.color = '#e67e22';
+                    h.classList.add('hl');
+                    setTimeout(function() { h.style.color = ''; h.classList.remove('hl'); }, 3000);
                 }
             }
         });
     }
 
-    // Password strength indicator (optional enhancement)
-    const password1 = document.querySelector('[name="password1"]');
-    if (password1) {
-        password1.addEventListener('input', function() {
-            const value = this.value;
-            const helpText = this.parentElement.querySelector('.field-help');
-
-            if (value.length > 0 && value.length < 8) {
-                if (helpText) {
-                    helpText.style.color = '#e74c3c';
-                }
-            } else if (value.length >= 8) {
-                if (helpText) {
-                    helpText.style.color = '#27ae60';
-                }
-            } else {
-                if (helpText) {
-                    helpText.style.color = '';
-                }
-            }
+    var pw = document.querySelector('[name="password1"]');
+    if (pw) {
+        pw.addEventListener('input', function() {
+            var h = this.parentElement.querySelector('.su-help');
+            if (!h) return;
+            if (this.value.length > 0 && this.value.length < 8) h.style.color = '#e74c3c';
+            else if (this.value.length >= 8) h.style.color = '#27ae60';
+            else h.style.color = '';
         });
     }
 });
