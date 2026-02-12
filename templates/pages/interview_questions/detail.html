@@ -26,7 +26,7 @@
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' %}
-    <main>
+    <main style="scroll-behavior: smooth;">
         <div class="iq-detail-shell">
             {# Hero #}
             <header class="iq-detail-hero">
@@ -42,30 +42,54 @@
                     </div>
                     <h1 class="iq-detail-title">{{ role.title }} Interview Questions</h1>
                     <p class="iq-detail-desc">{{ role.description }}</p>
-                    <div class="iq-detail-stats">
-                        <div class="iq-detail-stat">
-                            <span class="iq-detail-stat-val">{{ question_count }}</span>
-                            <span class="iq-detail-stat-lbl">Questions</span>
+                    <div class="iq-stats-row">
+                        <div class="iq-stat-card">
+                            <span class="iq-stat-card-val">{{ question_count }}</span>
+                            <span class="iq-stat-card-lbl">Questions</span>
                         </div>
-                        <div class="iq-detail-stat">
-                            <span class="iq-detail-stat-val">{{ categories|length }}</span>
-                            <span class="iq-detail-stat-lbl">Categories</span>
+                        <div class="iq-stat-card">
+                            <span class="iq-stat-card-val">{{ categories|length }}</span>
+                            <span class="iq-stat-card-lbl">Categories</span>
                         </div>
                         {% if recommended_assessments %}
-                        <div class="iq-detail-stat">
-                            <span class="iq-detail-stat-val">{{ recommended_assessments|length }}</span>
-                            <span class="iq-detail-stat-lbl">Assessments</span>
+                        <div class="iq-stat-card">
+                            <span class="iq-stat-card-val">{{ recommended_assessments|length }}</span>
+                            <span class="iq-stat-card-lbl">Assessments</span>
                         </div>
                         {% endif %}
                     </div>
                 </div>
             </header>
 
+            {# Sticky Table of Contents #}
+            <nav class="iq-toc" id="iq-toc">
+                <span class="iq-toc-label">On this page</span>
+                {% for cat_name, cat_questions in categories.items %}
+                <a class="iq-toc-link" href="#cat-{{ forloop.counter }}">{{ cat_name }}</a>
+                {% endfor %}
+                <a class="iq-toc-link" href="#assessments">Assessments</a>
+            </nav>
+
             {# Questions by Category #}
             {% for cat_name, cat_questions in categories.items %}
             <section class="iq-section {% if forloop.counter|divisibleby:2 %}iq-section--alt{% endif %}" id="cat-{{ forloop.counter }}">
                 <div class="iq-section-inner">
-                    <h2 class="iq-section-title">{{ cat_name }} Questions</h2>
+                    <div class="iq-section-header">
+                        {% if cat_name == "Technical" %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        {% elif cat_name == "Behavioral" %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        {% elif cat_name == "Situational" %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>
+                        {% elif cat_name == "Leadership" %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                        {% elif cat_name == "Culture Fit" or cat_name == "Culture" %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        {% elif cat_name == "Problem Solving" %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        {% endif %}
+                        <h2 class="iq-section-title">{{ cat_name }} Questions</h2>
+                    </div>
                     <p class="iq-section-desc">{{ cat_questions|length }} question{{ cat_questions|length|pluralize }} in this category.</p>
                     <div class="iq-questions">
                         {% for q in cat_questions %}
@@ -86,7 +110,10 @@
                             </details>
                             {% endif %}
                             {% if q.assessment_type %}
-                            <a href="{{ q.assessment_type.get_absolute_url }}" class="iq-assessment-link">
+                            <a href="{{ q.assessment_type.get_absolute_url }}" class="iq-assessment-link"
+                               data-gtag-click="assessment_link_click"
+                               data-gtag-category="engagement"
+                               data-gtag-label="{{ q.assessment_type.label }}">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                                 Assess with {{ q.assessment_type.label }}
                             </a>
@@ -106,7 +133,10 @@
                     <p class="iq-section-desc">Complement your interviews with structured skill assessments.</p>
                     <div class="iq-assessment-cards">
                         {% for assessment in recommended_assessments %}
-                        <a class="iq-assessment-card" href="{{ assessment.get_absolute_url }}">
+                        <a class="iq-assessment-card" href="{{ assessment.get_absolute_url }}"
+                           data-gtag-click="assessment_card_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ assessment.label }}">
                             <div class="iq-assessment-card-icon">
                                 {% if assessment.icon_svg %}{{ assessment.icon_svg|safe }}{% endif %}
                             </div>
@@ -132,11 +162,38 @@
                     <h2>Ready to assess {{ role.title }} candidates?</h2>
                     <p>Go beyond interviews with structured skill assessments — start free.</p>
                     <div class="iq-cta-actions">
-                        <a class="iq-btn-primary" href="{% url 'clients:signup' %}">Start Free Trial</a>
-                        <a class="iq-btn-secondary" href="{{ role.get_absolute_url }}">See recommended assessments</a>
+                        <a class="iq-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="cta_start_trial_click"
+                           data-gtag-category="conversion"
+                           data-gtag-label="{{ role.slug }}">Start Free Trial</a>
+                        <a class="iq-btn-secondary" href="{{ role.get_absolute_url }}"
+                           data-gtag-click="cta_see_assessments_click"
+                           data-gtag-category="conversion"
+                           data-gtag-label="{{ role.slug }}">See recommended assessments</a>
                     </div>
                 </div>
             </section>
+
+            {# Cross-link to Role Assessment Page #}
+            {% if recommended_assessments %}
+            <section class="iq-section" id="role-assessments">
+                <div class="iq-section-inner">
+                    <a class="iq-crosslink" href="{{ role.get_absolute_url }}"
+                       data-gtag-click="questions_to_role_click"
+                       data-gtag-category="engagement"
+                       data-gtag-label="{{ role.slug }}">
+                        <div class="iq-crosslink-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        </div>
+                        <div class="iq-crosslink-body">
+                            <h3>{{ role.title }} Assessment Battery</h3>
+                            <p>See the recommended assessments for evaluating {{ role.title }} candidates with automated scoring.</p>
+                        </div>
+                        <svg class="iq-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+            </section>
+            {% endif %}
 
             {# Related Roles #}
             {% if related_roles %}
@@ -145,7 +202,10 @@
                     <h2 class="iq-section-title">Related Roles</h2>
                     <div class="iq-related">
                         {% for rel in related_roles %}
-                        <a class="iq-related-card" href="{{ rel.get_interview_questions_url }}">
+                        <a class="iq-related-card" href="{{ rel.get_interview_questions_url }}"
+                           data-gtag-click="related_role_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ rel.slug }}">
                             <span class="iq-related-dept">{{ rel.department }}</span>
                             <h3>{{ rel.title }}</h3>
                             <p>{{ rel.description|truncatewords:15 }}</p>

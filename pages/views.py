@@ -1052,9 +1052,43 @@ def role_assessment_detail(request, slug):
 
     has_interview_questions = role.interview_questions.filter(is_active=True).exists()
 
+    # Aggregate rich content from all linked assessments
+    all_focus_areas = []
+    all_skills = []
+    all_samples = []
+    all_use_cases = []
+    all_faqs = []
+    total_duration = 0
+    total_questions = 0
+    seen_focus = set()
+    seen_skill_names = set()
+
+    for a in recommended_assessments:
+        total_duration += a.duration_minutes
+        total_questions += a.question_count
+        for fa in (a.focus_areas or []):
+            if fa not in seen_focus:
+                seen_focus.add(fa)
+                all_focus_areas.append(fa)
+        for sk in (a.skills_tested or []):
+            name = sk.get('name', '') if isinstance(sk, dict) else str(sk)
+            if name not in seen_skill_names:
+                seen_skill_names.add(name)
+                all_skills.append(sk)
+        all_samples.extend(a.sample_questions or [])
+        all_use_cases.extend(a.use_cases or [])
+        all_faqs.extend(a.faqs or [])
+
     return render(request, 'pages/roles/detail.html', {
         'role': role,
         'recommended_assessments': recommended_assessments,
         'related_roles': related_roles,
         'has_interview_questions': has_interview_questions,
+        'focus_areas': all_focus_areas,
+        'skills_tested': all_skills,
+        'sample_questions': all_samples[:6],
+        'use_cases': all_use_cases,
+        'faqs': all_faqs,
+        'total_duration': total_duration,
+        'total_questions': total_questions,
     })

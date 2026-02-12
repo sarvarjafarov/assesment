@@ -47,21 +47,17 @@
                     <p class="rp-detail-desc">{{ role.description }}</p>
                     <div class="rp-detail-stats">
                         <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ total_duration }} min</span>
+                            <span class="rp-detail-stat-lbl">Total Duration</span>
+                        </div>
+                        <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ total_questions }}</span>
+                            <span class="rp-detail-stat-lbl">Questions</span>
+                        </div>
+                        <div class="rp-detail-stat">
                             <span class="rp-detail-stat-val">{{ recommended_assessments|length }}</span>
                             <span class="rp-detail-stat-lbl">Assessments</span>
                         </div>
-                        {% if role.key_skills %}
-                        <div class="rp-detail-stat">
-                            <span class="rp-detail-stat-val">{{ role.key_skills|length }}</span>
-                            <span class="rp-detail-stat-lbl">Key Skills</span>
-                        </div>
-                        {% endif %}
-                        {% if role.responsibilities %}
-                        <div class="rp-detail-stat">
-                            <span class="rp-detail-stat-val">{{ role.responsibilities|length }}</span>
-                            <span class="rp-detail-stat-lbl">Responsibilities</span>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
             </header>
@@ -99,6 +95,39 @@
             </section>
             {% endif %}
 
+            {# Focus Areas #}
+            {% if focus_areas %}
+            <section class="rp-section" id="focus">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Focus Areas</h2>
+                    <p class="rp-section-desc">Key areas evaluated across the assessment battery for {{ role.title }} candidates.</p>
+                    <div class="rp-tags">
+                        {% for area in focus_areas %}
+                        <span class="rp-tag">{{ area }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Skills Tested #}
+            {% if skills_tested %}
+            <section class="rp-section rp-section--alt" id="skills-tested">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Skills Tested</h2>
+                    <p class="rp-section-desc">Competencies measured across all recommended assessments.</p>
+                    <div class="rp-skills-grid">
+                        {% for skill in skills_tested %}
+                        <div class="rp-skill-card">
+                            <h3>{{ skill.name }}</h3>
+                            <p>{{ skill.description }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
             {# Recommended Assessment Battery #}
             {% if recommended_assessments %}
             <section class="rp-section" id="assessments">
@@ -107,7 +136,10 @@
                     <p class="rp-section-desc">Use these assessments together for a comprehensive evaluation of {{ role.title }} candidates.</p>
                     <div class="rp-battery">
                         {% for assessment in recommended_assessments %}
-                        <a class="rp-battery-card" href="{{ assessment.get_absolute_url }}">
+                        <a class="rp-battery-card" href="{{ assessment.get_absolute_url }}"
+                           data-gtag-click="role_assessment_battery_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ assessment.slug }}">
                             <div class="rp-battery-icon">
                                 {% if assessment.icon_svg %}{{ assessment.icon_svg|safe }}{% endif %}
                             </div>
@@ -129,21 +161,103 @@
             </section>
             {% endif %}
 
+            {# Sample Questions #}
+            {% if sample_questions %}
+            <section class="rp-section rp-section--alt" id="samples">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Sample Questions</h2>
+                    <p class="rp-section-desc">Preview the types of questions {{ role.title }} candidates encounter.</p>
+                    <div class="rp-samples">
+                        {% for sample in sample_questions %}
+                        <div class="rp-sample">
+                            <span class="rp-sample-num">{{ forloop.counter }}</span>
+                            <div class="rp-sample-body">
+                                <span class="rp-sample-type">{{ sample.type|default:"Scenario" }}</span>
+                                <p>{{ sample.question }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Use Cases #}
+            {% if use_cases %}
+            <section class="rp-section" id="use-cases">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">When to Use These Assessments</h2>
+                    <p class="rp-section-desc">Ideal scenarios for deploying this assessment battery.</p>
+                    <div class="rp-usecases">
+                        {% for case in use_cases %}
+                        <div class="rp-usecase">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div>
+                                <h3>{{ case.title }}</h3>
+                                <p>{{ case.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# FAQs #}
+            {% if faqs %}
+            <section class="rp-section rp-section--alt" id="faqs">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Frequently Asked Questions</h2>
+                    <div class="rp-faqs">
+                        {% for faq in faqs %}
+                        <details class="rp-faq">
+                            <summary>{{ faq.question }}</summary>
+                            <div class="rp-faq-answer">{{ faq.answer }}</div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
             {# CTA #}
             <section class="rp-cta">
                 <div class="rp-cta-inner">
                     <h2>Start assessing {{ role.title }} candidates today</h2>
                     <p>Send assessments in minutes with automated scoring and detailed reports.</p>
                     <div class="rp-cta-actions">
-                        <a class="rp-btn-primary" href="{% url 'clients:signup' %}">Start Free Trial</a>
-                        {% if has_interview_questions %}
-                        <a class="rp-btn-secondary" href="{{ role.get_interview_questions_url }}">Browse interview questions</a>
-                        {% else %}
-                        <a class="rp-btn-secondary" href="{% url 'pages:contact' %}">Talk to sales</a>
-                        {% endif %}
+                        <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="role_detail_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ role.slug }}">Start Free Trial</a>
+                        <a class="rp-btn-secondary" href="{% url 'pages:contact' %}"
+                           data-gtag-click="contact_sales_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="role_contact_sales">Talk to sales</a>
                     </div>
                 </div>
             </section>
+
+            {# Interview Questions Cross-link #}
+            {% if has_interview_questions %}
+            <section class="rp-section" id="interview-questions">
+                <div class="rp-section-inner">
+                    <a class="rp-crosslink" href="{{ role.get_interview_questions_url }}"
+                       data-gtag-click="role_to_questions_click"
+                       data-gtag-category="engagement"
+                       data-gtag-label="{{ role.slug }}">
+                        <div class="rp-crosslink-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
+                        <div class="rp-crosslink-body">
+                            <h3>{{ role.title }} Interview Questions</h3>
+                            <p>Browse curated interview questions with difficulty ratings, evaluation criteria, and sample answer guidance.</p>
+                        </div>
+                        <svg class="rp-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+            </section>
+            {% endif %}
 
             {# Related Roles #}
             {% if related_roles %}
@@ -152,7 +266,10 @@
                     <h2 class="rp-section-title">Related Roles</h2>
                     <div class="rp-related">
                         {% for rel in related_roles %}
-                        <a class="rp-related-card" href="{{ rel.get_absolute_url }}">
+                        <a class="rp-related-card" href="{{ rel.get_absolute_url }}"
+                           data-gtag-click="related_role_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ rel.slug }}">
                             <span class="rp-related-dept">{{ rel.department }}</span>
                             <h3>{{ rel.title }}</h3>
                             <p>{{ rel.description|truncatewords:15 }}</p>

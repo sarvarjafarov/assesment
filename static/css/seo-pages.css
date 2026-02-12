@@ -989,6 +989,405 @@
 }
 
 
+/* ── Focus Area Tags (rp-tags) ────────────────────────────────────── */
+
+.rp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.rp-tag {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid #e2e5ea;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-navy);
+}
+
+
+/* ── Skills Grid (rp-skills-grid) ────────────────────────────────── */
+
+.rp-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.rp-skill-card {
+    padding: 1.25rem;
+    border: 1px solid #ebedf0;
+    border-radius: 12px;
+}
+
+.rp-skill-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    margin: 0 0 0.4rem;
+}
+
+.rp-skill-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.55;
+}
+
+
+/* ── Sample Questions (rp-sample) ────────────────────────────────── */
+
+.rp-samples {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rp-sample {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid #ebedf0;
+    border-radius: 12px;
+    background: var(--color-white);
+}
+
+.rp-sample-num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-orange);
+    border-radius: 50%;
+    color: var(--color-orange);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.rp-sample-body {
+    flex: 1;
+}
+
+.rp-sample-type {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-orange);
+    margin-bottom: 0.35rem;
+}
+
+.rp-sample-body p {
+    font-size: 0.9rem;
+    color: var(--color-navy);
+    margin: 0;
+    line-height: 1.55;
+    font-weight: 500;
+}
+
+
+/* ── Use Cases (rp-usecase) ──────────────────────────────────────── */
+
+.rp-usecases {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rp-usecase {
+    display: flex;
+    gap: 0.85rem;
+    padding: 1.25rem;
+    border: 1px solid #ebedf0;
+    border-radius: 12px;
+}
+
+.rp-usecase svg {
+    flex-shrink: 0;
+    color: var(--color-orange);
+    margin-top: 0.1rem;
+}
+
+.rp-usecase h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    margin: 0 0 0.3rem;
+}
+
+.rp-usecase p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.55;
+}
+
+
+/* ── FAQs (rp-faq) ──────────────────────────────────────────────── */
+
+.rp-faqs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rp-faq {
+    border: 1px solid #ebedf0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--color-white);
+}
+
+.rp-faq summary {
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-navy);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rp-faq summary::-webkit-details-marker { display: none; }
+
+.rp-faq summary::after {
+    content: '+';
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    color: var(--color-orange);
+    transition: transform 0.2s ease;
+}
+
+.rp-faq[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.rp-faq-answer {
+    padding: 0 1.25rem 1.25rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.65;
+}
+
+
+/* ── Cross-link Cards ────────────────────────────────────────────── */
+
+.rp-crosslink, .iq-crosslink {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border: 2px solid #ebedf0;
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    background: var(--color-white);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rp-crosslink:hover, .iq-crosslink:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.08);
+}
+
+.rp-crosslink-icon, .iq-crosslink-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 138, 0, 0.07);
+    border-radius: 12px;
+    color: var(--color-orange);
+    flex-shrink: 0;
+}
+
+.rp-crosslink-body, .iq-crosslink-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.rp-crosslink-body h3, .iq-crosslink-body h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    margin: 0 0 0.25rem;
+}
+
+.rp-crosslink-body p, .iq-crosslink-body p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.rp-crosslink-arrow, .iq-crosslink-arrow {
+    color: #d1d5db;
+    flex-shrink: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.rp-crosslink:hover .rp-crosslink-arrow,
+.iq-crosslink:hover .iq-crosslink-arrow {
+    color: var(--color-orange);
+    transform: translateX(3px);
+}
+
+
+/* ── Trust Stats (list page heroes) ──────────────────────────────── */
+
+.iq-trust-stats, .rp-trust-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.iq-trust-stat, .rp-trust-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.iq-trust-stat svg, .rp-trust-stat svg {
+    color: var(--color-orange);
+}
+
+.iq-trust-stat strong, .rp-trust-stat strong {
+    color: var(--color-navy);
+    font-weight: 700;
+}
+
+.iq-trust-dot, .rp-trust-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #d1d5db;
+}
+
+
+/* ── Department Icons (card headers) ─────────────────────────────── */
+
+.iq-card-dept-wrap, .rp-card-dept-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.iq-card-dept-icon, .rp-card-dept-icon {
+    color: #9ca3af;
+}
+
+
+/* ── Category Section Headers (IQ detail) ────────────────────────── */
+
+.iq-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem;
+}
+
+.iq-section-header svg {
+    color: var(--color-orange);
+    flex-shrink: 0;
+}
+
+.iq-section-header .iq-section-title {
+    margin: 0;
+}
+
+
+/* ── Sticky Table of Contents (IQ detail) ────────────────────────── */
+
+.iq-toc {
+    position: sticky;
+    top: 90px;
+    float: left;
+    width: 180px;
+    margin-left: -210px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 1rem 0;
+}
+
+.iq-toc-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    margin-bottom: 0.5rem;
+    padding-left: 0.75rem;
+}
+
+.iq-toc-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-decoration: none;
+    padding: 0.3rem 0.75rem;
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+    line-height: 1.4;
+}
+
+.iq-toc-link:hover {
+    color: var(--color-navy);
+}
+
+.iq-toc-link--active {
+    color: var(--color-orange);
+    border-left-color: var(--color-orange);
+    font-weight: 600;
+}
+
+
+/* ── IQ Stat Cards (hero upgrade) ────────────────────────────────── */
+
+.iq-stats-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.iq-stat-card {
+    flex: 1;
+    text-align: center;
+    padding: 1.25rem 0.75rem;
+    border: 1px solid #ebedf0;
+    border-radius: 12px;
+}
+
+.iq-stat-card-val {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-orange);
+    margin-bottom: 0.2rem;
+}
+
+.iq-stat-card-lbl {
+    display: block;
+    font-size: 0.72rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+
 /* ── Responsive ────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
@@ -1059,5 +1458,87 @@
     .iq-filter, .rp-filter {
         white-space: nowrap;
         flex-shrink: 0;
+    }
+
+    /* Skills grid → single column on mobile */
+    .rp-skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Hide sticky TOC on mobile */
+    .iq-toc {
+        display: none;
+    }
+
+    /* Stat cards smaller on mobile */
+    .iq-stats-row {
+        gap: 0.5rem;
+    }
+
+    .iq-stat-card {
+        padding: 0.85rem 0.5rem;
+    }
+
+    .iq-stat-card-val {
+        font-size: 1rem;
+    }
+
+    /* Cross-link cards stack on mobile */
+    .rp-crosslink, .iq-crosslink {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1.25rem;
+    }
+
+    .rp-crosslink-arrow, .iq-crosslink-arrow {
+        display: none;
+    }
+
+    /* Trust stats wrap nicely */
+    .iq-trust-stats, .rp-trust-stats {
+        gap: 0.5rem 0.6rem;
+    }
+
+    .iq-trust-stat, .rp-trust-stat {
+        font-size: 0.75rem;
+    }
+
+    /* Sample questions */
+    .rp-sample {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    .rp-sample-num {
+        width: 28px;
+        height: 28px;
+        font-size: 0.72rem;
+    }
+
+    /* Use cases */
+    .rp-usecase {
+        padding: 1rem;
+    }
+
+    /* FAQs */
+    .rp-faq summary {
+        padding: 0.85rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .rp-faq-answer {
+        padding: 0 1rem 1rem;
+    }
+
+    /* Assessment cards in IQ detail */
+    .iq-assessment-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .iq-assessment-card-arrow {
+        display: none;
     }
 }
