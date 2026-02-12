@@ -5,153 +5,142 @@
 {% block meta_description %}Manage your hiring projects and candidate pipelines.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="page-header-with-actions">
+
+    {# ── Page Header ── #}
+    <header class="pj-header">
         <div>
             <h1>Projects</h1>
             <p class="muted">Organize candidates by role and track hiring progress</p>
         </div>
+        {% if is_manager %}
+        <button type="button" class="btn btn-pill pj-create-btn" id="pj-toggle-create">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Project
+        </button>
+        {% endif %}
     </header>
 
-    {# Create New Project - Simplified Form #}
+    {# ── Collapsible Create Form ── #}
     {% if is_manager %}
-    <section class="portal-card create-project-card">
-        <div class="create-header">
-            <h3>Create New Project</h3>
-            <p class="muted">Start tracking candidates for a new role</p>
-        </div>
-        <form method="post" class="project-form">
+    <div class="pj-create-panel" id="pj-create-panel" {% if form.errors %}style="display:block"{% endif %}>
+        <form method="post" class="pj-form">
             {% csrf_token %}
-            <div class="form-row">
-                <div class="form-field">
-                    {{ form.title.label_tag }}
+            <div class="pj-form-grid">
+                <div class="pj-field">
+                    <label for="{{ form.title.id_for_label }}">Project title</label>
                     {{ form.title }}
                     {% for error in form.title.errors %}
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <div class="form-field">
-                    {{ form.open_roles.label_tag }}
+                <div class="pj-field">
+                    <label for="{{ form.open_roles.id_for_label }}">Open roles</label>
                     {{ form.open_roles }}
                     {% for error in form.open_roles.errors %}
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-field">
-                    {{ form.status.label_tag }}
-                    {{ form.status }}
-                    {% for error in form.status.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-field">
-                    {{ form.priority.label_tag }}
+                <div class="pj-field">
+                    <label for="{{ form.priority.id_for_label }}">Priority</label>
                     {{ form.priority }}
-                    {% for error in form.priority.errors %}
-                    <span class="field-error">{{ error }}</span>
-                    {% endfor %}
                 </div>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Create Project</button>
+                <div class="pj-field pj-field-action">
+                    <button type="submit" class="btn btn-primary">Create Project</button>
+                </div>
             </div>
         </form>
-    </section>
+    </div>
     {% endif %}
 
-    {# Projects Grid #}
-    <section class="projects-section">
-        <div class="section-header">
-            <h3>Your Projects</h3>
-            {% if projects %}
-            <p class="muted">{{ projects|length }} active project{{ projects|length|pluralize }}</p>
-            {% endif %}
-        </div>
+    {# ── Filter / Count Bar ── #}
+    {% if projects %}
+    <div class="pj-toolbar">
+        <span class="pj-count">{{ projects|length }} project{{ projects|length|pluralize }}</span>
+    </div>
+    {% endif %}
 
-        {% if projects %}
-        <div class="portal-card-grid two-up">
-            {% for project in projects %}
-            <article class="portal-card project-card-simple">
-                <div class="project-header">
-                    <div class="project-title-area">
-                        <h4>{{ project.title }}</h4>
-                        <div class="project-badges">
-                            <span class="badge {% if project.status == 'active' %}badge-success{% else %}badge-neutral{% endif %}">
-                                {{ project.get_status_display }}
-                            </span>
-                            <span class="badge badge-priority-{{ project.priority }}">
-                                {{ project.get_priority_display }} priority
-                            </span>
-                        </div>
-                    </div>
+    {# ── Projects Grid ── #}
+    {% if projects %}
+    <div class="pj-grid">
+        {% for project in projects %}
+        <a href="{% url 'clients:project-detail' project.uuid %}" class="pj-card pj-priority-{{ project.priority }}">
+            <div class="pj-card-top">
+                <div class="pj-card-title">
+                    <h3>{{ project.title }}</h3>
                     {% if project.department or project.location %}
-                    <p class="project-meta muted">
+                    <span class="pj-meta">
                         {% if project.department %}{{ project.department }}{% endif %}
-                        {% if project.department and project.location %} • {% endif %}
+                        {% if project.department and project.location %} · {% endif %}
                         {% if project.location %}{{ project.location }}{% endif %}
-                    </p>
+                    </span>
                     {% endif %}
                 </div>
+                <span class="pj-status pj-status-{{ project.status }}">{{ project.get_status_display }}</span>
+            </div>
 
-                <div class="project-stats">
-                    <div class="stat-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        <span>{{ project.open_roles }} open role{{ project.open_roles|pluralize }}</span>
-                    </div>
-                    <div class="stat-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span>{{ project.total_sessions }} assessment{{ project.total_sessions|pluralize }}</span>
-                    </div>
-                    {% with health=project.health %}
-                    {% if health.completion_rate is not None %}
-                    <div class="stat-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                        </svg>
-                        <span>{{ health.completion_rate|floatformat:0 }}% complete</span>
-                    </div>
-                    {% endif %}
-                    {% endwith %}
+            <div class="pj-stats-row">
+                <div class="pj-stat">
+                    <span class="pj-stat-val">{{ project.open_roles }}</span>
+                    <span class="pj-stat-lbl">Open role{{ project.open_roles|pluralize }}</span>
                 </div>
+                <div class="pj-stat">
+                    <span class="pj-stat-val">{{ project.total_sessions }}</span>
+                    <span class="pj-stat-lbl">Assessment{{ project.total_sessions|pluralize }}</span>
+                </div>
+                {% with health=project.health %}
+                {% if health.completion_rate is not None %}
+                <div class="pj-stat">
+                    <span class="pj-stat-val">{{ health.completion_rate|floatformat:0 }}%</span>
+                    <span class="pj-stat-lbl">Complete</span>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
 
-                <div class="project-footer">
-                    {% if is_manager %}
-                    <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-ghost small">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                        Duplicate
-                    </a>
-                    {% endif %}
-                    <a href="{% url 'clients:project-detail' project.uuid %}" class="btn btn-primary small">
-                        View Project
-                    </a>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="portal-card empty-state-card">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; color: var(--orange); margin-bottom: 1rem;">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <h4>No projects yet</h4>
-            {% if is_manager %}
-            <p class="muted">Create your first project above to start organizing candidates by role.</p>
-            {% else %}
-            <p class="muted">Projects will appear here once your manager creates them.</p>
+            {% with health=project.health %}
+            {% if health.completion_rate is not None %}
+            <div class="pj-progress">
+                <div class="pj-progress-fill" style="width: {{ health.completion_rate|floatformat:0 }}%"></div>
+            </div>
             {% endif %}
-        </div>
+            {% endwith %}
+
+            <div class="pj-card-foot">
+                <span class="pj-badge pj-badge-{{ project.priority }}">{{ project.get_priority_display }}</span>
+                <span class="pj-date">{{ project.created_at|naturaltime }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="pj-empty">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <h3>No projects yet</h3>
+        {% if is_manager %}
+        <p class="muted">Create your first project to start organizing candidates by role.</p>
+        {% else %}
+        <p class="muted">Projects will appear here once your manager creates them.</p>
         {% endif %}
-    </section>
+    </div>
+    {% endif %}
+
 </div>
 
-
+<script>
+(function() {
+    const btn = document.getElementById('pj-toggle-create');
+    const panel = document.getElementById('pj-create-panel');
+    if (!btn || !panel) return;
+    btn.addEventListener('click', function() {
+        const open = panel.style.display === 'block';
+        panel.style.display = open ? 'none' : 'block';
+        if (!open) panel.querySelector('input')?.focus();
+    });
+})();
+</script>
 {% endblock %}
