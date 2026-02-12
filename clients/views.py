@@ -200,11 +200,11 @@ def build_actionable_summary(report, decision_summary, recommended_decision):
         else:
             recommendation = "reject"
     tone_map = {
-        "advance": ("Advance candidate", "Strong score and minimal risk.", "positive"),
-        "hold": ("Gather more signals", "Borderline score or pending follow-up.", "neutral"),
-        "reject": ("Do not advance", "Score or risk indicators fall below expectations.", "warning"),
+        "advance": ("Advance candidate", "Strong score and minimal risk.", "positive", "Strong Hire"),
+        "hold": ("Gather more signals", "Borderline score or pending follow-up.", "neutral", "Needs Review"),
+        "reject": ("Do not advance", "Score or risk indicators fall below expectations.", "negative", "Below Bar"),
     }
-    headline, default_subline, tone = tone_map.get(recommendation, tone_map["hold"])
+    headline, default_subline, tone, label = tone_map.get(recommendation, tone_map["hold"])
     if base_score is not None:
         subline = f"Score {base_score:.1f} vs. target {threshold}"
     else:
@@ -215,11 +215,19 @@ def build_actionable_summary(report, decision_summary, recommended_decision):
         strength_focus = strengths[0].title()
     elif isinstance(strengths, dict) and strengths:
         strength_focus = max(strengths.items(), key=lambda item: item[1])[0].title()
+    score_display = f"{base_score:.0f}" if base_score is not None else "—"
+    flag_display = f"{flags} flag{'s' if flags != 1 else ''}" if flags else "None"
     return {
         "headline": headline,
         "subline": subline,
         "tone": tone,
+        "label": label,
         "strength_focus": strength_focus,
+        "metrics": {
+            "score": score_display,
+            "flags": flag_display,
+            "strength": strength_focus or "—",
+        },
     }
 
 
