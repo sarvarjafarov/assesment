@@ -93,6 +93,13 @@
                         {% endif %}
                     </div>
                     {% endif %}
+                    {% if role.assessment_types.all %}
+                    <div class="rp-card-assessments-row">
+                        {% for at in role.assessment_types.all|slice:":3" %}
+                        <span class="rp-card-assessment-badge">{{ at.label }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     <div class="rp-card-footer">
                         <span class="rp-card-assessments">{{ role.assessment_types.count }} assessment{{ role.assessment_types.count|pluralize }}</span>
                         <span class="rp-card-arrow">

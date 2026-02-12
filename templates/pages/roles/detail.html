@@ -182,6 +182,34 @@
             </section>
             {% endif %}
 
+            {# At a Glance #}
+            {% if recommended_assessments %}
+            <section class="rp-section" id="at-a-glance">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">At a Glance</h2>
+                    <p class="rp-section-desc">Key metrics for the {{ role.title }} assessment battery.</p>
+                    <div class="rp-glance-grid">
+                        <div class="rp-glance-card">
+                            <span class="rp-glance-val">{{ total_duration }} min</span>
+                            <span class="rp-glance-lbl">Total Duration</span>
+                        </div>
+                        <div class="rp-glance-card">
+                            <span class="rp-glance-val">{{ total_questions }}</span>
+                            <span class="rp-glance-lbl">Total Questions</span>
+                        </div>
+                        <div class="rp-glance-card">
+                            <span class="rp-glance-val">{{ recommended_assessments|length }}</span>
+                            <span class="rp-glance-lbl">Assessments</span>
+                        </div>
+                        <div class="rp-glance-card">
+                            <span class="rp-glance-val">{{ role.get_seniority_level_display }}</span>
+                            <span class="rp-glance-lbl">Seniority Level</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
             {# Use Cases #}
             {% if use_cases %}
             <section class="rp-section" id="use-cases">

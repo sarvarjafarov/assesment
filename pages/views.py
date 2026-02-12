@@ -913,7 +913,13 @@ def interview_questions_list(request):
             'interview_questions',
             filter=Q(interview_questions__is_active=True),
         )
-    ).filter(question_count__gt=0).distinct()
+    ).filter(question_count__gt=0).distinct().prefetch_related(
+        Prefetch(
+            'interview_questions',
+            queryset=InterviewQuestion.objects.filter(is_active=True).order_by('order', 'pk')[:3],
+            to_attr='preview_questions',
+        )
+    )
 
     department = request.GET.get('department', '').strip()
     if department:

@@ -72,7 +72,7 @@
 
             {# Questions by Category #}
             {% for cat_name, cat_questions in categories.items %}
-            <section class="iq-section {% if forloop.counter|divisibleby:2 %}iq-section--alt{% endif %}" id="cat-{{ forloop.counter }}">
+            <section class="iq-section {% if forloop.counter|divisibleby:2 %}iq-section--alt{% endif %} iq-cat--{% if cat_name == 'Technical' %}technical{% elif cat_name == 'Behavioral' %}behavioral{% elif cat_name == 'Situational' %}situational{% elif cat_name == 'Leadership' %}leadership{% elif cat_name == 'Culture Fit' or cat_name == 'Culture' %}culture{% elif cat_name == 'Problem Solving' %}problem-solving{% endif %}" id="cat-{{ forloop.counter }}">
                 <div class="iq-section-inner">
                     <div class="iq-section-header">
                         {% if cat_name == "Technical" %}
@@ -93,7 +93,7 @@
                     <p class="iq-section-desc">{{ cat_questions|length }} question{{ cat_questions|length|pluralize }} in this category.</p>
                     <div class="iq-questions">
                         {% for q in cat_questions %}
-                        <div class="iq-question">
+                        <div class="iq-question iq-cat--{% if cat_name == 'Technical' %}technical{% elif cat_name == 'Behavioral' %}behavioral{% elif cat_name == 'Situational' %}situational{% elif cat_name == 'Leadership' %}leadership{% elif cat_name == 'Culture Fit' or cat_name == 'Culture' %}culture{% elif cat_name == 'Problem Solving' %}problem-solving{% endif %}">
                             <div class="iq-question-header">
                                 <span class="iq-question-num">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</span>
                                 <span class="iq-difficulty iq-difficulty--{{ q.difficulty }}">{{ q.get_difficulty_display }}</span>

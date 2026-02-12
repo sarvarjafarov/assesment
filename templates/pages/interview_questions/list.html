@@ -83,6 +83,13 @@
                     </div>
                     <h3 class="iq-card-title">{{ role.title }}</h3>
                     <p class="iq-card-desc">{{ role.description|truncatewords:20 }}</p>
+                    {% if role.preview_questions %}
+                    <div class="iq-card-previews">
+                        {% for pq in role.preview_questions %}
+                        <p class="iq-card-preview">"{{ pq.question_text|truncatewords:8 }}"</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     <div class="iq-card-footer">
                         <span class="iq-card-level">{{ role.get_seniority_level_display }}</span>
                         <span class="iq-card-arrow">

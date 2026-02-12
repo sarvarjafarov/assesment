@@ -989,6 +989,42 @@
 }
 
 
+/* ── Card Enrichment (list pages) ───────────────────────────────── */
+
+.iq-card-previews {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.iq-card-preview {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin: 0;
+    line-height: 1.4;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rp-card-assessments-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
+}
+
+.rp-card-assessment-badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.12rem 0.45rem;
+    border-radius: var(--radius-full);
+    background: rgba(255, 138, 0, 0.08);
+    color: var(--color-orange);
+}
+
 /* ── Focus Area Tags (rp-tags) ────────────────────────────────────── */
 
 .rp-tags {
@@ -1089,6 +1125,38 @@
     font-weight: 500;
 }
 
+
+/* ── At a Glance (rp-glance) ───────────────────────────────────── */
+
+.rp-glance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.rp-glance-card {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border: 1px solid #ebedf0;
+    border-radius: 12px;
+    background: var(--color-white);
+}
+
+.rp-glance-val {
+    display: block;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-orange);
+    margin-bottom: 0.25rem;
+}
+
+.rp-glance-lbl {
+    display: block;
+    font-size: 0.72rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
 
 /* ── Use Cases (rp-usecase) ──────────────────────────────────────── */
 
@@ -1309,6 +1377,22 @@
 }
 
 
+/* ── Category Color Accents (IQ detail) ─────────────────────────── */
+
+.iq-section.iq-cat--technical { border-left: 3px solid #3b82f6; }
+.iq-section.iq-cat--behavioral { border-left: 3px solid #8b5cf6; }
+.iq-section.iq-cat--situational { border-left: 3px solid #f59e0b; }
+.iq-section.iq-cat--leadership { border-left: 3px solid #ef4444; }
+.iq-section.iq-cat--culture { border-left: 3px solid #ec4899; }
+.iq-section.iq-cat--problem-solving { border-left: 3px solid #10b981; }
+
+.iq-question.iq-cat--technical { border-left: 3px solid rgba(59, 130, 246, 0.3); }
+.iq-question.iq-cat--behavioral { border-left: 3px solid rgba(139, 92, 246, 0.3); }
+.iq-question.iq-cat--situational { border-left: 3px solid rgba(245, 158, 11, 0.3); }
+.iq-question.iq-cat--leadership { border-left: 3px solid rgba(239, 68, 68, 0.3); }
+.iq-question.iq-cat--culture { border-left: 3px solid rgba(236, 72, 153, 0.3); }
+.iq-question.iq-cat--problem-solving { border-left: 3px solid rgba(16, 185, 129, 0.3); }
+
 /* ── Sticky Table of Contents (IQ detail) ────────────────────────── */
 
 .iq-toc {
@@ -1474,6 +1558,20 @@
     .iq-filter, .rp-filter {
         white-space: nowrap;
         flex-shrink: 0;
+    }
+
+    /* At a Glance grid */
+    .rp-glance-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .rp-glance-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .rp-glance-val {
+        font-size: 1.1rem;
     }
 
     /* Skills grid → single column on mobile */
