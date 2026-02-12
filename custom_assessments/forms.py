@@ -106,7 +106,7 @@ class AIGenerationForm(forms.Form):
     )
     num_questions = forms.IntegerField(
         min_value=5,
-        max_value=10,
+        max_value=50,
         initial=5,
         widget=forms.NumberInput(attrs={
             "class": "form-input",
