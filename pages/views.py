@@ -482,6 +482,7 @@ def pricing(request):
     ]
 
     return render(request, "pages/pricing.html", {
+        "active": "pricing",
         "tiers": tiers,
         "comparison": comparison,
         "assessments": assessments,
