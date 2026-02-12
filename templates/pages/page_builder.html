@@ -4,50 +4,50 @@
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' %}
-    <main>
-        <div class="page-container slim">
-            <section class="hero-card stacked">
-                <div>
-                    <p class="eyebrow">{{ hero.eyebrow }}</p>
-                    <h1>{{ hero.title }}</h1>
-                    <p class="lede">{{ hero.lede }}</p>
-                </div>
-            </section>
+    <main class="pb-main">
+        <div class="pb-hero">
+            <p class="pb-eyebrow">{{ hero.eyebrow }}</p>
+            <h1 class="pb-title">{{ hero.title }}</h1>
+            <p class="pb-lede">{{ hero.lede }}</p>
+        </div>
 
-            <section class="panel">
-                <div class="value-grid">
-                    {% for section in sections %}
-                    <article class="value-card">
-                        {% if section.badge %}<p class="label">{{ section.badge }}</p>{% endif %}
-                        <h3>{{ section.title }}</h3>
-                        {% if section.body %}<p>{{ section.body }}</p>{% endif %}
-                        {% if section.list %}
-                        <ul>
-                            {% for item in section.list %}
-                            <li>{{ item }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                        {% if section.meta %}
-                        <ul class="stacked-list">
-                            {% for meta in section.meta %}
-                            <li><strong>{{ meta.label }}</strong><span>{{ meta.value }}</span></li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                        {% if section.cta_label %}
-                        <a class="btn btn-pill"
-                           href="{{ section.cta_url }}"
-                           data-gtag-click="page_builder_cta_click"
-                           data-gtag-category="engagement"
-                           data-gtag-label="{{ section.cta_label }}"
-                           data-gtag-params='{"section":"{{ section.title|escapejs }}"}'>{{ section.cta_label }}</a>
-                        {% endif %}
-                    </article>
+        <div class="pb-grid">
+            {% for section in sections %}
+            <article class="pb-card">
+                {% if section.badge %}<span class="pb-badge">{{ section.badge }}</span>{% endif %}
+                <h3 class="pb-card-title">{{ section.title }}</h3>
+                {% if section.body %}<p class="pb-card-body">{{ section.body }}</p>{% endif %}
+                {% if section.list %}
+                <ul class="pb-list">
+                    {% for item in section.list %}
+                    <li>{{ item }}</li>
                     {% endfor %}
-                </div>
-            </section>
+                </ul>
+                {% endif %}
+                {% if section.meta %}
+                <dl class="pb-meta">
+                    {% for meta in section.meta %}
+                    <div class="pb-meta-row">
+                        <dt>{{ meta.label }}</dt>
+                        <dd>{{ meta.value }}</dd>
+                    </div>
+                    {% endfor %}
+                </dl>
+                {% endif %}
+                {% if section.cta_label %}
+                <a class="pb-cta"
+                   href="{{ section.cta_url }}"
+                   data-gtag-click="page_builder_cta_click"
+                   data-gtag-category="engagement"
+                   data-gtag-label="{{ section.cta_label }}"
+                   data-gtag-params='{"section":"{{ section.title|escapejs }}"}'>{{ section.cta_label }}</a>
+                {% endif %}
+            </article>
+            {% endfor %}
         </div>
     </main>
 </div>
+{% endblock %}
+{% block site_footer %}
+    {% include 'includes/site_footer.html' %}
 {% endblock %}
