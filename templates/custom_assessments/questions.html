@@ -232,7 +232,7 @@
 {# AI Generation Modal #}
 <div id="ai-modal" class="modal">
     <div class="modal-content modal-lg">
-        <div class="modal-header ai-modal-header">
+        <div class="modal-header">
             <div class="modal-title-group">
                 <div class="modal-icon ai-gradient">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -256,50 +256,55 @@
         <form method="post" action="{% url 'custom_assessments:generate-ai' assessment.uuid %}">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="ai-tip-banner">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    <span>Be specific with skills &mdash; the more detail you give, the better the questions.</span>
-                </div>
-
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">1</span>
-                        Role &amp; Skills
+                <div class="csv-info-box">
+                    <div class="csv-info-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="8.5" cy="7" r="4"></circle>
-                                <line x1="20" y1="8" x2="20" y2="14"></line>
-                                <line x1="23" y1="11" x2="17" y2="11"></line>
-                            </svg>
-                            Role / Position <span class="required">*</span>
-                        </label>
-                        <input type="text" name="role_description" class="form-input" placeholder="e.g., Senior Sales Representative, Marketing Manager" required>
-                        <span class="form-hint">The job role this assessment will evaluate</span>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                            </svg>
-                            Skills to Test <span class="required">*</span>
-                        </label>
-                        <textarea name="skills_to_test" class="form-textarea" rows="3" placeholder="e.g., cold calling, objection handling, CRM usage, closing techniques, negotiation skills" required></textarea>
-                        <span class="form-hint">List the skills, knowledge areas, or competencies to assess</span>
+                    <div class="csv-info-content">
+                        <strong>Tip</strong>
+                        <p>Be specific with skills &mdash; the more detail you give, the better the questions.</p>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">2</span>
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                        </svg>
+                        Role / Position <span class="required">*</span>
+                    </label>
+                    <input type="text" name="role_description" class="form-input" placeholder="e.g., Senior Sales Representative, Marketing Manager" required>
+                    <span class="form-hint">The job role this assessment will evaluate</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        Skills to Test <span class="required">*</span>
+                    </label>
+                    <textarea name="skills_to_test" class="form-textarea" rows="3" placeholder="e.g., cold calling, objection handling, CRM usage, closing techniques, negotiation skills" required></textarea>
+                    <span class="form-hint">List the skills, knowledge areas, or competencies to assess</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 20h.01"></path>
+                            <path d="M7 20v-4"></path>
+                            <path d="M12 20v-8"></path>
+                            <path d="M17 20V8"></path>
+                        </svg>
                         Difficulty Level
-                    </div>
+                    </label>
                     <div class="level-selector">
                         <label class="level-option">
                             <input type="radio" name="difficulty_level" value="junior">
@@ -314,7 +319,6 @@
                                 </div>
                                 <span class="level-title">Junior</span>
                                 <span class="level-desc">0-2 years exp</span>
-                                <span class="level-detail">Foundational concepts</span>
                             </div>
                         </label>
                         <label class="level-option recommended">
@@ -328,7 +332,6 @@
                                 </div>
                                 <span class="level-title">Mid-Level</span>
                                 <span class="level-desc">2-5 years exp</span>
-                                <span class="level-detail">Applied knowledge</span>
                             </div>
                         </label>
                         <label class="level-option">
@@ -341,24 +344,26 @@
                                 </div>
                                 <span class="level-title">Senior</span>
                                 <span class="level-desc">5+ years exp</span>
-                                <span class="level-detail">Strategic thinking</span>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <div class="form-section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
-                    <div class="section-title">
-                        <span class="section-number">3</span>
-                        Question Count
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Number of Questions
+                    </label>
                     <div class="ai-count-row">
                         <div class="number-input-wrapper">
                             <button type="button" class="number-btn" onclick="adjustNumber('num_questions', -5)">-5</button>
                             <input type="number" name="num_questions" id="num_questions" class="form-input number-input" value="5" min="5" max="10">
                             <button type="button" class="number-btn" onclick="adjustNumber('num_questions', 5)">+5</button>
                         </div>
-                        <span class="ai-count-hint">5&ndash;10 questions per batch</span>
+                        <span class="ai-count-hint">5&ndash;10 per batch</span>
                     </div>
                 </div>
             </div>
@@ -482,7 +487,7 @@
 {# Manual Question Modal #}
 <div id="manual-modal" class="modal">
     <div class="modal-content modal-lg">
-        <div class="modal-header manual-header">
+        <div class="modal-header">
             <div class="modal-title-group">
                 <div class="modal-icon manual-gradient">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -505,22 +510,13 @@
         <form method="post" action="{% url 'custom_assessments:question-add' assessment.uuid %}">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">1</span>
-                        Question
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Question Text <span class="required">*</span></label>
-                        <textarea name="question_text" class="form-textarea" rows="3" placeholder="Enter your question here..." required></textarea>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Question Text <span class="required">*</span></label>
+                    <textarea name="question_text" class="form-textarea" rows="3" placeholder="Enter your question here..." required></textarea>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">2</span>
-                        Answer Options
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Answer Options</label>
                     <div class="options-grid">
                         <div class="option-input-group">
                             <span class="option-label required-option">A</span>
@@ -541,52 +537,47 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">3</span>
-                        Correct Answer & Details
-                    </div>
-                    <div class="form-row three-col">
-                        <div class="form-group">
-                            <label class="form-label">Correct Answer <span class="required">*</span></label>
-                            <div class="answer-selector">
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="A" checked>
-                                    <span>A</span>
-                                </label>
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="B">
-                                    <span>B</span>
-                                </label>
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="C">
-                                    <span>C</span>
-                                </label>
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="D">
-                                    <span>D</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Difficulty</label>
-                            <select name="difficulty_level" class="form-select">
-                                <option value="1">1 - Very Easy</option>
-                                <option value="2">2 - Easy</option>
-                                <option value="3" selected>3 - Medium</option>
-                                <option value="4">4 - Hard</option>
-                                <option value="5">5 - Very Hard</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Category</label>
-                            <input type="text" name="category" class="form-input" placeholder="e.g., Technical">
+                <div class="form-row three-col">
+                    <div class="form-group">
+                        <label class="form-label">Correct Answer <span class="required">*</span></label>
+                        <div class="answer-selector">
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="A" checked>
+                                <span>A</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="B">
+                                <span>B</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="C">
+                                <span>C</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="D">
+                                <span>D</span>
+                            </label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Explanation</label>
-                        <textarea name="explanation" class="form-textarea" rows="2" placeholder="Explain why this is the correct answer (shown after submission)"></textarea>
+                        <label class="form-label">Difficulty</label>
+                        <select name="difficulty_level" class="form-select">
+                            <option value="1">1 - Very Easy</option>
+                            <option value="2">2 - Easy</option>
+                            <option value="3" selected>3 - Medium</option>
+                            <option value="4">4 - Hard</option>
+                            <option value="5">5 - Very Hard</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <input type="text" name="category" class="form-input" placeholder="e.g., Technical">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Explanation</label>
+                    <textarea name="explanation" class="form-textarea" rows="2" placeholder="Explain why this is the correct answer (shown after submission)"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -606,7 +597,7 @@
 {# Edit Question Modal #}
 <div id="edit-modal" class="modal">
     <div class="modal-content modal-lg">
-        <div class="modal-header manual-header">
+        <div class="modal-header">
             <div class="modal-title-group">
                 <div class="modal-icon edit-gradient">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -629,22 +620,13 @@
         <form method="post" id="edit-question-form" action="">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">1</span>
-                        Question
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Question Text <span class="required">*</span></label>
-                        <textarea name="question_text" id="edit-question-text" class="form-textarea" rows="3" required></textarea>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Question Text <span class="required">*</span></label>
+                    <textarea name="question_text" id="edit-question-text" class="form-textarea" rows="3" required></textarea>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">2</span>
-                        Answer Options
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Answer Options</label>
                     <div class="options-grid">
                         <div class="option-input-group">
                             <span class="option-label required-option">A</span>
@@ -665,52 +647,47 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">3</span>
-                        Correct Answer & Details
-                    </div>
-                    <div class="form-row three-col">
-                        <div class="form-group">
-                            <label class="form-label">Correct Answer <span class="required">*</span></label>
-                            <div class="answer-selector">
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="A" id="edit-correct-a">
-                                    <span>A</span>
-                                </label>
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="B" id="edit-correct-b">
-                                    <span>B</span>
-                                </label>
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="C" id="edit-correct-c">
-                                    <span>C</span>
-                                </label>
-                                <label class="answer-option">
-                                    <input type="radio" name="correct_answer" value="D" id="edit-correct-d">
-                                    <span>D</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Difficulty</label>
-                            <select name="difficulty_level" id="edit-difficulty" class="form-select">
-                                <option value="1">1 - Very Easy</option>
-                                <option value="2">2 - Easy</option>
-                                <option value="3">3 - Medium</option>
-                                <option value="4">4 - Hard</option>
-                                <option value="5">5 - Very Hard</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Category</label>
-                            <input type="text" name="category" id="edit-category" class="form-input">
+                <div class="form-row three-col">
+                    <div class="form-group">
+                        <label class="form-label">Correct Answer <span class="required">*</span></label>
+                        <div class="answer-selector">
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="A" id="edit-correct-a">
+                                <span>A</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="B" id="edit-correct-b">
+                                <span>B</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="C" id="edit-correct-c">
+                                <span>C</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="correct_answer" value="D" id="edit-correct-d">
+                                <span>D</span>
+                            </label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Explanation</label>
-                        <textarea name="explanation" id="edit-explanation" class="form-textarea" rows="2"></textarea>
+                        <label class="form-label">Difficulty</label>
+                        <select name="difficulty_level" id="edit-difficulty" class="form-select">
+                            <option value="1">1 - Very Easy</option>
+                            <option value="2">2 - Easy</option>
+                            <option value="3">3 - Medium</option>
+                            <option value="4">4 - Hard</option>
+                            <option value="5">5 - Very Hard</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <input type="text" name="category" id="edit-category" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Explanation</label>
+                    <textarea name="explanation" id="edit-explanation" class="form-textarea" rows="2"></textarea>
                 </div>
             </div>
             <div class="modal-footer">

@@ -413,40 +413,39 @@
         <form method="post" action="{% url 'custom_assessments:invite' assessment.uuid %}">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">1</span>
-                        Candidate Details
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Candidate Name/ID <span class="required">*</span>
+                        </label>
+                        {{ invite_form.candidate_id }}
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                                Candidate Name/ID <span class="required">*</span>
-                            </label>
-                            {{ invite_form.candidate_id }}
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                    <polyline points="22,6 12,13 2,6"></polyline>
-                                </svg>
-                                Email <span class="required">*</span>
-                            </label>
-                            {{ invite_form.candidate_email }}
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Email <span class="required">*</span>
+                        </label>
+                        {{ invite_form.candidate_email }}
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">2</span>
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 20h.01"></path>
+                            <path d="M7 20v-4"></path>
+                            <path d="M12 20v-8"></path>
+                            <path d="M17 20V8"></path>
+                        </svg>
                         Assessment Level
-                    </div>
+                    </label>
                     <div class="level-options">
                         {% for value, label in invite_form.level.field.choices %}
                         <label class="level-option{% if value == 'mid' %} recommended{% endif %}">
@@ -479,35 +478,29 @@
                     </div>
                 </div>
 
-                <div class="form-section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
-                    <div class="section-title">
-                        <span class="section-number">3</span>
-                        Options
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Deadline (Optional)
+                        </label>
+                        {{ invite_form.deadline_at }}
+                        <span class="form-hint">Set a deadline for completion</span>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                Deadline (Optional)
-                            </label>
-                            {{ invite_form.deadline_at }}
-                            <span class="form-hint">Set a deadline for completion</span>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                                </svg>
-                                Project (Optional)
-                            </label>
-                            {{ invite_form.project }}
-                            <span class="form-hint">Associate with a project</span>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Project (Optional)
+                        </label>
+                        {{ invite_form.project }}
+                        <span class="form-hint">Associate with a project</span>
                     </div>
                 </div>
             </div>
@@ -553,64 +546,63 @@
         <form method="post" action="{% url 'custom_assessments:bulk-invite' assessment.uuid %}" enctype="multipart/form-data" id="bulk-csv-form">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">1</span>
-                        Upload CSV File
+                <div class="csv-info-box">
+                    <div class="csv-info-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
                     </div>
-                    <div class="csv-info-box">
-                        <div class="csv-info-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                            </svg>
-                        </div>
-                        <div class="csv-info-content">
-                            <strong>CSV Format Requirements</strong>
-                            <p>Each row should contain: <code style="background: rgba(14,20,40,0.06); padding: 0.15rem 0.35rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">name</code>, <code style="background: rgba(14,20,40,0.06); padding: 0.15rem 0.35rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">email</code> &mdash; Example: <code style="background: rgba(14,20,40,0.06); padding: 0.15rem 0.35rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">John Doe,john@example.com</code></p>
-                        </div>
-                    </div>
-
-                    <div class="upload-zone" id="bulk-upload-zone">
-                        <input type="file" name="csv_file" id="bulk-csv-file" accept=".csv" class="file-input" required>
-                        <div class="upload-content" id="bulk-upload-content">
-                            <div class="upload-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                            </div>
-                            <p class="upload-text">Drop your CSV file here or <span class="upload-link">browse</span></p>
-                            <p class="upload-hint">Maximum file size: 1MB</p>
-                        </div>
-                        <div class="file-selected" id="bulk-file-selected" style="display: none;">
-                            <div class="file-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                </svg>
-                            </div>
-                            <div class="file-info">
-                                <span class="file-name" id="bulk-file-name"></span>
-                                <span class="file-size" id="bulk-file-size"></span>
-                            </div>
-                            <button type="button" class="file-remove" onclick="clearBulkFile()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="csv-info-content">
+                        <strong>CSV Format</strong>
+                        <p>Each row: <code style="background: rgba(14,20,40,0.06); padding: 0.15rem 0.35rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">name, email</code> &mdash; e.g. <code style="background: rgba(14,20,40,0.06); padding: 0.15rem 0.35rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">John Doe,john@example.com</code></p>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">
-                        <span class="section-number">2</span>
-                        Assessment Level
+                <div class="upload-zone" id="bulk-upload-zone">
+                    <input type="file" name="csv_file" id="bulk-csv-file" accept=".csv" class="file-input" required>
+                    <div class="upload-content" id="bulk-upload-content">
+                        <div class="upload-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drop your CSV file here or <span class="upload-link">browse</span></p>
+                        <p class="upload-hint">Maximum file size: 1MB</p>
                     </div>
+                    <div class="file-selected" id="bulk-file-selected" style="display: none;">
+                        <div class="file-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="file-info">
+                            <span class="file-name" id="bulk-file-name"></span>
+                            <span class="file-size" id="bulk-file-size"></span>
+                        </div>
+                        <button type="button" class="file-remove" onclick="clearBulkFile()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 20h.01"></path>
+                            <path d="M7 20v-4"></path>
+                            <path d="M12 20v-8"></path>
+                            <path d="M17 20V8"></path>
+                        </svg>
+                        Assessment Level
+                    </label>
                     <div class="level-options">
                         {% for value, label in bulk_invite_form.level.field.choices %}
                         <label class="level-option{% if value == 'mid' %} recommended{% endif %}">
@@ -643,24 +635,18 @@
                     </div>
                 </div>
 
-                <div class="form-section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
-                    <div class="section-title">
-                        <span class="section-number">3</span>
-                        Options
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg>
-                            Deadline (Optional)
-                        </label>
-                        {{ bulk_invite_form.deadline_at }}
-                        <span class="form-hint">All candidates will share the same deadline</span>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Deadline (Optional)
+                    </label>
+                    {{ bulk_invite_form.deadline_at }}
+                    <span class="form-hint">All candidates will share the same deadline</span>
                 </div>
             </div>
             <div class="modal-footer">

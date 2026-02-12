@@ -19,26 +19,67 @@
             <h1>{{ session_obj.candidate_id }}</h1>
             <div class="rd-meta">
                 <span class="rd-status rd-st-{{ session_obj.status }}">{{ session_obj.get_status_display }}</span>
+                {% if session_obj.level %}
+                <span class="rd-level-pill">{{ session_obj.get_level_display }}</span>
+                {% endif %}
                 {% if session_obj.submitted_at %}
                 <span class="rd-meta-text">Submitted {{ session_obj.submitted_at|naturaltime }}</span>
                 {% endif %}
+                {% if recommended_decision %}
+                <span class="rd-decision-pill rd-decision--{{ recommended_decision.decision }}">
+                    {% if recommended_decision.decision == 'advance' %}Advance{% elif recommended_decision.decision == 'hold' %}Hold{% elif recommended_decision.decision == 'reject' %}Reject{% endif %}
+                    ({{ recommended_decision.count }})
+                </span>
+                {% endif %}
             </div>
         </div>
-        {% if share_link %}
-        <a href="{{ share_link }}" target="_blank" class="btn btn-outline small">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                <polyline points="16 6 12 2 8 6"></polyline>
-                <line x1="12" y1="2" x2="12" y2="15"></line>
-            </svg>
-            Share
-        </a>
-        {% endif %}
+        <div class="rd-header-actions">
+            {% if pdf_export_url %}
+            <a href="{{ pdf_export_url }}" class="btn btn-outline small" title="Export PDF">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                PDF
+            </a>
+            {% endif %}
+            {% if share_link %}
+            <a href="{{ share_link }}" target="_blank" class="btn btn-outline small" title="Share report link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+                Share
+            </a>
+            {% endif %}
+        </div>
     </header>
 
     {# ── Recommendation Banner ── #}
     {% if actionable_summary %}
     <div class="rd-banner rd-tone-{{ actionable_summary.tone }}">
+        <div class="rd-banner-icon">
+            {% if actionable_summary.tone == 'positive' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            {% elif actionable_summary.tone == 'negative' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            {% else %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {% endif %}
+        </div>
         <div class="rd-banner-left">
             <span class="rd-banner-badge">{{ actionable_summary.label }}</span>
             <h2>{{ actionable_summary.headline }}</h2>
@@ -68,9 +109,14 @@
             <span class="rd-metric-val">
                 {% if report.score %}{{ report.score|floatformat:1 }}{% elif report.overall %}{{ report.overall|floatformat:1 }}{% else %}—{% endif %}
             </span>
+            {% if report.score or report.overall %}
+            <div class="rd-metric-bar">
+                <div class="rd-metric-fill" style="width: {% if report.score %}{{ report.score|floatformat:0 }}{% elif report.overall %}{{ report.overall|floatformat:0 }}{% else %}0{% endif %}%"></div>
+            </div>
+            {% endif %}
             <span class="rd-metric-sub">
                 {% if comparative_insights.cohort_total %}
-                vs. avg {{ comparative_insights.cohort_avg|floatformat:1 }}
+                vs. avg {{ comparative_insights.cohort_avg|floatformat:1 }} · {{ comparative_insights.cohort_total }} candidates
                 {% else %}
                 Final assessment score
                 {% endif %}
@@ -94,11 +140,29 @@
         </article>
     </div>
 
+    {# ── Quick Follow-ups ── #}
+    {% if quick_followups %}
+    <div class="rd-followups">
+        {% for link in quick_followups %}
+        <a href="{{ link.url }}" class="rd-followup" {% if link.external %}target="_blank"{% endif %}>
+            <span>{{ link.label }}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {# ── Take Action ── #}
     {% if can_record_decision %}
     <section class="rd-section">
         <div class="rd-section-head">
-            <h2>Take Action</h2>
+            <div class="rd-section-title-row">
+                <svg class="rd-section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <h2>Take Action</h2>
+            </div>
             <span class="rd-section-sub">Record your hiring decision</span>
         </div>
         <div class="rd-action-card">
@@ -106,7 +170,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="quick_decision">
                 <div class="rd-action-btns">
-                    <button type="submit" name="decision" value="advance" class="rd-action rd-action--advance">
+                    <button type="submit" name="decision" value="advance" class="rd-action rd-action--advance {% if recommended_decision and recommended_decision.decision == 'advance' %}rd-action--active{% endif %}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
@@ -115,7 +179,7 @@
                             <span class="rd-action-hint">Move to next stage</span>
                         </div>
                     </button>
-                    <button type="submit" name="decision" value="hold" class="rd-action rd-action--hold">
+                    <button type="submit" name="decision" value="hold" class="rd-action rd-action--hold {% if recommended_decision and recommended_decision.decision == 'hold' %}rd-action--active{% endif %}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -126,7 +190,7 @@
                             <span class="rd-action-hint">Need more signals</span>
                         </div>
                     </button>
-                    <button type="submit" name="decision" value="reject" class="rd-action rd-action--reject">
+                    <button type="submit" name="decision" value="reject" class="rd-action rd-action--reject {% if recommended_decision and recommended_decision.decision == 'reject' %}rd-action--active{% endif %}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -150,13 +214,19 @@
     {% if activity_timeline %}
     <section class="rd-section">
         <div class="rd-section-head">
-            <h2>Candidate Journey</h2>
+            <div class="rd-section-title-row">
+                <svg class="rd-section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <h2>Candidate Journey</h2>
+            </div>
             <span class="rd-section-sub">Key milestones and events</span>
         </div>
         <div class="rd-timeline-card">
             {% for event in activity_timeline %}
             <div class="rd-tl-event">
-                <div class="rd-tl-dot"></div>
+                <div class="rd-tl-dot {% if forloop.first %}rd-tl-dot--first{% endif %}"></div>
                 <div class="rd-tl-body">
                     <div class="rd-tl-top">
                         <strong>{{ event.label }}</strong>
@@ -174,12 +244,18 @@
     {# ── Performance Breakdown ── #}
     <section class="rd-section">
         <div class="rd-section-head">
-            <h2>{% if assessment_type == 'behavioral' %}Behavioral Profile{% else %}Skill Breakdown{% endif %}</h2>
+            <div class="rd-section-title-row">
+                <svg class="rd-section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="20" x2="12" y2="10"></line>
+                    <line x1="18" y1="20" x2="18" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="16"></line>
+                </svg>
+                <h2>{% if assessment_type == 'behavioral' %}Behavioral Profile{% else %}Skill Breakdown{% endif %}</h2>
+            </div>
             <span class="rd-section-sub">Detailed performance analysis</span>
         </div>
 
         {% if assessment_type == 'behavioral' %}
-        {# Trait Scores #}
         {% if report.traits %}
         <div class="rd-traits-grid">
             {% for trait, score in report.traits.items %}
@@ -196,9 +272,15 @@
         </div>
         {% endif %}
 
-        {# Risk Flags #}
         {% if report.flags %}
-        <h3 class="rd-sub-title">Risk Flags</h3>
+        <h3 class="rd-sub-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="vertical-align: -3px;">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            Risk Flags
+        </h3>
         <div class="rd-flags-grid">
             {% for flag in report.flags %}
             <div class="rd-flag rd-flag--{{ flag.level|default:'watchlist'|lower }}">
@@ -220,19 +302,22 @@
         {% endif %}
 
         {% else %}
-        {# Skills Heatmap #}
         {% if report.category_heatmap %}
         <div class="rd-skills-grid">
             {% for item in report.category_heatmap %}
             <div class="rd-skill rd-skill--{{ item.status }}">
                 <span class="rd-skill-lbl">{{ item.label|title }}</span>
                 <span class="rd-skill-val">{% if item.score is not None %}{{ item.score|floatformat:0 }}{% else %}—{% endif %}</span>
+                {% if item.score is not None %}
+                <div class="rd-skill-bar">
+                    <div class="rd-skill-fill" style="width: {{ item.score|floatformat:0 }}%;"></div>
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        {# Category Scores Table #}
         {% if report.categories %}
         <div class="rd-cat-table">
             <div class="rd-cat-head">
@@ -242,18 +327,27 @@
             {% for cat, value in report.categories.items %}
             <div class="rd-cat-row">
                 <span class="rd-cat-name">{{ cat|title }}</span>
-                <span class="rd-cat-score">{{ value|floatformat:1 }}</span>
+                <div class="rd-cat-right">
+                    <div class="rd-cat-bar">
+                        <div class="rd-cat-fill" style="width: {{ value|floatformat:0 }}%;"></div>
+                    </div>
+                    <span class="rd-cat-score">{{ value|floatformat:1 }}</span>
+                </div>
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        {# Strengths & Development #}
         {% if report.strengths or report.development %}
         <div class="rd-strengths">
             {% if report.strengths %}
             <div class="rd-str-section">
-                <h4>Strengths</h4>
+                <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="vertical-align: -2px; margin-right: 0.25rem;">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Strengths
+                </h4>
                 <div class="rd-chips">
                     {% for item in report.strengths %}
                     <span class="rd-tag rd-tag--good">{{ item|title }}</span>
@@ -263,7 +357,14 @@
             {% endif %}
             {% if report.development %}
             <div class="rd-str-section">
-                <h4>Development Areas</h4>
+                <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="vertical-align: -2px; margin-right: 0.25rem;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    Development Areas
+                </h4>
                 <div class="rd-chips">
                     {% for item in report.development %}
                     <span class="rd-tag rd-tag--warn">{{ item|title }}</span>
@@ -279,7 +380,12 @@
     {# ── Team Notes ── #}
     <section class="rd-section">
         <div class="rd-section-head">
-            <h2>Team Notes</h2>
+            <div class="rd-section-title-row">
+                <svg class="rd-section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <h2>Team Notes</h2>
+            </div>
             <span class="rd-section-sub">Shared feedback and decisions</span>
         </div>
         <div class="rd-notes-card">
@@ -323,16 +429,19 @@
             {% if notes %}
             <div class="rd-note-list">
                 {% for note in notes %}
-                <div class="rd-note-item">
+                <div class="rd-note-item {% if note.note_type == 'decision' %}rd-note-item--decision{% endif %}">
                     <div class="rd-note-top">
                         <div class="rd-note-who">
-                            <span class="rd-note-author">
-                                {% if note.author %}{{ note.author.get_full_name|default:note.author.username }}{% else %}System{% endif %}
-                            </span>
-                            <span class="rd-note-time">{{ note.created_at|naturaltime }}</span>
+                            <span class="rd-note-avatar">{% if note.author %}{{ note.author.get_full_name|default:note.author.username|slice:":1"|upper }}{% else %}S{% endif %}</span>
+                            <div>
+                                <span class="rd-note-author">
+                                    {% if note.author %}{{ note.author.get_full_name|default:note.author.username }}{% else %}System{% endif %}
+                                </span>
+                                <span class="rd-note-time">{{ note.created_at|naturaltime }}</span>
+                            </div>
                         </div>
                         {% if note.note_type == 'decision' %}
-                        <span class="rd-note-badge">{{ note.get_decision_display }}</span>
+                        <span class="rd-note-badge rd-note-badge--{{ note.decision }}">{{ note.get_decision_display }}</span>
                         {% endif %}
                     </div>
                     {% if note.note %}
@@ -356,17 +465,27 @@
     {# ── Advanced Details ── #}
     <details class="rd-advanced">
         <summary class="rd-advanced-toggle">
-            <h3>Advanced Details</h3>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="rd-section-title-row">
+                <svg class="rd-section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <h3>Advanced Details</h3>
+            </div>
+            <svg class="rd-advanced-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
         </summary>
         <div class="rd-advanced-body">
 
-            {# Candidate Feedback #}
             {% if candidate_feedback %}
             <div class="rd-adv-card">
-                <h4>Candidate Feedback</h4>
+                <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 0.3rem;">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Candidate Feedback
+                </h4>
                 <div class="rd-adv-grid">
                     <div>
                         <span class="rd-adv-lbl">Rating</span>
@@ -383,10 +502,14 @@
             </div>
             {% endif %}
 
-            {# Integrity Signals #}
             {% if integrity_signals %}
             <div class="rd-adv-card">
-                <h4>Environment Telemetry</h4>
+                <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 0.3rem;">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    Environment Telemetry
+                </h4>
                 <div class="rd-adv-grid rd-adv-grid--3">
                     <div>
                         <span class="rd-adv-lbl">Primary IP</span>
@@ -407,10 +530,15 @@
             </div>
             {% endif %}
 
-            {# Response Drilldown #}
             {% if response_drilldown %}
             <div class="rd-adv-card">
-                <h4>Response Details</h4>
+                <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 0.3rem;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    Response Details
+                </h4>
                 {% for item in response_drilldown|slice:":5" %}
                 <details class="rd-response">
                     <summary>
