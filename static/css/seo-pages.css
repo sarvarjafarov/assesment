@@ -1379,19 +1379,21 @@
 
 /* ── Category Color Accents (IQ detail) ─────────────────────────── */
 
-.iq-section.iq-cat--technical { border-left: 3px solid #3b82f6; }
-.iq-section.iq-cat--behavioral { border-left: 3px solid #8b5cf6; }
-.iq-section.iq-cat--situational { border-left: 3px solid #f59e0b; }
-.iq-section.iq-cat--leadership { border-left: 3px solid #ef4444; }
-.iq-section.iq-cat--culture { border-left: 3px solid #ec4899; }
-.iq-section.iq-cat--problem-solving { border-left: 3px solid #10b981; }
+/* Color the section header icon per category */
+.iq-cat--technical .iq-section-header svg { color: #3b82f6; }
+.iq-cat--behavioral .iq-section-header svg { color: #8b5cf6; }
+.iq-cat--situational .iq-section-header svg { color: #f59e0b; }
+.iq-cat--leadership .iq-section-header svg { color: #ef4444; }
+.iq-cat--culture .iq-section-header svg { color: #ec4899; }
+.iq-cat--problem-solving .iq-section-header svg { color: #10b981; }
 
-.iq-question.iq-cat--technical { border-left: 3px solid rgba(59, 130, 246, 0.3); }
-.iq-question.iq-cat--behavioral { border-left: 3px solid rgba(139, 92, 246, 0.3); }
-.iq-question.iq-cat--situational { border-left: 3px solid rgba(245, 158, 11, 0.3); }
-.iq-question.iq-cat--leadership { border-left: 3px solid rgba(239, 68, 68, 0.3); }
-.iq-question.iq-cat--culture { border-left: 3px solid rgba(236, 72, 153, 0.3); }
-.iq-question.iq-cat--problem-solving { border-left: 3px solid rgba(16, 185, 129, 0.3); }
+/* Subtle top-border accent on question cards */
+.iq-question.iq-cat--technical { border-top: 2px solid rgba(59, 130, 246, 0.15); }
+.iq-question.iq-cat--behavioral { border-top: 2px solid rgba(139, 92, 246, 0.15); }
+.iq-question.iq-cat--situational { border-top: 2px solid rgba(245, 158, 11, 0.15); }
+.iq-question.iq-cat--leadership { border-top: 2px solid rgba(239, 68, 68, 0.15); }
+.iq-question.iq-cat--culture { border-top: 2px solid rgba(236, 72, 153, 0.15); }
+.iq-question.iq-cat--problem-solving { border-top: 2px solid rgba(16, 185, 129, 0.15); }
 
 /* ── Sticky Table of Contents (IQ detail) ────────────────────────── */
 
