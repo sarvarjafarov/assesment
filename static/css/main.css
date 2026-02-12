@@ -10618,105 +10618,125 @@ main {
    ================================================================= */
 
 /* Attention Banner */
-.attention-banner {
-    background: linear-gradient(135deg, rgba(255, 138, 0, 0.06), rgba(255, 138, 0, 0.02));
-    border: 1px solid rgba(255, 138, 0, 0.2);
-    border-radius: var(--radius-xl);
-    margin-bottom: 2.5rem;
+/* Compact collapsible attention bar */
+.db-attention {
+    border: 1px solid rgba(255, 138, 0, 0.18);
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+    background: rgba(255, 138, 0, 0.03);
     overflow: hidden;
 }
 
-.attention-header {
+.db-attention-toggle {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background 0.15s ease;
+}
+
+.db-attention-toggle::-webkit-details-marker { display: none; }
+
+.db-attention-toggle:hover {
     background: rgba(255, 138, 0, 0.05);
-    border-bottom: 1px solid rgba(255, 138, 0, 0.1);
 }
 
-.attention-header::before {
-    content: '';
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-md);
+.db-attention-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--color-orange), #ff6b00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'%3E%3Cpath d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E") center no-repeat,
-        linear-gradient(135deg, var(--color-orange), #ff6b00);
+    color: #fff;
 }
 
-.attention-header h3 {
-    margin: 0 0 0.125rem;
-    font-size: 1.125rem;
+.db-attention-label {
     font-weight: 700;
+    font-size: 0.875rem;
     color: var(--color-navy);
 }
 
-.attention-header .muted {
-    margin: 0;
-    font-size: 0.85rem;
+.db-attention-count {
+    background: var(--color-orange);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 10px;
+    line-height: 1.3;
 }
 
-.attention-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.attention-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1.5rem;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 138, 0, 0.08);
-    transition: background 0.2s ease;
-}
-
-.attention-list li .btn {
+.db-attention-chevron {
+    margin-left: auto;
+    color: var(--color-text-muted);
+    transition: transform 0.2s ease;
     flex-shrink: 0;
-    margin-top: 0.25rem;
 }
 
-.attention-list li:hover {
-    background: rgba(255, 138, 0, 0.03);
+.db-attention[open] .db-attention-chevron {
+    transform: rotate(180deg);
 }
 
-.attention-list li:last-child {
+.db-attention-body {
+    border-top: 1px solid rgba(255, 138, 0, 0.1);
+}
+
+.db-attention-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 1rem 0.5rem 1.25rem;
+    font-size: 0.825rem;
+    border-bottom: 1px solid rgba(255, 138, 0, 0.06);
+    transition: background 0.15s ease;
+}
+
+.db-attention-row:last-child {
     border-bottom: none;
 }
 
-.attention-content {
-    flex: 1;
+.db-attention-row:hover {
+    background: rgba(255, 138, 0, 0.04);
 }
 
-.attention-content strong {
-    display: block;
-    margin-bottom: 0.25rem;
+.db-attention-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-orange);
+    flex-shrink: 0;
+}
+
+.db-attention-text {
+    flex: 1;
+    min-width: 0;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.db-attention-text strong {
     color: var(--color-navy);
     font-weight: 600;
 }
 
-.attention-content .muted {
-    font-size: 0.85rem;
-}
-
-.attention-footer {
-    padding: 0.875rem 1.5rem;
-    text-align: center;
-    border-top: 1px solid rgba(255, 138, 0, 0.1);
-    background: rgba(255, 138, 0, 0.02);
-}
-
-.attention-footer a {
-    color: var(--color-orange);
+.db-attention-link {
+    flex-shrink: 0;
+    font-size: 0.8rem;
     font-weight: 600;
+    color: var(--color-orange);
     text-decoration: none;
-    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
-.attention-footer a:hover {
+.db-attention-link:hover {
     text-decoration: underline;
 }
 
@@ -12790,18 +12810,12 @@ main {
         font-size: 2rem;
     }
 
-    .attention-banner {
-        padding: 1.25rem;
+    .db-attention-row {
+        flex-wrap: wrap;
     }
 
-    .attention-header h3 {
-        font-size: 1rem;
-    }
-
-    .attention-list li {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
+    .db-attention-text {
+        white-space: normal;
     }
 
     .primary-action-card {

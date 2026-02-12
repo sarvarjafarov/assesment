@@ -195,38 +195,37 @@
         </article>
     </section>
 
-    {# ── Attention Items ── #}
+    {# ── Attention Items (compact collapsible) ── #}
     {% if attention_items %}
-    <section class="portal-card attention-banner">
-        <div class="attention-header">
-            <div>
-                <h3>Requires Attention</h3>
-                <p class="muted">{{ attention_items|length }} item{{ attention_items|length|pluralize }} need{{ attention_items|length|pluralize:"s," }} your review</p>
-            </div>
-        </div>
-        <ul class="attention-list">
+    <details class="db-attention" open>
+        <summary class="db-attention-toggle">
+            <span class="db-attention-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </span>
+            <span class="db-attention-label">Requires Attention</span>
+            <span class="db-attention-count">{{ attention_items|length }}</span>
+            <svg class="db-attention-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="db-attention-body">
             {% for item in attention_items|slice:":5" %}
-            <li>
-                <div class="attention-content">
-                    <strong>{{ item.label }}</strong>
-                    <p class="muted">{{ item.detail }}</p>
-                </div>
+            <div class="db-attention-row">
+                <span class="db-attention-dot"></span>
+                <span class="db-attention-text"><strong>{{ item.label }}</strong> — {{ item.detail }}</span>
                 {% if item.action_url %}
-                <a href="{{ item.action_url }}" class="btn btn-outline small">
-                    {% if "invite" in item.label|lower %}View Assessments
-                    {% elif "benchmark" in item.label|lower %}View Analytics
-                    {% else %}Review{% endif %}
+                <a href="{{ item.action_url }}" class="db-attention-link">
+                    {% if "invite" in item.label|lower %}View →
+                    {% elif "benchmark" in item.label|lower %}Analytics →
+                    {% else %}Review →{% endif %}
                 </a>
                 {% endif %}
-            </li>
+            </div>
             {% endfor %}
-        </ul>
-        {% if attention_items|length > 5 %}
-        <p class="attention-footer">
-            <a href="{% url 'clients:dashboard' %}#activity">View all {{ attention_items|length }} items →</a>
-        </p>
-        {% endif %}
-    </section>
+        </div>
+    </details>
     {% endif %}
 
     {# ── Two-Column Layout: Activity + Sidebar ── #}
