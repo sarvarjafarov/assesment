@@ -5,24 +5,22 @@
 {% block meta_description %}Manage candidates and track progress for {{ project.title }}.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    {# Project Header #}
-    <header class="page-header-with-actions">
-        <div>
-            <div class="breadcrumb-nav">
-                <a href="{% url 'clients:project-list' %}" class="breadcrumb-link">Projects</a>
-                <span class="breadcrumb-separator">›</span>
-                <span class="breadcrumb-current">{{ project.title }}</span>
-            </div>
+
+    {# ── Header ── #}
+    <header class="pd-header">
+        <div class="pd-header-left">
+            <nav class="pd-breadcrumb">
+                <a href="{% url 'clients:project-list' %}">Projects</a>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <span>{{ project.title }}</span>
+            </nav>
             <h1>{{ project.title }}</h1>
-            <div class="project-meta-badges">
-                <span class="badge {% if project.status == 'active' %}badge-success{% else %}badge-neutral{% endif %}">
-                    {{ project.get_status_display }}
-                </span>
-                <span class="badge badge-priority-{{ project.priority }}">
-                    {{ project.get_priority_display }} priority
-                </span>
+            <div class="pd-badges">
+                <span class="pj-status pj-status-{{ project.status }}">{{ project.get_status_display }}</span>
+                <span class="pj-badge pj-badge-{{ project.priority }}">{{ project.get_priority_display }}</span>
                 {% if project.department or project.location %}
-                <span class="meta-text">
+                <span class="pd-location">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     {% if project.department %}{{ project.department }}{% endif %}
                     {% if project.department and project.location %} · {% endif %}
                     {% if project.location %}{{ project.location }}{% endif %}
@@ -30,9 +28,9 @@
                 {% endif %}
             </div>
         </div>
-        <div class="header-actions">
+        <div class="pd-actions">
             {% if request.user.client_account.role == 'manager' or request.user.client_account.role == 'recruiter' %}
-            <a href="{% url 'clients:assessments' %}" class="btn btn-primary">
+            <a href="{% url 'clients:assessments' %}" class="btn btn-pill">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="8.5" cy="7" r="4"></circle>
@@ -43,7 +41,7 @@
             </a>
             {% endif %}
             {% if request.user.client_account.role == 'manager' %}
-            <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-ghost">
+            <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-outline small" title="Duplicate project">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -54,90 +52,81 @@
         </div>
     </header>
 
-    {# Key Metrics - Only 3 essential cards #}
-    <section class="portal-card-grid three-up key-metrics">
-        <article class="portal-card metric-card">
-            <p class="label">Open roles</p>
-            <h2 class="metric-value">{{ project.open_roles }}</h2>
-            <p class="muted">
-                {% if project.target_start_date %}
-                    Target start {{ project.target_start_date|date:"M j, Y" }}
-                {% else %}
-                    No target date set
-                {% endif %}
-            </p>
-        </article>
-        <article class="portal-card metric-card">
-            <p class="label">Total invites</p>
-            <h2 class="metric-value">{{ project.total_sessions }}</h2>
-            <p class="muted">{{ project_health.submitted }} completed</p>
-        </article>
-        <article class="portal-card metric-card">
-            <p class="label">Completion rate</p>
-            <h2 class="metric-value">
-                {% if project_health.completion_rate is not None %}
-                    {{ project_health.completion_rate|floatformat:0 }}%
-                {% else %}
-                    —
-                {% endif %}
-            </h2>
-            <p class="muted">
-                {% if project_health.total > 0 %}
-                    {{ project_health.submitted }}/{{ project_health.total }} submitted
-                {% else %}
-                    No invites yet
-                {% endif %}
-            </p>
-        </article>
-    </section>
+    {# ── Key Metrics Strip ── #}
+    <div class="pd-metrics">
+        <div class="pd-metric">
+            <span class="pd-metric-num">{{ project.open_roles }}</span>
+            <div class="pd-metric-info">
+                <span class="pd-metric-lbl">Open role{{ project.open_roles|pluralize }}</span>
+                <span class="pd-metric-sub">
+                    {% if project.target_start_date %}Target {{ project.target_start_date|date:"M j" }}{% else %}No target date{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="pd-metric-divider"></div>
+        <div class="pd-metric">
+            <span class="pd-metric-num">{{ project.total_sessions }}</span>
+            <div class="pd-metric-info">
+                <span class="pd-metric-lbl">Total invite{{ project.total_sessions|pluralize }}</span>
+                <span class="pd-metric-sub">{{ project_health.submitted }} completed</span>
+            </div>
+        </div>
+        <div class="pd-metric-divider"></div>
+        <div class="pd-metric">
+            <span class="pd-metric-num {% if project_health.completion_rate is not None and project_health.completion_rate >= 70 %}pd-num-good{% elif project_health.completion_rate is not None and project_health.completion_rate >= 40 %}pd-num-mid{% endif %}">
+                {% if project_health.completion_rate is not None %}{{ project_health.completion_rate|floatformat:0 }}%{% else %}—{% endif %}
+            </span>
+            <div class="pd-metric-info">
+                <span class="pd-metric-lbl">Completion rate</span>
+                <span class="pd-metric-sub">
+                    {% if project_health.total > 0 %}{{ project_health.submitted }}/{{ project_health.total }} submitted{% else %}No invites yet{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
 
-    {# Project Description - Only if exists #}
+    {# ── Description ── #}
     {% if project.description %}
-    <section class="portal-card description-card">
-        <h3>Description</h3>
-        <p class="description-text">{{ project.description }}</p>
-    </section>
+    <div class="pd-description">
+        <p>{{ project.description }}</p>
+    </div>
     {% endif %}
 
-    {# Pipeline Board #}
-    <section class="pipeline-section">
-        <div class="section-header">
-            <div>
-                <h3>Candidate Pipeline</h3>
-                <p class="muted">Stage-by-stage visibility</p>
-            </div>
-            <p class="muted hint-text">Drag-and-drop coming soon; for now update stages inline.</p>
+    {# ── Pipeline Board ── #}
+    <section class="pd-section">
+        <div class="pd-section-head">
+            <h2>Candidate Pipeline</h2>
+            {% if can_edit_pipeline %}
+            <span class="pd-hint">Update stages with the dropdown on each card</span>
+            {% endif %}
         </div>
-
-        <div class="pipeline-board">
+        <div class="pd-pipeline">
             {% for column in pipeline_columns %}
-            <article class="pipeline-column">
-                <div class="pipeline-column-header">
-                    <h4>{{ column.label }}</h4>
-                    <span class="count-badge">{{ column.count }}</span>
+            <div class="pd-col">
+                <div class="pd-col-head">
+                    <span class="pd-col-title">{{ column.label }}</span>
+                    <span class="pd-col-count">{{ column.count }}</span>
                 </div>
-                {% if column.sessions %}
-                <ul class="pipeline-card-list">
+                <div class="pd-col-body">
+                    {% if column.sessions %}
                     {% for card in column.sessions %}
-                    <li class="pipeline-candidate-card">
-                        <div class="candidate-info">
-                            <p class="candidate-name">{{ card.candidate }}</p>
-                            <p class="candidate-assessment muted">{{ card.assessment }}</p>
+                    <div class="pd-pipe-card">
+                        <div class="pd-pipe-top">
+                            <span class="pd-pipe-name">{{ card.candidate }}</span>
+                            {% if card.score %}
+                            <span class="pd-pipe-score">{{ card.score|floatformat:0 }}</span>
+                            {% endif %}
                         </div>
-                        {% if card.score %}
-                        <div class="candidate-score">
-                            <span class="score-value">{{ card.score|floatformat:0 }}</span>
-                        </div>
-                        {% endif %}
-                        <p class="candidate-updated muted">{{ card.updated_at|naturaltime }}</p>
-                        <div class="candidate-actions">
+                        <span class="pd-pipe-assess">{{ card.assessment }}</span>
+                        <span class="pd-pipe-time">{{ card.updated_at|naturaltime }}</span>
+                        <div class="pd-pipe-foot">
                             {% if card.detail_url %}
-                            <a href="{{ card.detail_url }}" class="btn btn-ghost small">View Report</a>
+                            <a href="{{ card.detail_url }}" class="pd-pipe-link">View Report →</a>
                             {% endif %}
                             {% if can_edit_pipeline %}
-                            <form method="post" action="{{ card.stage_url }}" class="stage-select-form">
+                            <form method="post" action="{{ card.stage_url }}" class="pd-stage-form">
                                 {% csrf_token %}
-                                <select name="stage" class="stage-select" aria-label="Update stage" onchange="this.form.submit()">
+                                <select name="stage" class="pd-stage-select" aria-label="Update stage" onchange="this.form.submit()">
                                     {% for value,label in pipeline_stage_choices %}
                                     <option value="{{ value }}" {% if value == card.stage %}selected{% endif %}>{{ label }}</option>
                                     {% endfor %}
@@ -145,111 +134,101 @@
                             </form>
                             {% endif %}
                         </div>
-                    </li>
+                    </div>
                     {% endfor %}
-                </ul>
-                {% else %}
-                <p class="pipeline-empty">No candidates in this stage.</p>
-                {% endif %}
-            </article>
+                    {% else %}
+                    <div class="pd-col-empty">No candidates</div>
+                    {% endif %}
+                </div>
+            </div>
             {% endfor %}
         </div>
     </section>
 
-    {# Assessment Breakdown #}
+    {# ── Assessment Breakdown ── #}
     {% if assessment_details %}
-    <section class="breakdown-section">
-        <div class="section-header">
-            <h3>Assessment Breakdown</h3>
-            <p class="muted">Invites by assessment type</p>
+    <section class="pd-section">
+        <div class="pd-section-head">
+            <h2>Assessment Breakdown</h2>
         </div>
-        <div class="portal-card-grid two-up">
+        <div class="pd-assess-grid">
             {% for row in assessment_details %}
-            <article class="portal-card breakdown-card">
-                <h4>{{ row.label }}</h4>
-                <div class="breakdown-stats">
-                    <div class="breakdown-main">
-                        <span class="breakdown-total">{{ row.total }}</span>
-                        <span class="breakdown-label">total invites</span>
-                    </div>
-                    <div class="breakdown-details">
-                        <span class="stat-item">{{ row.submitted }} completed</span>
-                        <span class="stat-separator">·</span>
-                        <span class="stat-item">{{ row.in_progress }} in progress</span>
-                        <span class="stat-separator">·</span>
-                        <span class="stat-item">{{ row.draft }} draft</span>
-                    </div>
+            <div class="pd-assess-card">
+                <div class="pd-assess-top">
+                    <span class="pd-assess-label">{{ row.label }}</span>
+                    <span class="pd-assess-total">{{ row.total }}</span>
                 </div>
-            </article>
+                {% if row.total > 0 %}
+                <div class="pd-assess-bar">
+                    <div class="pd-assess-fill" style="width: {% widthratio row.submitted row.total 100 %}%"></div>
+                </div>
+                {% endif %}
+                <div class="pd-assess-stats">
+                    <span>{{ row.submitted }} completed</span>
+                    <span>{{ row.in_progress }} in progress</span>
+                    <span>{{ row.draft }} draft</span>
+                </div>
+            </div>
             {% endfor %}
         </div>
     </section>
     {% endif %}
 
-    {# Recent Activity #}
+    {# ── Recent Activity ── #}
     {% if recent_sessions %}
-    <section class="activity-section">
-        <div class="section-header">
-            <h3>Recent Activity</h3>
-            <p class="muted">Latest candidate updates</p>
+    <section class="pd-section">
+        <div class="pd-section-head">
+            <h2>Recent Activity</h2>
         </div>
-        <div class="portal-card">
-            <div class="activity-table">
-                <div class="activity-table-header">
-                    <span>Candidate</span>
-                    <span>Assessment</span>
-                    <span>Level</span>
-                    <span>Status</span>
-                    <span>Updated</span>
-                    <span>Actions</span>
-                </div>
-                {% for row in recent_sessions %}
-                <div class="activity-table-row">
-                    <span class="activity-candidate">{{ row.candidate }}</span>
-                    <span class="activity-assessment">{{ row.assessment }}</span>
-                    <span class="activity-level">
-                        <span class="level-badge level-{{ row.level }}">{{ row.level_display }}</span>
-                    </span>
-                    <span class="activity-status">
-                        <span class="status-badge">{{ row.status }}</span>
-                    </span>
-                    <span class="activity-time muted">{{ row.updated_at|naturaltime }}</span>
-                    <span class="activity-actions">
-                        {% if row.detail_url %}
-                        <a href="{{ row.detail_url }}" class="btn btn-ghost small">Report</a>
-                        {% else %}
-                        <span class="muted">—</span>
-                        {% endif %}
-                    </span>
-                </div>
-                {% endfor %}
-            </div>
+        <div class="pd-table-wrap">
+            <table class="pd-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Assessment</th>
+                        <th>Level</th>
+                        <th>Status</th>
+                        <th>Updated</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in recent_sessions %}
+                    <tr>
+                        <td class="pd-cell-name">{{ row.candidate }}</td>
+                        <td>{{ row.assessment }}</td>
+                        <td><span class="pd-level pd-level-{{ row.level }}">{{ row.level_display }}</span></td>
+                        <td><span class="pd-status-pill pd-st-{{ row.status|slugify }}">{{ row.status }}</span></td>
+                        <td class="pd-cell-muted">{{ row.updated_at|naturaltime }}</td>
+                        <td class="pd-cell-action">
+                            {% if row.detail_url %}
+                            <a href="{{ row.detail_url }}" class="pd-report-link">Report →</a>
+                            {% else %}
+                            <span class="pd-cell-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </section>
     {% else %}
-    <section class="portal-card empty-state-card empty-state-with-cta">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--orange); margin-bottom: 1.25rem;">
+    {# ── Empty State ── #}
+    <div class="pd-empty">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="8.5" cy="7" r="4"></circle>
             <line x1="20" y1="8" x2="20" y2="14"></line>
             <line x1="23" y1="11" x2="17" y2="11"></line>
         </svg>
-        <h4>Ready to add candidates?</h4>
-        <p class="muted">Start by inviting candidates to take an assessment for this project.</p>
+        <h3>Ready to add candidates?</h3>
+        <p class="muted">Invite candidates to take an assessment for this project.</p>
         {% if request.user.client_account.role == 'manager' or request.user.client_account.role == 'recruiter' %}
-        <a href="{% url 'clients:assessments' %}" class="btn btn-primary" style="margin-top: 1.5rem;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="8.5" cy="7" r="4"></circle>
-                <line x1="20" y1="8" x2="20" y2="14"></line>
-                <line x1="23" y1="11" x2="17" y2="11"></line>
-            </svg>
-            Invite Candidates
-        </a>
+        <a href="{% url 'clients:assessments' %}" class="btn btn-pill" style="margin-top: 1.25rem;">Invite Candidates</a>
         {% endif %}
-    </section>
+    </div>
     {% endif %}
+
 </div>
-
-
 {% endblock %}
