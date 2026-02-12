@@ -7,7 +7,7 @@
 /* ── Shared Primitives ─────────────────────────────────────────────── */
 
 .iq-shell, .rp-shell {
-    max-width: 1140px;
+    max-width: 1080px;
     margin: 1.5rem auto 2rem;
     padding: 0 2rem 4rem;
     background: var(--color-white);
@@ -17,7 +17,7 @@
 }
 
 .iq-detail-shell, .rp-detail-shell {
-    max-width: 800px;
+    max-width: 1080px;
     margin: 1.5rem auto 2rem;
     padding: 0 2rem 4rem;
     background: var(--color-white);
@@ -375,7 +375,7 @@
 }
 
 .iq-section-inner, .rp-section-inner {
-    max-width: 800px;
+    max-width: 1080px;
 }
 
 .iq-section-title, .rp-section-title {
