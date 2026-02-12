@@ -9,7 +9,7 @@
 .iq-shell, .rp-shell {
     max-width: 1080px;
     margin: 1.5rem auto 2rem;
-    padding: 0 2rem 4rem;
+    padding: 0 3rem 4rem;
     background: var(--color-white);
     border: 1px solid rgba(14, 20, 40, 0.06);
     border-radius: var(--radius-2xl);
@@ -1754,7 +1754,7 @@
 @media (max-width: 640px) {
     .iq-shell, .rp-shell {
         margin: 0.5rem;
-        padding: 0 1rem 3rem;
+        padding: 0 1.25rem 3rem;
         border-radius: var(--radius-xl);
     }
 
