@@ -413,27 +413,24 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Assessment Level</label>
-                    <div class="level-options">
-                        {% for value, label in invite_form.level.field.choices %}
-                        <label class="level-option">
-                            <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
-                            <div class="level-card"><span class="level-title">{{ label }}</span></div>
-                        </label>
-                        {% endfor %}
-                    </div>
-                </div>
-
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Deadline (Optional)</label>
-                        {{ invite_form.deadline_at }}
+                        <label class="form-label">Assessment Level</label>
+                        <select name="level" class="form-select">
+                            {% for value, label in invite_form.level.field.choices %}
+                            <option value="{{ value }}" {% if value == 'mid' %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Project (Optional)</label>
                         {{ invite_form.project }}
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Deadline (Optional)</label>
+                    {{ invite_form.deadline_at }}
                 </div>
             </div>
             <div class="modal-footer">
@@ -512,21 +509,19 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Assessment Level</label>
-                    <div class="level-options">
-                        {% for value, label in bulk_invite_form.level.field.choices %}
-                        <label class="level-option">
-                            <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
-                            <div class="level-card"><span class="level-title">{{ label }}</span></div>
-                        </label>
-                        {% endfor %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Assessment Level</label>
+                        <select name="level" class="form-select">
+                            {% for value, label in bulk_invite_form.level.field.choices %}
+                            <option value="{{ value }}" {% if value == 'mid' %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Deadline (Optional)</label>
-                    {{ bulk_invite_form.deadline_at }}
+                    <div class="form-group">
+                        <label class="form-label">Deadline (Optional)</label>
+                        {{ bulk_invite_form.deadline_at }}
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
