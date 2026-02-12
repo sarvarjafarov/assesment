@@ -98,7 +98,7 @@
                 </div>
                 <div class="st-logo-info">
                     <div class="st-logo-btns">
-                        <form method="post" action="{% url 'clients:dashboard' %}" enctype="multipart/form-data" class="st-logo-form">
+                        <form method="post" enctype="multipart/form-data" class="st-logo-form">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="upload_logo">
                             <label for="id_logo" class="btn btn-outline small">
@@ -112,7 +112,7 @@
                             <input type="file" id="id_logo" name="logo" accept="image/*" style="display: none;" onchange="this.form.submit()">
                         </form>
                         {% if account.logo_data_url %}
-                        <form method="post" action="{% url 'clients:dashboard' %}" style="display: inline;">
+                        <form method="post" style="display: inline;">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="remove_logo">
                             <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove your logo?')">Remove</button>
@@ -421,11 +421,11 @@
                     </div>
 
                     {# Recent Webhook Deliveries #}
-                    {% if recent_webhooks %}
+                    {% if recent_deliveries %}
                     <div class="st-deliveries">
                         <h4>Recent Deliveries</h4>
                         <div class="st-delivery-list">
-                            {% for delivery in recent_webhooks %}
+                            {% for delivery in recent_deliveries %}
                             <div class="st-delivery st-delivery--{{ delivery.status }}">
                                 <span class="st-delivery-event">{{ delivery.event_type }}</span>
                                 <span class="st-delivery-badge">

@@ -1348,6 +1348,29 @@ class ClientSettingsView(LoginRequiredMixin, View):
                 messages.error(request, "Failed to send test webhook. Please check your URL and try again.")
             return redirect("clients:settings")
 
+        elif action == "upload_logo":
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "Only managers can update branding.")
+                return redirect("clients:settings")
+            form = ClientLogoForm(request.POST, request.FILES)
+            if form.is_valid():
+                account.logo = form.cleaned_data["logo"]
+                account.save()
+                messages.success(request, "Logo updated.")
+            else:
+                messages.error(request, "Invalid logo file. Please use PNG or JPG, max 2MB.")
+            return redirect("clients:settings")
+
+        elif action == "remove_logo":
+            if account.role not in ROLE_BRANDING_ACCESS:
+                messages.error(request, "Only managers can update branding.")
+                return redirect("clients:settings")
+            if account.has_logo:
+                account.clear_logo()
+                account.save(update_fields=["logo", "logo_data", "logo_mime"])
+            messages.info(request, "Logo removed.")
+            return redirect("clients:settings")
+
         return render(request, self.template_name, context)
 
 
