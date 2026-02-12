@@ -137,7 +137,7 @@
 
 .iq-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
 }
 
@@ -767,7 +767,7 @@
 
 .rp-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
 }
 
@@ -1747,7 +1747,7 @@
 
 @media (max-width: 900px) {
     .iq-grid, .rp-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
     }
 }
 
