@@ -1490,6 +1490,225 @@
 }
 
 
+/* ── Category Count (IQ detail) ──────────────────────────────────── */
+
+.iq-cat-count {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin: 0 0 1.25rem;
+}
+
+
+/* ── Role Detail: Sticky TOC ─────────────────────────────────────── */
+
+.rp-toc {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+    margin: 0 -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #ebedf0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.rp-toc::-webkit-scrollbar {
+    display: none;
+}
+
+.rp-toc-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.rp-toc-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-decoration: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.rp-toc-link:hover {
+    color: var(--color-navy);
+    background: #f3f4f6;
+}
+
+
+/* ── Mid-page CTA (shared) ──────────────────────────────────────── */
+
+.seo-mid-cta {
+    margin: 0 -2rem;
+    padding: 0 2rem;
+}
+
+.seo-mid-cta-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.04) 0%, rgba(255, 138, 0, 0.08) 100%);
+    border: 1px solid rgba(255, 138, 0, 0.15);
+    border-radius: 14px;
+}
+
+.seo-mid-cta-inner > svg {
+    flex-shrink: 0;
+    color: var(--color-orange);
+}
+
+.seo-mid-cta-inner > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.seo-mid-cta-inner h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.2rem;
+}
+
+.seo-mid-cta-inner p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.seo-mid-cta-inner .rp-btn-primary,
+.seo-mid-cta-inner .iq-btn-primary {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+
+/* ── List Page CTA (shared) ─────────────────────────────────────── */
+
+.seo-list-cta {
+    text-align: center;
+    padding: 3rem 0 2rem;
+}
+
+.seo-list-cta-inner {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.seo-list-cta h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+}
+
+.seo-list-cta p {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+}
+
+.seo-list-cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+
+/* ── List Page Cross-link (shared) ──────────────────────────────── */
+
+.seo-list-crosslink {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 0 2rem;
+}
+
+
+/* ── Blog Cross-link Cards ──────────────────────────────────────── */
+
+.seo-blog-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.seo-blog-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border: 1px solid #ebedf0;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.seo-blog-card:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 2px 8px rgba(255, 138, 0, 0.06);
+}
+
+.seo-blog-card-pill {
+    display: inline-block;
+    width: fit-content;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    background: rgba(255, 138, 0, 0.08);
+    color: var(--color-orange);
+    margin-bottom: 0.75rem;
+}
+
+.seo-blog-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    margin: 0 0 0.4rem;
+    line-height: 1.35;
+}
+
+.seo-blog-card p {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.seo-blog-card-meta {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f0f1f3;
+}
+
+
 /* ── Responsive ────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
@@ -1659,5 +1878,38 @@
 
     .iq-assessment-card-arrow {
         display: none;
+    }
+
+    /* Mid-page CTA stacks on mobile */
+    .seo-mid-cta {
+        margin-left: -1.25rem;
+        margin-right: -1.25rem;
+        padding: 0 1.25rem;
+    }
+
+    .seo-mid-cta-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+
+    /* List page CTA */
+    .seo-list-cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Blog cards → single column */
+    .seo-blog-cards {
+        grid-template-columns: 1fr;
+    }
+
+    /* Role TOC adjusts padding on mobile */
+    .rp-toc {
+        margin: 0 -1.25rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        gap: 0.35rem;
     }
 }

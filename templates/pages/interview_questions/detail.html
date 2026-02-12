@@ -25,7 +25,7 @@
 {% endblock %}
 {% block content %}
 <div class="page-shell">
-    {% include 'includes/site_header.html' %}
+    {% include 'includes/site_header.html' with active='assessments' %}
     <main style="scroll-behavior: smooth;">
         <div class="iq-detail-shell">
             {# Hero #}
@@ -90,7 +90,10 @@
                         {% endif %}
                         <h2 class="iq-section-title">{{ cat_name }} Questions</h2>
                     </div>
-                    <p class="iq-section-desc">{{ cat_questions|length }} question{{ cat_questions|length|pluralize }} in this category.</p>
+                    {% if category_descriptions %}
+                    <p class="iq-section-desc">{% for desc_cat, desc_text in category_descriptions.items %}{% if desc_cat == cat_name %}{{ desc_text }}{% endif %}{% endfor %}</p>
+                    {% endif %}
+                    <p class="iq-cat-count">{{ cat_questions|length }} question{{ cat_questions|length|pluralize }} in this category.</p>
                     <div class="iq-questions">
                         {% for q in cat_questions %}
                         <div class="iq-question iq-cat--{% if cat_name == 'Technical' %}technical{% elif cat_name == 'Behavioral' %}behavioral{% elif cat_name == 'Situational' %}situational{% elif cat_name == 'Leadership' %}leadership{% elif cat_name == 'Culture Fit' or cat_name == 'Culture' %}culture{% elif cat_name == 'Problem Solving' %}problem-solving{% endif %}">
@@ -124,6 +127,21 @@
                 </div>
             </section>
             {% endfor %}
+
+            {# Mid-page CTA #}
+            <section class="seo-mid-cta">
+                <div class="seo-mid-cta-inner">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <div>
+                        <h3>Go beyond interviews</h3>
+                        <p>Pair these questions with structured Evalon assessments for a complete picture.</p>
+                    </div>
+                    <a class="iq-btn-primary" href="{% url 'clients:signup' %}"
+                       data-gtag-click="iq_mid_cta_click"
+                       data-gtag-category="conversion"
+                       data-gtag-label="{{ role.slug }}">Start Free Trial</a>
+                </div>
+            </section>
 
             {# Recommended Assessments #}
             {% if recommended_assessments %}
@@ -191,6 +209,29 @@
                         </div>
                         <svg class="iq-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                     </a>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Blog Cross-links #}
+            {% if blog_posts %}
+            <section class="iq-section" id="resources">
+                <div class="iq-section-inner">
+                    <h2 class="iq-section-title">Related Resources</h2>
+                    <p class="iq-section-desc">Learn more about interviewing and hiring {{ role.title }} candidates.</p>
+                    <div class="seo-blog-cards">
+                        {% for post in blog_posts %}
+                        <a class="seo-blog-card" href="{{ post.get_absolute_url }}"
+                           data-gtag-click="blog_crosslink_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ post.slug }}">
+                            <span class="seo-blog-card-pill">{{ post.pill_label }}</span>
+                            <h3>{{ post.title }}</h3>
+                            <p>{{ post.excerpt|truncatewords:18 }}</p>
+                            <span class="seo-blog-card-meta">{{ post.estimated_read_minutes }} min read</span>
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
             </section>
             {% endif %}

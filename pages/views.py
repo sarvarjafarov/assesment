@@ -940,6 +940,13 @@ def interview_questions_list(request):
         .order_by('department')
     )
 
+    # Dynamic trust stats
+    total_roles = Role.objects.filter(
+        is_active=True, interview_questions__is_active=True,
+    ).distinct().count()
+    total_questions = InterviewQuestion.objects.filter(is_active=True).count()
+    total_departments = departments.count()
+
     paginator = Paginator(roles, 24)
     page_obj = paginator.get_page(request.GET.get('page'))
 
@@ -950,7 +957,21 @@ def interview_questions_list(request):
         'department': department,
         'departments': departments,
         'is_paginated': page_obj.has_other_pages(),
+        'total_roles': total_roles,
+        'total_questions': total_questions,
+        'total_departments': total_departments,
     })
+
+
+CATEGORY_DESCRIPTIONS = {
+    'Technical': 'Questions that evaluate domain expertise, technical knowledge, and hands-on skills relevant to the role.',
+    'Behavioral': 'Questions that explore past experiences and behaviors to predict future performance.',
+    'Situational': 'Hypothetical scenarios that test judgment, problem-solving approach, and decision-making.',
+    'Leadership': 'Questions that assess management style, team building, and strategic thinking abilities.',
+    'Culture Fit': 'Questions that evaluate alignment with company values, work style, and team dynamics.',
+    'Culture': 'Questions that evaluate alignment with company values, work style, and team dynamics.',
+    'Problem Solving': 'Questions that test analytical thinking, creativity, and structured problem-solving approaches.',
+}
 
 
 def interview_questions_detail(request, slug):
@@ -970,6 +991,11 @@ def interview_questions_detail(request, slug):
         if cat_display not in categories:
             categories[cat_display] = []
         categories[cat_display].append(q)
+
+    # Category descriptions for template
+    category_descriptions = {
+        cat: CATEGORY_DESCRIPTIONS.get(cat, '') for cat in categories
+    }
 
     # Related roles: same department, have questions
     related_roles = (
@@ -991,13 +1017,24 @@ def interview_questions_detail(request, slug):
 
     recommended_assessments = role.assessment_types.filter(is_active=True)
 
+    # Related blog posts
+    search_terms = [role.title, role.department, 'interview', 'hiring']
+    blog_posts = BlogPost.objects.published().none()
+    for term in search_terms[:2]:
+        blog_posts = blog_posts | BlogPost.objects.published().filter(
+            Q(title__icontains=term) | Q(excerpt__icontains=term)
+        )
+    blog_posts = blog_posts.distinct()[:3]
+
     return render(request, 'pages/interview_questions/detail.html', {
         'role': role,
         'questions': questions,
         'categories': categories,
+        'category_descriptions': category_descriptions,
         'question_count': questions.count(),
         'related_roles': related_roles,
         'recommended_assessments': recommended_assessments,
+        'blog_posts': blog_posts,
     })
 
 
@@ -1032,6 +1069,11 @@ def role_assessment_list(request):
         .order_by('department')
     )
 
+    # Dynamic trust stats
+    total_roles = Role.objects.filter(is_active=True).count()
+    total_assessments = PublicAssessment.objects.filter(is_active=True).count()
+    total_departments = departments.count()
+
     paginator = Paginator(roles, 24)
     page_obj = paginator.get_page(request.GET.get('page'))
 
@@ -1042,6 +1084,9 @@ def role_assessment_list(request):
         'department': department,
         'departments': departments,
         'is_paginated': page_obj.has_other_pages(),
+        'total_roles': total_roles,
+        'total_assessments': total_assessments,
+        'total_departments': total_departments,
     })
 
 
@@ -1085,6 +1130,15 @@ def role_assessment_detail(request, slug):
         all_use_cases.extend(a.use_cases or [])
         all_faqs.extend(a.faqs or [])
 
+    # Related blog posts
+    search_terms = [role.title, role.department, 'assessment', 'hiring']
+    blog_posts = BlogPost.objects.published().none()
+    for term in search_terms[:2]:
+        blog_posts = blog_posts | BlogPost.objects.published().filter(
+            Q(title__icontains=term) | Q(excerpt__icontains=term)
+        )
+    blog_posts = blog_posts.distinct()[:3]
+
     return render(request, 'pages/roles/detail.html', {
         'role': role,
         'recommended_assessments': recommended_assessments,
@@ -1097,4 +1151,5 @@ def role_assessment_detail(request, slug):
         'faqs': all_faqs,
         'total_duration': total_duration,
         'total_questions': total_questions,
+        'blog_posts': blog_posts,
     })

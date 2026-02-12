@@ -22,17 +22,17 @@
                 <div class="rp-trust-stats">
                     <span class="rp-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        <strong>30+</strong> Roles
+                        <strong>{{ total_roles }}+</strong> Roles
                     </span>
                     <span class="rp-trust-dot"></span>
                     <span class="rp-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        <strong>6</strong> Assessments
+                        <strong>{{ total_assessments }}</strong> Assessments
                     </span>
                     <span class="rp-trust-dot"></span>
                     <span class="rp-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                        <strong>6</strong> Departments
+                        <strong>{{ total_departments }}</strong> Departments
                     </span>
                     <span class="rp-trust-dot"></span>
                     <span class="rp-trust-stat">
@@ -120,6 +120,41 @@
                 <a class="rp-load-btn" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Load more roles</a>
             </div>
             {% endif %}
+
+            {# Body CTA #}
+            <section class="seo-list-cta">
+                <div class="seo-list-cta-inner">
+                    <h2>Ready to start assessing candidates?</h2>
+                    <p>Send assessments in minutes with automated scoring and detailed reports your team can trust.</p>
+                    <div class="seo-list-cta-actions">
+                        <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="rp_list_cta_click"
+                           data-gtag-category="conversion"
+                           data-gtag-label="rp_list_start_trial">Start Free Trial</a>
+                        <a class="rp-btn-secondary" href="{% url 'pages:contact' %}"
+                           data-gtag-click="rp_list_contact_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="rp_list_contact_sales">Talk to sales</a>
+                    </div>
+                </div>
+            </section>
+
+            {# Cross-link to Interview Questions #}
+            <section class="seo-list-crosslink">
+                <a class="rp-crosslink" href="{% url 'pages:interview_questions_list' %}"
+                   data-gtag-click="rp_to_iq_crosslink"
+                   data-gtag-category="engagement"
+                   data-gtag-label="rp_list_crosslink">
+                    <div class="rp-crosslink-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <div class="rp-crosslink-body">
+                        <h3>Interview Questions by Role</h3>
+                        <p>Browse curated interview questions with difficulty ratings, evaluation criteria, and sample answer guidance.</p>
+                    </div>
+                    <svg class="rp-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </section>
         </div>
     </main>
 </div>

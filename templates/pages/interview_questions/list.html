@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load humanize static %}
 {% block title %}{% if query %}Search: {{ query }} · {% endif %}Interview Questions for Hiring · Evalon{% endblock %}
-{% block meta_description %}Browse interview questions for 50+ roles across marketing, product, design, HR, finance, and leadership. Includes what each question tests and sample answer guidance.{% endblock %}
+{% block meta_description %}Browse interview questions for {{ total_roles }}+ roles across marketing, product, design, HR, finance, and leadership. Includes what each question tests and sample answer guidance.{% endblock %}
 {% block content %}
 <div class="page-shell">
-    {% include 'includes/site_header.html' %}
+    {% include 'includes/site_header.html' with active='assessments' %}
     <main>
         <div class="iq-shell">
             <section class="iq-hero">
@@ -22,17 +22,17 @@
                 <div class="iq-trust-stats">
                     <span class="iq-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        <strong>30+</strong> Roles
+                        <strong>{{ total_roles }}+</strong> Roles
                     </span>
                     <span class="iq-trust-dot"></span>
                     <span class="iq-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                        <strong>360+</strong> Questions
+                        <strong>{{ total_questions }}+</strong> Questions
                     </span>
                     <span class="iq-trust-dot"></span>
                     <span class="iq-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                        <strong>6</strong> Departments
+                        <strong>{{ total_departments }}</strong> Departments
                     </span>
                     <span class="iq-trust-dot"></span>
                     <span class="iq-trust-stat">
@@ -110,6 +110,41 @@
                 <a class="iq-load-btn" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Load more roles</a>
             </div>
             {% endif %}
+
+            {# Body CTA #}
+            <section class="seo-list-cta">
+                <div class="seo-list-cta-inner">
+                    <h2>Go beyond interviews</h2>
+                    <p>Pair your questions with structured skill assessments for a complete candidate evaluation.</p>
+                    <div class="seo-list-cta-actions">
+                        <a class="iq-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="iq_list_cta_click"
+                           data-gtag-category="conversion"
+                           data-gtag-label="iq_list_start_trial">Start Free Trial</a>
+                        <a class="iq-btn-secondary" href="{% url 'pages:assessment_list' %}"
+                           data-gtag-click="iq_list_assessments_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="iq_list_browse_assessments">Browse assessments</a>
+                    </div>
+                </div>
+            </section>
+
+            {# Cross-link to Role Assessments #}
+            <section class="seo-list-crosslink">
+                <a class="iq-crosslink" href="{% url 'pages:role_assessment_list' %}"
+                   data-gtag-click="iq_to_roles_crosslink"
+                   data-gtag-category="engagement"
+                   data-gtag-label="iq_list_crosslink">
+                    <div class="iq-crosslink-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    </div>
+                    <div class="iq-crosslink-body">
+                        <h3>Assessment Recommendations by Role</h3>
+                        <p>See which Evalon assessments are recommended for each role — with automated scoring and detailed reports.</p>
+                    </div>
+                    <svg class="iq-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </section>
         </div>
     </main>
 </div>

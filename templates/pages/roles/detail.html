@@ -7,19 +7,35 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "Product",
+        "@type": "WebPage",
         "name": "{{ role.title }} Assessment Battery",
         "description": "{{ role.role_seo_description|escapejs }}",
-        "brand": {
-            "@type": "Organization",
-            "name": "Evalon"
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Assessments",
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages:assessment_list' %}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Roles",
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages:role_assessment_list' %}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ role.title }}"
+                }
+            ]
         },
-        "offers": {
-            "@type": "Offer",
-            "url": "{{ request.build_absolute_uri }}",
-            "priceCurrency": "USD",
-            "price": "0",
-            "availability": "https://schema.org/InStock"
+        "provider": {
+            "@type": "Organization",
+            "name": "Evalon",
+            "url": "{{ request.scheme }}://{{ request.get_host }}"
         }
     }
     </script>
@@ -61,6 +77,17 @@
                     </div>
                 </div>
             </header>
+
+            {# Sticky Table of Contents #}
+            <nav class="rp-toc" id="rp-toc">
+                <span class="rp-toc-label">On this page</span>
+                {% if role.key_skills %}<a class="rp-toc-link" href="#skills">Skills</a>{% endif %}
+                {% if role.responsibilities %}<a class="rp-toc-link" href="#responsibilities">Responsibilities</a>{% endif %}
+                {% if recommended_assessments %}<a class="rp-toc-link" href="#assessments">Assessments</a>{% endif %}
+                {% if sample_questions %}<a class="rp-toc-link" href="#samples">Samples</a>{% endif %}
+                {% if faqs %}<a class="rp-toc-link" href="#faqs">FAQs</a>{% endif %}
+                {% if has_interview_questions %}<a class="rp-toc-link" href="#interview-questions">Questions</a>{% endif %}
+            </nav>
 
             {# Key Skills #}
             {% if role.key_skills %}
@@ -161,6 +188,21 @@
             </section>
             {% endif %}
 
+            {# Mid-page CTA #}
+            <section class="seo-mid-cta">
+                <div class="seo-mid-cta-inner">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <div>
+                        <h3>Ready to assess {{ role.title }} candidates?</h3>
+                        <p>Send this assessment battery in minutes — no setup required.</p>
+                    </div>
+                    <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
+                       data-gtag-click="role_mid_cta_click"
+                       data-gtag-category="conversion"
+                       data-gtag-label="{{ role.slug }}">Start Free Trial</a>
+                </div>
+            </section>
+
             {# Sample Questions #}
             {% if sample_questions %}
             <section class="rp-section rp-section--alt" id="samples">
@@ -177,34 +219,6 @@
                             </div>
                         </div>
                         {% endfor %}
-                    </div>
-                </div>
-            </section>
-            {% endif %}
-
-            {# At a Glance #}
-            {% if recommended_assessments %}
-            <section class="rp-section" id="at-a-glance">
-                <div class="rp-section-inner">
-                    <h2 class="rp-section-title">At a Glance</h2>
-                    <p class="rp-section-desc">Key metrics for the {{ role.title }} assessment battery.</p>
-                    <div class="rp-glance-grid">
-                        <div class="rp-glance-card">
-                            <span class="rp-glance-val">{{ total_duration }} min</span>
-                            <span class="rp-glance-lbl">Total Duration</span>
-                        </div>
-                        <div class="rp-glance-card">
-                            <span class="rp-glance-val">{{ total_questions }}</span>
-                            <span class="rp-glance-lbl">Total Questions</span>
-                        </div>
-                        <div class="rp-glance-card">
-                            <span class="rp-glance-val">{{ recommended_assessments|length }}</span>
-                            <span class="rp-glance-lbl">Assessments</span>
-                        </div>
-                        <div class="rp-glance-card">
-                            <span class="rp-glance-val">{{ role.get_seniority_level_display }}</span>
-                            <span class="rp-glance-lbl">Seniority Level</span>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -283,6 +297,29 @@
                         </div>
                         <svg class="rp-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                     </a>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Blog Cross-links #}
+            {% if blog_posts %}
+            <section class="rp-section" id="resources">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Related Resources</h2>
+                    <p class="rp-section-desc">Learn more about hiring and assessing {{ role.title }} candidates.</p>
+                    <div class="seo-blog-cards">
+                        {% for post in blog_posts %}
+                        <a class="seo-blog-card" href="{{ post.get_absolute_url }}"
+                           data-gtag-click="blog_crosslink_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ post.slug }}">
+                            <span class="seo-blog-card-pill">{{ post.pill_label }}</span>
+                            <h3>{{ post.title }}</h3>
+                            <p>{{ post.excerpt|truncatewords:18 }}</p>
+                            <span class="seo-blog-card-meta">{{ post.estimated_read_minutes }} min read</span>
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
             </section>
             {% endif %}
