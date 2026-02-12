@@ -419,10 +419,7 @@
                         {% for value, label in invite_form.level.field.choices %}
                         <label class="level-option">
                             <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
-                            <div class="level-card">
-                                <span class="level-title">{{ label }}</span>
-                                <span class="level-desc">{% if value == 'junior' %}0&ndash;2 years exp{% elif value == 'mid' %}2&ndash;5 years exp{% else %}5+ years exp{% endif %}</span>
-                            </div>
+                            <div class="level-card"><span class="level-title">{{ label }}</span></div>
                         </label>
                         {% endfor %}
                     </div>
@@ -521,10 +518,7 @@
                         {% for value, label in bulk_invite_form.level.field.choices %}
                         <label class="level-option">
                             <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
-                            <div class="level-card">
-                                <span class="level-title">{{ label }}</span>
-                                <span class="level-desc">{% if value == 'junior' %}0&ndash;2 years exp{% elif value == 'mid' %}2&ndash;5 years exp{% else %}5+ years exp{% endif %}</span>
-                            </div>
+                            <div class="level-card"><span class="level-title">{{ label }}</span></div>
                         </label>
                         {% endfor %}
                     </div>
