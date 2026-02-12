@@ -3351,6 +3351,452 @@
 
 
 /* ========================================================================
+   BILLING & PLANS PAGE (billing.html)  —  bi-* prefix
+   ======================================================================== */
+
+/* Header */
+.bi-header {
+    margin-bottom: 1.75rem;
+}
+.bi-header h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-navy);
+    margin: 0 0 0.25rem;
+}
+
+/* Current Plan Banner */
+.bi-plan-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, rgba(255,138,0,0.06), rgba(255,138,0,0.01));
+    border: 1px solid rgba(255,138,0,0.15);
+    border-left: 4px solid var(--color-orange);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+.bi-plan-left { flex: 1; min-width: 0; }
+.bi-plan-badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    background: var(--color-orange);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+}
+.bi-plan-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-navy);
+    margin: 0 0 0.25rem;
+}
+.bi-plan-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+.bi-plan-right {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+.bi-plan-price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-navy);
+    line-height: 1;
+}
+.bi-plan-cycle {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+/* Usage Meters */
+.bi-usage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.bi-usage-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border-medium);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+.bi-usage-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.bi-usage-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+.bi-usage-icon--invites { background: rgba(255,138,0,0.08); color: var(--color-orange); }
+.bi-usage-icon--projects { background: rgba(59,130,246,0.08); color: #3b82f6; }
+.bi-usage-info { display: flex; flex-direction: column; gap: 0.15rem; }
+.bi-usage-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+.bi-usage-nums { display: flex; align-items: baseline; gap: 0.3rem; }
+.bi-usage-used {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    line-height: 1.15;
+}
+.bi-usage-of {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+}
+.bi-usage-limit {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-navy);
+}
+.bi-usage-period {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+.bi-usage-bar {
+    height: 8px;
+    background: rgba(14, 20, 40, 0.06);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.bi-usage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-orange), rgba(255,138,0,0.6));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+.bi-usage-fill--warn { background: linear-gradient(90deg, #ef4444, rgba(239,68,68,0.7)); }
+.bi-usage-footer {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+}
+.bi-usage-footer--warn {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Section */
+.bi-section { margin-bottom: 2rem; }
+.bi-section-head { margin-bottom: 1rem; }
+.bi-section-head h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.15rem;
+}
+.bi-section-sub { font-size: 0.82rem; color: var(--color-text-muted); }
+
+/* Plan Cards Grid */
+.bi-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+.bi-plan-card {
+    position: relative;
+    background: var(--color-white);
+    border: 1px solid var(--color-border-medium);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.bi-plan-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+.bi-plan-card--current {
+    border: 2px solid var(--color-orange);
+    box-shadow: 0 4px 16px rgba(255,138,0,0.1);
+}
+.bi-plan-card--current:hover { box-shadow: 0 6px 24px rgba(255,138,0,0.15); }
+.bi-card-ribbon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.2rem 0.55rem;
+    background: var(--color-orange);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Card Sections */
+.bi-card-top {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-border-medium);
+    margin-bottom: 1rem;
+}
+.bi-card-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+}
+.bi-card-price { margin-bottom: 0.5rem; }
+.bi-card-amount {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-navy);
+}
+.bi-card-freq {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+.bi-card-desc {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Limits */
+.bi-card-limits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border-medium);
+    margin-bottom: 1rem;
+}
+.bi-card-limit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-navy);
+    font-weight: 500;
+}
+.bi-card-limit svg { color: var(--color-orange); flex-shrink: 0; opacity: 0.7; }
+
+/* Features */
+.bi-card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    flex: 1;
+}
+.bi-card-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--color-text);
+}
+.bi-card-features li svg { color: #10b981; flex-shrink: 0; margin-top: 1px; }
+
+/* Card Footer Button */
+.bi-card-foot { margin-top: auto; }
+.bi-card-btn {
+    display: block;
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 2px solid var(--color-border-medium);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--color-navy);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.bi-card-btn:hover { border-color: var(--color-orange); color: var(--color-orange); }
+.bi-card-btn--current {
+    background: rgba(14,20,40,0.04);
+    border-color: transparent;
+    color: var(--color-text-muted);
+    cursor: default;
+}
+.bi-card-btn--current:hover { border-color: transparent; color: var(--color-text-muted); }
+.bi-card-btn--upgrade {
+    background: var(--color-orange);
+    border-color: var(--color-orange);
+    color: #fff;
+}
+.bi-card-btn--upgrade:hover {
+    background: #e67a00;
+    border-color: #e67a00;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255,138,0,0.3);
+}
+.bi-card-btn--switch { border-color: var(--color-border-medium); }
+.bi-card-btn--switch:hover { border-color: var(--color-orange); color: var(--color-orange); }
+
+/* Help Footer */
+.bi-help {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: rgba(14,20,40,0.02);
+    border: 1px solid var(--color-border-medium);
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: var(--color-text);
+    margin-top: 0.5rem;
+}
+.bi-help svg { color: var(--color-orange); flex-shrink: 0; margin-top: 1px; }
+.bi-help-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-orange);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.bi-help-link:hover { opacity: 0.75; }
+
+/* Support Modal */
+.bi-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(14,20,40,0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1.5rem;
+}
+.bi-modal {
+    background: var(--color-white);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+.bi-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border-medium);
+}
+.bi-modal-head h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0;
+}
+.bi-modal-close {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.bi-modal-close:hover { background: rgba(14,20,40,0.05); }
+.bi-modal-form { padding: 1.5rem; }
+.bi-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+}
+.bi-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.85rem;
+}
+.bi-form-row .bi-form-field { margin-bottom: 0; }
+.bi-form-field label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-navy);
+}
+.bi-form-field select,
+.bi-form-field input,
+.bi-form-field textarea {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--color-navy);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.bi-form-field select:focus,
+.bi-form-field input:focus,
+.bi-form-field textarea:focus {
+    outline: none;
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 3px rgba(255,138,0,0.1);
+}
+.bi-form-field textarea { resize: vertical; }
+.bi-modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+}
+.bi-modal-success {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+.bi-modal-success h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 1rem 0 0.25rem;
+}
+.bi-modal-success p { margin: 0 0 1.25rem; }
+
+/* ── bi-* Responsive ── */
+@media (max-width: 900px) {
+    .bi-plans-grid { grid-template-columns: 1fr; max-width: 400px; }
+    .bi-plan-banner { flex-direction: column; gap: 1rem; text-align: center; }
+    .bi-plan-right { justify-content: center; }
+}
+@media (max-width: 640px) {
+    .bi-usage-grid { grid-template-columns: 1fr; }
+    .bi-form-row { grid-template-columns: 1fr; }
+    .bi-plan-banner { padding: 1.25rem; }
+    .bi-plan-price { font-size: 2rem; }
+}
+
+
+/* ========================================================================
    ASSESSMENT MANAGE PAGE (assessments/manage.html)
    ======================================================================== */
 

@@ -5,176 +5,173 @@
 {% block meta_description %}Manage your Evalon subscription and view plan details.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="page-header-with-actions">
+
+    {# ── Header ── #}
+    <header class="bi-header">
         <div>
             <h1>Billing & Plans</h1>
-            <p class="muted">Manage your subscription and view usage</p>
+            <p class="muted">Manage your subscription and monitor usage</p>
         </div>
     </header>
 
-    {# Current Plan Overview #}
-    <section class="portal-card current-plan-card">
-        <div class="plan-header">
-            <div>
-                <div class="plan-badge">Current Plan</div>
-                <h2>{{ current_plan.name }}</h2>
-                <p class="muted">{{ current_plan.description }}</p>
-            </div>
-            <div class="plan-pricing">
-                <div class="price-display">
-                    <span class="price">{{ current_plan.price }}</span>
-                    {% if current_plan.billing_cycle != 'Forever' %}
-                    <span class="billing-cycle">/ {{ current_plan.billing_cycle }}</span>
-                    {% else %}
-                    <span class="billing-cycle">{{ current_plan.billing_cycle }}</span>
-                    {% endif %}
-                </div>
-            </div>
+    {# ── Current Plan Banner ── #}
+    <div class="bi-plan-banner">
+        <div class="bi-plan-left">
+            <span class="bi-plan-badge">Current Plan</span>
+            <h2 class="bi-plan-name">{{ current_plan.name }}</h2>
+            <p class="bi-plan-desc">{{ current_plan.description }}</p>
         </div>
-    </section>
+        <div class="bi-plan-right">
+            <span class="bi-plan-price">{{ current_plan.price }}</span>
+            {% if current_plan.billing_cycle != 'Forever' %}
+            <span class="bi-plan-cycle">/ {{ current_plan.billing_cycle }}</span>
+            {% else %}
+            <span class="bi-plan-cycle">{{ current_plan.billing_cycle }}</span>
+            {% endif %}
+        </div>
+    </div>
 
-    {# Usage Statistics #}
-    <section class="usage-section">
-        <h3>Current Usage</h3>
-        <div class="portal-card-grid two-up">
-            {# Invite Usage #}
-            <article class="portal-card usage-card">
-                <div class="usage-header">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
+    {# ── Usage Meters ── #}
+    <div class="bi-usage-grid">
+        <article class="bi-usage-card">
+            <div class="bi-usage-top">
+                <div class="bi-usage-icon bi-usage-icon--invites">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
                     </svg>
-                    <div>
-                        <h4>Assessment Invites</h4>
-                        <p class="usage-stats">
-                            <span class="used">{{ usage.invites.used }}</span>
-                            <span class="separator">of</span>
-                            <span class="limit">{{ usage.invites.limit }}</span>
-                            <span class="muted">this month</span>
-                        </p>
+                </div>
+                <div class="bi-usage-info">
+                    <span class="bi-usage-title">Assessment Invites</span>
+                    <div class="bi-usage-nums">
+                        <span class="bi-usage-used">{{ usage.invites.used }}</span>
+                        <span class="bi-usage-of">of</span>
+                        <span class="bi-usage-limit">{{ usage.invites.limit }}</span>
+                        <span class="bi-usage-period">this month</span>
                     </div>
                 </div>
-                {% if usage.invites.percent is not None %}
-                <div class="usage-bar">
-                    <div class="usage-fill" style="width: {{ usage.invites.percent }}%"></div>
-                </div>
-                {% if usage.invites.remaining is not None %}
-                <p class="usage-footer">
-                    {% if usage.invites.remaining > 0 %}
-                        <span class="remaining">{{ usage.invites.remaining }} invite{{ usage.invites.remaining|pluralize }} remaining</span>
-                    {% else %}
-                        <span class="limit-reached">Invite limit reached for this period</span>
-                    {% endif %}
-                </p>
-                {% endif %}
+            </div>
+            {% if usage.invites.percent is not None %}
+            <div class="bi-usage-bar">
+                <div class="bi-usage-fill {% if usage.invites.percent >= 90 %}bi-usage-fill--warn{% endif %}" style="width: {{ usage.invites.percent }}%;"></div>
+            </div>
+            {% if usage.invites.remaining is not None %}
+            <span class="bi-usage-footer {% if usage.invites.remaining == 0 %}bi-usage-footer--warn{% endif %}">
+                {% if usage.invites.remaining > 0 %}
+                {{ usage.invites.remaining }} invite{{ usage.invites.remaining|pluralize }} remaining
                 {% else %}
-                <p class="usage-footer muted">Unlimited invites</p>
+                Invite limit reached
                 {% endif %}
-            </article>
+            </span>
+            {% endif %}
+            {% else %}
+            <span class="bi-usage-footer">Unlimited invites</span>
+            {% endif %}
+        </article>
 
-            {# Project Usage #}
-            <article class="portal-card usage-card">
-                <div class="usage-header">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <article class="bi-usage-card">
+            <div class="bi-usage-top">
+                <div class="bi-usage-icon bi-usage-icon--projects">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    <div>
-                        <h4>Active Projects</h4>
-                        <p class="usage-stats">
-                            <span class="used">{{ usage.projects.used }}</span>
-                            <span class="separator">of</span>
-                            <span class="limit">{{ usage.projects.limit }}</span>
-                        </p>
+                </div>
+                <div class="bi-usage-info">
+                    <span class="bi-usage-title">Active Projects</span>
+                    <div class="bi-usage-nums">
+                        <span class="bi-usage-used">{{ usage.projects.used }}</span>
+                        <span class="bi-usage-of">of</span>
+                        <span class="bi-usage-limit">{{ usage.projects.limit }}</span>
                     </div>
                 </div>
-                {% if usage.projects.percent is not None %}
-                <div class="usage-bar">
-                    <div class="usage-fill" style="width: {{ usage.projects.percent }}%"></div>
-                </div>
-                {% if usage.projects.remaining is not None %}
-                <p class="usage-footer">
-                    {% if usage.projects.remaining > 0 %}
-                        <span class="remaining">{{ usage.projects.remaining }} project slot{{ usage.projects.remaining|pluralize }} available</span>
-                    {% else %}
-                        <span class="limit-reached">Project limit reached</span>
-                    {% endif %}
-                </p>
-                {% endif %}
+            </div>
+            {% if usage.projects.percent is not None %}
+            <div class="bi-usage-bar">
+                <div class="bi-usage-fill {% if usage.projects.percent >= 90 %}bi-usage-fill--warn{% endif %}" style="width: {{ usage.projects.percent }}%;"></div>
+            </div>
+            {% if usage.projects.remaining is not None %}
+            <span class="bi-usage-footer {% if usage.projects.remaining == 0 %}bi-usage-footer--warn{% endif %}">
+                {% if usage.projects.remaining > 0 %}
+                {{ usage.projects.remaining }} project slot{{ usage.projects.remaining|pluralize }} available
                 {% else %}
-                <p class="usage-footer muted">Unlimited projects</p>
+                Project limit reached
                 {% endif %}
-            </article>
-        </div>
-    </section>
+            </span>
+            {% endif %}
+            {% else %}
+            <span class="bi-usage-footer">Unlimited projects</span>
+            {% endif %}
+        </article>
+    </div>
 
-    {# Available Plans #}
-    <section class="available-plans-section">
-        <div class="section-header">
-            <h3>Available Plans</h3>
-            <p class="muted">Compare plans and features</p>
+    {# ── Plan Comparison ── #}
+    <section class="bi-section">
+        <div class="bi-section-head">
+            <h2>Compare Plans</h2>
+            <span class="bi-section-sub">Choose the plan that fits your hiring needs</span>
         </div>
-        <div class="plan-cards-grid">
+        <div class="bi-plans-grid">
             {% for plan in available_plans %}
-            <article class="portal-card plan-card {% if plan.is_current %}current{% endif %}">
+            <article class="bi-plan-card {% if plan.is_current %}bi-plan-card--current{% endif %}">
                 {% if plan.is_current %}
-                <div class="current-badge">Current Plan</div>
+                <div class="bi-card-ribbon">Current</div>
                 {% endif %}
-                <div class="plan-card-header">
-                    <h4>{{ plan.name }}</h4>
-                    <div class="plan-card-pricing">
-                        <span class="price">{{ plan.price }}</span>
+
+                <div class="bi-card-top">
+                    <h3 class="bi-card-name">{{ plan.name }}</h3>
+                    <div class="bi-card-price">
+                        <span class="bi-card-amount">{{ plan.price }}</span>
                         {% if plan.billing_cycle != 'Forever' and plan.billing_cycle != 'contact us' %}
-                        <span class="cycle">/ {{ plan.billing_cycle }}</span>
+                        <span class="bi-card-freq">/ {{ plan.billing_cycle }}</span>
                         {% elif plan.billing_cycle == 'contact us' %}
-                        <span class="cycle">{{ plan.billing_cycle }}</span>
+                        <span class="bi-card-freq">{{ plan.billing_cycle }}</span>
                         {% endif %}
                     </div>
-                    <p class="plan-description">{{ plan.description }}</p>
+                    <p class="bi-card-desc">{{ plan.description }}</p>
                 </div>
 
-                <div class="plan-card-details">
-                    <div class="plan-detail-item">
+                <div class="bi-card-limits">
+                    <div class="bi-card-limit">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                         </svg>
-                        <span>{% if plan.project_quota %}{{ plan.project_quota }} active project{{ plan.project_quota|pluralize }}{% else %}Unlimited projects{% endif %}</span>
+                        <span>{% if plan.project_quota %}{{ plan.project_quota }} project{{ plan.project_quota|pluralize }}{% else %}Unlimited projects{% endif %}</span>
                     </div>
-                    <div class="plan-detail-item">
+                    <div class="bi-card-limit">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
-                        <span>{% if plan.invite_quota %}{{ plan.invite_quota }} invites / month{% else %}Unlimited invites{% endif %}</span>
+                        <span>{% if plan.invite_quota %}{{ plan.invite_quota }} invites/mo{% else %}Unlimited invites{% endif %}</span>
                     </div>
                 </div>
 
                 {% if plan.features %}
-                <div class="plan-features">
-                    <p class="features-label">Key Features:</p>
-                    <ul class="features-list">
-                        {% for feature in plan.features %}
-                        <li>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            {{ feature }}
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                <ul class="bi-card-features">
+                    {% for feature in plan.features %}
+                    <li>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        {{ feature }}
+                    </li>
+                    {% endfor %}
+                </ul>
                 {% endif %}
 
-                <div class="plan-card-footer">
+                <div class="bi-card-foot">
                     {% if plan.is_current %}
-                        <button class="btn btn-outline" disabled>Current Plan</button>
+                    <button class="bi-card-btn bi-card-btn--current" disabled>Current Plan</button>
                     {% elif plan.action == 'upgrade' %}
-                        <a href="mailto:{{ contact_email }}?subject=Upgrade to {{ plan.name }} Plan" class="btn btn-primary">
-                            Upgrade to {{ plan.name }}
-                        </a>
+                    <a href="mailto:{{ contact_email }}?subject=Upgrade to {{ plan.name }} Plan" class="bi-card-btn bi-card-btn--upgrade">
+                        Upgrade to {{ plan.name }}
+                    </a>
                     {% elif plan.action == 'downgrade' %}
-                        <a href="mailto:{{ contact_email }}?subject=Downgrade to {{ plan.name }} Plan" class="btn btn-ghost">
-                            Switch to {{ plan.name }}
-                        </a>
+                    <a href="mailto:{{ contact_email }}?subject=Switch to {{ plan.name }} Plan" class="bi-card-btn bi-card-btn--switch">
+                        Switch to {{ plan.name }}
+                    </a>
                     {% endif %}
                 </div>
             </article>
@@ -182,174 +179,111 @@
         </div>
     </section>
 
-    {# Billing Support #}
-    <section class="portal-card billing-support-card">
-        <div class="support-content">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            <div>
-                <h3>Need help with billing?</h3>
-                <p class="muted">Contact our support team for plan changes, billing questions, or invoice requests.</p>
-            </div>
+    {# ── Help Footer ── #}
+    <div class="bi-help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <div>
+            <strong>Need help with billing?</strong>
+            <span class="muted"> Plan changes, invoices, or payment questions. </span>
+            <button type="button" class="bi-help-link" id="openSupportModal">Contact Support →</button>
         </div>
-        <button type="button" class="btn btn-outline" id="openSupportModal">
-            Contact Support
-        </button>
-    </section>
+    </div>
+
 </div>
 
-{# Support Request Modal #}
-<div class="modal-overlay" id="supportModal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
+{# ── Support Modal ── #}
+<div class="bi-modal-overlay" id="supportModal" style="display: none;">
+    <div class="bi-modal">
+        <div class="bi-modal-head">
             <h2>Contact Support</h2>
-            <button type="button" class="modal-close" id="closeSupportModal">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button type="button" class="bi-modal-close" id="closeSupportModal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
         </div>
-        <form id="supportRequestForm" class="support-form">
+        <form id="supportRequestForm" class="bi-modal-form">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="request_type">Request Type</label>
-                <select name="request_type" id="request_type" required>
-                    <option value="billing">Billing & Plans</option>
-                    <option value="technical">Technical Issue</option>
-                    <option value="feature">Feature Request</option>
-                    <option value="other">Other</option>
-                </select>
+            <div class="bi-form-row">
+                <div class="bi-form-field">
+                    <label for="request_type">Request Type</label>
+                    <select name="request_type" id="request_type" required>
+                        <option value="billing">Billing & Plans</option>
+                        <option value="technical">Technical Issue</option>
+                        <option value="feature">Feature Request</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="bi-form-field">
+                    <label for="subject">Subject</label>
+                    <input type="text" name="subject" id="subject" placeholder="Brief description" required maxlength="200">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="subject">Subject</label>
-                <input type="text" name="subject" id="subject" placeholder="Brief description of your request" required maxlength="200">
-            </div>
-            <div class="form-group">
+            <div class="bi-form-field">
                 <label for="message">Message</label>
-                <textarea name="message" id="message" rows="5" placeholder="Please provide details about your request..." required></textarea>
+                <textarea name="message" id="message" rows="4" placeholder="Please provide details about your request..." required></textarea>
             </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-ghost" id="cancelSupportModal">Cancel</button>
+            <div class="bi-modal-foot">
+                <button type="button" class="btn btn-outline small" id="cancelSupportModal">Cancel</button>
                 <button type="submit" class="btn btn-primary" id="submitSupportRequest">
                     <span class="btn-text">Submit Request</span>
-                    <span class="btn-loading" style="display: none;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32">
-                                <animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/>
-                            </circle>
-                        </svg>
-                        Submitting...
-                    </span>
+                    <span class="btn-loading" style="display: none;">Submitting...</span>
                 </button>
             </div>
         </form>
-        <div class="support-success" id="supportSuccess" style="display: none;">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2">
+        <div class="bi-modal-success" id="supportSuccess" style="display: none;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-orange)" stroke-width="2">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
             <h3>Request Submitted</h3>
-            <p>Your support request has been submitted successfully. We'll get back to you soon.</p>
-            <button type="button" class="btn btn-primary" id="closeSupportSuccess">Done</button>
+            <p class="muted">We'll get back to you within 24 hours.</p>
+            <button type="button" class="btn btn-pill" id="closeSupportSuccess">Done</button>
         </div>
     </div>
 </div>
 
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
     const modal = document.getElementById('supportModal');
     const form = document.getElementById('supportRequestForm');
-    const successView = document.getElementById('supportSuccess');
-    const openBtn = document.getElementById('openSupportModal');
-    const closeBtn = document.getElementById('closeSupportModal');
-    const cancelBtn = document.getElementById('cancelSupportModal');
-    const closeSuccessBtn = document.getElementById('closeSupportSuccess');
+    const success = document.getElementById('supportSuccess');
     const submitBtn = document.getElementById('submitSupportRequest');
 
-    function openModal() {
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        form.style.display = 'block';
-        successView.style.display = 'none';
-    }
+    function open() { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; form.style.display = 'block'; success.style.display = 'none'; }
+    function close() { modal.style.display = 'none'; document.body.style.overflow = ''; form.reset(); }
 
-    function closeModal() {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-        form.reset();
-    }
+    document.getElementById('openSupportModal').addEventListener('click', open);
+    document.getElementById('closeSupportModal').addEventListener('click', close);
+    document.getElementById('cancelSupportModal').addEventListener('click', close);
+    document.getElementById('closeSupportSuccess').addEventListener('click', close);
+    modal.addEventListener('click', function(e) { if (e.target === modal) close(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && modal.style.display === 'flex') close(); });
 
-    openBtn.addEventListener('click', openModal);
-    closeBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-    closeSuccessBtn.addEventListener('click', closeModal);
-
-    // Close on overlay click
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.style.display === 'flex') {
-            closeModal();
-        }
-    });
-
-    // Form submission
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-
         const btnText = submitBtn.querySelector('.btn-text');
-        const btnLoading = submitBtn.querySelector('.btn-loading');
-
-        // Show loading state
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'inline-flex';
-        submitBtn.disabled = true;
-
-        const formData = {
-            request_type: form.request_type.value,
-            subject: form.subject.value,
-            message: form.message.value
-        };
+        const btnLoad = submitBtn.querySelector('.btn-loading');
+        btnText.style.display = 'none'; btnLoad.style.display = 'inline'; submitBtn.disabled = true;
 
         try {
-            const response = await fetch('{% url "clients:support-request" %}', {
+            const res = await fetch('{% url "clients:support-request" %}', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': (form.querySelector('[name=csrfmiddlewaretoken]') || {}).value || ''
-                },
-                body: JSON.stringify(formData)
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': (form.querySelector('[name=csrfmiddlewaretoken]') || {}).value || '' },
+                body: JSON.stringify({ request_type: form.request_type.value, subject: form.subject.value, message: form.message.value })
             });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // Show success view
-                form.style.display = 'none';
-                successView.style.display = 'block';
-            } else {
-                alert(data.error || 'Something went wrong. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to submit request. Please try again.');
-        } finally {
-            // Reset button state
-            btnText.style.display = 'inline';
-            btnLoading.style.display = 'none';
-            submitBtn.disabled = false;
-        }
+            const data = await res.json();
+            if (data.success) { form.style.display = 'none'; success.style.display = 'block'; }
+            else { alert(data.error || 'Something went wrong.'); }
+        } catch (err) { alert('Failed to submit. Please try again.'); }
+        finally { btnText.style.display = 'inline'; btnLoad.style.display = 'none'; submitBtn.disabled = false; }
     });
-});
+})();
 </script>
 
 {% endblock %}
