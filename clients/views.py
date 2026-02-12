@@ -2465,6 +2465,152 @@ class ClientAssessmentExportView(ClientAssessmentMixin, View):
         return response
 
 
+class GettingStartedView(LoginRequiredMixin, TemplateView):
+    """Getting Started checklist with 8 actionable onboarding tasks."""
+    template_name = "clients/getting_started.html"
+    login_url = reverse_lazy("clients:login")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        client = request.user.client_account
+        if not client.company_name:
+            return redirect("clients:complete_profile")
+        if client.status != "approved":
+            messages.info(request, "Your account is still pending approval.")
+            return redirect("clients:pending_approval")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        account = self.request.user.client_account
+        step_data = account.onboarding_step_data or {}
+
+        # Count sessions for invite/review detection
+        dataset_map = build_dataset_map(account)
+        total_sessions = sum(qs.count() for qs in dataset_map.values())
+        completed_sessions = sum(
+            qs.filter(status="submitted").count() for qs in dataset_map.values()
+        )
+
+        # Build link to first assessment manage page
+        first_assessment = next(iter(account.approved_assessments), None)
+        assessment_url = (
+            reverse("clients:assessment-manage", args=[first_assessment])
+            if first_assessment
+            else reverse("clients:assessments")
+        )
+
+        steps = [
+            {
+                "key": "complete_profile",
+                "number": 1,
+                "title": "Complete your profile",
+                "description": "Ensure your company name and contact details are set up.",
+                "icon": "user",
+                "action_label": "Go to Settings",
+                "action_url": reverse("clients:settings"),
+                "completed": bool(account.company_name),
+                "auto": True,
+            },
+            {
+                "key": "upload_logo",
+                "number": 2,
+                "title": "Upload company logo",
+                "description": "Add your brand identity to candidate-facing assessment pages.",
+                "icon": "image",
+                "action_label": "Upload Logo",
+                "action_url": reverse("clients:settings") + "#branding",
+                "completed": account.has_logo,
+                "auto": True,
+            },
+            {
+                "key": "create_project",
+                "number": 3,
+                "title": "Create your first project",
+                "description": "Organize your hiring pipeline by role or campaign.",
+                "icon": "folder",
+                "action_label": "Create Project",
+                "action_url": reverse("clients:project-list"),
+                "completed": account.projects.exists(),
+                "auto": True,
+            },
+            {
+                "key": "browse_assessments",
+                "number": 4,
+                "title": "Browse assessment banks",
+                "description": "Explore your approved assessment types and question banks.",
+                "icon": "file-text",
+                "action_label": "Browse Assessments",
+                "action_url": reverse("clients:assessments"),
+                "completed": step_data.get("browse_assessments", False),
+                "auto": False,
+            },
+            {
+                "key": "invite_candidate",
+                "number": 5,
+                "title": "Invite your first candidate",
+                "description": "Send an assessment invitation to a candidate via email.",
+                "icon": "send",
+                "action_label": "Send Invite",
+                "action_url": assessment_url,
+                "completed": total_sessions > 0,
+                "auto": True,
+            },
+            {
+                "key": "review_assessment",
+                "number": 6,
+                "title": "Review a completed assessment",
+                "description": "Check a candidate's auto-scored results and recommendations.",
+                "icon": "bar-chart",
+                "action_label": "View Results",
+                "action_url": assessment_url,
+                "completed": completed_sessions > 0,
+                "auto": True,
+            },
+            {
+                "key": "setup_notifications",
+                "number": 7,
+                "title": "Set up notifications",
+                "description": "Configure email alerts for assessment completions and activity.",
+                "icon": "bell",
+                "action_label": "Notification Settings",
+                "action_url": reverse("clients:settings") + "#notifications",
+                "completed": step_data.get("setup_notifications", False),
+                "auto": False,
+            },
+            {
+                "key": "explore_analytics",
+                "number": 8,
+                "title": "Explore analytics",
+                "description": "View hiring insights, score distributions, and performance reports.",
+                "icon": "trending-up",
+                "action_label": "View Analytics",
+                "action_url": reverse("clients:analytics"),
+                "completed": step_data.get("explore_analytics", False),
+                "auto": False,
+            },
+        ]
+
+        completed_count = sum(1 for s in steps if s["completed"])
+        total_count = len(steps)
+        progress_percent = round((completed_count / total_count) * 100)
+        all_complete = completed_count == total_count
+
+        if all_complete and not account.has_completed_onboarding:
+            account.mark_onboarding_complete()
+
+        context.update({
+            "account": account,
+            "steps": steps,
+            "completed_count": completed_count,
+            "total_count": total_count,
+            "progress_percent": progress_percent,
+            "all_complete": all_complete,
+        })
+        return context
+
+
 class OnboardingCompleteView(LoginRequiredMixin, View):
     """AJAX endpoint to mark onboarding steps complete."""
     login_url = reverse_lazy("clients:login")
@@ -2478,7 +2624,10 @@ class OnboardingCompleteView(LoginRequiredMixin, View):
             return JsonResponse({'success': True, 'message': 'Onboarding completed!'})
 
         elif action == 'complete_step':
-            VALID_STEPS = {'step_1', 'step_2', 'step_3', 'step_4', 'step_5'}
+            VALID_STEPS = {
+                'step_1', 'step_2', 'step_3', 'step_4', 'step_5',
+                'browse_assessments', 'setup_notifications', 'explore_analytics',
+            }
             step_id = request.POST.get('step_id', '')
             if step_id and step_id in VALID_STEPS:
                 account.onboarding_step_data[step_id] = True

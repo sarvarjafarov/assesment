@@ -17,6 +17,7 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
     path("assessments/", views.ClientAssessmentsView.as_view(), name="assessments"),
     path("analytics/", views.ClientAnalyticsView.as_view(), name="analytics"),
     path("settings/", views.ClientSettingsView.as_view(), name="settings"),
+    path("getting-started/", views.GettingStartedView.as_view(), name="getting-started"),
     path(
         "dashboard/assessments/<slug:assessment_type>/",
         views.ClientAssessmentManageView.as_view(),

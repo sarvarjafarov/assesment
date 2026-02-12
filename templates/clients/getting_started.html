@@ -1,0 +1,125 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% block title %}Getting Started · Evalon{% endblock %}
+{% block meta_description %}Complete your setup checklist to get the most out of Evalon.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+
+    {# ── Header ── #}
+    <header class="gs-header">
+        <div class="gs-header-left">
+            <div class="gs-header-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+                    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+                    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+                </svg>
+            </div>
+            <div>
+                <h1>Getting Started</h1>
+                <p class="muted">Complete these steps to get the most out of Evalon</p>
+            </div>
+        </div>
+    </header>
+
+    {# ── Progress ── #}
+    <div class="gs-progress">
+        <div class="gs-progress-top">
+            <span class="gs-progress-text">{{ completed_count }} of {{ total_count }} completed</span>
+            <span class="gs-progress-pct">{{ progress_percent }}%</span>
+        </div>
+        <div class="gs-progress-bar">
+            <div class="gs-progress-fill" style="width: {{ progress_percent }}%"></div>
+        </div>
+    </div>
+
+    {# ── Completion Banner ── #}
+    {% if all_complete %}
+    <div class="gs-complete-banner">
+        <div class="gs-complete-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+        <div>
+            <h3>All set! You're ready to go.</h3>
+            <p>You've completed all the setup steps. Head to your <a href="{% url 'clients:dashboard' %}">dashboard</a> to manage your pipeline.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Steps List ── #}
+    <div class="gs-steps">
+        {% for step in steps %}
+        <div class="gs-step {% if step.completed %}gs-step--done{% endif %}" data-step-key="{{ step.key }}" data-auto="{{ step.auto|yesno:'true,false' }}">
+            <div class="gs-step-check">
+                {% if step.completed %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                {% else %}
+                <span class="gs-step-num">{{ step.number }}</span>
+                {% endif %}
+            </div>
+
+            <div class="gs-step-body">
+                <h3 class="gs-step-title">{{ step.title }}</h3>
+                <p class="gs-step-desc">{{ step.description }}</p>
+            </div>
+
+            <a href="{{ step.action_url }}" class="btn {% if step.completed %}btn-ghost{% else %}btn-outline{% endif %} btn-sm gs-step-action" data-step-key="{{ step.key }}">
+                {% if step.completed %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Done
+                {% else %}
+                {{ step.action_label }}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                {% endif %}
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# ── Help Footer ── #}
+    <div class="gs-help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <p>Need help? <a href="mailto:support@evalon.app">Contact our support team</a></p>
+    </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.gs-step-action').forEach(function(link) {
+    link.addEventListener('click', function() {
+        var step = this.closest('.gs-step');
+        var key = step.dataset.stepKey;
+        var isAuto = step.dataset.auto === 'true';
+        if (!isAuto && !step.classList.contains('gs-step--done')) {
+            var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfToken) return;
+            fetch('{% url "clients:onboarding-complete" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken.value,
+                },
+                body: 'action=complete_step&step_id=' + key
+            });
+        }
+    });
+});
+</script>
+{# Hidden CSRF token for JS fetch #}
+<form style="display:none;">{% csrf_token %}</form>
+{% endblock %}
