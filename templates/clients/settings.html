@@ -4,59 +4,72 @@
 {% block meta_description %}Manage your account settings and preferences.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="page-header-with-actions">
-        <div>
-            <h1>Settings</h1>
-            <p class="muted">Manage your account and preferences</p>
-        </div>
+
+    {# ── Header ── #}
+    <header class="st-header">
+        <h1>Settings</h1>
+        <p class="muted">Manage your account and preferences</p>
     </header>
 
-    {# Account Information #}
-    <section class="settings-section">
-        <div class="settings-section-header">
-            <h2>Account Information</h2>
-            <p class="muted">Your workspace details and contact information</p>
+    {# ── Account Information ── #}
+    <section class="st-section">
+        <div class="st-section-head">
+            <div class="st-section-icon st-section-icon--account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <div>
+                <h2>Account Information</h2>
+                <span class="st-section-sub">Your workspace details and contact information</span>
+            </div>
         </div>
-        <div class="portal-card">
-            <div class="settings-row">
-                <div class="setting-info">
-                    <h4>Company Name</h4>
-                    <p class="muted">{{ account.company_name }}</p>
+        <div class="st-card">
+            <div class="st-info-grid">
+                <div class="st-info-item">
+                    <span class="st-info-label">Company Name</span>
+                    <span class="st-info-value">{{ account.company_name }}</span>
                 </div>
-            </div>
-            <div class="settings-row">
-                <div class="setting-info">
-                    <h4>Email Address</h4>
-                    <p class="muted">{{ account.email }}</p>
+                <div class="st-info-item">
+                    <span class="st-info-label">Email Address</span>
+                    <span class="st-info-value">{{ account.email }}</span>
                 </div>
-            </div>
-            <div class="settings-row">
-                <div class="setting-info">
-                    <h4>Account Role</h4>
-                    <p class="muted">{{ role_label }}</p>
+                <div class="st-info-item">
+                    <span class="st-info-label">Account Role</span>
+                    <span class="st-info-value">{{ role_label }}</span>
                 </div>
-            </div>
-            <div class="settings-row">
-                <div class="setting-info">
-                    <h4>Member Since</h4>
-                    <p class="muted">{{ account.created_at|date:"F j, Y" }}</p>
+                <div class="st-info-item">
+                    <span class="st-info-label">Member Since</span>
+                    <span class="st-info-value">{{ account.created_at|date:"F j, Y" }}</span>
                 </div>
             </div>
         </div>
     </section>
 
-    {# Branding Settings - Only for managers and branding managers #}
+    {# ── Branding & White-Labeling ── #}
     {% if can_manage_branding %}
-    <section class="settings-section">
-        <div class="settings-section-header">
-            <h2>Branding & White-Labeling</h2>
-            <p class="muted">Customize assessment experience with your company branding</p>
+    <section class="st-section">
+        <div class="st-section-head">
+            <div class="st-section-icon st-section-icon--brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="13.5" cy="6.5" r="2.5"></circle>
+                    <circle cx="17.5" cy="10.5" r="2.5"></circle>
+                    <circle cx="8.5" cy="7.5" r="2.5"></circle>
+                    <circle cx="6.5" cy="12.5" r="2.5"></circle>
+                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+                </svg>
+            </div>
+            <div>
+                <h2>Branding & White-Labeling</h2>
+                <span class="st-section-sub">Customize assessment experience with your company branding</span>
+            </div>
         </div>
 
         {# Logo Upload #}
-        <div class="portal-card branding-card">
-            <div class="card-title-row">
-                <div class="card-title-icon">
+        <div class="st-card">
+            <div class="st-card-head">
+                <div class="st-card-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
@@ -64,16 +77,16 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="card-title">Company Logo</h3>
-                    <p class="card-subtitle">Your logo appears on all candidate-facing pages</p>
+                    <h3 class="st-card-title">Company Logo</h3>
+                    <p class="st-card-sub">Your logo appears on all candidate-facing pages</p>
                 </div>
             </div>
-            <div class="logo-upload-area">
-                <div class="logo-preview-frame">
+            <div class="st-logo-area">
+                <div class="st-logo-frame">
                     {% if account.logo_data_url %}
-                    <img src="{{ account.logo_data_url }}" alt="{{ account.company_name }} logo" class="current-logo">
+                    <img src="{{ account.logo_data_url }}" alt="{{ account.company_name }} logo" class="st-logo-img">
                     {% else %}
-                    <div class="logo-placeholder">
+                    <div class="st-logo-placeholder">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <circle cx="8.5" cy="8.5" r="1.5"></circle>
@@ -83,12 +96,12 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="logo-upload-info">
-                    <div class="logo-actions">
-                        <form method="post" action="{% url 'clients:dashboard' %}" enctype="multipart/form-data" class="logo-upload-form">
+                <div class="st-logo-info">
+                    <div class="st-logo-btns">
+                        <form method="post" action="{% url 'clients:dashboard' %}" enctype="multipart/form-data" class="st-logo-form">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="upload_logo">
-                            <label for="id_logo" class="btn btn-outline btn-upload">
+                            <label for="id_logo" class="btn btn-outline small">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="17 8 12 3 7 8"></polyline>
@@ -102,21 +115,19 @@
                         <form method="post" action="{% url 'clients:dashboard' %}" style="display: inline;">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="remove_logo">
-                            <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove your logo?')">
-                                Remove
-                            </button>
+                            <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove your logo?')">Remove</button>
                         </form>
                         {% endif %}
                     </div>
-                    <p class="form-help">Square PNG or JPG, min 200x200px. Max 2MB.</p>
+                    <p class="st-hint">Square PNG or JPG, min 200×200px. Max 2MB.</p>
                 </div>
             </div>
         </div>
 
-        {# Brand Colors #}
-        <div class="portal-card branding-card" style="margin-top: 1rem;">
-            <div class="card-title-row">
-                <div class="card-title-icon">
+        {# Brand Colors + Preview + Custom Text #}
+        <div class="st-card" style="margin-top: 1rem;">
+            <div class="st-card-head">
+                <div class="st-card-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="13.5" cy="6.5" r="2.5"></circle>
                         <circle cx="17.5" cy="10.5" r="2.5"></circle>
@@ -126,67 +137,67 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="card-title">Brand Colors</h3>
-                    <p class="card-subtitle">Customize the look and feel of your assessments</p>
+                    <h3 class="st-card-title">Brand Colors</h3>
+                    <p class="st-card-sub">Customize the look and feel of your assessments</p>
                 </div>
             </div>
-            <form method="post" class="settings-form" id="branding-form">
+            <form method="post" class="st-form" id="branding-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_branding">
-                <div class="color-picker-grid">
-                    <div class="form-group color-group">
+                <div class="st-color-grid">
+                    <div class="st-color-group">
                         <label for="id_brand_primary_color">Primary Color</label>
-                        <div class="color-input-wrapper">
+                        <div class="st-color-input">
                             <input type="color" id="id_brand_primary_color" name="brand_primary_color"
                                    value="{{ account.brand_primary_color|default:'#ff8a00' }}"
-                                   class="color-picker">
-                            <input type="text" class="color-hex-input" value="{{ account.brand_primary_color|default:'#ff8a00' }}"
+                                   class="st-color-picker">
+                            <input type="text" class="st-color-hex" value="{{ account.brand_primary_color|default:'#ff8a00' }}"
                                    maxlength="7" pattern="#[0-9A-Fa-f]{6}">
                         </div>
-                        <span class="form-help">Buttons, links, highlights</span>
+                        <span class="st-hint">Buttons, links, highlights</span>
                     </div>
-                    <div class="form-group color-group">
+                    <div class="st-color-group">
                         <label for="id_brand_secondary_color">Text Color</label>
-                        <div class="color-input-wrapper">
+                        <div class="st-color-input">
                             <input type="color" id="id_brand_secondary_color" name="brand_secondary_color"
                                    value="{{ account.brand_secondary_color|default:'#0e1428' }}"
-                                   class="color-picker">
-                            <input type="text" class="color-hex-input" value="{{ account.brand_secondary_color|default:'#0e1428' }}"
+                                   class="st-color-picker">
+                            <input type="text" class="st-color-hex" value="{{ account.brand_secondary_color|default:'#0e1428' }}"
                                    maxlength="7" pattern="#[0-9A-Fa-f]{6}">
                         </div>
-                        <span class="form-help">Headings and text</span>
+                        <span class="st-hint">Headings and text</span>
                     </div>
-                    <div class="form-group color-group">
+                    <div class="st-color-group">
                         <label for="id_brand_background_color">Background Color</label>
-                        <div class="color-input-wrapper">
+                        <div class="st-color-input">
                             <input type="color" id="id_brand_background_color" name="brand_background_color"
                                    value="{{ account.brand_background_color|default:'#ffffff' }}"
-                                   class="color-picker">
-                            <input type="text" class="color-hex-input" value="{{ account.brand_background_color|default:'#ffffff' }}"
+                                   class="st-color-picker">
+                            <input type="text" class="st-color-hex" value="{{ account.brand_background_color|default:'#ffffff' }}"
                                    maxlength="7" pattern="#[0-9A-Fa-f]{6}">
                         </div>
-                        <span class="form-help">Page background</span>
+                        <span class="st-hint">Page background</span>
                     </div>
                 </div>
 
                 {# Branding Preview #}
-                <div class="branding-preview-box" id="branding-preview">
-                    <p class="preview-label">Preview</p>
-                    <div class="preview-card">
+                <div class="st-preview-box" id="branding-preview">
+                    <p class="st-preview-label">Preview</p>
+                    <div class="st-preview-card">
                         {% if account.logo_data_url %}
-                        <img src="{{ account.logo_data_url }}" alt="Logo" class="preview-logo">
+                        <img src="{{ account.logo_data_url }}" alt="Logo" class="st-preview-logo">
                         {% endif %}
-                        <h4 class="preview-title">Assessment Title</h4>
-                        <p class="preview-text">This is how your branded assessment will look to candidates.</p>
-                        <button type="button" class="preview-button">Start Assessment</button>
-                        <p class="preview-footer">{{ account.get_footer_text }}</p>
+                        <h4 class="st-preview-title">Assessment Title</h4>
+                        <p class="st-preview-text">This is how your branded assessment will look to candidates.</p>
+                        <button type="button" class="st-preview-btn">Start Assessment</button>
+                        <p class="st-preview-footer">{{ account.get_footer_text }}</p>
                     </div>
                 </div>
 
                 {# Custom Text Settings #}
-                <div class="form-divider"></div>
-                <div class="subsection-header">
-                    <div class="subsection-icon">
+                <div class="st-divider"></div>
+                <div class="st-subsection">
+                    <div class="st-subsection-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -196,13 +207,13 @@
                         </svg>
                     </div>
                     <div>
-                        <h4 class="subsection-title">Custom Text</h4>
-                        <p class="subsection-desc">Personalize the copy candidates see during assessments</p>
+                        <h4 class="st-subsection-title">Custom Text</h4>
+                        <p class="st-subsection-desc">Personalize the copy candidates see during assessments</p>
                     </div>
                 </div>
 
-                <div class="form-fields-stack">
-                    <div class="form-group enhanced">
+                <div class="st-fields">
+                    <div class="st-field">
                         <label for="id_custom_email_sender_name">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -214,16 +225,16 @@
                                value="{{ account.custom_email_sender_name }}"
                                placeholder="e.g., Acme Hiring Team"
                                {% if not account.can_use_white_labeling %}disabled{% endif %}>
-                        <span class="form-help">
+                        <span class="st-hint">
                             {% if account.can_use_white_labeling %}
                             Custom sender name for assessment invitation emails
                             {% else %}
-                            <span class="upgrade-badge">Pro/Enterprise</span> Upgrade to customize email sender
+                            <span class="st-upgrade-badge">Pro/Enterprise</span> Upgrade to customize email sender
                             {% endif %}
                         </span>
                     </div>
 
-                    <div class="form-group enhanced">
+                    <div class="st-field">
                         <label for="id_custom_welcome_message">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -232,10 +243,10 @@
                         </label>
                         <textarea id="id_custom_welcome_message" name="custom_welcome_message" rows="3"
                                   placeholder="Add a custom welcome message for candidates...">{{ account.custom_welcome_message }}</textarea>
-                        <span class="form-help">Shown on the assessment intro page before candidates start</span>
+                        <span class="st-hint">Shown on the assessment intro page before candidates start</span>
                     </div>
 
-                    <div class="form-group enhanced">
+                    <div class="st-field">
                         <label for="id_custom_footer_text">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="4 7 4 4 20 4 20 7"></polyline>
@@ -247,39 +258,39 @@
                         <input type="text" id="id_custom_footer_text" name="custom_footer_text"
                                value="{{ account.custom_footer_text }}"
                                placeholder="e.g., Assessment powered by Acme Inc.">
-                        <span class="form-help">Replaces 'Powered by Evalon' in candidate-facing pages</span>
+                        <span class="st-hint">Replaces 'Powered by Evalon' in candidate-facing pages</span>
                     </div>
                 </div>
 
-                <div class="branding-toggle-card">
-                    <div class="toggle-card-content">
-                        <div class="toggle-card-icon">
+                <div class="st-toggle-card">
+                    <div class="st-toggle-card-left">
+                        <div class="st-toggle-card-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                                 <line x1="1" y1="1" x2="23" y2="23"></line>
                             </svg>
                         </div>
-                        <div class="setting-info">
+                        <div>
                             <h4>Hide Evalon Branding</h4>
                             <p class="muted">
                                 {% if account.can_use_white_labeling %}
                                 Remove Evalon branding from candidate-facing pages
                                 {% else %}
-                                <span class="upgrade-badge">Pro/Enterprise</span> Upgrade to hide Evalon branding
+                                <span class="st-upgrade-badge">Pro/Enterprise</span> Upgrade to hide Evalon branding
                                 {% endif %}
                             </p>
                         </div>
                     </div>
-                    <label class="toggle-switch">
+                    <label class="st-toggle">
                         <input type="checkbox" name="hide_evalon_branding"
                                {% if account.hide_evalon_branding %}checked{% endif %}
                                {% if not account.can_use_white_labeling %}disabled{% endif %}>
-                        <span class="toggle-slider"></span>
+                        <span class="st-toggle-slider"></span>
                     </label>
                 </div>
 
-                <div class="form-actions-bar">
-                    <button type="submit" class="btn btn-primary btn-save">
+                <div class="st-actions-bar">
+                    <button type="submit" class="btn btn-primary">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -287,7 +298,7 @@
                         </svg>
                         Save Branding Settings
                     </button>
-                    <button type="button" class="btn btn-outline btn-reset" id="reset-branding">
+                    <button type="button" class="btn btn-outline" id="reset-branding">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="1 4 1 10 7 10"></polyline>
                             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
@@ -300,118 +311,127 @@
     </section>
     {% endif %}
 
-    {# Webhook & API Integration - Pro/Enterprise only #}
+    {# ── Webhook & API Integration ── #}
     {% if can_manage_branding %}
-    <section class="settings-section">
-        <div class="settings-section-header">
-            <h2>Webhook & API Integration</h2>
-            <p class="muted">Receive real-time notifications and access assessment data programmatically</p>
-        </div>
-
-        {# Webhooks Configuration #}
-        <div class="portal-card">
-            <h3 class="card-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
+    <section class="st-section">
+        <div class="st-section-head">
+            <div class="st-section-icon st-section-icon--api">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                 </svg>
-                Webhooks
-            </h3>
-            <form method="post" class="settings-form" id="webhook-form">
+            </div>
+            <div>
+                <h2>Webhook & API Integration</h2>
+                <span class="st-section-sub">Receive real-time notifications and access assessment data programmatically</span>
+            </div>
+        </div>
+
+        {# Webhooks Configuration #}
+        <div class="st-card">
+            <div class="st-card-head">
+                <div class="st-card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="st-card-title">Webhooks</h3>
+                    <p class="st-card-sub">Configure HTTP POST notifications for assessment events</p>
+                </div>
+            </div>
+            <form method="post" class="st-form" id="webhook-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_webhooks">
 
-                <div class="settings-row toggle-row">
-                    <div class="setting-info">
+                <div class="st-row">
+                    <div>
                         <h4>Enable Webhooks</h4>
-                        <p class="muted">Receive HTTP POST notifications when assessment events occur</p>
+                        <p class="muted">Toggle to start receiving event notifications</p>
                     </div>
-                    <label class="toggle-switch">
+                    <label class="st-toggle">
                         <input type="checkbox" name="webhook_enabled" id="webhook_enabled"
                                {% if account.webhook_enabled %}checked{% endif %}>
-                        <span class="toggle-slider"></span>
+                        <span class="st-toggle-slider"></span>
                     </label>
                 </div>
 
-                <div id="webhook-config" class="{% if not account.webhook_enabled %}hidden{% endif %}">
-                    <div class="form-group">
+                <div id="webhook-config" class="st-webhook-config {% if not account.webhook_enabled %}hidden{% endif %}">
+                    <div class="st-field">
                         <label for="webhook_url">Webhook URL</label>
                         <input type="url" id="webhook_url" name="webhook_url"
                                value="{{ account.webhook_url }}"
                                placeholder="https://your-server.com/webhooks/evalon"
                                pattern="https://.*">
-                        <span class="form-help">Must use HTTPS. We'll send a POST request with JSON payload for each event.</span>
+                        <span class="st-hint">Must use HTTPS. We'll send a POST request with JSON payload for each event.</span>
                     </div>
 
-                    <div class="form-group">
+                    <div class="st-field">
                         <label>Webhook Secret</label>
-                        <div class="secret-display">
+                        <div class="st-secret-row">
                             {% if account.webhook_secret %}
-                            <code class="secret-value">{{ account.webhook_secret|slice:":8" }}••••••••</code>
-                            <button type="button" class="btn btn-ghost btn-sm" id="regenerate-webhook-secret">
-                                Regenerate
-                            </button>
+                            <code class="st-secret-value">{{ account.webhook_secret|slice:":8" }}••••••••</code>
+                            <button type="button" class="btn btn-ghost btn-sm" id="regenerate-webhook-secret">Regenerate</button>
                             {% else %}
                             <span class="muted">No secret configured</span>
-                            <button type="button" class="btn btn-outline btn-sm" id="generate-webhook-secret">
-                                Generate Secret
-                            </button>
+                            <button type="button" class="btn btn-outline small" id="generate-webhook-secret">Generate Secret</button>
                             {% endif %}
                         </div>
-                        <span class="form-help">Used to verify webhook signatures. Keep this secure!</span>
+                        <span class="st-hint">Used to verify webhook signatures. Keep this secure!</span>
                     </div>
 
-                    <div class="form-group">
+                    <div class="st-field">
                         <label>Webhook Events</label>
-                        <div class="webhook-events-grid">
-                            <label class="webhook-event-option">
+                        <div class="st-event-grid">
+                            <label class="st-event-option">
                                 <input type="checkbox" name="webhook_events" value="session.created"
                                        {% if "session.created" in account.webhook_events %}checked{% endif %}>
-                                <span class="event-card">
+                                <span class="st-event-card">
                                     <strong>session.created</strong>
                                     <span>When a new assessment session is created</span>
                                 </span>
                             </label>
-                            <label class="webhook-event-option">
+                            <label class="st-event-option">
                                 <input type="checkbox" name="webhook_events" value="session.started"
                                        {% if "session.started" in account.webhook_events %}checked{% endif %}>
-                                <span class="event-card">
+                                <span class="st-event-card">
                                     <strong>session.started</strong>
                                     <span>When a candidate starts an assessment</span>
                                 </span>
                             </label>
-                            <label class="webhook-event-option">
+                            <label class="st-event-option">
                                 <input type="checkbox" name="webhook_events" value="session.completed"
                                        {% if "session.completed" in account.webhook_events %}checked{% endif %}>
-                                <span class="event-card">
+                                <span class="st-event-card">
                                     <strong>session.completed</strong>
                                     <span>When a candidate completes an assessment</span>
                                 </span>
                             </label>
-                            <label class="webhook-event-option">
+                            <label class="st-event-option">
                                 <input type="checkbox" name="webhook_events" value="session.expired"
                                        {% if "session.expired" in account.webhook_events %}checked{% endif %}>
-                                <span class="event-card">
+                                <span class="st-event-card">
                                     <strong>session.expired</strong>
                                     <span>When an assessment session expires</span>
                                 </span>
                             </label>
                         </div>
-                        <span class="form-help">Leave all unchecked to receive all events</span>
+                        <span class="st-hint">Leave all unchecked to receive all events</span>
                     </div>
 
                     {# Recent Webhook Deliveries #}
                     {% if recent_webhooks %}
-                    <div class="webhook-history">
+                    <div class="st-deliveries">
                         <h4>Recent Deliveries</h4>
-                        <div class="webhook-history-list">
+                        <div class="st-delivery-list">
                             {% for delivery in recent_webhooks %}
-                            <div class="webhook-delivery-item status-{{ delivery.status }}">
-                                <span class="delivery-event">{{ delivery.event_type }}</span>
-                                <span class="delivery-status">
+                            <div class="st-delivery st-delivery--{{ delivery.status }}">
+                                <span class="st-delivery-event">{{ delivery.event_type }}</span>
+                                <span class="st-delivery-badge">
                                     {% if delivery.status == 'success' %}✓{% elif delivery.status == 'failed' %}✕{% else %}⋯{% endif %}
                                 </span>
-                                <span class="delivery-time">{{ delivery.created_at|timesince }} ago</span>
+                                <span class="st-delivery-time">{{ delivery.created_at|timesince }} ago</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -419,7 +439,7 @@
                     {% endif %}
                 </div>
 
-                <div class="form-actions">
+                <div class="st-actions-bar" style="margin-top: 1.25rem;">
                     <button type="submit" class="btn btn-primary">Save Webhook Settings</button>
                     <button type="button" class="btn btn-ghost" id="test-webhook" {% if not account.webhook_url %}disabled{% endif %}>
                         Send Test Webhook
@@ -429,21 +449,23 @@
         </div>
 
         {# API Key #}
-        <div class="portal-card" style="margin-top: 1rem;">
-            <h3 class="card-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
-                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
-                </svg>
-                API Key
-            </h3>
-            <p class="muted" style="margin-bottom: 1rem;">
-                Use an API key to access assessment data programmatically.
-            </p>
+        <div class="st-card" style="margin-top: 1rem;">
+            <div class="st-card-head">
+                <div class="st-card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="st-card-title">API Key</h3>
+                    <p class="st-card-sub">Use an API key to access assessment data programmatically</p>
+                </div>
+            </div>
 
-            <div class="api-key-display">
+            <div class="st-api-area">
                 {% if account.api_key %}
-                <div class="api-key-box">
-                    <code class="api-key-value" id="api-key-value">{{ account.api_key }}</code>
+                <div class="st-api-box">
+                    <code class="st-api-value" id="api-key-value">{{ account.api_key }}</code>
                     <button type="button" class="btn btn-ghost btn-sm" onclick="copyApiKey()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -452,17 +474,17 @@
                         Copy
                     </button>
                 </div>
-                <p class="form-help">Created {{ account.api_key_created_at|date:"F d, Y" }}</p>
+                <p class="st-hint">Created {{ account.api_key_created_at|date:"F d, Y" }}</p>
                 <form method="post" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="revoke_api_key">
-                    <button type="submit" class="btn btn-ghost btn-danger" onclick="return confirm('Are you sure you want to revoke this API key? Any integrations using it will stop working.')">
+                    <button type="submit" class="btn btn-ghost st-btn-danger" onclick="return confirm('Are you sure you want to revoke this API key? Any integrations using it will stop working.')">
                         Revoke Key
                     </button>
                 </form>
                 {% else %}
                 <p class="muted">No API key configured</p>
-                <form method="post">
+                <form method="post" style="margin-top: 0.75rem;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="generate_api_key">
                     <button type="submit" class="btn btn-primary">Generate API Key</button>
@@ -473,15 +495,23 @@
     </section>
     {% endif %}
 
-    {# Onboarding Tour #}
-    <section class="settings-section">
-        <div class="settings-section-header">
-            <h2>Onboarding Tour</h2>
-            <p class="muted">Review the guided tour anytime</p>
+    {# ── Onboarding Tour ── #}
+    <section class="st-section">
+        <div class="st-section-head">
+            <div class="st-section-icon st-section-icon--tour">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                </svg>
+            </div>
+            <div>
+                <h2>Onboarding Tour</h2>
+                <span class="st-section-sub">Review the guided tour anytime</span>
+            </div>
         </div>
-        <div class="portal-card">
-            <div class="settings-row">
-                <div class="setting-info">
+        <div class="st-card">
+            <div class="st-row">
+                <div>
                     <h4>Restart Tour</h4>
                     <p class="muted">Replay the onboarding walkthrough to refresh your knowledge</p>
                 </div>
@@ -493,137 +523,160 @@
         </div>
     </section>
 
-    {# Security & Access - Password Change #}
-    <section class="settings-section">
-        <div class="settings-section-header">
-            <h2>Security & Access</h2>
-            <p class="muted">Manage password and login preferences</p>
+    {# ── Security & Access ── #}
+    <section class="st-section">
+        <div class="st-section-head">
+            <div class="st-section-icon st-section-icon--security">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <div>
+                <h2>Security & Access</h2>
+                <span class="st-section-sub">Manage password and login preferences</span>
+            </div>
         </div>
-        <div class="portal-card">
-            <form method="post" class="settings-form" id="password-form">
+        <div class="st-card">
+            <form method="post" class="st-form" id="password-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="change_password">
-                <div class="settings-row">
-                    <div class="setting-info">
-                        <h4>Change Password</h4>
-                        <p class="muted">Update your account password</p>
-                    </div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
+                <div class="st-pw-grid">
+                    <div class="st-field">
                         <label for="id_current_password">Current Password</label>
                         {{ password_form.current_password }}
                         {% if password_form.current_password.errors %}
-                        <span class="form-error">{{ password_form.current_password.errors.0 }}</span>
+                        <span class="st-error">{{ password_form.current_password.errors.0 }}</span>
                         {% endif %}
                     </div>
-                    <div class="form-group">
+                    <div class="st-field">
                         <label for="id_new_password1">New Password</label>
                         {{ password_form.new_password1 }}
                         {% if password_form.new_password1.errors %}
-                        <span class="form-error">{{ password_form.new_password1.errors.0 }}</span>
+                        <span class="st-error">{{ password_form.new_password1.errors.0 }}</span>
                         {% endif %}
-                        <span class="form-help">At least 8 characters</span>
+                        <span class="st-hint">At least 8 characters</span>
                     </div>
-                    <div class="form-group">
+                    <div class="st-field">
                         <label for="id_new_password2">Confirm New Password</label>
                         {{ password_form.new_password2 }}
                         {% if password_form.new_password2.errors %}
-                        <span class="form-error">{{ password_form.new_password2.errors.0 }}</span>
+                        <span class="st-error">{{ password_form.new_password2.errors.0 }}</span>
                         {% endif %}
                     </div>
                 </div>
-                <div class="form-actions">
+                <div class="st-actions-bar">
                     <button type="submit" class="btn btn-primary">Update Password</button>
                 </div>
             </form>
         </div>
     </section>
 
-    {# Notifications - Email Preferences #}
-    <section class="settings-section">
-        <div class="settings-section-header">
-            <h2>Notifications</h2>
-            <p class="muted">Control how and when you receive updates</p>
+    {# ── Notifications ── #}
+    <section class="st-section">
+        <div class="st-section-head">
+            <div class="st-section-icon st-section-icon--notif">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </div>
+            <div>
+                <h2>Notifications</h2>
+                <span class="st-section-sub">Control how and when you receive updates</span>
+            </div>
         </div>
-        <div class="portal-card">
-            <form method="post" class="settings-form" id="email-preferences-form">
+        <div class="st-card">
+            <form method="post" class="st-form" id="email-preferences-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_email_preferences">
-                <div class="settings-row toggle-row">
-                    <div class="setting-info">
+                <div class="st-row">
+                    <div>
                         <h4>Weekly Summary Email</h4>
                         <p class="muted">Receive a weekly digest of your assessment activity and candidate results</p>
                     </div>
-                    <label class="toggle-switch">
+                    <label class="st-toggle">
                         <input type="checkbox" name="receive_weekly_summary" {% if account.receive_weekly_summary %}checked{% endif %}>
-                        <span class="toggle-slider"></span>
+                        <span class="st-toggle-slider"></span>
                     </label>
                 </div>
-                <div class="settings-row toggle-row">
-                    <div class="setting-info">
+                <div class="st-row">
+                    <div>
                         <h4>Assessment Completion Alerts</h4>
                         <p class="muted">Get notified when a candidate completes an assessment</p>
                     </div>
-                    <label class="toggle-switch">
+                    <label class="st-toggle">
                         <input type="checkbox" name="receive_completion_alerts" {% if account.receive_completion_alerts %}checked{% endif %}>
-                        <span class="toggle-slider"></span>
+                        <span class="st-toggle-slider"></span>
                     </label>
                 </div>
-                <div class="settings-row toggle-row">
-                    <div class="setting-info">
+                <div class="st-row">
+                    <div>
                         <h4>New Candidate Alerts</h4>
                         <p class="muted">Get notified when a new candidate starts an assessment</p>
                     </div>
-                    <label class="toggle-switch">
+                    <label class="st-toggle">
                         <input type="checkbox" name="receive_new_candidate_alerts" {% if account.receive_new_candidate_alerts %}checked{% endif %}>
-                        <span class="toggle-slider"></span>
+                        <span class="st-toggle-slider"></span>
                     </label>
                 </div>
-                <div class="form-actions">
+                <div class="st-actions-bar">
                     <button type="submit" class="btn btn-primary">Save Preferences</button>
                 </div>
             </form>
         </div>
     </section>
 
-    {# Help & Support #}
-    <section class="settings-section">
-        <div class="settings-section-header">
-            <h2>Help & Support</h2>
-            <p class="muted">Get assistance with your account</p>
+    {# ── Help & Support ── #}
+    <section class="st-section">
+        <div class="st-section-head">
+            <div class="st-section-icon st-section-icon--help">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <div>
+                <h2>Help & Support</h2>
+                <span class="st-section-sub">Get assistance with your account</span>
+            </div>
         </div>
-        <div class="portal-card">
-            <div class="support-options">
-                <div class="support-option">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                        <polyline points="22,6 12,13 2,6"></polyline>
-                    </svg>
+        <div class="st-card">
+            <div class="st-support-grid">
+                <div class="st-support-option">
+                    <div class="st-support-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </div>
                     <div>
                         <h4>Email Support</h4>
                         <p class="muted">Get help from our team</p>
-                        <a href="mailto:support@evalon.app" class="link-with-arrow" style="margin-top: 0.5rem;">
+                        <a href="mailto:support@evalon.app" class="st-support-link">
                             support@evalon.app
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                 <polyline points="12 5 19 12 12 19"></polyline>
                             </svg>
                         </a>
                     </div>
                 </div>
-                <div class="support-option">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
+                <div class="st-support-option">
+                    <div class="st-support-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
                     <div>
                         <h4>Documentation</h4>
                         <p class="muted">Learn how to use Evalon</p>
-                        <a href="mailto:support@evalon.app?subject=Documentation%20Request" class="link-with-arrow" style="margin-top: 0.5rem;">
+                        <a href="mailto:support@evalon.app?subject=Documentation%20Request" class="st-support-link">
                             Request documentation
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                 <polyline points="12 5 19 12 12 19"></polyline>
                             </svg>
@@ -633,167 +686,110 @@
             </div>
         </div>
     </section>
-</div>
 
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Color picker synchronization
-    const colorGroups = document.querySelectorAll('.color-group');
+    /* ── Color Picker Sync ── */
+    const colorGroups = document.querySelectorAll('.st-color-group');
     colorGroups.forEach(group => {
-        const picker = group.querySelector('.color-picker');
-        const hexInput = group.querySelector('.color-hex-input');
+        const picker = group.querySelector('.st-color-picker');
+        const hexInput = group.querySelector('.st-color-hex');
+        if (!picker || !hexInput) return;
 
-        if (picker && hexInput) {
-            // Sync picker to hex input
-            picker.addEventListener('input', function() {
-                hexInput.value = this.value.toUpperCase();
-                updatePreview();
-            });
-
-            // Sync hex input to picker
-            hexInput.addEventListener('input', function() {
-                let value = this.value;
-                if (!value.startsWith('#')) {
-                    value = '#' + value;
-                }
-                if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-                    picker.value = value;
-                    updatePreview();
-                }
-            });
-
-            // Format on blur
-            hexInput.addEventListener('blur', function() {
-                let value = this.value.replace(/[^0-9A-Fa-f]/g, '');
-                if (value.length === 6) {
-                    this.value = '#' + value.toUpperCase();
-                    picker.value = this.value;
-                }
-            });
-        }
+        picker.addEventListener('input', function() {
+            hexInput.value = this.value.toUpperCase();
+            updatePreview();
+        });
+        hexInput.addEventListener('input', function() {
+            let v = this.value;
+            if (!v.startsWith('#')) v = '#' + v;
+            if (/^#[0-9A-Fa-f]{6}$/.test(v)) { picker.value = v; updatePreview(); }
+        });
+        hexInput.addEventListener('blur', function() {
+            let v = this.value.replace(/[^0-9A-Fa-f]/g, '');
+            if (v.length === 6) { this.value = '#' + v.toUpperCase(); picker.value = this.value; }
+        });
     });
 
-    // Update preview in real-time
+    /* ── Live Branding Preview ── */
     function updatePreview() {
-        const primaryColor = document.getElementById('id_brand_primary_color').value;
-        const secondaryColor = document.getElementById('id_brand_secondary_color').value;
-        const backgroundColor = document.getElementById('id_brand_background_color').value;
-
+        const primary = document.getElementById('id_brand_primary_color').value;
+        const secondary = document.getElementById('id_brand_secondary_color').value;
+        const bg = document.getElementById('id_brand_background_color').value;
         const preview = document.getElementById('branding-preview');
-        if (preview) {
-            const previewCard = preview.querySelector('.preview-card');
-            const previewTitle = preview.querySelector('.preview-title');
-            const previewButton = preview.querySelector('.preview-button');
-
-            if (previewCard) previewCard.style.background = backgroundColor;
-            if (previewTitle) previewTitle.style.color = secondaryColor;
-            if (previewButton) previewButton.style.background = primaryColor;
-        }
+        if (!preview) return;
+        const card = preview.querySelector('.st-preview-card');
+        const title = preview.querySelector('.st-preview-title');
+        const btn = preview.querySelector('.st-preview-btn');
+        if (card) card.style.background = bg;
+        if (title) title.style.color = secondary;
+        if (btn) btn.style.background = primary;
     }
 
-    // Reset to defaults
+    /* ── Reset Branding ── */
     const resetBtn = document.getElementById('reset-branding');
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
-            if (confirm('Reset all branding settings to default Evalon colors?')) {
-                document.getElementById('id_brand_primary_color').value = '#ff8a00';
-                document.getElementById('id_brand_secondary_color').value = '#0e1428';
-                document.getElementById('id_brand_background_color').value = '#ffffff';
-
-                // Update hex inputs
-                document.querySelectorAll('.color-hex-input').forEach((input, index) => {
-                    const defaults = ['#FF8A00', '#0E1428', '#FFFFFF'];
-                    input.value = defaults[index];
-                });
-
-                updatePreview();
-            }
+            if (!confirm('Reset all branding settings to default Evalon colors?')) return;
+            document.getElementById('id_brand_primary_color').value = '#ff8a00';
+            document.getElementById('id_brand_secondary_color').value = '#0e1428';
+            document.getElementById('id_brand_background_color').value = '#ffffff';
+            document.querySelectorAll('.st-color-hex').forEach((input, i) => {
+                input.value = ['#FF8A00', '#0E1428', '#FFFFFF'][i];
+            });
+            updatePreview();
         });
     }
-
-    // Initial preview update
     updatePreview();
 
-    // =============================================
-    // WEBHOOK SETTINGS
-    // =============================================
-
-    // Toggle webhook config visibility
-    const webhookEnabledCheckbox = document.getElementById('webhook_enabled');
-    const webhookConfig = document.getElementById('webhook-config');
-
-    if (webhookEnabledCheckbox && webhookConfig) {
-        webhookEnabledCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                webhookConfig.classList.remove('hidden');
-            } else {
-                webhookConfig.classList.add('hidden');
-            }
+    /* ── Webhook Toggle ── */
+    const whToggle = document.getElementById('webhook_enabled');
+    const whConfig = document.getElementById('webhook-config');
+    if (whToggle && whConfig) {
+        whToggle.addEventListener('change', function() {
+            whConfig.classList.toggle('hidden', !this.checked);
         });
     }
 
-    // Copy API key to clipboard
+    /* ── Copy API Key ── */
     window.copyApiKey = function() {
-        const apiKeyValue = document.getElementById('api-key-value');
-        if (apiKeyValue) {
-            navigator.clipboard.writeText(apiKeyValue.textContent).then(() => {
-                // Show feedback
-                const btn = event.target.closest('button');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
-            });
-        }
+        const el = document.getElementById('api-key-value');
+        if (!el) return;
+        navigator.clipboard.writeText(el.textContent).then(() => {
+            const btn = event.target.closest('button');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!';
+            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+        });
     };
 
-    // Generate webhook secret
-    const generateSecretBtn = document.getElementById('generate-webhook-secret');
-    const regenerateSecretBtn = document.getElementById('regenerate-webhook-secret');
-
+    /* ── Webhook Secret Generation ── */
     function handleSecretGeneration() {
-        if (confirm('Generate a new webhook secret? This will invalidate any existing integrations using the old secret.')) {
-            // Submit form to generate secret
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.innerHTML = `
-                <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
-                <input type="hidden" name="action" value="generate_webhook_secret">
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        }
+        if (!confirm('Generate a new webhook secret? This will invalidate any existing integrations using the old secret.')) return;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.innerHTML = '<input type="hidden" name="csrfmiddlewaretoken" value="' + document.querySelector('[name=csrfmiddlewaretoken]').value + '"><input type="hidden" name="action" value="generate_webhook_secret">';
+        document.body.appendChild(form);
+        form.submit();
     }
+    const genBtn = document.getElementById('generate-webhook-secret');
+    const regenBtn = document.getElementById('regenerate-webhook-secret');
+    if (genBtn) genBtn.addEventListener('click', handleSecretGeneration);
+    if (regenBtn) regenBtn.addEventListener('click', handleSecretGeneration);
 
-    if (generateSecretBtn) {
-        generateSecretBtn.addEventListener('click', handleSecretGeneration);
-    }
-    if (regenerateSecretBtn) {
-        regenerateSecretBtn.addEventListener('click', handleSecretGeneration);
-    }
-
-    // Test webhook
-    const testWebhookBtn = document.getElementById('test-webhook');
-    if (testWebhookBtn) {
-        testWebhookBtn.addEventListener('click', function() {
-            const webhookUrl = document.getElementById('webhook_url').value;
-            if (!webhookUrl) {
-                alert('Please enter a webhook URL first.');
-                return;
-            }
-
+    /* ── Test Webhook ── */
+    const testBtn = document.getElementById('test-webhook');
+    if (testBtn) {
+        testBtn.addEventListener('click', function() {
+            const url = document.getElementById('webhook_url').value;
+            if (!url) { alert('Please enter a webhook URL first.'); return; }
             this.disabled = true;
             this.textContent = 'Sending...';
-
-            // Submit test webhook request
             const form = document.createElement('form');
             form.method = 'POST';
-            form.innerHTML = `
-                <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
-                <input type="hidden" name="action" value="test_webhook">
-            `;
+            form.innerHTML = '<input type="hidden" name="csrfmiddlewaretoken" value="' + document.querySelector('[name=csrfmiddlewaretoken]').value + '"><input type="hidden" name="action" value="test_webhook">';
             document.body.appendChild(form);
             form.submit();
         });
