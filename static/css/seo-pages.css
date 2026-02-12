@@ -8,14 +8,22 @@
 
 .iq-shell, .rp-shell {
     max-width: 1140px;
-    margin: 0 auto;
+    margin: 1.5rem auto 2rem;
     padding: 0 2rem 4rem;
+    background: var(--color-white);
+    border: 1px solid rgba(14, 20, 40, 0.06);
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 20px 40px rgba(13, 18, 34, 0.05);
 }
 
 .iq-detail-shell, .rp-detail-shell {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 1.5rem auto 2rem;
     padding: 0 2rem 4rem;
+    background: var(--color-white);
+    border: 1px solid rgba(14, 20, 40, 0.06);
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 20px 40px rgba(13, 18, 34, 0.05);
 }
 
 /* Hero (shared pattern) */
@@ -361,8 +369,9 @@
 
 .iq-section--alt, .rp-section--alt {
     background: #fafafa;
-    margin: 0 -2rem;
-    padding: 3rem 2rem;
+    margin: 0;
+    padding: 3rem 0;
+    border-radius: var(--radius-lg);
 }
 
 .iq-section-inner, .rp-section-inner {
@@ -609,10 +618,11 @@
 
 .iq-cta, .rp-cta {
     text-align: center;
-    padding: 3.5rem 2rem;
-    margin: 0 -2rem;
+    padding: 3.5rem 0;
+    margin: 0;
     background: #fafafa;
     border-top: 1px solid #ebedf0;
+    border-radius: var(--radius-lg);
 }
 
 .iq-cta-inner, .rp-cta-inner {
@@ -1405,10 +1415,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 0;
-    margin: 0 -2rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-    background: rgba(255, 255, 255, 0.92);
+    margin: 0;
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid #ebedf0;
@@ -1509,10 +1517,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 0;
-    margin: 0 -2rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-    background: rgba(255, 255, 255, 0.92);
+    margin: 0;
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid #ebedf0;
@@ -1557,8 +1563,8 @@
 /* ── Mid-page CTA (shared) ──────────────────────────────────────── */
 
 .seo-mid-cta {
-    margin: 0 -2rem;
-    padding: 0 2rem;
+    margin: 0;
+    padding: 0;
 }
 
 .seo-mid-cta-inner {
@@ -1719,11 +1725,15 @@
 
 @media (max-width: 640px) {
     .iq-shell, .rp-shell {
+        margin: 0.5rem;
         padding: 0 1rem 3rem;
+        border-radius: var(--radius-xl);
     }
 
     .iq-detail-shell, .rp-detail-shell {
+        margin: 0.5rem;
         padding: 0 1.25rem 3rem;
+        border-radius: var(--radius-xl);
     }
 
     .iq-hero, .rp-hero {
@@ -1743,15 +1753,13 @@
     }
 
     .iq-section--alt, .rp-section--alt {
-        margin-left: -1.25rem;
-        margin-right: -1.25rem;
-        padding: 2.5rem 1.25rem;
+        margin: 0;
+        padding: 2.5rem 0;
     }
 
     .iq-cta, .rp-cta {
-        margin-left: -1.25rem;
-        margin-right: -1.25rem;
-        padding: 2.5rem 1.25rem;
+        margin: 0;
+        padding: 2.5rem 0;
     }
 
     .iq-cta-actions, .rp-cta-actions {
@@ -1802,9 +1810,7 @@
 
     /* TOC adjusts padding on mobile */
     .iq-toc {
-        margin: 0 -1.25rem;
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
+        margin: 0;
         gap: 0.35rem;
     }
 
@@ -1882,9 +1888,8 @@
 
     /* Mid-page CTA stacks on mobile */
     .seo-mid-cta {
-        margin-left: -1.25rem;
-        margin-right: -1.25rem;
-        padding: 0 1.25rem;
+        margin: 0;
+        padding: 0;
     }
 
     .seo-mid-cta-inner {
@@ -1907,9 +1912,7 @@
 
     /* Role TOC adjusts padding on mobile */
     .rp-toc {
-        margin: 0 -1.25rem;
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
+        margin: 0;
         gap: 0.35rem;
     }
 }
