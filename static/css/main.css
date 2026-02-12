@@ -10080,14 +10080,10 @@ main {
     opacity: 0.8;
 }
 
-.logo-icon {
-    font-size: 1.5rem;
-    line-height: 1;
-}
-
-.logo-text {
-    font-size: 1.25rem;
-    font-weight: 800;
+.sidebar-logo-img {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
 }
 
 .sidebar-toggle {
