@@ -3,62 +3,73 @@
 {% block title %}{{ assessment_label }} · Manage Invites{% endblock %}
 {% block meta_description %}Create candidate invites, bulk upload, and monitor {{ assessment_label|lower }} sessions in your Evalon console.{% endblock %}
 {% block portal_content %}
-<!-- UPDATED: 2026-01-06 23:45 -->
 <div class="portal-shell">
-    <header class="page-header-with-actions">
-        <div>
-            <div class="breadcrumb-nav">
-                <a href="{% url 'clients:assessments' %}" class="breadcrumb-link">Assessments</a>
-                <span class="breadcrumb-separator">›</span>
-                <span class="breadcrumb-current">{{ assessment_label }}</span>
-            </div>
-            <h1>Manage Invites</h1>
-            <p class="muted">Launch new sessions and monitor your candidates</p>
+
+    {# ── Header ── #}
+    <header class="am-header">
+        <div class="am-header-left">
+            <nav class="am-breadcrumb">
+                <a href="{% url 'clients:assessments' %}">Assessments</a>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <span>{{ assessment_label }}</span>
+            </nav>
+            <h1>{{ assessment_label }}</h1>
+            <p class="muted">Create invites and track candidate progress</p>
         </div>
     </header>
 
-    <div class="portal-card-grid">
-        {# Create Invite Card #}
-        <section class="portal-card invite-card">
-            <div class="section-header">
-                <h3>Create Candidate Link</h3>
-                <p class="muted">Generate a unique invitation link</p>
+    {# ── Two-Column Forms ── #}
+    <div class="am-forms">
+
+        {# ── Create Invite ── #}
+        <section class="am-panel">
+            <div class="am-panel-head">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+                <div>
+                    <h3>Create Invite</h3>
+                    <p class="muted">Generate a unique candidate link</p>
+                </div>
             </div>
 
             {% if not has_projects %}
-            <div class="alert-box warning">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="am-alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                     <line x1="12" y1="9" x2="12" y2="13"></line>
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                 </svg>
                 <div>
-                    <p><strong>No projects found</strong></p>
-                    <p>You need at least one project before inviting candidates.</p>
-                    <a class="btn btn-outline" href="{% url 'clients:project-list' %}">Create Project</a>
+                    <strong>No projects found</strong>
+                    <p>Create a project before inviting candidates.</p>
+                    <a class="btn btn-outline small" href="{% url 'clients:project-list' %}" style="margin-top: 0.5rem;">Create Project</a>
                 </div>
             </div>
             {% else %}
-            <form method="post" class="invite-form">
+            <form method="post" class="am-invite-form">
                 {% csrf_token %}
                 {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
                 {% for field in form %}
                     {% if field.name == 'level' %}
-                    <div class="form-group level-selector-group">
-                        <label class="form-label">{{ field.label }}</label>
-                        <p class="form-help">{{ field.help_text }}</p>
-                        <div class="level-options">
+                    <div class="am-field am-level-group">
+                        <label class="am-label">{{ field.label }}</label>
+                        <p class="am-help">{{ field.help_text }}</p>
+                        <div class="am-levels">
                             {% for choice in field.field.choices %}
-                            <label class="level-option {% if choice.0 == 'mid' %}recommended{% endif %}">
+                            <label class="am-level {% if choice.0 == 'mid' %}am-level--rec{% endif %}">
                                 <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" {% if choice.0 == field.value or choice.0 == 'mid' and not field.value %}checked{% endif %}>
-                                <span class="level-card">
-                                    <span class="level-name">
+                                <span class="am-level-card">
+                                    <span class="am-level-name">
                                         {% if choice.0 == 'junior' %}Junior{% elif choice.0 == 'mid' %}Mid-Level{% else %}Senior{% endif %}
                                     </span>
-                                    <span class="level-years">
-                                        {% if choice.0 == 'junior' %}0-2 years{% elif choice.0 == 'mid' %}2-5 years{% else %}5+ years{% endif %}
+                                    <span class="am-level-years">
+                                        {% if choice.0 == 'junior' %}0-2 yrs{% elif choice.0 == 'mid' %}2-5 yrs{% else %}5+ yrs{% endif %}
                                     </span>
-                                    <span class="level-desc">
+                                    <span class="am-level-desc">
                                         {% if choice.0 == 'junior' %}Foundational concepts{% elif choice.0 == 'mid' %}Applied knowledge{% else %}Strategic thinking{% endif %}
                                     </span>
                                 </span>
@@ -66,22 +77,22 @@
                             {% endfor %}
                         </div>
                         {% for error in field.errors %}
-                        <span class="form-error">{{ error }}</span>
+                        <span class="am-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="form-group">
+                    <div class="am-field">
                         {{ field.label_tag }}
                         {{ field }}
-                        {% if field.help_text %}<small class="form-help">{{ field.help_text }}</small>{% endif %}
+                        {% if field.help_text %}<small class="am-help">{{ field.help_text }}</small>{% endif %}
                         {% for error in field.errors %}
-                        <span class="form-error">{{ error }}</span>
+                        <span class="am-error">{{ error }}</span>
                         {% endfor %}
                     </div>
                     {% endif %}
                 {% endfor %}
-                <button class="btn btn-primary btn-block" type="submit">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="btn btn-primary" type="submit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="8.5" cy="7" r="4"></circle>
                         <line x1="20" y1="8" x2="20" y2="14"></line>
@@ -93,45 +104,52 @@
             {% endif %}
         </section>
 
-        {# Bulk Upload Card #}
-        <section class="portal-card bulk-card">
-            <div class="section-header">
-                <h3>Bulk Upload</h3>
-                <p class="muted">Upload multiple invites via CSV</p>
+        {# ── Bulk Upload ── #}
+        <section class="am-panel am-panel--compact">
+            <div class="am-panel-head">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div>
+                    <h3>Bulk Upload</h3>
+                    <p class="muted">Import multiple invites via CSV</p>
+                </div>
             </div>
 
-            <div class="info-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="am-info">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="16" x2="12" y2="12"></line>
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                 </svg>
-                <p>CSV format: <code>candidate_id, duration_minutes, send_at</code></p>
+                <span>CSV format: <code>candidate_id, duration_minutes, send_at</code></span>
             </div>
 
-            <form method="post" enctype="multipart/form-data" class="bulk-form">
+            <form method="post" enctype="multipart/form-data" class="am-bulk-form">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="bulk_upload">
                 {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
 
-                <div class="form-group">
+                <div class="am-field">
                     {{ bulk_form.project.label_tag }}
                     {{ bulk_form.project }}
                     {% for error in bulk_form.project.errors %}
-                    <span class="form-error">{{ error }}</span>
+                    <span class="am-error">{{ error }}</span>
                     {% endfor %}
                 </div>
 
-                <div class="form-group">
+                <div class="am-field">
                     {{ bulk_form.csv_file.label_tag }}
                     {{ bulk_form.csv_file }}
                     {% for error in bulk_form.csv_file.errors %}
-                    <span class="form-error">{{ error }}</span>
+                    <span class="am-error">{{ error }}</span>
                     {% endfor %}
                 </div>
 
-                <button class="btn btn-outline btn-block" type="submit">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="btn btn-outline" type="submit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -142,14 +160,15 @@
         </section>
     </div>
 
-    <section class="portal-card sessions-card">
-        <div class="section-header">
+    {# ── Sessions Table ── #}
+    <section class="am-sessions">
+        <div class="am-sessions-head">
             <div>
-                <h3>Active Sessions</h3>
-                <p class="muted">Track candidate progress</p>
+                <h2>Active Sessions</h2>
+                <p class="muted">{{ sessions|length }} invite{{ sessions|length|pluralize }}</p>
             </div>
-            <form method="get" class="filter-form">
-                <select name="project" onchange="this.form.submit()" class="select-input">
+            <form method="get" class="am-filter">
+                <select name="project" onchange="this.form.submit()" class="am-select">
                     <option value="">All projects</option>
                     {% for project in projects %}
                     <option value="{{ project.uuid }}" {% if selected_project and selected_project.uuid == project.uuid %}selected{% endif %}>{{ project.title }}</option>
@@ -159,22 +178,20 @@
         </div>
 
         {% if sessions %}
-        <div class="sessions-table-wrapper">
-            <table class="sessions-table">
+        <div class="am-table-wrap">
+            <table class="am-table">
                 <thead>
                     <tr>
                         <th>Candidate</th>
                         <th>Project</th>
                         <th>Status</th>
                         <th>Timing</th>
-                        <th class="sortable-header" data-sort="score" title="Click to sort by score">
+                        <th class="am-sortable" data-sort="score" title="Sort by score">
                             Score
-                            <span class="sort-icon">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 15l5 5 5-5"></path>
-                                    <path d="M7 9l5-5 5 5"></path>
-                                </svg>
-                            </span>
+                            <svg class="am-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 15l5 5 5-5"></path>
+                                <path d="M7 9l5-5 5 5"></path>
+                            </svg>
                         </th>
                         <th>Notes</th>
                         <th>Updated</th>
@@ -185,100 +202,98 @@
                     {% for row in sessions %}
                     <tr>
                         <td>
-                            <div class="candidate-cell">
-                                <span class="candidate-name">{{ row.candidate }}</span>
-                            </div>
+                            <span class="am-candidate">{{ row.candidate }}</span>
                         </td>
                         <td>
                             {% if row.project_url %}
-                            <a href="{{ row.project_url }}" class="project-link">{{ row.project_title }}</a>
+                            <a href="{{ row.project_url }}" class="am-project-link">{{ row.project_title }}</a>
                             {% else %}
-                            <span class="project-name">{{ row.project_title }}</span>
+                            <span class="am-muted">{{ row.project_title }}</span>
                             {% endif %}
                         </td>
                         <td>
-                            <span class="status-badge status-{{ row.status_code }}">{{ row.status }}</span>
+                            <span class="am-status am-st-{{ row.status_code }}">{{ row.status }}</span>
                         </td>
-                        <td class="timing-cell">
+                        <td class="am-cell-muted">
                             {% if row.scheduled_for %}
-                            <span class="timing-text">Scheduled {{ row.scheduled_for|naturaltime }}</span>
+                            Scheduled {{ row.scheduled_for|naturaltime }}
                             {% elif row.last_reminder_at %}
-                            <span class="timing-text">Reminder sent {{ row.last_reminder_at|naturaltime }} ({{ row.reminder_count }})</span>
+                            Reminder {{ row.last_reminder_at|naturaltime }} ({{ row.reminder_count }})
                             {% else %}
-                            <span class="muted">—</span>
+                            —
                             {% endif %}
                         </td>
-                        <td class="score-cell" data-score="{{ row.score|default:'0' }}">
+                        <td class="am-cell-score" data-score="{{ row.score|default:'0' }}">
                             {% if row.score %}
-                            <span class="score-badge">{{ row.score }}</span>
+                            <span class="am-score">{{ row.score }}</span>
                             {% else %}
-                            <span class="muted">—</span>
+                            <span class="am-muted">—</span>
                             {% endif %}
                         </td>
                         <td>
-                            <div class="notes-cell">
+                            <div class="am-notes">
                                 {% if row.needs_review %}
-                                <span class="badge badge-warning">Needs review</span>
+                                <span class="am-badge am-badge--warn">Needs review</span>
                                 {% elif row.notes %}
-                                <span class="notes-text">{{ row.notes }} note{{ row.notes|pluralize }}</span>
+                                <span class="am-muted">{{ row.notes }} note{{ row.notes|pluralize }}</span>
                                 {% else %}
-                                <span class="muted">—</span>
+                                <span class="am-muted">—</span>
                                 {% endif %}
                                 {% if row.decision_summary %}
-                                <span class="badge badge-info">{{ row.decision_summary }}</span>
+                                <span class="am-badge am-badge--info">{{ row.decision_summary }}</span>
                                 {% endif %}
                             </div>
                         </td>
-                        <td class="updated-cell">
+                        <td class="am-cell-muted">
                             {% if row.submitted_at %}
                             {{ row.submitted_at|naturaltime }}
                             {% else %}
-                            <span class="muted">—</span>
+                            —
                             {% endif %}
                         </td>
                         <td>
-                            <div class="action-buttons">
-                                <button class="btn-action copy-link-btn" data-link="{{ row.share_link }}" title="Copy link">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <div class="am-actions">
+                                <button class="am-act am-copy-btn" data-link="{{ row.share_link }}" title="Copy link">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                                     </svg>
                                 </button>
-                                <a class="btn-action" href="{{ row.share_link }}" target="_blank" title="Open link">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <a class="am-act" href="{{ row.share_link }}" target="_blank" title="Open link">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                                         <polyline points="15 3 21 3 21 9"></polyline>
                                         <line x1="10" y1="14" x2="21" y2="3"></line>
                                     </svg>
                                 </a>
                                 {% if row.detail_url %}
-                                <a class="btn-action primary" href="{{ row.detail_url }}" title="View report">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <a class="am-act am-act--primary" href="{{ row.detail_url }}" title="View report">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                         <polyline points="14 2 14 8 20 8"></polyline>
                                     </svg>
                                 </a>
                                 {% endif %}
                                 {% if row.scheduled_for %}
-                                <form method="post" style="display: inline;">
+                                <form method="post" class="am-inline-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="launch_now">
                                     <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
                                     {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
-                                    <button class="btn-action success" type="submit" title="Launch now">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <button class="am-act am-act--success" type="submit" title="Launch now">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                         </svg>
                                     </button>
                                 </form>
                                 {% elif row.status_code == "in_progress" %}
-                                <form method="post" style="display: inline;">
+                                <form method="post" class="am-inline-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="send_reminder">
                                     <input type="hidden" name="session_uuid" value="{{ row.uuid }}">
                                     {% if selected_project %}<input type="hidden" name="project_filter" value="{{ selected_project.uuid }}">{% endif %}
-                                    <button class="btn-action" type="submit" title="Send reminder">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <button class="am-act" type="submit" title="Send reminder">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                                         </svg>
@@ -293,18 +308,19 @@
             </table>
         </div>
         {% else %}
-        <div class="empty-state">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; color: var(--orange);">
+        <div class="am-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 0.75rem;">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="8.5" cy="7" r="4"></circle>
                 <line x1="20" y1="8" x2="20" y2="14"></line>
                 <line x1="23" y1="11" x2="17" y2="11"></line>
             </svg>
-            <h4>No invites yet</h4>
-            <p class="muted">Use the form above to launch your first candidate experience</p>
+            <h3>No invites yet</h3>
+            <p class="muted">Use the form above to create your first candidate invite</p>
         </div>
         {% endif %}
     </section>
+
 </div>
 
 <!-- Flatpickr Date Picker Library -->
@@ -312,14 +328,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-
 <script>
-// Initialize Flatpickr Date Pickers
-document.addEventListener('DOMContentLoaded', function() {
-    // Find all datetime picker inputs
-    const dateTimePickers = document.querySelectorAll('.datetime-picker');
-
-    dateTimePickers.forEach(function(input) {
+(function() {
+    /* Flatpickr init */
+    document.querySelectorAll('.datetime-picker').forEach(function(input) {
         flatpickr(input, {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
@@ -329,132 +341,60 @@ document.addEventListener('DOMContentLoaded', function() {
             time_24hr: false,
             minuteIncrement: 15,
             disableMobile: false,
-            allowInput: true,
-            onReady: function(selectedDates, dateStr, instance) {
-                // Add clear button
-                const clearBtn = document.createElement('button');
-                clearBtn.type = 'button';
-                clearBtn.className = 'flatpickr-clear-btn';
-                clearBtn.innerHTML = 'Clear';
-                clearBtn.style.cssText = 'position: absolute; right: 50px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #718096; font-size: 12px; cursor: pointer; padding: 4px 8px;';
-                clearBtn.addEventListener('click', function() {
-                    instance.clear();
-                });
-                input.parentElement.style.position = 'relative';
-                input.parentElement.appendChild(clearBtn);
-            }
+            allowInput: true
         });
     });
-});
 
-// Copy Link Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const copyButtons = document.querySelectorAll('.copy-link-btn');
-
-    copyButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+    /* Copy link */
+    document.querySelectorAll('.am-copy-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
-            const link = this.dataset.link;
-
-            // Copy to clipboard
+            var link = this.dataset.link;
             navigator.clipboard.writeText(link).then(() => {
-                // Show success feedback
-                const originalHTML = this.innerHTML;
-                this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                this.style.backgroundColor = '#10b981';
-                this.style.color = 'white';
-
-                // Reset after 2 seconds
-                setTimeout(() => {
-                    this.innerHTML = originalHTML;
-                    this.style.backgroundColor = '';
-                    this.style.color = '';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-                alert('Failed to copy link. Please try again.');
+                var orig = this.innerHTML;
+                this.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                this.classList.add('am-act--copied');
+                setTimeout(() => { this.innerHTML = orig; this.classList.remove('am-act--copied'); }, 1500);
             });
         });
     });
 
-    // Deadline Type Toggle Functionality
-    const deadlineTypeSelect = document.getElementById('id_deadline_type');
-    const deadlineDaysGroup = document.querySelector('[for="id_deadline_days"]')?.closest('.form-group');
-    const deadlineAtGroup = document.querySelector('[for="id_deadline_at"]')?.closest('.form-group');
-
-    if (deadlineTypeSelect && deadlineDaysGroup && deadlineAtGroup) {
-        function toggleDeadlineFields() {
-            const selectedType = deadlineTypeSelect.value;
-
-            if (selectedType === 'relative') {
-                deadlineDaysGroup.style.display = 'block';
-                deadlineAtGroup.style.display = 'none';
-            } else if (selectedType === 'absolute') {
-                deadlineDaysGroup.style.display = 'none';
-                deadlineAtGroup.style.display = 'block';
-            } else {
-                deadlineDaysGroup.style.display = 'none';
-                deadlineAtGroup.style.display = 'none';
-            }
+    /* Deadline type toggle */
+    var dt = document.getElementById('id_deadline_type');
+    var dDays = document.querySelector('[for="id_deadline_days"]');
+    var dAt = document.querySelector('[for="id_deadline_at"]');
+    if (dt && dDays && dAt) {
+        dDays = dDays.closest('.am-field');
+        dAt = dAt.closest('.am-field');
+        function toggle() {
+            var v = dt.value;
+            if (dDays) dDays.style.display = v === 'relative' ? '' : 'none';
+            if (dAt) dAt.style.display = v === 'absolute' ? '' : 'none';
         }
-
-        // Initialize on page load
-        toggleDeadlineFields();
-
-        // Update on change
-        deadlineTypeSelect.addEventListener('change', toggleDeadlineFields);
+        toggle();
+        dt.addEventListener('change', toggle);
     }
-});
 
-// Table Sorting Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const table = document.querySelector('.sessions-table');
-    if (!table) return;
-
-    const sortableHeaders = table.querySelectorAll('.sortable-header');
-    let currentSort = { column: null, direction: null };
-
-    sortableHeaders.forEach(header => {
-        header.addEventListener('click', function() {
-            const sortKey = this.dataset.sort;
-            const tbody = table.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-
-            // Determine sort direction
-            let direction = 'desc'; // Default to highest first
-            if (currentSort.column === sortKey && currentSort.direction === 'desc') {
-                direction = 'asc';
-            }
-
-            // Update header classes
-            sortableHeaders.forEach(h => {
-                h.classList.remove('sort-asc', 'sort-desc');
+    /* Table sort by score */
+    var table = document.querySelector('.am-table');
+    if (table) {
+        var dir = 'desc';
+        table.querySelectorAll('.am-sortable').forEach(function(th) {
+            th.addEventListener('click', function() {
+                var tbody = table.querySelector('tbody');
+                var rows = Array.from(tbody.querySelectorAll('tr'));
+                dir = dir === 'desc' ? 'asc' : 'desc';
+                th.classList.remove('am-sort-asc', 'am-sort-desc');
+                th.classList.add(dir === 'asc' ? 'am-sort-asc' : 'am-sort-desc');
+                rows.sort(function(a, b) {
+                    var av = parseFloat(a.querySelector('.am-cell-score')?.dataset.score || 0);
+                    var bv = parseFloat(b.querySelector('.am-cell-score')?.dataset.score || 0);
+                    return dir === 'asc' ? av - bv : bv - av;
+                });
+                rows.forEach(function(r) { tbody.appendChild(r); });
             });
-            this.classList.add(direction === 'asc' ? 'sort-asc' : 'sort-desc');
-
-            // Sort rows
-            rows.sort((a, b) => {
-                const aCell = a.querySelector('.score-cell');
-                const bCell = b.querySelector('.score-cell');
-
-                const aValue = parseFloat(aCell?.dataset.score || 0);
-                const bValue = parseFloat(bCell?.dataset.score || 0);
-
-                if (direction === 'asc') {
-                    return aValue - bValue;
-                } else {
-                    return bValue - aValue;
-                }
-            });
-
-            // Re-append rows in sorted order
-            rows.forEach(row => tbody.appendChild(row));
-
-            // Update current sort state
-            currentSort = { column: sortKey, direction };
         });
-    });
-});
+    }
+})();
 </script>
-
 {% endblock %}
