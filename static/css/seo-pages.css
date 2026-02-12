@@ -32,8 +32,6 @@
     padding: 3.5rem 2rem 2.5rem;
     max-width: 720px;
     margin: 0 auto;
-    background: linear-gradient(180deg, rgba(255, 138, 0, 0.03) 0%, transparent 100%);
-    border-radius: var(--radius-2xl);
 }
 
 .iq-eyebrow, .rp-eyebrow {
