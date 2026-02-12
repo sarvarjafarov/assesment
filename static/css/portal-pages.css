@@ -240,7 +240,7 @@
     color: var(--color-navy);
 }
 .modal-body {
-    padding: 24px 28px;
+    padding: 20px 28px;
 }
 .modal-footer {
     display: flex;
@@ -303,7 +303,7 @@
 
 /* Shared Form Styles */
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 .form-group:last-child {
     margin-bottom: 0;
@@ -313,9 +313,9 @@
     align-items: center;
     gap: 8px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: var(--color-navy);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 .form-group label svg {
     color: var(--color-text-muted);
@@ -325,9 +325,9 @@
     align-items: center;
     gap: 8px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: var(--color-navy);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 .form-label svg {
     color: var(--color-text-muted);
@@ -542,7 +542,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 14px 8px;
+    padding: 11px 8px;
     text-align: center;
     transition: all var(--transition-base);
     position: relative;
@@ -557,8 +557,15 @@
 }
 .level-option input:checked + .level-card,
 .level-option input:checked + div.level-card {
-    background: rgba(255, 138, 0, 0.06);
-    box-shadow: inset 0 0 0 2px var(--color-orange);
+    background: var(--color-orange);
+}
+.level-option input:checked + .level-card .level-title,
+.level-option input:checked + .level-card .level-name {
+    color: var(--color-white);
+}
+.level-option input:checked + .level-card .level-desc,
+.level-option input:checked + .level-card .level-years {
+    color: rgba(255, 255, 255, 0.8);
 }
 .level-name {
     font-weight: 700;
@@ -571,16 +578,15 @@
     margin-top: 0.125rem;
 }
 .level-desc {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--color-text-muted);
-    margin-top: 2px;
+    margin-top: 1px;
     line-height: 1.3;
 }
 .level-title {
     font-weight: 700;
     color: var(--color-navy);
-    font-size: 0.95rem;
-    margin-bottom: 2px;
+    font-size: 0.9rem;
 }
 
 /* Level Selector Group (manage) */
