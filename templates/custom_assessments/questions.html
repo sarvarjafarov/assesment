@@ -232,7 +232,7 @@
 {# AI Generation Modal #}
 <div id="ai-modal" class="modal">
     <div class="modal-content modal-lg">
-        <div class="modal-header ai-header">
+        <div class="modal-header ai-modal-header">
             <div class="modal-title-group">
                 <div class="modal-icon ai-gradient">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -256,41 +256,50 @@
         <form method="post" action="{% url 'custom_assessments:generate-ai' assessment.uuid %}">
             {% csrf_token %}
             <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                        </svg>
-                        Role / Position <span class="required">*</span>
-                    </label>
-                    <input type="text" name="role_description" class="form-input" placeholder="e.g., Senior Sales Representative, Marketing Manager" required>
-                    <span class="form-hint">The job role this assessment will evaluate</span>
+                <div class="ai-tip-banner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span>Be specific with skills &mdash; the more detail you give, the better the questions.</span>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                        Skills to Test <span class="required">*</span>
-                    </label>
-                    <textarea name="skills_to_test" class="form-textarea" rows="3" placeholder="e.g., cold calling, objection handling, CRM usage, closing techniques, negotiation skills" required></textarea>
-                    <span class="form-hint">List the skills, knowledge areas, or competencies to assess</span>
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">1</span>
+                        Role &amp; Skills
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                                <line x1="20" y1="8" x2="20" y2="14"></line>
+                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                            </svg>
+                            Role / Position <span class="required">*</span>
+                        </label>
+                        <input type="text" name="role_description" class="form-input" placeholder="e.g., Senior Sales Representative, Marketing Manager" required>
+                        <span class="form-hint">The job role this assessment will evaluate</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            Skills to Test <span class="required">*</span>
+                        </label>
+                        <textarea name="skills_to_test" class="form-textarea" rows="3" placeholder="e.g., cold calling, objection handling, CRM usage, closing techniques, negotiation skills" required></textarea>
+                        <span class="form-hint">List the skills, knowledge areas, or competencies to assess</span>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 20h.01"></path>
-                            <path d="M7 20v-4"></path>
-                            <path d="M12 20v-8"></path>
-                            <path d="M17 20V8"></path>
-                        </svg>
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-number">2</span>
                         Difficulty Level
-                    </label>
+                    </div>
                     <div class="level-selector">
                         <label class="level-option">
                             <input type="radio" name="difficulty_level" value="junior">
@@ -304,14 +313,13 @@
                                     </svg>
                                 </div>
                                 <span class="level-title">Junior</span>
-                                <span class="level-desc">0-2 years experience</span>
+                                <span class="level-desc">0-2 years exp</span>
                                 <span class="level-detail">Foundational concepts</span>
                             </div>
                         </label>
-                        <label class="level-option">
+                        <label class="level-option recommended">
                             <input type="radio" name="difficulty_level" value="mid" checked>
-                            <div class="level-card recommended">
-                                <div class="level-badge">Recommended</div>
+                            <div class="level-card">
                                 <div class="level-icon mid">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -319,7 +327,7 @@
                                     </svg>
                                 </div>
                                 <span class="level-title">Mid-Level</span>
-                                <span class="level-desc">2-5 years experience</span>
+                                <span class="level-desc">2-5 years exp</span>
                                 <span class="level-detail">Applied knowledge</span>
                             </div>
                         </label>
@@ -332,27 +340,26 @@
                                     </svg>
                                 </div>
                                 <span class="level-title">Senior</span>
-                                <span class="level-desc">5+ years experience</span>
+                                <span class="level-desc">5+ years exp</span>
                                 <span class="level-detail">Strategic thinking</span>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        Number of Questions
-                    </label>
-                    <div class="number-input-wrapper">
-                        <button type="button" class="number-btn" onclick="adjustNumber('num_questions', -5)">-5</button>
-                        <input type="number" name="num_questions" id="num_questions" class="form-input number-input" value="5" min="5" max="10">
-                        <button type="button" class="number-btn" onclick="adjustNumber('num_questions', 5)">+5</button>
+                <div class="form-section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+                    <div class="section-title">
+                        <span class="section-number">3</span>
+                        Question Count
                     </div>
-                    <span class="form-hint">5-10 questions (larger sets can be added in batches)</span>
+                    <div class="ai-count-row">
+                        <div class="number-input-wrapper">
+                            <button type="button" class="number-btn" onclick="adjustNumber('num_questions', -5)">-5</button>
+                            <input type="number" name="num_questions" id="num_questions" class="form-input number-input" value="5" min="5" max="10">
+                            <button type="button" class="number-btn" onclick="adjustNumber('num_questions', 5)">+5</button>
+                        </div>
+                        <span class="ai-count-hint">5&ndash;10 questions per batch</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
