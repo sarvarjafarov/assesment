@@ -187,7 +187,7 @@
 }
 .modal-content {
     background: var(--color-white);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     width: 100%;
     max-width: 520px;
     max-height: 90vh;
@@ -249,7 +249,7 @@
     padding: 20px 28px;
     border-top: 1px solid rgba(14, 20, 40, 0.06);
     background: rgba(14, 20, 40, 0.02);
-    border-radius: 0 0 20px 20px;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 .modal-title-group {
     display: flex;
@@ -362,9 +362,9 @@
 .form-textarea,
 .form-select {
     width: 100%;
-    padding: 11px 14px;
+    padding: 10px 12px;
     border: 1px solid #d1d5db;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 0.95rem;
     transition: all var(--transition-base);
     background: var(--color-white);
@@ -525,7 +525,7 @@
 .level-options {
     display: flex;
     border: 1px solid #d1d5db;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     overflow: hidden;
 }
 .level-option {
@@ -629,8 +629,8 @@
     background: none;
     border: 1px solid #d1d5db;
     color: var(--color-navy);
-    padding: 10px 20px;
-    border-radius: 10px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-base);
@@ -7618,7 +7618,7 @@
     gap: 4px;
     background: #f9fafb;
     border: 1px solid #d1d5db;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     padding: 3px;
 }
 .number-btn {
@@ -7626,7 +7626,7 @@
     height: 34px;
     border: none;
     background: var(--color-white);
-    border-radius: 7px;
+    border-radius: var(--radius-sm);
     font-weight: 700;
     font-size: 0.8rem;
     color: var(--color-navy);
@@ -7683,7 +7683,7 @@
     padding: 10px 16px;
     border: 1px solid #d1d5db;
     background: var(--color-white);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     font-size: var(--text-sm);
     color: var(--color-navy);
@@ -7699,7 +7699,7 @@
 .upload-zone {
     position: relative;
     border: 1.5px dashed #c4c9d2;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     padding: 28px 24px;
     text-align: center;
     transition: all var(--transition-base);
@@ -7850,7 +7850,12 @@
     border-color: var(--color-success);
 }
 
-/* Button Variants */
+/* Button Variants — override pill radius from .btn base */
+.modal-footer .btn {
+    border-radius: var(--radius-md);
+    padding: 10px 18px;
+    font-size: 0.9rem;
+}
 .btn-ai {
     background: linear-gradient(135deg, var(--color-info) 0%, #1d4ed8 100%);
     border: none;
