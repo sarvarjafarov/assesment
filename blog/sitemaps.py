@@ -6,7 +6,7 @@ from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
 from .models import BlogPost, BlogCategory
-from pages.models import PublicAssessment
+from pages.models import PublicAssessment, Role
 
 
 class BlogPostSitemap(Sitemap):
@@ -51,6 +51,8 @@ class StaticPagesSitemap(Sitemap):
             'pages:terms',
             'pages:resources',
             'pages:assessment_list',
+            'pages:interview_questions_list',
+            'pages:role_assessment_list',
             'blog:list',
         ]
 
@@ -65,6 +67,41 @@ class PublicAssessmentSitemap(Sitemap):
 
     def items(self):
         return PublicAssessment.objects.filter(is_active=True)
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+    def location(self, obj):
+        return obj.get_absolute_url()
+
+
+class InterviewQuestionsSitemap(Sitemap):
+    """Sitemap for interview question pages (one per role)."""
+    changefreq = "weekly"
+    priority = 0.7
+
+    def items(self):
+        from django.db.models import Count, Q
+        return Role.objects.filter(
+            is_active=True,
+        ).annotate(
+            q_count=Count('interview_questions', filter=Q(interview_questions__is_active=True))
+        ).filter(q_count__gt=0)
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+    def location(self, obj):
+        return obj.get_interview_questions_url()
+
+
+class RoleAssessmentSitemap(Sitemap):
+    """Sitemap for role-based assessment pages."""
+    changefreq = "weekly"
+    priority = 0.7
+
+    def items(self):
+        return Role.objects.filter(is_active=True)
 
     def lastmod(self, obj):
         return obj.updated_at

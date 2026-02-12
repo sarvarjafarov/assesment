@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber, PublicAssessment
+from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber, PublicAssessment, Role, InterviewQuestion
 
 
 @admin.register(DemoRequest)
@@ -196,3 +196,72 @@ class PublicAssessmentAdmin(admin.ModelAdmin):
         updated = queryset.update(is_active=False)
         self.message_user(request, f'{updated} assessment(s) deactivated.')
     deactivate.short_description = "Deactivate selected assessments"
+
+
+class InterviewQuestionInline(admin.TabularInline):
+    model = InterviewQuestion
+    extra = 1
+    fields = ['question_text', 'category', 'difficulty', 'what_it_tests', 'order', 'is_active']
+    ordering = ['order', 'category']
+
+
+@admin.register(Role)
+class RoleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'department', 'seniority_level', 'is_active', 'order', 'updated_at']
+    list_filter = ['department', 'seniority_level', 'is_active']
+    list_editable = ['is_active', 'order']
+    search_fields = ['title', 'department', 'description']
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['order', 'title']
+    filter_horizontal = ['assessment_types']
+    inlines = [InterviewQuestionInline]
+
+    fieldsets = (
+        ('Role Information', {
+            'fields': ('title', 'slug', 'department', 'seniority_level')
+        }),
+        ('Content', {
+            'fields': ('description', 'responsibilities', 'key_skills')
+        }),
+        ('Assessment Links', {
+            'fields': ('assessment_types',),
+            'description': 'Select which Evalon assessments are recommended for this role.'
+        }),
+        ('Display Settings', {
+            'fields': ('is_active', 'order')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    actions = ['activate', 'deactivate']
+
+    def activate(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f'{updated} role(s) activated.')
+    activate.short_description = "Activate selected roles"
+
+    def deactivate(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f'{updated} role(s) deactivated.')
+    deactivate.short_description = "Deactivate selected roles"
+
+
+@admin.register(InterviewQuestion)
+class InterviewQuestionAdmin(admin.ModelAdmin):
+    list_display = ['question_text_short', 'role', 'category', 'difficulty', 'is_active', 'order']
+    list_filter = ['category', 'difficulty', 'is_active', 'role__department']
+    search_fields = ['question_text', 'what_it_tests', 'role__title']
+    raw_id_fields = ['role', 'assessment_type']
+    ordering = ['role', 'order']
+
+    def question_text_short(self, obj):
+        return obj.question_text[:80]
+    question_text_short.short_description = 'Question'

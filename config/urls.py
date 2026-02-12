@@ -21,13 +21,18 @@ from django.contrib.auth import views as auth_views
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
 
-from blog.sitemaps import BlogPostSitemap, BlogCategorySitemap, StaticPagesSitemap, PublicAssessmentSitemap
+from blog.sitemaps import (
+    BlogPostSitemap, BlogCategorySitemap, StaticPagesSitemap,
+    PublicAssessmentSitemap, InterviewQuestionsSitemap, RoleAssessmentSitemap,
+)
 
 sitemaps = {
     'posts': BlogPostSitemap,
     'categories': BlogCategorySitemap,
     'assessments': PublicAssessmentSitemap,
     'static': StaticPagesSitemap,
+    'interview-questions': InterviewQuestionsSitemap,
+    'role-assessments': RoleAssessmentSitemap,
 }
 
 urlpatterns = [

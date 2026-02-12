@@ -230,3 +230,115 @@ class PublicAssessment(models.Model):
     @property
     def seo_description(self):
         return self.meta_description or self.summary
+
+
+class Role(models.Model):
+    """Roles for programmatic SEO: interview questions and assessment recommendation pages."""
+
+    SENIORITY_CHOICES = [
+        ('junior', 'Junior'),
+        ('mid', 'Mid-Level'),
+        ('senior', 'Senior'),
+        ('lead', 'Lead'),
+        ('executive', 'Executive'),
+    ]
+
+    slug = models.SlugField(unique=True, max_length=120, help_text="URL identifier, e.g. 'senior-product-manager'")
+    title = models.CharField(max_length=200, help_text="Display name, e.g. 'Senior Product Manager'")
+    department = models.CharField(max_length=60, help_text="e.g. Marketing, Product, Design, HR, Finance, Leadership")
+    seniority_level = models.CharField(max_length=20, choices=SENIORITY_CHOICES, default='mid')
+    description = models.TextField(help_text="2-3 sentence role description")
+    responsibilities = models.JSONField(default=list, blank=True, help_text="JSON list of key responsibilities")
+    key_skills = models.JSONField(default=list, blank=True, help_text="JSON list of skills required")
+    assessment_types = models.ManyToManyField(
+        'PublicAssessment',
+        blank=True,
+        related_name='roles',
+        help_text="Which Evalon assessments are relevant for this role",
+    )
+
+    # SEO fields
+    meta_title = models.CharField(max_length=160, blank=True)
+    meta_description = models.CharField(max_length=300, blank=True)
+    meta_keywords = models.CharField(max_length=255, blank=True)
+
+    # Display
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    # Timestamps
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'title']
+        verbose_name = 'Role'
+        verbose_name_plural = 'Roles'
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('pages:role_assessment_detail', kwargs={'slug': self.slug})
+
+    def get_interview_questions_url(self):
+        return reverse('pages:interview_questions_detail', kwargs={'slug': self.slug})
+
+    @property
+    def seo_title(self):
+        return self.meta_title or f"{self.title} Interview Questions | Evalon"
+
+    @property
+    def seo_description(self):
+        return self.meta_description or f"Top interview questions for {self.title} roles. Includes what each question tests and sample answer guidance."
+
+    @property
+    def role_seo_title(self):
+        return self.meta_title or f"Best Assessments for Hiring a {self.title} | Evalon"
+
+    @property
+    def role_seo_description(self):
+        return self.meta_description or f"Recommended assessment battery for {self.title} candidates. Covers {', '.join(self.key_skills[:3]) if self.key_skills else 'core competencies'}."
+
+
+class InterviewQuestion(models.Model):
+    """Public-facing interview questions for programmatic SEO pages."""
+
+    CATEGORY_CHOICES = [
+        ('technical', 'Technical'),
+        ('behavioral', 'Behavioral'),
+        ('situational', 'Situational'),
+        ('leadership', 'Leadership'),
+        ('culture', 'Culture Fit'),
+        ('problem_solving', 'Problem Solving'),
+    ]
+    DIFFICULTY_CHOICES = [
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ]
+
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='interview_questions')
+    question_text = models.TextField()
+    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES)
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medium')
+    what_it_tests = models.CharField(max_length=200, help_text="Brief explanation of what this question evaluates")
+    sample_answer_outline = models.TextField(blank=True, help_text="Brief outline of a good answer")
+    assessment_type = models.ForeignKey(
+        'PublicAssessment',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='interview_questions',
+        help_text="Links to relevant Evalon assessment",
+    )
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'category']
+        verbose_name = 'Interview Question'
+        verbose_name_plural = 'Interview Questions'
+
+    def __str__(self):
+        return f"{self.role.title}: {self.question_text[:60]}"

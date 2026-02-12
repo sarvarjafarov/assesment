@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ role.role_seo_title }}{% endblock %}
+{% block meta_description %}{{ role.role_seo_description }}{% endblock %}
+{% block extra_meta %}
+    {% if role.meta_keywords %}<meta name="keywords" content="{{ role.meta_keywords }}">{% endif %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "{{ role.title }} Assessment Battery",
+        "description": "{{ role.role_seo_description|escapejs }}",
+        "brand": {
+            "@type": "Organization",
+            "name": "Evalon"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": "{{ request.build_absolute_uri }}",
+            "priceCurrency": "USD",
+            "price": "0",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
+{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' with active='assessments' %}
+    <main>
+        <div class="rp-detail-shell">
+            {# Hero #}
+            <header class="rp-detail-hero">
+                <div class="rp-detail-hero-inner">
+                    <div class="rp-breadcrumb">
+                        <a href="{% url 'pages:assessment_list' %}">Assessments</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <a href="{% url 'pages:role_assessment_list' %}">Roles</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span>{{ role.title }}</span>
+                    </div>
+                    <div class="rp-detail-badges">
+                        <span class="rp-badge rp-badge--dept">{{ role.department }}</span>
+                        <span class="rp-badge rp-badge--level">{{ role.get_seniority_level_display }}</span>
+                    </div>
+                    <h1 class="rp-detail-title">Best Assessments for Hiring a {{ role.title }}</h1>
+                    <p class="rp-detail-desc">{{ role.description }}</p>
+                    <div class="rp-detail-stats">
+                        <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ recommended_assessments|length }}</span>
+                            <span class="rp-detail-stat-lbl">Assessments</span>
+                        </div>
+                        {% if role.key_skills %}
+                        <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ role.key_skills|length }}</span>
+                            <span class="rp-detail-stat-lbl">Key Skills</span>
+                        </div>
+                        {% endif %}
+                        {% if role.responsibilities %}
+                        <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ role.responsibilities|length }}</span>
+                            <span class="rp-detail-stat-lbl">Responsibilities</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+
+            {# Key Skills #}
+            {% if role.key_skills %}
+            <section class="rp-section" id="skills">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Key Skills to Assess</h2>
+                    <p class="rp-section-desc">Core competencies required for {{ role.title }} candidates.</p>
+                    <div class="rp-skills-tags">
+                        {% for skill in role.key_skills %}
+                        <span class="rp-skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Responsibilities #}
+            {% if role.responsibilities %}
+            <section class="rp-section rp-section--alt" id="responsibilities">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Role Responsibilities</h2>
+                    <p class="rp-section-desc">What {{ role.title|lower }}s are expected to do.</p>
+                    <ul class="rp-responsibilities">
+                        {% for resp in role.responsibilities %}
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>{{ resp }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Recommended Assessment Battery #}
+            {% if recommended_assessments %}
+            <section class="rp-section" id="assessments">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Recommended Assessment Battery</h2>
+                    <p class="rp-section-desc">Use these assessments together for a comprehensive evaluation of {{ role.title }} candidates.</p>
+                    <div class="rp-battery">
+                        {% for assessment in recommended_assessments %}
+                        <a class="rp-battery-card" href="{{ assessment.get_absolute_url }}">
+                            <div class="rp-battery-icon">
+                                {% if assessment.icon_svg %}{{ assessment.icon_svg|safe }}{% endif %}
+                            </div>
+                            <div class="rp-battery-body">
+                                <span class="rp-battery-label">{{ assessment.label }}</span>
+                                <h3>{{ assessment.title }}</h3>
+                                <p>{{ assessment.summary|truncatewords:20 }}</p>
+                                <div class="rp-battery-meta">
+                                    <span>{{ assessment.duration_minutes }} min</span>
+                                    <span>{{ assessment.question_count }} questions</span>
+                                    <span>{{ assessment.get_difficulty_level_display }}</span>
+                                </div>
+                            </div>
+                            <svg class="rp-battery-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# CTA #}
+            <section class="rp-cta">
+                <div class="rp-cta-inner">
+                    <h2>Start assessing {{ role.title }} candidates today</h2>
+                    <p>Send assessments in minutes with automated scoring and detailed reports.</p>
+                    <div class="rp-cta-actions">
+                        <a class="rp-btn-primary" href="{% url 'clients:signup' %}">Start Free Trial</a>
+                        {% if has_interview_questions %}
+                        <a class="rp-btn-secondary" href="{{ role.get_interview_questions_url }}">Browse interview questions</a>
+                        {% else %}
+                        <a class="rp-btn-secondary" href="{% url 'pages:contact' %}">Talk to sales</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            {# Related Roles #}
+            {% if related_roles %}
+            <section class="rp-section" id="related">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Related Roles</h2>
+                    <div class="rp-related">
+                        {% for rel in related_roles %}
+                        <a class="rp-related-card" href="{{ rel.get_absolute_url }}">
+                            <span class="rp-related-dept">{{ rel.department }}</span>
+                            <h3>{{ rel.title }}</h3>
+                            <p>{{ rel.description|truncatewords:15 }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

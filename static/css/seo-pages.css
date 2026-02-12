@@ -1,0 +1,1053 @@
+/* ===================================================================
+   SEO Pages — Interview Questions (iq-*) & Role Pages (rp-*)
+   Programmatic SEO landing pages for /interview-questions/ and
+   /assessments/roles/ & /assessments/for/
+   =================================================================== */
+
+/* ── Shared Primitives ─────────────────────────────────────────────── */
+
+.iq-shell, .rp-shell,
+.iq-detail-shell, .rp-detail-shell {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+}
+
+/* Hero (shared pattern) */
+.iq-hero, .rp-hero {
+    text-align: center;
+    padding: 3.5rem 0 2.5rem;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.iq-eyebrow, .rp-eyebrow {
+    color: var(--color-orange);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.75rem;
+}
+
+.iq-title, .rp-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    font-weight: 800;
+    color: var(--color-navy);
+    margin: 0 0 0.75rem;
+    line-height: 1.15;
+}
+
+.iq-desc, .rp-desc {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0 0 2rem;
+    line-height: 1.6;
+}
+
+/* Search */
+.iq-search, .rp-search {
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.iq-search-field, .rp-search-field {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e2e5ea;
+    border-radius: 12px;
+    background: #f8f9fa;
+    padding: 0 1rem;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.iq-search-field:focus-within, .rp-search-field:focus-within {
+    border-color: var(--color-orange);
+    background: var(--color-white);
+}
+
+.iq-search-icon, .rp-search-icon {
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+
+.iq-search-field input, .rp-search-field input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.7rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--color-navy);
+    outline: none;
+}
+
+.iq-search-field input::placeholder, .rp-search-field input::placeholder {
+    color: #9ca3af;
+}
+
+/* Department Filters */
+.iq-filters, .rp-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.iq-filter, .rp-filter {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-full);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    background: #f3f4f6;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.iq-filter:hover, .rp-filter:hover {
+    color: var(--color-orange);
+    background: rgba(255, 138, 0, 0.06);
+}
+
+.iq-filter--active, .rp-filter--active {
+    color: var(--color-orange);
+    background: rgba(255, 138, 0, 0.08);
+    border-color: rgba(255, 138, 0, 0.2);
+}
+
+
+/* ── Interview Questions: List Grid ────────────────────────────────── */
+
+.iq-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.iq-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-white);
+    border: 1px solid #ebedf0;
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.iq-card:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.08);
+}
+
+.iq-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.iq-card-dept {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-orange);
+}
+
+.iq-card-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: #f3f4f6;
+    padding: 0.15rem 0.55rem;
+    border-radius: var(--radius-full);
+}
+
+.iq-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+}
+
+.iq-card-desc {
+    font-size: 0.88rem;
+    color: #6b7280;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.iq-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f0f1f3;
+}
+
+.iq-card-level {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.iq-card-arrow {
+    color: #d1d5db;
+    transition: color 0.15s;
+}
+
+.iq-card:hover .iq-card-arrow {
+    color: var(--color-orange);
+}
+
+.iq-empty, .rp-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-text-muted);
+}
+
+.iq-empty h3, .rp-empty h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem;
+    color: var(--color-navy);
+}
+
+.iq-load-more, .rp-load-more {
+    text-align: center;
+    padding: 2.5rem 0;
+}
+
+.iq-load-btn, .rp-load-btn {
+    display: inline-block;
+    padding: 0.65rem 2rem;
+    border: 1px solid #e2e5ea;
+    border-radius: var(--radius-lg);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.iq-load-btn:hover, .rp-load-btn:hover {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+}
+
+
+/* ── Interview Questions: Detail Page ──────────────────────────────── */
+
+.iq-detail-hero {
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid #f0f1f3;
+    margin-bottom: 2rem;
+}
+
+.iq-detail-hero-inner {
+    max-width: 760px;
+}
+
+.iq-breadcrumb, .rp-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1.25rem;
+}
+
+.iq-breadcrumb a, .rp-breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.iq-breadcrumb a:hover, .rp-breadcrumb a:hover {
+    color: var(--color-orange);
+}
+
+.iq-breadcrumb svg, .rp-breadcrumb svg {
+    color: #d1d5db;
+}
+
+.iq-detail-badges, .rp-detail-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.iq-badge, .rp-badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-full);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.iq-badge--dept, .rp-badge--dept {
+    background: rgba(255, 138, 0, 0.1);
+    color: var(--color-orange);
+}
+
+.iq-badge--level, .rp-badge--level {
+    background: #f3f4f6;
+    color: var(--color-text-muted);
+}
+
+.iq-detail-title, .rp-detail-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    color: var(--color-navy);
+    margin: 0 0 0.75rem;
+    line-height: 1.2;
+}
+
+.iq-detail-desc, .rp-detail-desc {
+    font-size: 1.05rem;
+    color: #6b7280;
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+}
+
+.iq-detail-stats, .rp-detail-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.iq-detail-stat, .rp-detail-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.iq-detail-stat-val, .rp-detail-stat-val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-navy);
+    line-height: 1.2;
+}
+
+.iq-detail-stat-lbl, .rp-detail-stat-lbl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    margin-top: 0.15rem;
+}
+
+/* Sections (alternating bg) */
+.iq-section, .rp-section {
+    padding: 3rem 0;
+}
+
+.iq-section--alt, .rp-section--alt {
+    background: #fafbfc;
+    margin: 0 -2rem;
+    padding: 3rem 2rem;
+}
+
+.iq-section-inner, .rp-section-inner {
+    max-width: 760px;
+}
+
+.iq-section-title, .rp-section-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+}
+
+.iq-section-desc, .rp-section-desc {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0 0 1.5rem;
+}
+
+/* Questions */
+.iq-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.iq-question {
+    background: var(--color-white);
+    border: 1px solid #ebedf0;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    transition: border-color 0.15s;
+}
+
+.iq-question:hover {
+    border-color: #d1d5db;
+}
+
+.iq-question-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.iq-question-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+}
+
+.iq-difficulty {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.iq-difficulty--easy {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.iq-difficulty--medium {
+    background: rgba(255, 138, 0, 0.12);
+    color: #e07800;
+}
+
+.iq-difficulty--hard {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+}
+
+.iq-question-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    margin: 0 0 0.75rem;
+    line-height: 1.45;
+}
+
+.iq-what-tests {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 0.5rem;
+    line-height: 1.5;
+}
+
+.iq-what-tests svg {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    color: var(--color-orange);
+}
+
+.iq-what-tests strong {
+    color: var(--color-navy);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.iq-answer-outline {
+    margin-top: 0.5rem;
+}
+
+.iq-answer-outline summary {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-orange);
+    cursor: pointer;
+    padding: 0.3rem 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.iq-answer-outline summary::-webkit-details-marker {
+    display: none;
+}
+
+.iq-answer-outline summary::before {
+    content: '▸';
+    font-size: 0.75rem;
+    transition: transform 0.15s;
+}
+
+.iq-answer-outline[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.iq-answer-body {
+    font-size: 0.88rem;
+    color: #6b7280;
+    line-height: 1.6;
+    padding: 0.5rem 0 0.25rem 1rem;
+    border-left: 2px solid rgba(255, 138, 0, 0.2);
+}
+
+.iq-assessment-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-orange);
+    text-decoration: none;
+    margin-top: 0.5rem;
+    transition: opacity 0.15s;
+}
+
+.iq-assessment-link:hover {
+    opacity: 0.75;
+}
+
+/* Assessment Cards (in detail) */
+.iq-assessment-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.iq-assessment-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-white);
+    border: 1px solid #ebedf0;
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.iq-assessment-card:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 2px 8px rgba(255, 138, 0, 0.06);
+}
+
+.iq-assessment-card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 138, 0, 0.07);
+    border-radius: 10px;
+    color: var(--color-orange);
+    flex-shrink: 0;
+}
+
+.iq-assessment-card-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.iq-assessment-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.iq-assessment-card-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-orange);
+}
+
+.iq-assessment-card-body h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0.15rem 0 0.25rem;
+}
+
+.iq-assessment-card-meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+
+.iq-assessment-card-arrow {
+    color: #d1d5db;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.iq-assessment-card:hover .iq-assessment-card-arrow {
+    color: var(--color-orange);
+}
+
+
+/* ── CTA Section (shared) ──────────────────────────────────────────── */
+
+.iq-cta, .rp-cta {
+    text-align: center;
+    padding: 4rem 2rem;
+    margin: 2rem -2rem;
+    background: linear-gradient(135deg, #0e1428 0%, #1a2240 100%);
+    border-radius: 0;
+    color: var(--color-white);
+}
+
+.iq-cta-inner, .rp-cta-inner {
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+.iq-cta h2, .rp-cta h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    color: var(--color-white);
+}
+
+.iq-cta p, .rp-cta p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 1.5rem;
+}
+
+.iq-cta-actions, .rp-cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.iq-btn-primary, .rp-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    background: var(--color-orange);
+    color: var(--color-white);
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.iq-btn-primary:hover, .rp-btn-primary:hover {
+    background: #e67a00;
+    box-shadow: 0 4px 12px rgba(255, 138, 0, 0.3);
+}
+
+.iq-btn-secondary, .rp-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.iq-btn-secondary:hover, .rp-btn-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--color-white);
+}
+
+
+/* ── Related Roles (shared) ────────────────────────────────────────── */
+
+.iq-related, .rp-related {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.iq-related-card, .rp-related-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-white);
+    border: 1px solid #ebedf0;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.iq-related-card:hover, .rp-related-card:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 2px 8px rgba(255, 138, 0, 0.06);
+}
+
+.iq-related-dept, .rp-related-dept {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-orange);
+    margin-bottom: 0.4rem;
+}
+
+.iq-related-card h3, .rp-related-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.35rem;
+    line-height: 1.3;
+}
+
+.iq-related-card p, .rp-related-card p {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.iq-related-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f0f1f3;
+}
+
+
+/* ── Role Pages: List Grid ─────────────────────────────────────────── */
+
+.rp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.rp-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-white);
+    border: 1px solid #ebedf0;
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rp-card:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.08);
+}
+
+.rp-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.rp-card-dept {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-orange);
+}
+
+.rp-card-level {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.rp-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+}
+
+.rp-card-desc {
+    font-size: 0.88rem;
+    color: #6b7280;
+    margin: 0 0 0.75rem;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.rp-card-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+}
+
+.rp-card-skill {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    background: #f3f4f6;
+    color: var(--color-text-muted);
+}
+
+.rp-card-skill--more {
+    background: rgba(255, 138, 0, 0.08);
+    color: var(--color-orange);
+}
+
+.rp-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f0f1f3;
+}
+
+.rp-card-assessments {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.rp-card-arrow {
+    color: #d1d5db;
+    transition: color 0.15s;
+}
+
+.rp-card:hover .rp-card-arrow {
+    color: var(--color-orange);
+}
+
+
+/* ── Role Pages: Detail ────────────────────────────────────────────── */
+
+.rp-detail-hero {
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid #f0f1f3;
+    margin-bottom: 2rem;
+}
+
+.rp-detail-hero-inner {
+    max-width: 760px;
+}
+
+/* Skills Tags */
+.rp-skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.rp-skill-tag {
+    display: inline-block;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: rgba(255, 138, 0, 0.08);
+    color: var(--color-orange);
+    border: 1px solid rgba(255, 138, 0, 0.15);
+}
+
+/* Responsibilities */
+.rp-responsibilities {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.rp-responsibilities li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    color: var(--color-navy);
+    line-height: 1.5;
+}
+
+.rp-responsibilities svg {
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+    color: var(--color-success);
+}
+
+/* Battery Cards */
+.rp-battery {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rp-battery-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: var(--color-white);
+    border: 1px solid #ebedf0;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.rp-battery-card:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 4px 12px rgba(255, 138, 0, 0.06);
+}
+
+.rp-battery-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 138, 0, 0.07);
+    border-radius: var(--radius-lg);
+    color: var(--color-orange);
+    flex-shrink: 0;
+}
+
+.rp-battery-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.rp-battery-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.rp-battery-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-orange);
+}
+
+.rp-battery-body h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0.2rem 0 0.3rem;
+}
+
+.rp-battery-body p {
+    font-size: 0.88rem;
+    color: #6b7280;
+    margin: 0 0 0.4rem;
+    line-height: 1.5;
+}
+
+.rp-battery-meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.rp-battery-arrow {
+    color: #d1d5db;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.rp-battery-card:hover .rp-battery-arrow {
+    color: var(--color-orange);
+}
+
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+    .iq-grid, .rp-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .iq-related, .rp-related {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .iq-shell, .rp-shell,
+    .iq-detail-shell, .rp-detail-shell {
+        padding: 0 1rem 3rem;
+    }
+
+    .iq-hero, .rp-hero {
+        padding: 2rem 0 1.5rem;
+    }
+
+    .iq-grid, .rp-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .iq-related, .rp-related {
+        grid-template-columns: 1fr;
+    }
+
+    .iq-detail-stats, .rp-detail-stats {
+        gap: 1.25rem;
+    }
+
+    .iq-section--alt, .rp-section--alt {
+        margin: 0 -1rem;
+        padding: 2rem 1rem;
+    }
+
+    .iq-cta, .rp-cta {
+        margin: 1rem -1rem;
+        padding: 2.5rem 1.5rem;
+    }
+
+    .iq-cta-actions, .rp-cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rp-battery-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .rp-battery-arrow {
+        display: none;
+    }
+
+    .iq-filters, .rp-filters {
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .iq-filter, .rp-filter {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}

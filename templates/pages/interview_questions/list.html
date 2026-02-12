@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{% if query %}Search: {{ query }} · {% endif %}Interview Questions for Hiring · Evalon{% endblock %}
+{% block meta_description %}Browse interview questions for 50+ roles across marketing, product, design, HR, finance, and leadership. Includes what each question tests and sample answer guidance.{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="iq-shell">
+            <section class="iq-hero">
+                <p class="iq-eyebrow">Interview Questions</p>
+                <h1 class="iq-title">{% if query %}Results for "{{ query }}"{% elif department %}{{ department }} Interview Questions{% else %}Interview Questions for Every Role{% endif %}</h1>
+                <p class="iq-desc">
+                    {% if query %}
+                    Found {{ roles.paginator.count }} role{{ roles.paginator.count|pluralize }} matching your search.
+                    {% else %}
+                    Curated interview questions with difficulty ratings, evaluation criteria, and sample answer guidance — organized by role.
+                    {% endif %}
+                </p>
+
+                <form action="{% url 'pages:interview_questions_list' %}" method="get" class="iq-search">
+                    <div class="iq-search-field">
+                        <svg class="iq-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="search" name="q" value="{{ query }}" placeholder="Search roles..." aria-label="Search roles">
+                    </div>
+                </form>
+
+                {% if departments %}
+                <div class="iq-filters">
+                    <a href="{% url 'pages:interview_questions_list' %}" class="iq-filter {% if not department %}iq-filter--active{% endif %}">All</a>
+                    {% for dept in departments %}
+                    <a href="{% url 'pages:interview_questions_list' %}?department={{ dept|urlencode }}" class="iq-filter {% if department == dept %}iq-filter--active{% endif %}">{{ dept }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+
+            <section class="iq-grid" id="grid">
+                {% for role in roles %}
+                <a class="iq-card" href="{{ role.get_interview_questions_url }}">
+                    <div class="iq-card-top">
+                        <span class="iq-card-dept">{{ role.department }}</span>
+                        <span class="iq-card-count">{{ role.question_count }} questions</span>
+                    </div>
+                    <h3 class="iq-card-title">{{ role.title }}</h3>
+                    <p class="iq-card-desc">{{ role.description|truncatewords:20 }}</p>
+                    <div class="iq-card-footer">
+                        <span class="iq-card-level">{{ role.get_seniority_level_display }}</span>
+                        <span class="iq-card-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="iq-empty">
+                    <h3>No roles found</h3>
+                    <p>{% if query %}Try adjusting your search or <a href="{% url 'pages:interview_questions_list' %}">browse all roles</a>.{% else %}Check back soon for new interview question guides.{% endif %}</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            {% if is_paginated and page_obj.has_next %}
+            <div class="iq-load-more">
+                <a class="iq-load-btn" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Load more roles</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

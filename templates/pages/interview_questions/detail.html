@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ role.seo_title }}{% endblock %}
+{% block meta_description %}{{ role.seo_description }}{% endblock %}
+{% block extra_meta %}
+    {% if role.meta_keywords %}<meta name="keywords" content="{{ role.meta_keywords }}">{% endif %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {% for q in questions %}
+            {
+                "@type": "Question",
+                "name": "{{ q.question_text|escapejs }}",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "{{ q.what_it_tests|escapejs }}{% if q.sample_answer_outline %} {{ q.sample_answer_outline|escapejs }}{% endif %}"
+                }
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="iq-detail-shell">
+            {# Hero #}
+            <header class="iq-detail-hero">
+                <div class="iq-detail-hero-inner">
+                    <div class="iq-breadcrumb">
+                        <a href="{% url 'pages:interview_questions_list' %}">Interview Questions</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span>{{ role.title }}</span>
+                    </div>
+                    <div class="iq-detail-badges">
+                        <span class="iq-badge iq-badge--dept">{{ role.department }}</span>
+                        <span class="iq-badge iq-badge--level">{{ role.get_seniority_level_display }}</span>
+                    </div>
+                    <h1 class="iq-detail-title">{{ role.title }} Interview Questions</h1>
+                    <p class="iq-detail-desc">{{ role.description }}</p>
+                    <div class="iq-detail-stats">
+                        <div class="iq-detail-stat">
+                            <span class="iq-detail-stat-val">{{ question_count }}</span>
+                            <span class="iq-detail-stat-lbl">Questions</span>
+                        </div>
+                        <div class="iq-detail-stat">
+                            <span class="iq-detail-stat-val">{{ categories|length }}</span>
+                            <span class="iq-detail-stat-lbl">Categories</span>
+                        </div>
+                        {% if recommended_assessments %}
+                        <div class="iq-detail-stat">
+                            <span class="iq-detail-stat-val">{{ recommended_assessments|length }}</span>
+                            <span class="iq-detail-stat-lbl">Assessments</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+
+            {# Questions by Category #}
+            {% for cat_name, cat_questions in categories.items %}
+            <section class="iq-section {% if forloop.counter|divisibleby:2 %}iq-section--alt{% endif %}" id="cat-{{ forloop.counter }}">
+                <div class="iq-section-inner">
+                    <h2 class="iq-section-title">{{ cat_name }} Questions</h2>
+                    <p class="iq-section-desc">{{ cat_questions|length }} question{{ cat_questions|length|pluralize }} in this category.</p>
+                    <div class="iq-questions">
+                        {% for q in cat_questions %}
+                        <div class="iq-question">
+                            <div class="iq-question-header">
+                                <span class="iq-question-num">{{ forloop.parentloop.counter }}.{{ forloop.counter }}</span>
+                                <span class="iq-difficulty iq-difficulty--{{ q.difficulty }}">{{ q.get_difficulty_display }}</span>
+                            </div>
+                            <h3 class="iq-question-text">{{ q.question_text }}</h3>
+                            <p class="iq-what-tests">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                                <strong>What it tests:</strong> {{ q.what_it_tests }}
+                            </p>
+                            {% if q.sample_answer_outline %}
+                            <details class="iq-answer-outline">
+                                <summary>Sample answer guidance</summary>
+                                <div class="iq-answer-body">{{ q.sample_answer_outline }}</div>
+                            </details>
+                            {% endif %}
+                            {% if q.assessment_type %}
+                            <a href="{{ q.assessment_type.get_absolute_url }}" class="iq-assessment-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                                Assess with {{ q.assessment_type.label }}
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endfor %}
+
+            {# Recommended Assessments #}
+            {% if recommended_assessments %}
+            <section class="iq-section" id="assessments">
+                <div class="iq-section-inner">
+                    <h2 class="iq-section-title">Recommended Assessments for {{ role.title }}</h2>
+                    <p class="iq-section-desc">Complement your interviews with structured skill assessments.</p>
+                    <div class="iq-assessment-cards">
+                        {% for assessment in recommended_assessments %}
+                        <a class="iq-assessment-card" href="{{ assessment.get_absolute_url }}">
+                            <div class="iq-assessment-card-icon">
+                                {% if assessment.icon_svg %}{{ assessment.icon_svg|safe }}{% endif %}
+                            </div>
+                            <div class="iq-assessment-card-body">
+                                <span class="iq-assessment-card-label">{{ assessment.label }}</span>
+                                <h3>{{ assessment.title }}</h3>
+                                <div class="iq-assessment-card-meta">
+                                    <span>{{ assessment.duration_minutes }} min</span>
+                                    <span>{{ assessment.question_count }} Qs</span>
+                                </div>
+                            </div>
+                            <svg class="iq-assessment-card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# CTA #}
+            <section class="iq-cta">
+                <div class="iq-cta-inner">
+                    <h2>Ready to assess {{ role.title }} candidates?</h2>
+                    <p>Go beyond interviews with structured skill assessments — start free.</p>
+                    <div class="iq-cta-actions">
+                        <a class="iq-btn-primary" href="{% url 'clients:signup' %}">Start Free Trial</a>
+                        <a class="iq-btn-secondary" href="{{ role.get_absolute_url }}">See recommended assessments</a>
+                    </div>
+                </div>
+            </section>
+
+            {# Related Roles #}
+            {% if related_roles %}
+            <section class="iq-section" id="related">
+                <div class="iq-section-inner">
+                    <h2 class="iq-section-title">Related Roles</h2>
+                    <div class="iq-related">
+                        {% for rel in related_roles %}
+                        <a class="iq-related-card" href="{{ rel.get_interview_questions_url }}">
+                            <span class="iq-related-dept">{{ rel.department }}</span>
+                            <h3>{{ rel.title }}</h3>
+                            <p>{{ rel.description|truncatewords:15 }}</p>
+                            <span class="iq-related-count">{{ rel.question_count }} questions</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

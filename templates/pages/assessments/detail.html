@@ -230,6 +230,25 @@
                 </div>
             </section>
 
+            {# Roles that use this assessment #}
+            {% if assessment.roles.exists %}
+            <section class="ad-section" id="roles">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Roles That Use This Assessment</h2>
+                    <p class="ad-section-desc">See how this assessment fits into hiring for specific positions.</p>
+                    <div class="ad-related">
+                        {% for role in assessment.roles.all %}
+                        <a class="ad-related-card" href="{{ role.get_absolute_url }}">
+                            <span class="ad-related-label">{{ role.department }}</span>
+                            <h3>{{ role.title }}</h3>
+                            <p>{{ role.description|truncatewords:18 }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
             {# Related #}
             {% if related_assessments %}
             <section class="ad-section" id="related">

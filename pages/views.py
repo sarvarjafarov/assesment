@@ -18,7 +18,8 @@ from django.shortcuts import get_object_or_404
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
 from .forms import DemoRequestForm
-from .models import NewsletterSubscriber, PublicAssessment
+from django.db.models import Count, Prefetch
+from .models import NewsletterSubscriber, PublicAssessment, Role, InterviewQuestion
 
 def home(request):
     """Render the marketing landing page."""
@@ -896,4 +897,164 @@ def assessment_preview(request, slug, token):
         'assessment': assessment,
         'related_assessments': related,
         'preview_mode': True,
+    })
+
+
+# ── Programmatic SEO: Interview Questions ──────────────────────────
+
+
+def interview_questions_list(request):
+    """List all roles that have interview questions."""
+    roles = Role.objects.filter(
+        is_active=True,
+        interview_questions__is_active=True,
+    ).annotate(
+        question_count=Count(
+            'interview_questions',
+            filter=Q(interview_questions__is_active=True),
+        )
+    ).filter(question_count__gt=0).distinct()
+
+    department = request.GET.get('department', '').strip()
+    if department:
+        roles = roles.filter(department__iexact=department)
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        roles = roles.filter(
+            Q(title__icontains=query)
+            | Q(department__icontains=query)
+            | Q(description__icontains=query)
+        )
+
+    departments = (
+        Role.objects.filter(is_active=True)
+        .values_list('department', flat=True)
+        .distinct()
+        .order_by('department')
+    )
+
+    paginator = Paginator(roles, 24)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'pages/interview_questions/list.html', {
+        'roles': page_obj,
+        'page_obj': page_obj,
+        'query': query,
+        'department': department,
+        'departments': departments,
+        'is_paginated': page_obj.has_other_pages(),
+    })
+
+
+def interview_questions_detail(request, slug):
+    """Show interview questions for a specific role."""
+    role = get_object_or_404(Role, slug=slug, is_active=True)
+
+    questions = (
+        role.interview_questions.filter(is_active=True)
+        .select_related('assessment_type')
+        .order_by('category', 'order')
+    )
+
+    # Group questions by category
+    categories = {}
+    for q in questions:
+        cat_display = q.get_category_display()
+        if cat_display not in categories:
+            categories[cat_display] = []
+        categories[cat_display].append(q)
+
+    # Related roles: same department, have questions
+    related_roles = (
+        Role.objects.filter(
+            is_active=True,
+            department=role.department,
+            interview_questions__is_active=True,
+        )
+        .exclude(pk=role.pk)
+        .annotate(
+            question_count=Count(
+                'interview_questions',
+                filter=Q(interview_questions__is_active=True),
+            )
+        )
+        .filter(question_count__gt=0)
+        .distinct()[:4]
+    )
+
+    recommended_assessments = role.assessment_types.filter(is_active=True)
+
+    return render(request, 'pages/interview_questions/detail.html', {
+        'role': role,
+        'questions': questions,
+        'categories': categories,
+        'question_count': questions.count(),
+        'related_roles': related_roles,
+        'recommended_assessments': recommended_assessments,
+    })
+
+
+# ── Programmatic SEO: Role Assessment Pages ────────────────────────
+
+
+def role_assessment_list(request):
+    """List all roles with their recommended assessments."""
+    roles = Role.objects.filter(is_active=True).prefetch_related(
+        Prefetch(
+            'assessment_types',
+            queryset=PublicAssessment.objects.filter(is_active=True),
+        )
+    )
+
+    department = request.GET.get('department', '').strip()
+    if department:
+        roles = roles.filter(department__iexact=department)
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        roles = roles.filter(
+            Q(title__icontains=query)
+            | Q(department__icontains=query)
+            | Q(description__icontains=query)
+        )
+
+    departments = (
+        Role.objects.filter(is_active=True)
+        .values_list('department', flat=True)
+        .distinct()
+        .order_by('department')
+    )
+
+    paginator = Paginator(roles, 24)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'pages/roles/list.html', {
+        'roles': page_obj,
+        'page_obj': page_obj,
+        'query': query,
+        'department': department,
+        'departments': departments,
+        'is_paginated': page_obj.has_other_pages(),
+    })
+
+
+def role_assessment_detail(request, slug):
+    """Show assessment recommendations for a role."""
+    role = get_object_or_404(Role, slug=slug, is_active=True)
+
+    recommended_assessments = role.assessment_types.filter(is_active=True).order_by('order')
+
+    related_roles = (
+        Role.objects.filter(is_active=True, department=role.department)
+        .exclude(pk=role.pk)[:4]
+    )
+
+    has_interview_questions = role.interview_questions.filter(is_active=True).exists()
+
+    return render(request, 'pages/roles/detail.html', {
+        'role': role,
+        'recommended_assessments': recommended_assessments,
+        'related_roles': related_roles,
+        'has_interview_questions': has_interview_questions,
     })
