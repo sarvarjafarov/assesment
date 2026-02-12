@@ -38,146 +38,299 @@
         </div>
     </div>
 
-    {# ── Form ── #}
-    <div class="ca-form-wrap">
-        <form method="post" class="ca-form">
-            {% csrf_token %}
+    {# ── Two-column layout: Form + Sidebar ── #}
+    <div class="ca-create-layout">
 
-            {# ── Assessment Details Section ── #}
-            <div class="ca-form-section">
-                <div class="ca-form-section-head">
-                    <div class="ca-section-icon ca-section-icon--blue">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>Assessment Details</h3>
-                        <p class="muted">Basic information about your assessment</p>
-                    </div>
-                </div>
+        {# ── Form Column ── #}
+        <div class="ca-form-wrap">
+            <form method="post" class="ca-form">
+                {% csrf_token %}
 
-                <div class="ca-field">
-                    <label for="id_name">{{ form.name.label }} <span class="ca-req">*</span></label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                    <span class="ca-field-error">{{ form.name.errors.0 }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="ca-field">
-                    <label for="id_description">{{ form.description.label }}</label>
-                    {{ form.description }}
-                    <span class="ca-field-hint">Optional — shown to candidates before they start</span>
-                    {% if form.description.errors %}
-                    <span class="ca-field-error">{{ form.description.errors.0 }}</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            {# ── Settings Section ── #}
-            <div class="ca-form-section">
-                <div class="ca-form-section-head">
-                    <div class="ca-section-icon ca-section-icon--orange">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>Settings</h3>
-                        <p class="muted">Time limits and scoring criteria</p>
-                    </div>
-                </div>
-
-                <div class="ca-field-row">
-                    <div class="ca-field">
-                        <label for="id_time_limit_minutes">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
+                {# ── Assessment Details Section ── #}
+                <div class="ca-form-section">
+                    <div class="ca-form-section-head">
+                        <div class="ca-section-icon ca-section-icon--blue">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
-                            {{ form.time_limit_minutes.label }}
-                        </label>
-                        {{ form.time_limit_minutes }}
-                        <span class="ca-field-hint">5–120 minutes</span>
+                        </div>
+                        <div>
+                            <h3>Assessment Details</h3>
+                            <p class="muted">Give your assessment a clear name candidates will recognize</p>
+                        </div>
                     </div>
 
                     <div class="ca-field">
-                        <label for="id_passing_score">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="20" x2="12" y2="10"></line>
-                                <line x1="18" y1="20" x2="18" y2="4"></line>
-                                <line x1="6" y1="20" x2="6" y2="16"></line>
+                        <label for="id_name">Assessment Name <span class="ca-req">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <span class="ca-field-error">{{ form.name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="ca-field">
+                        <label for="id_description">Description</label>
+                        {{ form.description }}
+                        <span class="ca-field-hint">This will be shown to candidates before they start the assessment</span>
+                        {% if form.description.errors %}
+                        <span class="ca-field-error">{{ form.description.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# ── Settings Section ── #}
+                <div class="ca-form-section">
+                    <div class="ca-form-section-head">
+                        <div class="ca-section-icon ca-section-icon--orange">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                             </svg>
-                            {{ form.passing_score.label }}
+                        </div>
+                        <div>
+                            <h3>Assessment Settings</h3>
+                            <p class="muted">Configure time limit and passing criteria</p>
+                        </div>
+                    </div>
+
+                    <div class="ca-field-row">
+                        <div class="ca-field">
+                            <label for="id_time_limit_minutes">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                Time Limit (minutes) <span class="ca-req">*</span>
+                            </label>
+                            {{ form.time_limit_minutes }}
+                            <span class="ca-field-hint">How long candidates have to complete (5–120 min)</span>
+                            {% if form.time_limit_minutes.errors %}
+                            <span class="ca-field-error">{{ form.time_limit_minutes.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="ca-field">
+                            <label for="id_passing_score">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                Passing Score (%) <span class="ca-req">*</span>
+                            </label>
+                            {{ form.passing_score }}
+                            <span class="ca-field-hint">Minimum percentage to pass (0–100%)</span>
+                            {% if form.passing_score.errors %}
+                            <span class="ca-field-error">{{ form.passing_score.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {# ── Anti-Cheating Section ── #}
+                <div class="ca-form-section">
+                    <div class="ca-form-section-head">
+                        <div class="ca-section-icon ca-section-icon--red">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Anti-Cheating Protection</h3>
+                            <p class="muted">Security measures to maintain assessment integrity</p>
+                        </div>
+                    </div>
+
+                    <div class="ca-toggle-group">
+                        <label class="ca-toggle-item">
+                            {{ form.detect_tab_switches }}
+                            <div class="ca-toggle-info">
+                                <span class="ca-toggle-label">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                    </svg>
+                                    Detect Tab Switching
+                                </span>
+                                <span class="ca-toggle-hint">Track when candidates switch to other tabs or windows</span>
+                            </div>
                         </label>
-                        {{ form.passing_score }}
-                        <span class="ca-field-hint">Minimum score to pass (0–100%)</span>
+                        <label class="ca-toggle-item">
+                            {{ form.prevent_copy_paste }}
+                            <div class="ca-toggle-info">
+                                <span class="ca-toggle-label">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                    Prevent Copy/Paste
+                                </span>
+                                <span class="ca-toggle-hint">Disable copying question text and right-click menu</span>
+                            </div>
+                        </label>
+                        <label class="ca-toggle-item">
+                            {{ form.require_fullscreen }}
+                            <div class="ca-toggle-info">
+                                <span class="ca-toggle-label">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                    </svg>
+                                    Require Fullscreen Mode
+                                </span>
+                                <span class="ca-toggle-hint">Force candidates to use fullscreen during the assessment</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="ca-field" style="margin-top: 1.25rem;">
+                        <label for="id_max_tab_switches">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            Max Tab Switches Before Flagging
+                        </label>
+                        {{ form.max_tab_switches }}
+                        <span class="ca-field-hint">Flag candidate for review after this many tab switches (0 = no limit)</span>
+                        {% if form.max_tab_switches.errors %}
+                        <span class="ca-field-error">{{ form.max_tab_switches.errors.0 }}</span>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
 
-            {# ── Anti-Cheating Section ── #}
-            <div class="ca-form-section">
-                <div class="ca-form-section-head">
-                    <div class="ca-section-icon ca-section-icon--red">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                {# ── Actions ── #}
+                <div class="ca-form-actions">
+                    <a href="{% url 'custom_assessments:list' %}" class="btn btn-outline">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        Create & Add Questions
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
                         </svg>
-                    </div>
-                    <div>
-                        <h3>Anti-Cheating</h3>
-                        <p class="muted">Controls to ensure assessment integrity</p>
-                    </div>
+                    </button>
                 </div>
+            </form>
+        </div>
 
-                <div class="ca-toggle-group">
-                    <label class="ca-toggle-item">
-                        {{ form.detect_tab_switches }}
-                        <div class="ca-toggle-info">
-                            <span class="ca-toggle-label">{{ form.detect_tab_switches.label }}</span>
-                            <span class="ca-toggle-hint">{{ form.detect_tab_switches.help_text }}</span>
-                        </div>
-                    </label>
-                    <label class="ca-toggle-item">
-                        {{ form.prevent_copy_paste }}
-                        <div class="ca-toggle-info">
-                            <span class="ca-toggle-label">{{ form.prevent_copy_paste.label }}</span>
-                            <span class="ca-toggle-hint">{{ form.prevent_copy_paste.help_text }}</span>
-                        </div>
-                    </label>
-                    <label class="ca-toggle-item">
-                        {{ form.require_fullscreen }}
-                        <div class="ca-toggle-info">
-                            <span class="ca-toggle-label">{{ form.require_fullscreen.label }}</span>
-                            <span class="ca-toggle-hint">{{ form.require_fullscreen.help_text }}</span>
-                        </div>
-                    </label>
-                </div>
+        {# ── Sidebar Column ── #}
+        <aside class="ca-create-sidebar">
 
-                <div class="ca-field" style="margin-top: 1rem;">
-                    <label for="id_max_tab_switches">
-                        {{ form.max_tab_switches.label }}
-                    </label>
-                    {{ form.max_tab_switches }}
-                    <span class="ca-field-hint">{{ form.max_tab_switches.help_text }}</span>
-                </div>
-            </div>
-
-            {# ── Actions ── #}
-            <div class="ca-form-actions">
-                <a href="{% url 'custom_assessments:list' %}" class="btn btn-outline">Cancel</a>
-                <button type="submit" class="btn btn-primary">
-                    Create & Add Questions
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
+            {# What happens next #}
+            <div class="ca-sidebar-card">
+                <div class="ca-sidebar-card-head">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                </button>
+                    <h4>What Happens Next</h4>
+                </div>
+                <ol class="ca-sidebar-steps">
+                    <li class="ca-sidebar-step ca-sidebar-step--active">
+                        <span class="ca-sidebar-step-num">1</span>
+                        <div>
+                            <strong>Set up details</strong>
+                            <span>You are here</span>
+                        </div>
+                    </li>
+                    <li class="ca-sidebar-step">
+                        <span class="ca-sidebar-step-num">2</span>
+                        <div>
+                            <strong>Add questions</strong>
+                            <span>AI, CSV, or manual</span>
+                        </div>
+                    </li>
+                    <li class="ca-sidebar-step">
+                        <span class="ca-sidebar-step-num">3</span>
+                        <div>
+                            <strong>Preview & publish</strong>
+                            <span>Then invite candidates</span>
+                        </div>
+                    </li>
+                </ol>
             </div>
-        </form>
+
+            {# Tips #}
+            <div class="ca-sidebar-card">
+                <div class="ca-sidebar-card-head">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <h4>Tips</h4>
+                </div>
+                <ul class="ca-sidebar-tips">
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Use a descriptive name so candidates know what to expect
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        30–60 minutes is ideal for most assessments
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        A 70% passing score works well as a baseline
+                    </li>
+                    <li>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Enable anti-cheating for high-stakes assessments
+                    </li>
+                </ul>
+            </div>
+
+            {# Question types info #}
+            <div class="ca-sidebar-card">
+                <div class="ca-sidebar-card-head">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    <h4>Question Types</h4>
+                </div>
+                <div class="ca-sidebar-types">
+                    <div class="ca-sidebar-type">
+                        <span class="ca-sidebar-type-badge ca-sidebar-type-badge--mc">MC</span>
+                        Multiple Choice
+                    </div>
+                    <div class="ca-sidebar-type">
+                        <span class="ca-sidebar-type-badge ca-sidebar-type-badge--text">Aa</span>
+                        Short & Long Text
+                    </div>
+                    <div class="ca-sidebar-type">
+                        <span class="ca-sidebar-type-badge ca-sidebar-type-badge--video">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                <rect x="1" y="5" width="15" height="14" rx="2"></rect>
+                            </svg>
+                        </span>
+                        Video Response
+                    </div>
+                    <div class="ca-sidebar-type">
+                        <span class="ca-sidebar-type-badge ca-sidebar-type-badge--file">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </span>
+                        File Upload
+                    </div>
+                </div>
+                <p class="ca-sidebar-note">You'll add questions in the next step using AI generation, CSV import, or manual entry.</p>
+            </div>
+        </aside>
     </div>
 
 </div>
