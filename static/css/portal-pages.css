@@ -363,11 +363,12 @@
 .form-select {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid #c4c9d2;
     border-radius: var(--radius-md);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
     transition: all var(--transition-base);
-    background: var(--color-white);
+    background: #f9fafb;
     color: var(--color-navy);
 }
 .form-input:focus,
@@ -376,10 +377,15 @@
     outline: none;
     border-color: var(--color-orange);
     box-shadow: 0 0 0 3px var(--color-orange-light);
+    background: var(--color-white);
+}
+.form-textarea {
+    resize: vertical;
 }
 .form-input::placeholder,
 .form-textarea::placeholder {
     color: #9ca3af;
+    font-weight: 400;
 }
 
 .form-row {
