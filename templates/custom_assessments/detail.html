@@ -415,63 +415,24 @@
             <div class="modal-body">
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                            Candidate Name/ID <span class="required">*</span>
-                        </label>
+                        <label class="form-label">Candidate Name/ID <span class="required">*</span></label>
                         {{ invite_form.candidate_id }}
                     </div>
                     <div class="form-group">
-                        <label class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                            Email <span class="required">*</span>
-                        </label>
+                        <label class="form-label">Email <span class="required">*</span></label>
                         {{ invite_form.candidate_email }}
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 20h.01"></path>
-                            <path d="M7 20v-4"></path>
-                            <path d="M12 20v-8"></path>
-                            <path d="M17 20V8"></path>
-                        </svg>
-                        Assessment Level
-                    </label>
+                    <label class="form-label">Assessment Level</label>
                     <div class="level-options">
                         {% for value, label in invite_form.level.field.choices %}
                         <label class="level-option{% if value == 'mid' %} recommended{% endif %}">
                             <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
                             <div class="level-card">
-                                <div class="level-icon {% if value == 'junior' %}junior{% elif value == 'mid' %}mid{% else %}senior{% endif %}">
-                                    {% if value == 'junior' %}
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                                    </svg>
-                                    {% elif value == 'mid' %}
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                    </svg>
-                                    {% else %}
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                    </svg>
-                                    {% endif %}
-                                </div>
                                 <span class="level-title">{{ label }}</span>
-                                <span class="level-desc">{% if value == 'junior' %}0-2 years exp{% elif value == 'mid' %}2-5 years exp{% else %}5+ years exp{% endif %}</span>
+                                <span class="level-desc">{% if value == 'junior' %}0&ndash;2 years exp{% elif value == 'mid' %}2&ndash;5 years exp{% else %}5+ years exp{% endif %}</span>
                             </div>
                         </label>
                         {% endfor %}
@@ -480,27 +441,12 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg>
-                            Deadline (Optional)
-                        </label>
+                        <label class="form-label">Deadline (Optional)</label>
                         {{ invite_form.deadline_at }}
-                        <span class="form-hint">Set a deadline for completion</span>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            Project (Optional)
-                        </label>
+                        <label class="form-label">Project (Optional)</label>
                         {{ invite_form.project }}
-                        <span class="form-hint">Associate with a project</span>
                     </div>
                 </div>
             </div>
@@ -594,41 +540,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 20h.01"></path>
-                            <path d="M7 20v-4"></path>
-                            <path d="M12 20v-8"></path>
-                            <path d="M17 20V8"></path>
-                        </svg>
-                        Assessment Level
-                    </label>
+                    <label class="form-label">Assessment Level</label>
                     <div class="level-options">
                         {% for value, label in bulk_invite_form.level.field.choices %}
                         <label class="level-option{% if value == 'mid' %} recommended{% endif %}">
                             <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
                             <div class="level-card">
-                                <div class="level-icon {% if value == 'junior' %}junior{% elif value == 'mid' %}mid{% else %}senior{% endif %}">
-                                    {% if value == 'junior' %}
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                                    </svg>
-                                    {% elif value == 'mid' %}
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                    </svg>
-                                    {% else %}
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                    </svg>
-                                    {% endif %}
-                                </div>
                                 <span class="level-title">{{ label }}</span>
-                                <span class="level-desc">{% if value == 'junior' %}0-2 years exp{% elif value == 'mid' %}2-5 years exp{% else %}5+ years exp{% endif %}</span>
+                                <span class="level-desc">{% if value == 'junior' %}0&ndash;2 years exp{% elif value == 'mid' %}2&ndash;5 years exp{% else %}5+ years exp{% endif %}</span>
                             </div>
                         </label>
                         {% endfor %}
@@ -636,17 +555,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        Deadline (Optional)
-                    </label>
+                    <label class="form-label">Deadline (Optional)</label>
                     {{ bulk_invite_form.deadline_at }}
-                    <span class="form-hint">All candidates will share the same deadline</span>
                 </div>
             </div>
             <div class="modal-footer">
