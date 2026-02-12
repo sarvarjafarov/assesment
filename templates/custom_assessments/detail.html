@@ -5,9 +5,9 @@
 {% block meta_description %}View results and manage your custom assessment{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="dashboard-page-header">
-        <div>
-            <a href="{% url 'custom_assessments:list' %}" class="back-link">
+    <header class="ca-header">
+        <div class="ca-header-left">
+            <a href="{% url 'custom_assessments:list' %}" class="ca-back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -15,12 +15,26 @@
                 Back to Assessments
             </a>
             <h1>{{ assessment.name }}</h1>
-            <p class="muted">
-                <span class="status-badge status-{{ assessment.status }}">{{ assessment.get_status_display }}</span>
-                · {{ assessment.question_count }} questions · {{ assessment.time_limit_minutes }} min
-            </p>
+            <div class="ca-header-meta">
+                <span class="ca-status ca-status--{{ assessment.status }}">{{ assessment.get_status_display }}</span>
+                <span class="ca-meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {{ assessment.question_count }} questions
+                </span>
+                <span class="ca-meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    {{ assessment.time_limit_minutes }} min
+                </span>
+            </div>
         </div>
-        <div class="header-actions">
+        <div class="ca-header-actions">
             {% if assessment.status == 'published' %}
             <button class="btn btn-outline" onclick="openModal('bulk-invite-modal')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -49,136 +63,134 @@
     </header>
 
     {# Analytics Dashboard #}
-    <div class="analytics-dashboard">
-        <div class="analytics-row">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="ca-analytics">
+        <div class="ca-stats-strip">
+            <article class="ca-stat">
+                <div class="ca-stat-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value">{{ analytics.total_invited }}</div>
-                    <div class="stat-label">Total Invited</div>
+                <div class="ca-stat-body">
+                    <span class="ca-stat-value">{{ analytics.total_invited }}</span>
+                    <span class="ca-stat-label">Total Invited</span>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon completed">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            </article>
+            <article class="ca-stat">
+                <div class="ca-stat-icon ca-stat-icon--green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value">{{ analytics.completed }}</div>
-                    <div class="stat-label">Completed</div>
+                <div class="ca-stat-body">
+                    <span class="ca-stat-value">{{ analytics.completed }}</span>
+                    <span class="ca-stat-label">Completed</span>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon progress">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            </article>
+            <article class="ca-stat">
+                <div class="ca-stat-icon ca-stat-icon--blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value">{{ analytics.in_progress }}</div>
-                    <div class="stat-label">In Progress</div>
+                <div class="ca-stat-body">
+                    <span class="ca-stat-value">{{ analytics.in_progress }}</span>
+                    <span class="ca-stat-label">In Progress</span>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            </article>
+            <article class="ca-stat">
+                <div class="ca-stat-icon ca-stat-icon--gray">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value">{{ analytics.not_started }}</div>
-                    <div class="stat-label">Not Started</div>
+                <div class="ca-stat-body">
+                    <span class="ca-stat-value">{{ analytics.not_started }}</span>
+                    <span class="ca-stat-label">Not Started</span>
                 </div>
-            </div>
+            </article>
         </div>
 
         {% if analytics.completed > 0 %}
-        <div class="analytics-row metrics-row">
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-label">Completion Rate</span>
-                    <span class="metric-value {% if analytics.completion_rate >= 70 %}good{% elif analytics.completion_rate >= 40 %}moderate{% else %}low{% endif %}">{{ analytics.completion_rate }}%</span>
+        <div class="ca-perf">
+            <div class="ca-perf-bar-card">
+                <div class="ca-perf-bar-head">
+                    <span class="ca-perf-bar-label">Completion Rate</span>
+                    <span class="ca-perf-bar-value {% if analytics.completion_rate >= 70 %}ca-perf--good{% elif analytics.completion_rate >= 40 %}ca-perf--mod{% else %}ca-perf--low{% endif %}">{{ analytics.completion_rate }}%</span>
                 </div>
-                <div class="metric-bar">
-                    <div class="metric-fill" style="width: {{ analytics.completion_rate }}%"></div>
-                </div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-label">Pass Rate</span>
-                    <span class="metric-value {% if analytics.pass_rate >= 70 %}good{% elif analytics.pass_rate >= 40 %}moderate{% else %}low{% endif %}">{{ analytics.pass_rate|default:0 }}%</span>
-                </div>
-                <div class="metric-bar">
-                    <div class="metric-fill pass" style="width: {{ analytics.pass_rate|default:0 }}%"></div>
+                <div class="ca-perf-track">
+                    <div class="ca-perf-fill" style="width: {{ analytics.completion_rate }}%"></div>
                 </div>
             </div>
-            <div class="metric-card score-metrics">
-                <div class="score-item">
-                    <span class="score-label">Avg Score</span>
-                    <span class="score-value">{{ analytics.avg_score|default:"—" }}%</span>
+            <div class="ca-perf-bar-card">
+                <div class="ca-perf-bar-head">
+                    <span class="ca-perf-bar-label">Pass Rate</span>
+                    <span class="ca-perf-bar-value {% if analytics.pass_rate >= 70 %}ca-perf--good{% elif analytics.pass_rate >= 40 %}ca-perf--mod{% else %}ca-perf--low{% endif %}">{{ analytics.pass_rate|default:0 }}%</span>
                 </div>
-                <div class="score-item">
-                    <span class="score-label">High</span>
-                    <span class="score-value good">{{ analytics.highest_score|default:"—" }}%</span>
+                <div class="ca-perf-track">
+                    <div class="ca-perf-fill ca-perf-fill--green" style="width: {{ analytics.pass_rate|default:0 }}%"></div>
                 </div>
-                <div class="score-item">
-                    <span class="score-label">Low</span>
-                    <span class="score-value low">{{ analytics.lowest_score|default:"—" }}%</span>
+            </div>
+            <div class="ca-perf-scores">
+                <div class="ca-score-item">
+                    <span class="ca-score-num">{{ analytics.avg_score|default:"—" }}%</span>
+                    <span class="ca-score-lbl">Avg Score</span>
+                </div>
+                <div class="ca-score-item">
+                    <span class="ca-score-num ca-perf--good">{{ analytics.highest_score|default:"—" }}%</span>
+                    <span class="ca-score-lbl">Highest</span>
+                </div>
+                <div class="ca-score-item">
+                    <span class="ca-score-num ca-perf--low">{{ analytics.lowest_score|default:"—" }}%</span>
+                    <span class="ca-score-lbl">Lowest</span>
                 </div>
             </div>
             {% if analytics.avg_time_minutes %}
-            <div class="metric-card time-metric">
-                <div class="time-icon">
+            <div class="ca-perf-time">
+                <div class="ca-perf-time-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                 </div>
-                <div class="time-content">
-                    <span class="time-value">{{ analytics.avg_time_minutes }} min</span>
-                    <span class="time-label">Avg. Time</span>
+                <div>
+                    <span class="ca-perf-time-val">{{ analytics.avg_time_minutes }} min</span>
+                    <span class="ca-perf-time-lbl">Avg. Time</span>
                 </div>
             </div>
             {% endif %}
         </div>
 
-        <div class="analytics-row level-breakdown">
-            <div class="level-chart">
-                <h4>Level Distribution</h4>
-                <div class="level-bars">
-                    <div class="level-bar-item">
-                        <span class="level-name">Junior</span>
-                        <div class="level-bar-bg">
-                            <div class="level-bar-fill junior" style="width: {% widthratio level_stats.junior analytics.total_invited 100 %}%"></div>
-                        </div>
-                        <span class="level-count">{{ level_stats.junior }}</span>
+        <div class="ca-levels">
+            <h4 class="ca-levels-title">Level Distribution</h4>
+            <div class="ca-levels-bars">
+                <div class="ca-level-row">
+                    <span class="ca-level-name">Junior</span>
+                    <div class="ca-level-track">
+                        <div class="ca-level-fill ca-level-fill--junior" style="width: {% widthratio level_stats.junior analytics.total_invited 100 %}%"></div>
                     </div>
-                    <div class="level-bar-item">
-                        <span class="level-name">Mid</span>
-                        <div class="level-bar-bg">
-                            <div class="level-bar-fill mid" style="width: {% widthratio level_stats.mid analytics.total_invited 100 %}%"></div>
-                        </div>
-                        <span class="level-count">{{ level_stats.mid }}</span>
+                    <span class="ca-level-count">{{ level_stats.junior }}</span>
+                </div>
+                <div class="ca-level-row">
+                    <span class="ca-level-name">Mid</span>
+                    <div class="ca-level-track">
+                        <div class="ca-level-fill ca-level-fill--mid" style="width: {% widthratio level_stats.mid analytics.total_invited 100 %}%"></div>
                     </div>
-                    <div class="level-bar-item">
-                        <span class="level-name">Senior</span>
-                        <div class="level-bar-bg">
-                            <div class="level-bar-fill senior" style="width: {% widthratio level_stats.senior analytics.total_invited 100 %}%"></div>
-                        </div>
-                        <span class="level-count">{{ level_stats.senior }}</span>
+                    <span class="ca-level-count">{{ level_stats.mid }}</span>
+                </div>
+                <div class="ca-level-row">
+                    <span class="ca-level-name">Senior</span>
+                    <div class="ca-level-track">
+                        <div class="ca-level-fill ca-level-fill--senior" style="width: {% widthratio level_stats.senior analytics.total_invited 100 %}%"></div>
                     </div>
+                    <span class="ca-level-count">{{ level_stats.senior }}</span>
                 </div>
             </div>
         </div>
@@ -186,128 +198,150 @@
     </div>
 
     {# Candidates Table #}
-    <div class="section-header">
-        <h2>Candidates</h2>
-    </div>
+    <div class="ca-section">
+        <div class="ca-section-head">
+            <div class="ca-section-icon ca-section-icon--blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <div>
+                <h3>Candidates</h3>
+                <p class="muted">{{ sessions|length }} candidate{{ sessions|length|pluralize }}</p>
+            </div>
+        </div>
 
-    {% if sessions %}
-    <div class="table-container">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Candidate</th>
-                    <th>Level</th>
-                    <th>Status</th>
-                    <th>Score</th>
-                    <th>Started</th>
-                    <th>Completed</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for session in sessions %}
-                <tr>
-                    <td>
-                        <div class="candidate-cell">
-                            <strong>{{ session.candidate_id }}</strong>
-                            {% if session.candidate_email %}
-                            <span class="email">{{ session.candidate_email }}</span>
+        {% if sessions %}
+        <div class="ca-table-wrap">
+            <table class="ca-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Level</th>
+                        <th>Status</th>
+                        <th>Score</th>
+                        <th>Started</th>
+                        <th>Completed</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions %}
+                    <tr>
+                        <td>
+                            <div class="ca-candidate">
+                                <strong>{{ session.candidate_id }}</strong>
+                                {% if session.candidate_email %}
+                                <span class="ca-candidate-email">{{ session.candidate_email }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="ca-level-pill ca-level-pill--{{ session.level }}">
+                                {{ session.get_level_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="ca-status-pill ca-status-pill--{{ session.status }}">
+                                {{ session.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if session.score is not None %}
+                            <span class="ca-score {% if session.passed %}ca-score--pass{% else %}ca-score--fail{% endif %}">
+                                {{ session.score|floatformat:0 }}%
+                            </span>
+                            {% else %}
+                            <span class="muted">—</span>
                             {% endif %}
-                        </div>
-                    </td>
-                    <td>
-                        <span class="level-badge level-{{ session.level }}">
-                            {{ session.get_level_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="status-pill status-{{ session.status }}">
-                            {{ session.get_status_display }}
-                        </span>
-                    </td>
-                    <td>
-                        {% if session.score is not None %}
-                        <span class="score {% if session.passed %}passed{% else %}failed{% endif %}">
-                            {{ session.score|floatformat:0 }}%
-                        </span>
-                        {% else %}
-                        <span class="muted">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if session.started_at %}
-                        {{ session.started_at|date:"M j, g:i A" }}
-                        {% else %}
-                        <span class="muted">Not started</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if session.completed_at %}
-                        {{ session.completed_at|date:"M j, g:i A" }}
-                        {% else %}
-                        <span class="muted">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if session.status == 'submitted' %}
-                        <a href="{% url 'custom_assessments:session-result' session.uuid %}" class="btn btn-outline btn-small">
-                            View Results
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                        </td>
+                        <td>
+                            {% if session.started_at %}
+                            {{ session.started_at|date:"M j, g:i A" }}
+                            {% else %}
+                            <span class="muted">Not started</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if session.completed_at %}
+                            {{ session.completed_at|date:"M j, g:i A" }}
+                            {% else %}
+                            <span class="muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if session.status == 'submitted' %}
+                            <a href="{% url 'custom_assessments:session-result' session.uuid %}" class="ca-btn ca-btn--primary">
+                                View Results
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    {# Pagination Controls #}
-    {% if page_obj.has_other_pages %}
-    <nav class="pagination-nav" aria-label="Candidates pagination">
-        <div class="pagination">
+        {# Pagination Controls #}
+        {% if page_obj.has_other_pages %}
+        <nav class="ca-pagination" aria-label="Candidates pagination">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">&laquo; Previous</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="ca-page-btn">&laquo; Previous</a>
             {% else %}
-            <span class="pagination-btn disabled">&laquo; Previous</span>
+            <span class="ca-page-btn ca-page-btn--disabled">&laquo; Previous</span>
             {% endif %}
 
-            <span class="pagination-info">
+            <span class="ca-page-info">
                 Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
             </span>
 
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">Next &raquo;</a>
+            <a href="?page={{ page_obj.next_page_number }}" class="ca-page-btn">Next &raquo;</a>
             {% else %}
-            <span class="pagination-btn disabled">Next &raquo;</span>
+            <span class="ca-page-btn ca-page-btn--disabled">Next &raquo;</span>
+            {% endif %}
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="ca-empty">
+            <div class="ca-empty-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <line x1="17" y1="11" x2="23" y2="11"></line>
+                </svg>
+            </div>
+            <h3>No Candidates Yet</h3>
+            <p class="muted">Invite candidates to take this assessment</p>
+            {% if assessment.status == 'published' %}
+            <button class="btn btn-primary" onclick="openModal('invite-modal')" style="margin-top: 1rem;">
+                Invite Candidate
+            </button>
             {% endif %}
         </div>
-    </nav>
-    {% endif %}
-    {% else %}
-    <div class="empty-state">
-        <div class="empty-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <line x1="17" y1="11" x2="23" y2="11"></line>
-            </svg>
-        </div>
-        <h3>No Candidates Yet</h3>
-        <p>Invite candidates to take this assessment</p>
-        {% if assessment.status == 'published' %}
-        <button class="btn btn-primary" onclick="openModal('invite-modal')">
-            Invite Candidate
-        </button>
         {% endif %}
     </div>
-    {% endif %}
 
     {# Assessment Actions #}
-    <div class="assessment-actions">
-        <h3>Assessment Actions</h3>
-        <div class="action-buttons">
+    <div class="ca-section" style="margin-top: 1.5rem;">
+        <div class="ca-section-head">
+            <div class="ca-section-icon ca-section-icon--orange">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </div>
+            <div>
+                <h3>Assessment Actions</h3>
+                <p class="muted">Manage, export, or duplicate this assessment</p>
+            </div>
+        </div>
+        <div class="ca-actions-row">
             {% if assessment.status == 'draft' %}
-            <a href="{% url 'custom_assessments:edit' assessment.uuid %}" class="btn btn-outline">
+            <a href="{% url 'custom_assessments:edit' assessment.uuid %}" class="ca-action-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -316,7 +350,7 @@
             </a>
             {% endif %}
 
-            <a href="{% url 'custom_assessments:export-questions' assessment.uuid %}" class="btn btn-outline">
+            <a href="{% url 'custom_assessments:export-questions' assessment.uuid %}" class="ca-action-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -327,7 +361,7 @@
 
             <form method="post" action="{% url 'custom_assessments:duplicate' assessment.uuid %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline">
+                <button type="submit" class="ca-action-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -339,7 +373,7 @@
             {% if assessment.status != 'archived' %}
             <form method="post" action="{% url 'custom_assessments:archive' assessment.uuid %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline btn-danger" onclick="return confirm('Archive this assessment? It will no longer be available for new candidates.')">
+                <button type="submit" class="ca-action-btn ca-action-btn--danger" onclick="return confirm('Archive this assessment? It will no longer be available for new candidates.')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="21 8 21 21 3 21 3 8"></polyline>
                         <rect x="1" y="3" width="22" height="5"></rect>

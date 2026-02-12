@@ -4,9 +4,9 @@
 {% block meta_description %}Add and manage questions for your custom assessment{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="dashboard-page-header">
-        <div>
-            <a href="{% url 'custom_assessments:list' %}" class="back-link">
+    <header class="ca-header">
+        <div class="ca-header-left">
+            <a href="{% url 'custom_assessments:list' %}" class="ca-back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -14,9 +14,18 @@
                 Back to Assessments
             </a>
             <h1>{{ assessment.name }}</h1>
-            <p class="muted">{{ questions|length }} question{{ questions|length|pluralize }}</p>
+            <div class="ca-header-meta">
+                <span class="ca-meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {{ questions|length }} question{{ questions|length|pluralize }}
+                </span>
+            </div>
         </div>
-        <div class="header-actions">
+        <div class="ca-header-actions">
             {% if questions %}
             <a href="{% url 'custom_assessments:preview' assessment.uuid %}" class="btn btn-outline" target="_blank">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -43,23 +52,23 @@
 
     {% if assessment.status == 'draft' %}
     {# Import Options #}
-    <div class="import-options">
-        <div class="import-card" onclick="openModal('ai-modal')">
-            <div class="import-icon ai-icon">
+    <div class="ca-import-options">
+        <div class="ca-import-card" onclick="openModal('ai-modal')">
+            <div class="ca-import-icon ca-import-icon--ai">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                     <path d="M2 17l10 5 10-5"></path>
                     <path d="M2 12l10 5 10-5"></path>
                 </svg>
             </div>
-            <div class="import-content">
+            <div class="ca-import-content">
                 <h3>Generate with AI</h3>
                 <p>Describe your requirements and let AI create relevant questions</p>
             </div>
         </div>
 
-        <div class="import-card" onclick="openModal('csv-modal')">
-            <div class="import-icon csv-icon">
+        <div class="ca-import-card" onclick="openModal('csv-modal')">
+            <div class="ca-import-icon ca-import-icon--csv">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -67,20 +76,20 @@
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                 </svg>
             </div>
-            <div class="import-content">
+            <div class="ca-import-content">
                 <h3>Upload CSV</h3>
                 <p>Import questions from a spreadsheet file</p>
             </div>
         </div>
 
-        <div class="import-card" onclick="openModal('manual-modal')">
-            <div class="import-icon manual-icon">
+        <div class="ca-import-card" onclick="openModal('manual-modal')">
+            <div class="ca-import-icon ca-import-icon--manual">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
             </div>
-            <div class="import-content">
+            <div class="ca-import-content">
                 <h3>Add Manually</h3>
                 <p>Create questions one at a time</p>
             </div>
@@ -90,12 +99,12 @@
 
     {# Questions List #}
     {% if questions %}
-    <div class="questions-list">
+    <div class="ca-questions">
         {% for question in questions %}
-        <div class="question-card">
-            <div class="question-header">
-                <span class="question-number">Q{{ question.order }}</span>
-                <span class="question-type-tag type-{{ question.question_type }}">
+        <div class="ca-question">
+            <div class="ca-question-head">
+                <span class="ca-q-num">Q{{ question.order }}</span>
+                <span class="ca-q-type ca-q-type--{{ question.question_type }}">
                     {% if question.question_type == 'multiple_choice' %}Multiple Choice
                     {% elif question.question_type == 'text_short' %}Short Text
                     {% elif question.question_type == 'text_long' %}Essay
@@ -104,47 +113,47 @@
                     {% else %}Multiple Choice{% endif %}
                 </span>
                 {% if question.ai_generated %}
-                <span class="ai-tag">AI Generated</span>
+                <span class="ca-q-ai">AI Generated</span>
                 {% endif %}
                 {% if question.category %}
-                <span class="category-tag">{{ question.category }}</span>
+                <span class="ca-q-cat">{{ question.category }}</span>
                 {% endif %}
-                <span class="difficulty-tag difficulty-{{ question.difficulty_level }}">
+                <span class="ca-q-diff ca-q-diff--{{ question.difficulty_level }}">
                     Difficulty {{ question.difficulty_level }}
                 </span>
                 {% if question.points > 1 %}
-                <span class="points-tag">{{ question.points }} pts</span>
+                <span class="ca-q-pts">{{ question.points }} pts</span>
                 {% endif %}
             </div>
 
-            <p class="question-text">{{ question.question_text }}</p>
+            <p class="ca-q-text">{{ question.question_text }}</p>
 
             {% if question.question_type == 'multiple_choice' %}
-            <div class="options-list">
-                <div class="option {% if question.correct_answer == 'A' %}correct{% endif %}">
-                    <span class="option-letter">A</span>
+            <div class="ca-options">
+                <div class="ca-opt {% if question.correct_answer == 'A' %}ca-opt--correct{% endif %}">
+                    <span class="ca-opt-letter">A</span>
                     <span>{{ question.option_a }}</span>
                 </div>
-                <div class="option {% if question.correct_answer == 'B' %}correct{% endif %}">
-                    <span class="option-letter">B</span>
+                <div class="ca-opt {% if question.correct_answer == 'B' %}ca-opt--correct{% endif %}">
+                    <span class="ca-opt-letter">B</span>
                     <span>{{ question.option_b }}</span>
                 </div>
                 {% if question.option_c %}
-                <div class="option {% if question.correct_answer == 'C' %}correct{% endif %}">
-                    <span class="option-letter">C</span>
+                <div class="ca-opt {% if question.correct_answer == 'C' %}ca-opt--correct{% endif %}">
+                    <span class="ca-opt-letter">C</span>
                     <span>{{ question.option_c }}</span>
                 </div>
                 {% endif %}
                 {% if question.option_d %}
-                <div class="option {% if question.correct_answer == 'D' %}correct{% endif %}">
-                    <span class="option-letter">D</span>
+                <div class="ca-opt {% if question.correct_answer == 'D' %}ca-opt--correct{% endif %}">
+                    <span class="ca-opt-letter">D</span>
                     <span>{{ question.option_d }}</span>
                 </div>
                 {% endif %}
             </div>
             {% elif question.question_type == 'text_short' or question.question_type == 'text_long' %}
-            <div class="question-settings">
-                <span class="setting-item">
+            <div class="ca-q-settings">
+                <span class="ca-q-setting">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="17" y1="10" x2="3" y2="10"></line>
                         <line x1="21" y1="6" x2="3" y2="6"></line>
@@ -152,12 +161,12 @@
                     {{ question.text_min_length }}-{{ question.text_max_length }} characters
                 </span>
                 {% if question.text_ideal_answer %}
-                <span class="setting-item has-reference">Has reference answer</span>
+                <span class="ca-q-setting ca-q-setting--ref">Has reference answer</span>
                 {% endif %}
             </div>
             {% elif question.question_type == 'video' %}
-            <div class="question-settings">
-                <span class="setting-item">
+            <div class="ca-q-settings">
+                <span class="ca-q-setting">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="23 7 16 12 23 17 23 7"></polygon>
                         <rect x="1" y="5" width="15" height="14" rx="2"></rect>
@@ -166,8 +175,8 @@
                 </span>
             </div>
             {% elif question.question_type == 'file_upload' %}
-            <div class="question-settings">
-                <span class="setting-item">
+            <div class="ca-q-settings">
+                <span class="ca-q-setting">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
@@ -178,14 +187,14 @@
             {% endif %}
 
             {% if question.explanation %}
-            <div class="explanation">
+            <div class="ca-explanation">
                 <strong>{% if question.question_type == 'multiple_choice' %}Explanation{% else %}Grading Guide{% endif %}:</strong> {{ question.explanation }}
             </div>
             {% endif %}
 
             {% if assessment.status == 'draft' %}
-            <div class="question-actions">
-                <button class="btn-icon" onclick="editQuestion({{ question.pk }})" title="Edit">
+            <div class="ca-question-actions">
+                <button class="ca-icon-btn" onclick="editQuestion({{ question.pk }})" title="Edit">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -193,7 +202,7 @@
                 </button>
                 <form method="post" action="{% url 'custom_assessments:question-delete' assessment.uuid question.pk %}" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" class="btn-icon delete" onclick="return confirm('Delete this question?')" title="Delete">
+                    <button type="submit" class="ca-icon-btn ca-icon-btn--danger" onclick="return confirm('Delete this question?')" title="Delete">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -206,8 +215,8 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="empty-state">
-        <div class="empty-icon">
+    <div class="ca-empty">
+        <div class="ca-empty-icon">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -215,7 +224,7 @@
             </svg>
         </div>
         <h3>No Questions Yet</h3>
-        <p>Add questions using AI generation, CSV upload, or manually create them one by one.</p>
+        <p class="muted">Add questions using AI generation, CSV upload, or manually create them one by one.</p>
     </div>
     {% endif %}
 </div>
@@ -735,7 +744,6 @@
 <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 10000;"></div>
 
 <script>
-// Toast notification function
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -758,7 +766,6 @@ function showToast(message, type = 'info') {
     }, 5000);
 }
 
-// Check for Django messages on page load
 {% if messages %}
 {% for message in messages %}
 showToast('{{ message|escapejs }}', '{{ message.tags }}');
@@ -775,7 +782,6 @@ function closeModal(id) {
     document.body.style.overflow = '';
 }
 
-// Close modal on backdrop click
 document.querySelectorAll('.modal').forEach(modal => {
     modal.addEventListener('click', function(e) {
         if (e.target === this) {
@@ -785,7 +791,6 @@ document.querySelectorAll('.modal').forEach(modal => {
     });
 });
 
-// Close on Escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal.active').forEach(modal => {
@@ -795,7 +800,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Number input adjustment
 function adjustNumber(inputId, delta) {
     const input = document.getElementById(inputId);
     let value = parseInt(input.value) + delta;
@@ -803,7 +807,6 @@ function adjustNumber(inputId, delta) {
     input.value = value;
 }
 
-// File upload handling
 const fileInput = document.getElementById('csv-file');
 const uploadZone = document.getElementById('upload-zone');
 const fileSelected = document.getElementById('file-selected');
@@ -849,44 +852,28 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// AI Generate form handling
 const aiForm = document.querySelector('#ai-modal form');
 if (aiForm) {
-    console.log('AI form found, attaching submit handler');
     aiForm.addEventListener('submit', function(e) {
-        console.log('AI form submit triggered');
-
-        // Show toast notification
         showToast('Generating questions with AI... This may take 30-60 seconds.', 'info');
-
         try {
             const btn = document.getElementById('ai-generate-btn');
             if (btn) {
                 const defaultIcon = btn.querySelector('.btn-icon-default');
                 const loadingIcon = btn.querySelector('.btn-icon-loading');
                 const btnText = btn.querySelector('.btn-text');
-
-                // Show loading state
                 btn.disabled = true;
                 if (defaultIcon) defaultIcon.style.display = 'none';
                 if (loadingIcon) loadingIcon.style.display = 'inline';
                 if (btnText) btnText.textContent = 'Generating... (this may take 30-60 seconds)';
             }
         } catch (err) {
-            console.error('Error in submit handler:', err);
             showToast('Error: ' + err.message, 'error');
-            // Don't prevent form submission even if there's an error
         }
-        // Form will submit naturally - no preventDefault()
-        console.log('Form submitting to:', this.action);
     });
-} else {
-    console.warn('AI form not found in DOM');
 }
 
-// Edit question functionality
 function editQuestion(questionId) {
-    // Get questions data from JSON
     const questionsDataEl = document.getElementById('questions-data');
     if (!questionsDataEl) return;
 
@@ -894,18 +881,12 @@ function editQuestion(questionId) {
     try {
         questions = JSON.parse(questionsDataEl.textContent);
     } catch (e) {
-        console.error('Failed to parse questions data:', e);
         return;
     }
 
-    // Find the question
     const question = questions.find(q => q.id === questionId);
-    if (!question) {
-        console.error('Question not found:', questionId);
-        return;
-    }
+    if (!question) return;
 
-    // Populate the edit form
     document.getElementById('edit-question-text').value = question.question_text;
     document.getElementById('edit-option-a').value = question.option_a;
     document.getElementById('edit-option-b').value = question.option_b;
@@ -915,18 +896,13 @@ function editQuestion(questionId) {
     document.getElementById('edit-category').value = question.category || '';
     document.getElementById('edit-explanation').value = question.explanation || '';
 
-    // Set the correct answer radio
     const correctRadio = document.getElementById('edit-correct-' + question.correct_answer.toLowerCase());
-    if (correctRadio) {
-        correctRadio.checked = true;
-    }
+    if (correctRadio) correctRadio.checked = true;
 
-    // Update form action
     const form = document.getElementById('edit-question-form');
     const baseUrl = '{% url "custom_assessments:question-edit" assessment.uuid 0 %}'.replace('/0/', '/' + questionId + '/');
     form.action = baseUrl;
 
-    // Open the modal
     openModal('edit-modal');
 }
 </script>

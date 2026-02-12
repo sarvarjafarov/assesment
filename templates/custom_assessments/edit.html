@@ -4,9 +4,9 @@
 {% block meta_description %}Edit your custom assessment settings{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="dashboard-page-header">
-        <div>
-            <a href="{% url 'custom_assessments:detail' assessment.uuid %}" class="back-link">
+    <header class="ca-header">
+        <div class="ca-header-left">
+            <a href="{% url 'custom_assessments:detail' assessment.uuid %}" class="ca-back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -18,126 +18,167 @@
         </div>
     </header>
 
-    <div class="form-container">
-        <form method="post" class="assessment-form">
+    {# Steps Indicator #}
+    <div class="ca-steps">
+        <div class="ca-step">
+            <span class="ca-step-num ca-step-num--done">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </span>
+            <span class="ca-step-label">Details & Settings</span>
+        </div>
+        <span class="ca-step-line"></span>
+        <div class="ca-step">
+            <span class="ca-step-num">2</span>
+            <span class="ca-step-label">Add Questions</span>
+        </div>
+        <span class="ca-step-line"></span>
+        <div class="ca-step">
+            <span class="ca-step-num">3</span>
+            <span class="ca-step-label">Publish</span>
+        </div>
+    </div>
+
+    <div class="ca-form-wrap">
+        <form method="post">
             {% csrf_token %}
 
-            <div class="form-card">
-                <div class="form-section">
-                    <h3>Basic Information</h3>
-                    <p class="section-desc">Set the name and description for your assessment</p>
-
-                    <div class="form-group">
-                        <label for="id_name">Assessment Name <span class="required">*</span></label>
-                        {{ form.name }}
-                        {% if form.name.errors %}
-                        <span class="field-error">{{ form.name.errors.0 }}</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_description">Description</label>
-                        {{ form.description }}
-                        <span class="form-hint">This will be shown to candidates before they start</span>
-                        {% if form.description.errors %}
-                        <span class="field-error">{{ form.description.errors.0 }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h3>Assessment Settings</h3>
-                    <p class="section-desc">Configure time limit and passing criteria</p>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="id_time_limit_minutes">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                                Time Limit (minutes) <span class="required">*</span>
-                            </label>
-                            {{ form.time_limit_minutes }}
-                            <span class="form-hint">How long candidates have to complete the assessment</span>
-                            {% if form.time_limit_minutes.errors %}
-                            <span class="field-error">{{ form.time_limit_minutes.errors.0 }}</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <label for="id_passing_score">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                </svg>
-                                Passing Score (%) <span class="required">*</span>
-                            </label>
-                            {{ form.passing_score }}
-                            <span class="form-hint">Minimum percentage to pass</span>
-                            {% if form.passing_score.errors %}
-                            <span class="field-error">{{ form.passing_score.errors.0 }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h3>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px; color: var(--orange);">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            {# Section 1: Basic Information #}
+            <div class="ca-form-section">
+                <div class="ca-form-section-head">
+                    <div class="ca-section-icon ca-section-icon--blue">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
                         </svg>
-                        Anti-Cheating Protection
-                    </h3>
-                    <p class="section-desc">Configure security measures to maintain assessment integrity</p>
-
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            {{ form.detect_tab_switches }}
-                            <span class="checkbox-text">
-                                <strong>Detect Tab Switching</strong>
-                                <span class="checkbox-hint">Track when candidates switch to other tabs or windows</span>
-                            </span>
-                        </label>
                     </div>
-
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            {{ form.prevent_copy_paste }}
-                            <span class="checkbox-text">
-                                <strong>Prevent Copy/Paste</strong>
-                                <span class="checkbox-hint">Disable copying question text and right-click menu</span>
-                            </span>
-                        </label>
+                    <div>
+                        <h3>Assessment Details</h3>
+                        <p class="muted">Set the name and description for your assessment</p>
                     </div>
+                </div>
 
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            {{ form.require_fullscreen }}
-                            <span class="checkbox-text">
-                                <strong>Require Fullscreen Mode</strong>
-                                <span class="checkbox-hint">Force candidates to use fullscreen during the assessment</span>
-                            </span>
-                        </label>
+                <div class="ca-field">
+                    <label for="id_name">Assessment Name <span class="ca-req">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <span class="ca-field-error">{{ form.name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="ca-field">
+                    <label for="id_description">Description</label>
+                    {{ form.description }}
+                    <span class="ca-field-hint">This will be shown to candidates before they start</span>
+                    {% if form.description.errors %}
+                    <span class="ca-field-error">{{ form.description.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Section 2: Settings #}
+            <div class="ca-form-section">
+                <div class="ca-form-section-head">
+                    <div class="ca-section-icon ca-section-icon--orange">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
                     </div>
+                    <div>
+                        <h3>Assessment Settings</h3>
+                        <p class="muted">Configure time limit and passing criteria</p>
+                    </div>
+                </div>
 
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label for="id_max_tab_switches">
+                <div class="ca-field-row">
+                    <div class="ca-field">
+                        <label for="id_time_limit_minutes">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                                <line x1="12" y1="9" x2="12" y2="13"></line>
-                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
-                            Max Tab Switches Before Flagging
+                            Time Limit (minutes) <span class="ca-req">*</span>
                         </label>
-                        {{ form.max_tab_switches }}
-                        <span class="form-hint">Flag candidate for review after this many tab switches (0 = no limit)</span>
+                        {{ form.time_limit_minutes }}
+                        <span class="ca-field-hint">How long candidates have to complete the assessment</span>
+                        {% if form.time_limit_minutes.errors %}
+                        <span class="ca-field-error">{{ form.time_limit_minutes.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="ca-field">
+                        <label for="id_passing_score">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            Passing Score (%) <span class="ca-req">*</span>
+                        </label>
+                        {{ form.passing_score }}
+                        <span class="ca-field-hint">Minimum percentage to pass</span>
+                        {% if form.passing_score.errors %}
+                        <span class="ca-field-error">{{ form.passing_score.errors.0 }}</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div class="form-actions">
-                <a href="{% url 'custom_assessments:detail' assessment.uuid %}" class="btn btn-ghost">Cancel</a>
+            {# Section 3: Anti-Cheating #}
+            <div class="ca-form-section">
+                <div class="ca-form-section-head">
+                    <div class="ca-section-icon ca-section-icon--red">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Anti-Cheating Protection</h3>
+                        <p class="muted">Configure security measures to maintain assessment integrity</p>
+                    </div>
+                </div>
+
+                <div class="ca-toggle-group">
+                    <label class="ca-toggle-item">
+                        {{ form.detect_tab_switches }}
+                        <div class="ca-toggle-info">
+                            <span class="ca-toggle-label">Detect Tab Switching</span>
+                            <span class="ca-toggle-hint">Track when candidates switch to other tabs or windows</span>
+                        </div>
+                    </label>
+                    <label class="ca-toggle-item">
+                        {{ form.prevent_copy_paste }}
+                        <div class="ca-toggle-info">
+                            <span class="ca-toggle-label">Prevent Copy/Paste</span>
+                            <span class="ca-toggle-hint">Disable copying question text and right-click menu</span>
+                        </div>
+                    </label>
+                    <label class="ca-toggle-item">
+                        {{ form.require_fullscreen }}
+                        <div class="ca-toggle-info">
+                            <span class="ca-toggle-label">Require Fullscreen Mode</span>
+                            <span class="ca-toggle-hint">Force candidates to use fullscreen during the assessment</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="ca-field" style="margin-top: 1.25rem;">
+                    <label for="id_max_tab_switches">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Max Tab Switches Before Flagging
+                    </label>
+                    {{ form.max_tab_switches }}
+                    <span class="ca-field-hint">Flag candidate for review after this many tab switches (0 = no limit)</span>
+                </div>
+            </div>
+
+            <div class="ca-form-actions">
+                <a href="{% url 'custom_assessments:detail' assessment.uuid %}" class="btn btn-outline">Cancel</a>
                 <button type="submit" class="btn btn-primary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>

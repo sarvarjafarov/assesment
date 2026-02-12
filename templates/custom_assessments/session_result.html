@@ -5,9 +5,9 @@
 {% block meta_description %}View detailed assessment results{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="dashboard-page-header">
-        <div>
-            <a href="{% url 'custom_assessments:detail' session.assessment.uuid %}" class="back-link">
+    <header class="ca-header">
+        <div class="ca-header-left">
+            <a href="{% url 'custom_assessments:detail' session.assessment.uuid %}" class="ca-back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -15,19 +15,19 @@
                 Back to {{ session.assessment.name }}
             </a>
             <h1>{{ session.candidate_id }}</h1>
-            <p class="muted">
-                {{ session.candidate_email }}
+            <div class="ca-header-meta">
+                <span class="ca-meta-item">{{ session.candidate_email }}</span>
                 {% if session.level %}
-                · <span class="level-badge level-{{ session.level }}">{{ session.get_level_display }}</span>
+                <span class="ca-level-pill ca-level-pill--{{ session.level }}">{{ session.get_level_display }}</span>
                 {% endif %}
-            </p>
+            </div>
         </div>
     </header>
 
     {# Results Summary #}
-    <div class="results-summary">
-        <div class="score-card {% if session.passed %}passed{% else %}failed{% endif %}">
-            <div class="score-circle">
+    <div class="ca-result-summary">
+        <div class="ca-result-score {% if session.passed %}ca-result-score--pass{% else %}ca-result-score--fail{% endif %}">
+            <div class="ca-score-circle">
                 <svg viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="8"/>
                     <circle cx="50" cy="50" r="45" fill="none"
@@ -37,18 +37,18 @@
                             stroke-linecap="round"
                             transform="rotate(-90 50 50)"/>
                 </svg>
-                <div class="score-value">{{ session.score|floatformat:0 }}%</div>
+                <div class="ca-score-circle-val">{{ session.score|floatformat:0 }}%</div>
             </div>
-            <div class="score-details">
-                <div class="pass-fail-badge {% if session.passed %}passed{% else %}failed{% endif %}">
+            <div class="ca-result-detail">
+                <div class="ca-pass-badge {% if session.passed %}ca-pass-badge--pass{% else %}ca-pass-badge--fail{% endif %}">
                     {% if session.passed %}
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
                     Passed
                     {% else %}
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="15" y1="9" x2="9" y2="15"></line>
                         <line x1="9" y1="9" x2="15" y2="15"></line>
@@ -56,7 +56,7 @@
                     Did Not Pass
                     {% endif %}
                 </div>
-                <p class="score-context">
+                <p class="ca-result-context">
                     {{ correct_count }} of {{ total_count }} questions correct
                     <br>
                     <span class="muted">Passing score: {{ session.assessment.passing_score }}%</span>
@@ -64,29 +64,28 @@
             </div>
         </div>
 
-        <div class="stats-row">
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="ca-result-stats">
+            <div class="ca-result-stat">
+                <div class="ca-result-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                 </div>
                 <div>
-                    <div class="stat-value">
+                    <span class="ca-result-stat-val">
                         {% if session.started_at and session.completed_at %}
-                            {% widthratio session.completed_at|timeuntil:session.started_at 60 1 as duration %}
                             {{ session.completed_at|timeuntil:session.started_at }}
                         {% else %}
                             —
                         {% endif %}
-                    </div>
-                    <div class="stat-label">Time Taken</div>
+                    </span>
+                    <span class="ca-result-stat-lbl">Time Taken</span>
                 </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="ca-result-stat">
+                <div class="ca-result-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -94,13 +93,13 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="stat-value">{{ session.completed_at|date:"M j, Y" }}</div>
-                    <div class="stat-label">Completed</div>
+                    <span class="ca-result-stat-val">{{ session.completed_at|date:"M j, Y" }}</span>
+                    <span class="ca-result-stat-lbl">Completed</span>
                 </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="ca-result-stat">
+                <div class="ca-result-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 20h.01"></path>
                         <path d="M7 20v-4"></path>
                         <path d="M12 20v-8"></path>
@@ -108,23 +107,23 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="stat-value">{{ session.get_level_display }}</div>
-                    <div class="stat-label">Level</div>
+                    <span class="ca-result-stat-val">{{ session.get_level_display }}</span>
+                    <span class="ca-result-stat-lbl">Level</span>
                 </div>
             </div>
         </div>
 
         {# Trust Score & Anti-Cheating Report #}
-        <div class="trust-score-section">
-            <div class="trust-score-header">
+        <div class="ca-trust">
+            <div class="ca-trust-header">
                 <h3>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                     Integrity Report
                 </h3>
                 {% if session.flagged_for_review %}
-                <span class="flag-badge flagged">
+                <span class="ca-flag ca-flag--warn">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                         <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -133,7 +132,7 @@
                     Flagged for Review
                 </span>
                 {% else %}
-                <span class="flag-badge clean">
+                <span class="ca-flag ca-flag--ok">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -143,9 +142,9 @@
                 {% endif %}
             </div>
 
-            <div class="trust-metrics">
-                <div class="trust-score-display {% if session.trust_score >= 80 %}high{% elif session.trust_score >= 50 %}medium{% else %}low{% endif %}">
-                    <div class="trust-score-circle">
+            <div class="ca-trust-body">
+                <div class="ca-trust-score {% if session.trust_score >= 80 %}ca-trust-score--high{% elif session.trust_score >= 50 %}ca-trust-score--med{% else %}ca-trust-score--low{% endif %}">
+                    <div class="ca-trust-circle">
                         <svg viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="6"/>
                             <circle cx="50" cy="50" r="40" fill="none"
@@ -155,61 +154,53 @@
                                     stroke-linecap="round"
                                     transform="rotate(-90 50 50)"/>
                         </svg>
-                        <span class="trust-value">{{ session.trust_score }}</span>
+                        <span class="ca-trust-val">{{ session.trust_score }}</span>
                     </div>
-                    <div class="trust-label">Trust Score</div>
+                    <span class="ca-trust-lbl">Trust Score</span>
                 </div>
 
-                <div class="violation-counts">
-                    <div class="violation-item {% if session.tab_switch_count > 0 %}active{% endif %}">
-                        <div class="violation-icon">
+                <div class="ca-violations">
+                    <div class="ca-violation {% if session.tab_switch_count > 0 %}ca-violation--active{% endif %}">
+                        <div class="ca-violation-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="9" y1="3" x2="9" y2="21"></line>
                             </svg>
                         </div>
-                        <div class="violation-details">
-                            <span class="violation-count">{{ session.tab_switch_count }}</span>
-                            <span class="violation-label">Tab Switches</span>
-                        </div>
+                        <span class="ca-violation-count">{{ session.tab_switch_count }}</span>
+                        <span class="ca-violation-lbl">Tab Switches</span>
                     </div>
-
-                    <div class="violation-item {% if session.copy_attempt_count > 0 %}active{% endif %}">
-                        <div class="violation-icon">
+                    <div class="ca-violation {% if session.copy_attempt_count > 0 %}ca-violation--active{% endif %}">
+                        <div class="ca-violation-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                             </svg>
                         </div>
-                        <div class="violation-details">
-                            <span class="violation-count">{{ session.copy_attempt_count }}</span>
-                            <span class="violation-label">Copy Attempts</span>
-                        </div>
+                        <span class="ca-violation-count">{{ session.copy_attempt_count }}</span>
+                        <span class="ca-violation-lbl">Copy Attempts</span>
                     </div>
-
-                    <div class="violation-item {% if session.fullscreen_exit_count > 0 %}active{% endif %}">
-                        <div class="violation-icon">
+                    <div class="ca-violation {% if session.fullscreen_exit_count > 0 %}ca-violation--active{% endif %}">
+                        <div class="ca-violation-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
                             </svg>
                         </div>
-                        <div class="violation-details">
-                            <span class="violation-count">{{ session.fullscreen_exit_count }}</span>
-                            <span class="violation-label">Fullscreen Exits</span>
-                        </div>
+                        <span class="ca-violation-count">{{ session.fullscreen_exit_count }}</span>
+                        <span class="ca-violation-lbl">Fullscreen Exits</span>
                     </div>
                 </div>
             </div>
 
             {% if session.telemetry_log %}
-            <details class="telemetry-log">
+            <details class="ca-telemetry">
                 <summary>View Activity Log ({{ session.telemetry_log|length }} events)</summary>
-                <div class="log-entries">
+                <div class="ca-telemetry-entries">
                     {% for event in session.telemetry_log %}
-                    <div class="log-entry">
-                        <span class="log-time">{{ event.timestamp|slice:":19" }}</span>
-                        <span class="log-type">{{ event.type }}</span>
-                        <span class="log-question">Q{{ event.question_index|add:1 }}</span>
+                    <div class="ca-telemetry-row">
+                        <span class="ca-telemetry-time">{{ event.timestamp|slice:":19" }}</span>
+                        <span class="ca-telemetry-type">{{ event.type }}</span>
+                        <span class="ca-telemetry-q">Q{{ event.question_index|add:1 }}</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -219,146 +210,155 @@
     </div>
 
     {# Question-by-Question Results #}
-    <div class="section-header">
-        <h2>Question Breakdown</h2>
-    </div>
-
-    <div class="questions-results">
-        {% for result in results %}
-        <div class="result-card {% if result.is_correct %}correct{% elif result.is_correct == False %}incorrect{% else %}pending{% endif %}">
-            <div class="result-header">
-                <span class="question-number">Q{{ forloop.counter }}</span>
-                <span class="question-type-badge type-{{ result.question.question_type }}">
-                    {{ result.question.get_question_type_display }}
-                </span>
-                {% if result.question.question_type == 'multiple_choice' %}
-                <span class="result-badge {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
-                    {% if result.is_correct %}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Correct
-                    {% else %}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    Incorrect
-                    {% endif %}
-                </span>
-                {% elif result.response %}
-                    {% if result.response.score is not None %}
-                    <span class="result-badge score">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                        {{ result.response.score|floatformat:0 }}%
-                    </span>
-                    {% else %}
-                    <span class="result-badge pending">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        Awaiting Review
-                    </span>
-                    {% endif %}
-                {% endif %}
-                {% if result.question.category %}
-                <span class="category-tag">{{ result.question.category }}</span>
-                {% endif %}
+    <div class="ca-section">
+        <div class="ca-section-head">
+            <div class="ca-section-icon ca-section-icon--blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
             </div>
+            <div>
+                <h3>Question Breakdown</h3>
+                <p class="muted">{{ results|length }} question{{ results|length|pluralize }}</p>
+            </div>
+        </div>
 
-            <p class="question-text">{{ result.question.question_text }}</p>
-
-            {% if result.question.question_type == 'multiple_choice' %}
-            {# Multiple Choice - Show options #}
-            <div class="answers-grid">
-                {% for letter, text in result.question.get_options %}
-                <div class="answer-item
-                    {% if letter == result.question.correct_answer %}correct-answer{% endif %}
-                    {% if letter == result.selected and not result.is_correct %}wrong-answer{% endif %}
-                    {% if letter == result.selected %}selected{% endif %}">
-                    <span class="answer-letter">{{ letter }}</span>
-                    <span class="answer-text">{{ text }}</span>
-                    {% if letter == result.question.correct_answer %}
-                    <span class="answer-indicator correct">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="ca-results-list">
+            {% for result in results %}
+            <div class="ca-result-card {% if result.is_correct %}ca-result-card--correct{% elif result.is_correct == False %}ca-result-card--wrong{% else %}ca-result-card--pending{% endif %}">
+                <div class="ca-result-card-head">
+                    <span class="ca-q-num">Q{{ forloop.counter }}</span>
+                    <span class="ca-q-type ca-q-type--{{ result.question.question_type }}">
+                        {{ result.question.get_question_type_display }}
+                    </span>
+                    {% if result.question.question_type == 'multiple_choice' %}
+                    <span class="ca-q-badge {% if result.is_correct %}ca-q-badge--correct{% else %}ca-q-badge--wrong{% endif %}">
+                        {% if result.is_correct %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                    </span>
-                    {% elif letter == result.selected and not result.is_correct %}
-                    <span class="answer-indicator wrong">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        Correct
+                        {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
+                        Incorrect
+                        {% endif %}
                     </span>
+                    {% elif result.response %}
+                        {% if result.response.score is not None %}
+                        <span class="ca-q-badge ca-q-badge--score">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            {{ result.response.score|floatformat:0 }}%
+                        </span>
+                        {% else %}
+                        <span class="ca-q-badge ca-q-badge--pending">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Awaiting Review
+                        </span>
+                        {% endif %}
+                    {% endif %}
+                    {% if result.question.category %}
+                    <span class="ca-q-cat">{{ result.question.category }}</span>
                     {% endif %}
                 </div>
-                {% endfor %}
-            </div>
 
-            {% elif result.response %}
-            {# Non-MC Questions - Show Response #}
-            <div class="candidate-response-box">
-                <div class="response-label">Candidate's Response:</div>
-                {% if result.question.question_type == 'text_short' or result.question.question_type == 'text_long' %}
-                <div class="text-response">{{ result.response.text_response }}</div>
-                {% elif result.question.question_type == 'video' %}
-                {% if result.response.video_file %}
-                <video controls class="video-response" preload="metadata">
-                    <source src="{{ result.response.video_file.url }}" type="video/webm">
-                    Your browser does not support video playback.
-                </video>
-                {% else %}
-                <div class="no-response">No video submitted</div>
-                {% endif %}
-                {% elif result.question.question_type == 'file_upload' %}
-                {% if result.response.uploaded_file %}
-                <div class="file-response">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                    </svg>
-                    <span>{{ result.response.uploaded_file_name }}</span>
-                    <a href="{{ result.response.uploaded_file.url }}" class="download-link" download>Download</a>
-                </div>
-                {% else %}
-                <div class="no-response">No file submitted</div>
-                {% endif %}
-                {% endif %}
+                <p class="ca-q-text">{{ result.question.question_text }}</p>
 
-                {# Scoring section for non-MC questions #}
-                {% if result.response.score is not None %}
-                <div class="response-scoring">
-                    <div class="score-display">
-                        <strong>Score:</strong> {{ result.response.score|floatformat:0 }}/100
-                        {% if result.response.scored_by == 'ai' %}
-                        <span class="ai-badge">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9l2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9l2.83-2.83"></path>
+                {% if result.question.question_type == 'multiple_choice' %}
+                <div class="ca-answers">
+                    {% for letter, text in result.question.get_options %}
+                    <div class="ca-answer
+                        {% if letter == result.question.correct_answer %}ca-answer--correct{% endif %}
+                        {% if letter == result.selected and not result.is_correct %}ca-answer--wrong{% endif %}
+                        {% if letter == result.selected %}ca-answer--selected{% endif %}">
+                        <span class="ca-answer-letter">{{ letter }}</span>
+                        <span class="ca-answer-text">{{ text }}</span>
+                        {% if letter == result.question.correct_answer %}
+                        <span class="ca-answer-mark ca-answer-mark--correct">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            AI Scored
                         </span>
-                        {% elif result.response.scored_by == 'manual' %}
-                        <span class="manual-badge">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
+                        {% elif letter == result.selected and not result.is_correct %}
+                        <span class="ca-answer-mark ca-answer-mark--wrong">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
                             </svg>
-                            Manual Score
                         </span>
                         {% endif %}
                     </div>
-                    {% if result.response.score_feedback %}
-                    <div class="score-feedback">
-                        <strong>Feedback:</strong> {{ result.response.score_feedback }}
-                    </div>
+                    {% endfor %}
+                </div>
+
+                {% elif result.response %}
+                <div class="ca-response-box">
+                    <div class="ca-response-label">Candidate's Response:</div>
+                    {% if result.question.question_type == 'text_short' or result.question.question_type == 'text_long' %}
+                    <div class="ca-response-text">{{ result.response.text_response }}</div>
+                    {% elif result.question.question_type == 'video' %}
+                    {% if result.response.video_file %}
+                    <video controls class="ca-response-video" preload="metadata">
+                        <source src="{{ result.response.video_file.url }}" type="video/webm">
+                        Your browser does not support video playback.
+                    </video>
+                    {% else %}
+                    <div class="ca-no-response">No video submitted</div>
                     {% endif %}
-                    <div class="scoring-actions">
-                        <button type="button" class="btn-edit-score" onclick="openScoreModal({{ result.response.pk }}, {{ result.response.score|floatformat:0 }}, '{{ result.response.score_feedback|escapejs }}')">
+                    {% elif result.question.question_type == 'file_upload' %}
+                    {% if result.response.uploaded_file %}
+                    <div class="ca-response-file">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <span>{{ result.response.uploaded_file_name }}</span>
+                        <a href="{{ result.response.uploaded_file.url }}" class="ca-download-link" download>Download</a>
+                    </div>
+                    {% else %}
+                    <div class="ca-no-response">No file submitted</div>
+                    {% endif %}
+                    {% endif %}
+
+                    {# Scoring section #}
+                    {% if result.response.score is not None %}
+                    <div class="ca-scoring">
+                        <div class="ca-scoring-display">
+                            <strong>Score:</strong> {{ result.response.score|floatformat:0 }}/100
+                            {% if result.response.scored_by == 'ai' %}
+                            <span class="ca-scored-badge ca-scored-badge--ai">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9l2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9l2.83-2.83"></path>
+                                </svg>
+                                AI Scored
+                            </span>
+                            {% elif result.response.scored_by == 'manual' %}
+                            <span class="ca-scored-badge ca-scored-badge--manual">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                Manual Score
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% if result.response.score_feedback %}
+                        <div class="ca-scoring-feedback">
+                            <strong>Feedback:</strong> {{ result.response.score_feedback }}
+                        </div>
+                        {% endif %}
+                        <button type="button" class="ca-btn ca-btn--primary" onclick="openScoreModal({{ result.response.pk }}, {{ result.response.score|floatformat:0 }}, '{{ result.response.score_feedback|escapejs }}')">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -366,57 +366,59 @@
                             Edit Score
                         </button>
                     </div>
-                </div>
-                {% else %}
-                {# Pending scoring #}
-                {% if result.response.text_response or result.response.video_file or result.response.uploaded_file %}
-                <div class="response-scoring pending">
-                    <p class="muted">This response hasn't been scored yet.</p>
-                    <div class="scoring-actions">
-                        <button type="button" class="btn-score-now" onclick="openScoreModal({{ result.response.pk }}, 0, '')">
+                    {% else %}
+                    {% if result.response.text_response or result.response.video_file or result.response.uploaded_file %}
+                    <div class="ca-scoring ca-scoring--pending">
+                        <p class="muted">This response hasn't been scored yet.</p>
+                        <button type="button" class="ca-btn ca-btn--primary" onclick="openScoreModal({{ result.response.pk }}, 0, '')">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
                             Score This Response
                         </button>
                     </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="ca-no-response">No response submitted</div>
+                {% endif %}
+
+                {% if result.question.explanation %}
+                <div class="ca-explanation">
+                    <strong>{% if result.question.question_type == 'multiple_choice' %}Explanation{% else %}Grading Guide{% endif %}:</strong> {{ result.question.explanation }}
                 </div>
                 {% endif %}
-                {% endif %}
             </div>
-            {% else %}
-            <div class="no-response">No response submitted</div>
-            {% endif %}
-
-            {% if result.question.explanation %}
-            <div class="explanation">
-                <strong>{% if result.question.question_type == 'multiple_choice' %}Explanation{% else %}Grading Guide{% endif %}:</strong> {{ result.question.explanation }}
-            </div>
-            {% endif %}
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 
 
 {# Score Edit Modal #}
-<div class="score-modal-overlay" id="score-modal">
-    <div class="score-modal">
-        <h3>Edit Response Score</h3>
+<div class="modal" id="score-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Response Score</h2>
+            <button class="modal-close" onclick="closeScoreModal()">&times;</button>
+        </div>
         <form method="post" action="{% url 'custom_assessments:update-response-score' session.uuid %}">
             {% csrf_token %}
             <input type="hidden" name="response_id" id="modal-response-id">
-            <div class="form-group">
-                <label for="modal-score">Score (0-100)</label>
-                <input type="number" name="score" id="modal-score" min="0" max="100" required>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modal-score">Score (0-100)</label>
+                    <input type="number" name="score" id="modal-score" class="form-input" min="0" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal-feedback">Feedback (optional)</label>
+                    <textarea name="feedback" id="modal-feedback" class="form-textarea" placeholder="Add feedback for the candidate..."></textarea>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="modal-feedback">Feedback (optional)</label>
-                <textarea name="feedback" id="modal-feedback" placeholder="Add feedback for the candidate..."></textarea>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn-cancel" onclick="closeScoreModal()">Cancel</button>
-                <button type="submit" class="btn-save">Save Score</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeScoreModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Score</button>
             </div>
         </form>
     </div>
@@ -434,18 +436,12 @@ function closeScoreModal() {
     document.getElementById('score-modal').classList.remove('active');
 }
 
-// Close modal on overlay click
 document.getElementById('score-modal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeScoreModal();
-    }
+    if (e.target === this) closeScoreModal();
 });
 
-// Close modal on Escape key
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeScoreModal();
-    }
+    if (e.key === 'Escape') closeScoreModal();
 });
 </script>
 {% endblock %}
