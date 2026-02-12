@@ -24,6 +24,7 @@ from django.urls import path, include
 from blog.sitemaps import (
     BlogPostSitemap, BlogCategorySitemap, StaticPagesSitemap,
     PublicAssessmentSitemap, InterviewQuestionsSitemap, RoleAssessmentSitemap,
+    DepartmentIQSitemap, DepartmentRoleSitemap,
 )
 
 sitemaps = {
@@ -33,6 +34,8 @@ sitemaps = {
     'static': StaticPagesSitemap,
     'interview-questions': InterviewQuestionsSitemap,
     'role-assessments': RoleAssessmentSitemap,
+    'department-iq': DepartmentIQSitemap,
+    'department-roles': DepartmentRoleSitemap,
 }
 
 urlpatterns = [

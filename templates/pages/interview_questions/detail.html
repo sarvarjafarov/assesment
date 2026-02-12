@@ -22,6 +22,16 @@
         ]
     }
     </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Interview Questions", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages:interview_questions_list' %}"},
+            {"@type": "ListItem", "position": 2, "name": "{{ role.title|escapejs }}"}
+        ]
+    }
+    </script>
 {% endblock %}
 {% block content %}
 <div class="page-shell">

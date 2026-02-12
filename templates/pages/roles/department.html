@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ dept_name }} Assessment Recommendations · Evalon{% endblock %}
+{% block meta_description %}Find the right assessment battery for {{ dept_name|lower }} roles. Browse recommended Evalon assessments tailored to {{ dept_name|lower }} positions with automated scoring.{% endblock %}
+{% block extra_meta %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Assessments by Role", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages:role_assessment_list' %}"},
+        {"@type": "ListItem", "position": 2, "name": "{{ dept_name }}"}
+    ]
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' with active='assessments' %}
+    <main>
+        <div class="rp-shell">
+            <section class="rp-hero">
+                <div class="rp-breadcrumb" style="justify-content: center;">
+                    <a href="{% url 'pages:role_assessment_list' %}">All Roles</a>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    <span>{{ dept_name }}</span>
+                </div>
+                <p class="rp-eyebrow">{{ dept_name }} Assessments</p>
+                <h1 class="rp-title">{{ dept_name }} Role Assessments</h1>
+                <p class="rp-desc">Recommended assessment batteries tailored to {{ dept_name|lower }} positions — covering the skills, competencies, and behaviors that matter most.</p>
+
+                <div class="rp-trust-stats">
+                    <span class="rp-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <strong>{{ roles|length }}</strong> Roles
+                    </span>
+                    <span class="rp-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <strong>{{ total_assessments }}</strong> Assessments
+                    </span>
+                    <span class="rp-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <strong>AI</strong> Scoring
+                    </span>
+                </div>
+            </section>
+
+            <section class="rp-grid" id="grid">
+                {% for role in roles %}
+                <a class="rp-card" href="{{ role.get_absolute_url }}">
+                    <div class="rp-card-top">
+                        <span class="rp-card-dept">{{ role.get_seniority_level_display }}</span>
+                        <span class="rp-card-level">{{ role.assessment_types.count }} assessment{{ role.assessment_types.count|pluralize }}</span>
+                    </div>
+                    <h3 class="rp-card-title">{{ role.title }}</h3>
+                    <p class="rp-card-desc">{{ role.description|truncatewords:20 }}</p>
+                    {% if role.key_skills %}
+                    <div class="rp-card-skills">
+                        {% for skill in role.key_skills|slice:":3" %}
+                        <span class="rp-card-skill">{{ skill }}</span>
+                        {% endfor %}
+                        {% if role.key_skills|length > 3 %}
+                        <span class="rp-card-skill rp-card-skill--more">+{{ role.key_skills|length|add:"-3" }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="rp-card-footer">
+                        <span class="rp-card-assessments">{{ role.assessment_types.count }} assessment{{ role.assessment_types.count|pluralize }}</span>
+                        <span class="rp-card-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="rp-empty">
+                    <h3>No {{ dept_name }} roles yet</h3>
+                    <p>Check back soon or <a href="{% url 'pages:role_assessment_list' %}">browse all roles</a>.</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            {# Other departments #}
+            <section class="rp-section">
+                <h2 class="rp-section-title">Explore other departments</h2>
+                <div class="rp-filters" style="justify-content: flex-start;">
+                    {% for dept in all_departments %}
+                    {% if dept != dept_name %}
+                    <a href="{% url 'pages:role_assessment_department' dept_slug=dept|slugify %}" class="rp-filter">{{ dept }}</a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+
+            {# CTA #}
+            <section class="seo-list-cta">
+                <div class="seo-list-cta-inner">
+                    <h2>Ready to assess {{ dept_name|lower }} candidates?</h2>
+                    <p>Send assessments in minutes with automated scoring and detailed reports your team can trust.</p>
+                    <div class="seo-list-cta-actions">
+                        <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="rp_dept_cta_click"
+                           data-gtag-category="conversion"
+                           data-gtag-label="rp_dept_{{ dept_slug }}_trial">Start Free Trial</a>
+                        <a class="rp-btn-secondary" href="{% url 'pages:interview_questions_department' dept_slug=dept_slug %}"
+                           data-gtag-click="rp_dept_iq_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="rp_dept_{{ dept_slug }}_iq">{{ dept_name }} interview questions</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

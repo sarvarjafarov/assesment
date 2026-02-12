@@ -2,6 +2,10 @@
 {% load humanize static %}
 {% block title %}{% if query %}Search: {{ query }} · {% endif %}Assessment Recommendations by Role · Evalon{% endblock %}
 {% block meta_description %}Find the right assessment battery for every role. Browse recommended Evalon assessments for marketing, product, design, HR, finance, and leadership positions.{% endblock %}
+{% block extra_meta %}
+{% if page_obj.has_previous %}<link rel="prev" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">{% endif %}
+{% if page_obj.has_next %}<link rel="next" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">{% endif %}
+{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='assessments' %}

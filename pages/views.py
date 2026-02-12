@@ -903,6 +903,7 @@ def assessment_preview(request, slug, token):
 # ── Programmatic SEO: Interview Questions ──────────────────────────
 
 
+@cache_page(60 * 60)
 def interview_questions_list(request):
     """List all roles that have interview questions."""
     roles = Role.objects.filter(
@@ -963,6 +964,103 @@ def interview_questions_list(request):
     })
 
 
+DEPARTMENT_META = {
+    'marketing': {'name': 'Marketing', 'desc': 'interview questions for marketing roles including CMOs, directors, growth managers, content strategists, and SEO specialists'},
+    'product': {'name': 'Product', 'desc': 'interview questions for product roles including CPOs, product managers, product designers, and product analysts'},
+    'design': {'name': 'Design', 'desc': 'interview questions for design roles including design directors, UX designers, UI designers, and brand designers'},
+    'hr': {'name': 'HR', 'desc': 'interview questions for HR roles including CHROs, HR managers, recruiters, and people operations leads'},
+    'finance': {'name': 'Finance', 'desc': 'interview questions for finance roles including CFOs, controllers, financial analysts, and accounting managers'},
+    'leadership': {'name': 'Leadership', 'desc': 'interview questions for leadership roles including CEOs, COOs, VPs, and general managers'},
+    'engineering': {'name': 'Engineering', 'desc': 'interview questions for engineering roles including VPs of Engineering, engineering managers, software engineers, and DevOps engineers'},
+    'sales': {'name': 'Sales', 'desc': 'interview questions for sales roles including VPs of Sales, account executives, SDRs, and sales operations managers'},
+    'operations': {'name': 'Operations', 'desc': 'interview questions for operations roles including COOs, operations directors, project managers, and business analysts'},
+    'data': {'name': 'Data', 'desc': 'interview questions for data roles including data scientists, data engineers, ML engineers, and data analysts'},
+}
+
+
+@cache_page(60 * 60)
+def interview_questions_department(request, dept_slug):
+    """Department landing page for interview questions."""
+    dept_info = DEPARTMENT_META.get(dept_slug)
+    if not dept_info:
+        raise Http404
+
+    dept_name = dept_info['name']
+
+    roles = Role.objects.filter(
+        is_active=True,
+        department__iexact=dept_name,
+        interview_questions__is_active=True,
+    ).annotate(
+        question_count=Count(
+            'interview_questions',
+            filter=Q(interview_questions__is_active=True),
+        )
+    ).filter(question_count__gt=0).distinct().prefetch_related(
+        Prefetch(
+            'interview_questions',
+            queryset=InterviewQuestion.objects.filter(is_active=True).order_by('order', 'pk')[:3],
+            to_attr='preview_questions',
+        )
+    )
+
+    total_questions = InterviewQuestion.objects.filter(
+        is_active=True, role__department__iexact=dept_name,
+    ).count()
+
+    all_departments = (
+        Role.objects.filter(is_active=True)
+        .values_list('department', flat=True)
+        .distinct()
+        .order_by('department')
+    )
+
+    return render(request, 'pages/interview_questions/department.html', {
+        'dept_name': dept_name,
+        'dept_slug': dept_slug,
+        'dept_desc': dept_info['desc'],
+        'roles': roles,
+        'total_questions': total_questions,
+        'all_departments': all_departments,
+    })
+
+
+@cache_page(60 * 60)
+def role_assessment_department(request, dept_slug):
+    """Department landing page for role assessments."""
+    dept_info = DEPARTMENT_META.get(dept_slug)
+    if not dept_info:
+        raise Http404
+
+    dept_name = dept_info['name']
+
+    roles = Role.objects.filter(
+        is_active=True, department__iexact=dept_name,
+    ).prefetch_related(
+        Prefetch(
+            'assessment_types',
+            queryset=PublicAssessment.objects.filter(is_active=True),
+        )
+    )
+
+    total_assessments = PublicAssessment.objects.filter(is_active=True).count()
+
+    all_departments = (
+        Role.objects.filter(is_active=True)
+        .values_list('department', flat=True)
+        .distinct()
+        .order_by('department')
+    )
+
+    return render(request, 'pages/roles/department.html', {
+        'dept_name': dept_name,
+        'dept_slug': dept_slug,
+        'roles': roles,
+        'total_assessments': total_assessments,
+        'all_departments': all_departments,
+    })
+
+
 CATEGORY_DESCRIPTIONS = {
     'Technical': 'Questions that evaluate domain expertise, technical knowledge, and hands-on skills relevant to the role.',
     'Behavioral': 'Questions that explore past experiences and behaviors to predict future performance.',
@@ -974,6 +1072,7 @@ CATEGORY_DESCRIPTIONS = {
 }
 
 
+@cache_page(60 * 60)
 def interview_questions_detail(request, slug):
     """Show interview questions for a specific role."""
     role = get_object_or_404(Role, slug=slug, is_active=True)
@@ -1041,6 +1140,7 @@ def interview_questions_detail(request, slug):
 # ── Programmatic SEO: Role Assessment Pages ────────────────────────
 
 
+@cache_page(60 * 60)
 def role_assessment_list(request):
     """List all roles with their recommended assessments."""
     roles = Role.objects.filter(is_active=True).prefetch_related(
@@ -1090,6 +1190,7 @@ def role_assessment_list(request):
     })
 
 
+@cache_page(60 * 60)
 def role_assessment_detail(request, slug):
     """Show assessment recommendations for a role."""
     role = get_object_or_404(Role, slug=slug, is_active=True)

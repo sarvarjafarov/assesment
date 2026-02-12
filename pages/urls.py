@@ -17,9 +17,11 @@ urlpatterns = [
     path('robots.txt', views.robots_txt, name='robots'),
     # Interview Questions (programmatic SEO)
     path('interview-questions/', views.interview_questions_list, name='interview_questions_list'),
+    path('interview-questions/department/<slug:dept_slug>/', views.interview_questions_department, name='interview_questions_department'),
     path('interview-questions/<slug:slug>/', views.interview_questions_detail, name='interview_questions_detail'),
     # Role-Based Assessments (programmatic SEO)
     path('assessments/roles/', views.role_assessment_list, name='role_assessment_list'),
+    path('assessments/roles/department/<slug:dept_slug>/', views.role_assessment_department, name='role_assessment_department'),
     path('assessments/for/<slug:slug>/', views.role_assessment_detail, name='role_assessment_detail'),
     # Public assessments
     path('assessments/', views.assessment_list, name='assessment_list'),

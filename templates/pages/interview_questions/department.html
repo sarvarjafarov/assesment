@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ dept_name }} Interview Questions · Evalon{% endblock %}
+{% block meta_description %}Curated {{ dept_name|lower }} {{ dept_desc }}. Includes difficulty ratings, evaluation criteria, and sample answer guidance.{% endblock %}
+{% block extra_meta %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Interview Questions", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages:interview_questions_list' %}"},
+        {"@type": "ListItem", "position": 2, "name": "{{ dept_name }}"}
+    ]
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' with active='assessments' %}
+    <main>
+        <div class="iq-shell">
+            <section class="iq-hero">
+                <div class="iq-breadcrumb" style="justify-content: center;">
+                    <a href="{% url 'pages:interview_questions_list' %}">All Roles</a>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    <span>{{ dept_name }}</span>
+                </div>
+                <p class="iq-eyebrow">{{ dept_name }} Department</p>
+                <h1 class="iq-title">{{ dept_name }} Interview Questions</h1>
+                <p class="iq-desc">Curated {{ dept_desc }}. Each question includes what it tests, difficulty level, and sample answer guidance.</p>
+
+                <div class="iq-trust-stats">
+                    <span class="iq-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <strong>{{ roles|length }}</strong> Roles
+                    </span>
+                    <span class="iq-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        <strong>{{ total_questions }}+</strong> Questions
+                    </span>
+                    <span class="iq-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <strong>Free</strong> Access
+                    </span>
+                </div>
+            </section>
+
+            <section class="iq-grid" id="grid">
+                {% for role in roles %}
+                <a class="iq-card" href="{{ role.get_interview_questions_url }}">
+                    <div class="iq-card-top">
+                        <span class="iq-card-dept">{{ role.get_seniority_level_display }}</span>
+                        <span class="iq-card-count">{{ role.question_count }} questions</span>
+                    </div>
+                    <h3 class="iq-card-title">{{ role.title }}</h3>
+                    <p class="iq-card-desc">{{ role.description|truncatewords:20 }}</p>
+                    {% if role.preview_questions %}
+                    <div class="iq-card-previews">
+                        {% for pq in role.preview_questions %}
+                        <p class="iq-card-preview">"{{ pq.question_text|truncatewords:8 }}"</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="iq-card-footer">
+                        <span class="iq-card-level">{{ role.get_seniority_level_display }}</span>
+                        <span class="iq-card-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="iq-empty">
+                    <h3>No {{ dept_name }} roles yet</h3>
+                    <p>Check back soon or <a href="{% url 'pages:interview_questions_list' %}">browse all roles</a>.</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            {# Other departments #}
+            <section class="iq-section">
+                <h2 class="iq-section-title">Explore other departments</h2>
+                <div class="iq-filters" style="justify-content: flex-start;">
+                    {% for dept in all_departments %}
+                    {% if dept != dept_name %}
+                    <a href="{% url 'pages:interview_questions_department' dept_slug=dept|slugify %}" class="iq-filter">{{ dept }}</a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+
+            {# CTA #}
+            <section class="seo-list-cta">
+                <div class="seo-list-cta-inner">
+                    <h2>Go beyond interviews</h2>
+                    <p>Pair your {{ dept_name|lower }} interview questions with structured skill assessments.</p>
+                    <div class="seo-list-cta-actions">
+                        <a class="iq-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="iq_dept_cta_click"
+                           data-gtag-category="conversion"
+                           data-gtag-label="iq_dept_{{ dept_slug }}_trial">Start Free Trial</a>
+                        <a class="iq-btn-secondary" href="{% url 'pages:role_assessment_department' dept_slug=dept_slug %}"
+                           data-gtag-click="iq_dept_assessments_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="iq_dept_{{ dept_slug }}_assessments">{{ dept_name }} assessments</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}

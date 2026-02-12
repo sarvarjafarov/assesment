@@ -12,6 +12,10 @@ from ._seed_data.design import DESIGN_ROLES
 from ._seed_data.hr import HR_ROLES
 from ._seed_data.finance import FINANCE_ROLES
 from ._seed_data.leadership import LEADERSHIP_ROLES
+from ._seed_data.engineering import ENGINEERING_ROLES
+from ._seed_data.sales import SALES_ROLES
+from ._seed_data.operations import OPERATIONS_ROLES
+from ._seed_data.data import DATA_ROLES
 
 
 class Command(BaseCommand):
@@ -32,7 +36,9 @@ class Command(BaseCommand):
 
         all_roles = (
             MARKETING_ROLES + PRODUCT_ROLES + DESIGN_ROLES +
-            HR_ROLES + FINANCE_ROLES + LEADERSHIP_ROLES
+            HR_ROLES + FINANCE_ROLES + LEADERSHIP_ROLES +
+            ENGINEERING_ROLES + SALES_ROLES + OPERATIONS_ROLES +
+            DATA_ROLES
         )
 
         # Cache assessment lookup

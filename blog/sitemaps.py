@@ -108,3 +108,31 @@ class RoleAssessmentSitemap(Sitemap):
 
     def location(self, obj):
         return obj.get_absolute_url()
+
+
+class DepartmentIQSitemap(Sitemap):
+    """Sitemap for department interview question landing pages."""
+    changefreq = "weekly"
+    priority = 0.6
+
+    def items(self):
+        from pages.views import DEPARTMENT_META
+        return list(DEPARTMENT_META.keys())
+
+    def location(self, item):
+        from django.urls import reverse
+        return reverse('pages:interview_questions_department', kwargs={'dept_slug': item})
+
+
+class DepartmentRoleSitemap(Sitemap):
+    """Sitemap for department role assessment landing pages."""
+    changefreq = "weekly"
+    priority = 0.6
+
+    def items(self):
+        from pages.views import DEPARTMENT_META
+        return list(DEPARTMENT_META.keys())
+
+    def location(self, item):
+        from django.urls import reverse
+        return reverse('pages:role_assessment_department', kwargs={'dept_slug': item})

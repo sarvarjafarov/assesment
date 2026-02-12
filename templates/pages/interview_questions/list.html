@@ -2,6 +2,10 @@
 {% load humanize static %}
 {% block title %}{% if query %}Search: {{ query }} · {% endif %}Interview Questions for Hiring · Evalon{% endblock %}
 {% block meta_description %}Browse interview questions for {{ total_roles }}+ roles across marketing, product, design, HR, finance, and leadership. Includes what each question tests and sample answer guidance.{% endblock %}
+{% block extra_meta %}
+{% if page_obj.has_previous %}<link rel="prev" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">{% endif %}
+{% if page_obj.has_next %}<link rel="next" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">{% endif %}
+{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='assessments' %}
