@@ -5,14 +5,63 @@
 {% block meta_description %}Your Evalon dashboard - track assessments, projects, and candidate progress.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="dashboard-page-header">
-        <div>
+
+    {# ── Page Header ── #}
+    <header class="db-header">
+        <div class="db-header-left">
             <h1>Welcome back, {{ account.company_name }}</h1>
             <p class="muted">{{ "now"|date:"l, F j, Y" }} · {{ role_label }}</p>
         </div>
+        <a href="{% url 'clients:assessments' %}" class="db-header-cta btn btn-pill">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            Invite Candidates
+        </a>
     </header>
 
-    {# Onboarding Checklist - Show for new users #}
+    {# ── Plan Usage Bar ── #}
+    {% if plan_overview %}
+    <div class="db-plan-usage">
+        <div class="db-usage-item">
+            <div class="db-usage-label">
+                <span>Invites</span>
+                <span class="db-usage-count">{{ plan_overview.invites_used }} / {{ plan_overview.invite_limit|default:"∞" }}</span>
+            </div>
+            {% if plan_overview.invite_limit %}
+            <div class="db-usage-bar">
+                <div class="db-usage-fill {% if plan_overview.invite_percent > 85 %}warn{% endif %}" style="width: {{ plan_overview.invite_percent|floatformat:0 }}%"></div>
+            </div>
+            {% else %}
+            <div class="db-usage-bar"><div class="db-usage-fill" style="width: 0%"></div></div>
+            {% endif %}
+        </div>
+        <div class="db-usage-item">
+            <div class="db-usage-label">
+                <span>Projects</span>
+                <span class="db-usage-count">{{ plan_overview.project_used }} / {{ plan_overview.project_limit|default:"∞" }}</span>
+            </div>
+            {% if plan_overview.project_limit %}
+            <div class="db-usage-bar">
+                <div class="db-usage-fill {% if plan_overview.project_percent > 85 %}warn{% endif %}" style="width: {% widthratio plan_overview.project_used plan_overview.project_limit 100 %}%"></div>
+            </div>
+            {% else %}
+            <div class="db-usage-bar"><div class="db-usage-fill" style="width: 0%"></div></div>
+            {% endif %}
+        </div>
+        <div class="db-usage-plan">
+            <span class="db-plan-badge">{{ plan_overview.name }}</span>
+            {% if plan_overview.upgrade_url %}
+            <a href="{{ plan_overview.upgrade_url }}" class="db-upgrade-link">Upgrade</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Onboarding Checklist ── #}
     {% if not account.has_completed_onboarding %}
     <section class="onboarding-section">
         <div class="onboarding-card">
@@ -50,26 +99,15 @@
                 <div class="onboarding-step {% if onboarding_step_1_completed %}completed{% endif %}">
                     <div class="step-number">
                         {% if onboarding_step_1_completed %}
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        {% else %}
-                            <span>1</span>
-                        {% endif %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        {% else %}<span>1</span>{% endif %}
                     </div>
                     <div class="step-content">
                         <h4>Create Your First Project</h4>
                         <p>Organize candidates by role or hiring campaign. Projects help you track progress for specific positions.</p>
                         <a href="{% url 'clients:project-list' %}" class="btn btn-outline btn-small">
-                            {% if onboarding_step_1_completed %}
-                                <span>View Projects</span>
-                            {% else %}
-                                <span>Create Project</span>
-                            {% endif %}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
+                            <span>{% if onboarding_step_1_completed %}View Projects{% else %}Create Project{% endif %}</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </a>
                     </div>
                 </div>
@@ -77,22 +115,15 @@
                 <div class="onboarding-step {% if onboarding_step_2_completed %}completed{% endif %}">
                     <div class="step-number">
                         {% if onboarding_step_2_completed %}
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        {% else %}
-                            <span>2</span>
-                        {% endif %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        {% else %}<span>2</span>{% endif %}
                     </div>
                     <div class="step-content">
                         <h4>Send Your First Candidate Invite</h4>
                         <p>Choose from {{ allowed_assessments|length }} approved assessment{{ allowed_assessments|length|pluralize }}: {% for a in allowed_assessments %}{{ a.label }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
                         <a href="{% url 'clients:assessments' %}" class="btn btn-outline btn-small">
                             <span>Browse Assessments</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </a>
                     </div>
                 </div>
@@ -100,12 +131,8 @@
                 <div class="onboarding-step {% if onboarding_step_3_completed %}completed{% endif %}">
                     <div class="step-number">
                         {% if onboarding_step_3_completed %}
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        {% else %}
-                            <span>3</span>
-                        {% endif %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        {% else %}<span>3</span>{% endif %}
                     </div>
                     <div class="step-content">
                         <h4>Review Your First Assessment Result</h4>
@@ -113,10 +140,7 @@
                         {% if onboarding_step_3_completed %}
                             <a href="{% url 'clients:analytics' %}" class="btn btn-outline btn-small">
                                 <span>View Analytics</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </a>
                         {% else %}
                             <span class="step-pending">Complete steps 1 & 2 first</span>
@@ -137,72 +161,41 @@
     </section>
     {% endif %}
 
-    {# Key Metrics - Only 3 most important #}
-    <section class="portal-card-grid three-up key-metrics">
-        <article class="portal-card metric-card">
-            <p class="label">Completion rate</p>
-            <h2 class="metric-value">{{ portal_stats.completion_rate|floatformat:0 }}%</h2>
-            <p class="muted">{{ portal_stats.completed_count }} completed invites</p>
+    {# ── Key Metrics ── #}
+    <section class="db-metrics">
+        <article class="db-metric">
+            <div class="db-metric-icon" style="--accent: #10b981;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div class="db-metric-data">
+                <span class="db-metric-value">{{ portal_stats.completion_rate|floatformat:0 }}%</span>
+                <span class="db-metric-label">Completion rate</span>
+            </div>
+            <span class="db-metric-sub">{{ portal_stats.completed_count }} completed</span>
         </article>
-        <article class="portal-card metric-card">
-            <p class="label">Avg. duration</p>
-            <h2 class="metric-value">{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}</h2>
-            <p class="muted">Start to submission</p>
+        <article class="db-metric">
+            <div class="db-metric-icon" style="--accent: #6366f1;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div class="db-metric-data">
+                <span class="db-metric-value">{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}</span>
+                <span class="db-metric-label">Avg. duration</span>
+            </div>
+            <span class="db-metric-sub">Start to submission</span>
         </article>
-        <article class="portal-card metric-card">
-            <p class="label">Avg. score</p>
-            <h2 class="metric-value">{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</h2>
-            <p class="muted">Across finished sessions</p>
+        <article class="db-metric">
+            <div class="db-metric-icon" style="--accent: var(--color-orange);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+            </div>
+            <div class="db-metric-data">
+                <span class="db-metric-value">{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</span>
+                <span class="db-metric-label">Avg. score</span>
+            </div>
+            <span class="db-metric-sub">Across finished sessions</span>
         </article>
     </section>
 
-    {# Product Tour Video #}
-    <section class="portal-card video-tour-section">
-        <div class="video-tour-header">
-            <div class="video-tour-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-            </div>
-            <div>
-                <h3>How Evalon Works</h3>
-                <p class="muted">Watch a quick 2-minute overview of the platform</p>
-            </div>
-        </div>
-        <div class="video-container">
-            {# Replace VIDEO_URL_HERE with your actual video URL #}
-            {# Supports YouTube, Vimeo, or direct video files #}
-
-            {# Option 1: YouTube embed #}
-            {# <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> #}
-
-            {# Option 2: Vimeo embed #}
-            {# <iframe src="https://player.vimeo.com/video/YOUR_VIDEO_ID" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe> #}
-
-            {# Option 3: Direct video file #}
-            {# <video controls>
-                <source src="/static/videos/product-tour.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video> #}
-
-            {# Placeholder until you add your video #}
-            <div class="video-placeholder">
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-                <h4>Product Demo Video</h4>
-                <p class="muted">Replace this placeholder with your video URL</p>
-                <p class="video-help">
-                    <strong>To add your video:</strong><br>
-                    1. Create your demo video using Loom, Tango, or similar tools<br>
-                    2. Upload to YouTube or Vimeo<br>
-                    3. Update the iframe src in this template
-                </p>
-            </div>
-        </div>
-    </section>
-
-    {# Attention Items - Things that need action #}
+    {# ── Attention Items ── #}
     {% if attention_items %}
     <section class="portal-card attention-banner">
         <div class="attention-header">
@@ -220,13 +213,9 @@
                 </div>
                 {% if item.action_url %}
                 <a href="{{ item.action_url }}" class="btn btn-outline small">
-                    {% if "invite" in item.label|lower %}
-                        View Assessments
-                    {% elif "benchmark" in item.label|lower %}
-                        View Analytics
-                    {% else %}
-                        Review
-                    {% endif %}
+                    {% if "invite" in item.label|lower %}View Assessments
+                    {% elif "benchmark" in item.label|lower %}View Analytics
+                    {% else %}Review{% endif %}
                 </a>
                 {% endif %}
             </li>
@@ -240,159 +229,138 @@
     </section>
     {% endif %}
 
-    {# Primary Action - Invite Candidates #}
-    <section class="primary-action-section">
-        <div class="primary-action-card">
-            <div class="action-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    {# ── Two-Column Layout: Activity + Sidebar ── #}
+    <div class="db-content-grid">
+
+        {# ── Left: Recent Activity ── #}
+        <section class="db-activity-col">
+            <div class="section-header">
+                <h3>Recent Activity</h3>
+                <a href="#activity" class="link-subtle">View all →</a>
+            </div>
+            {% if activity_feed %}
+            <div class="db-activity-card">
+                <ul class="activity-feed">
+                    {% for entry in activity_feed|slice:":8" %}
+                    <li class="activity-item">
+                        <div class="activity-main">
+                            <div class="activity-avatar">
+                                <span>{{ entry.candidate|slice:":1"|upper }}</span>
+                            </div>
+                            <div class="activity-details">
+                                <p class="activity-name">{{ entry.candidate }}</p>
+                                <p class="activity-meta">
+                                    {{ entry.assessment }}
+                                    <span class="db-status-dot {% if entry.status == 'Completed' or entry.status == 'Submitted' %}dot-success{% elif entry.status == 'In Progress' %}dot-active{% else %}dot-pending{% endif %}"></span>
+                                    {{ entry.status }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="activity-actions">
+                            <span class="activity-time">{{ entry.timestamp|naturaltime }}</span>
+                            {% if entry.detail_url %}
+                            <a href="{{ entry.detail_url }}" class="btn btn-ghost small">View</a>
+                            {% else %}
+                            <a href="{{ entry.manage_url }}" class="btn btn-ghost small">Manage</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+            <div class="db-empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25; margin-bottom: 1rem;">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="8.5" cy="7" r="4"></circle>
                     <line x1="20" y1="8" x2="20" y2="14"></line>
                     <line x1="23" y1="11" x2="17" y2="11"></line>
                 </svg>
+                <p>No recent activity yet.</p>
+                <a href="{% url 'clients:assessments' %}" class="btn btn-outline small">Invite your first candidate</a>
             </div>
-            <div class="action-content">
-                <h3>Ready to invite candidates?</h3>
-                <p>Choose an assessment and send invites to your candidates in seconds.</p>
-            </div>
-            <a href="{% url 'clients:assessments' %}" class="btn btn-pill btn-large">
-                <span>Invite Candidates</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-            </a>
-        </div>
-    </section>
-
-    {# Quick Links #}
-    <section class="quick-links-section">
-        <h3>Quick Actions</h3>
-        <div class="quick-links-grid">
-            <a href="{% url 'clients:assessments' %}" class="quick-link-card">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <div>
-                    <h4>Assessments</h4>
-                    <p class="muted">View all {{ allowed_assessments|length }} assessment{{ allowed_assessments|length|pluralize }}</p>
-                </div>
-            </a>
-            <a href="{% url 'clients:project-list' %}" class="quick-link-card">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <div>
-                    <h4>Projects</h4>
-                    <p class="muted">Manage {{ project_preview|length|default:0 }} active project{{ project_preview|length|default:0|pluralize }}</p>
-                </div>
-            </a>
-            <a href="{% url 'clients:analytics' %}" class="quick-link-card">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="20" x2="12" y2="10"></line>
-                    <line x1="18" y1="20" x2="18" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="16"></line>
-                </svg>
-                <div>
-                    <h4>Analytics</h4>
-                    <p class="muted">View performance reports</p>
-                </div>
-            </a>
-            <a href="{{ activity_export_url }}" class="quick-link-card">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <div>
-                    <h4>Export Data</h4>
-                    <p class="muted">Download activity CSV</p>
-                </div>
-            </a>
-            {% if is_manager %}
-            <a href="{% url 'clients:billing' %}" class="quick-link-card">
-                <svg class="link-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                    <line x1="2" y1="10" x2="22" y2="10"></line>
-                </svg>
-                <div>
-                    <h4>Billing & Plans</h4>
-                    <p class="muted">Manage your {{ plan_overview.name }} plan</p>
-                </div>
-            </a>
             {% endif %}
-        </div>
-    </section>
+        </section>
 
-    {# Recent Activity Feed #}
-    <section class="recent-activity-section">
-        <div class="section-header">
-            <h3>Recent Activity</h3>
-            <a href="#activity" class="link-subtle">View all activity →</a>
-        </div>
-        {% if activity_feed %}
-        <div class="portal-card">
-            <ul class="activity-feed">
-                {% for entry in activity_feed|slice:":10" %}
-                <li class="activity-item">
-                    <div class="activity-main">
-                        <div class="activity-avatar">
-                            <span>{{ entry.candidate|slice:":1"|upper }}</span>
-                        </div>
-                        <div class="activity-details">
-                            <p class="activity-name">{{ entry.candidate }}</p>
-                            <p class="activity-meta">{{ entry.assessment }} · {{ entry.status }}</p>
-                        </div>
-                    </div>
-                    <div class="activity-actions">
-                        <span class="activity-time">{{ entry.timestamp|naturaltime }}</span>
-                        {% if entry.detail_url %}
-                        <a href="{{ entry.detail_url }}" class="btn btn-ghost small">View</a>
-                        {% else %}
-                        <a href="{{ entry.manage_url }}" class="btn btn-ghost small">Manage</a>
-                        {% endif %}
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% else %}
-        <div class="portal-card empty-state-card">
-            <p class="muted">No recent activity. Invite candidates to get started.</p>
-        </div>
-        {% endif %}
-    </section>
-
-    {# Plan Usage - Compact #}
-    {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 or plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
-    <section class="plan-alert">
-        <div class="portal-card plan-warning-card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <div>
-                {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 %}
-                <strong>Plan limit approaching</strong>
-                <p class="muted">Only {{ plan_overview.invite_remaining }} invite{{ plan_overview.invite_remaining|pluralize }} remaining this month.</p>
-                {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
-                <strong>Project limit approaching</strong>
-                <p class="muted">Only {{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} remaining.</p>
-                {% endif %}
+        {# ── Right: Sidebar ── #}
+        <aside class="db-sidebar-col">
+            {# Quick Actions #}
+            <div class="db-sidebar-section">
+                <h4 class="db-sidebar-title">Quick Actions</h4>
+                <nav class="db-quick-nav">
+                    <a href="{% url 'clients:assessments' %}" class="db-quick-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        <span>Assessments <em class="db-quick-count">{{ allowed_assessments|length }}</em></span>
+                    </a>
+                    <a href="{% url 'clients:project-list' %}" class="db-quick-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        <span>Projects <em class="db-quick-count">{{ project_preview|length|default:0 }}</em></span>
+                    </a>
+                    <a href="{% url 'clients:analytics' %}" class="db-quick-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="{{ activity_export_url }}" class="db-quick-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export CSV</span>
+                    </a>
+                    {% if is_manager %}
+                    <a href="{% url 'clients:billing' %}" class="db-quick-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                        <span>Billing</span>
+                    </a>
+                    {% endif %}
+                </nav>
             </div>
-            <a href="{{ plan_overview.upgrade_url }}" target="_blank" class="btn btn-outline small">View Plans</a>
-        </div>
-    </section>
-    {% endif %}
+
+            {# Active Projects #}
+            {% if project_preview %}
+            <div class="db-sidebar-section">
+                <div class="db-sidebar-header">
+                    <h4 class="db-sidebar-title">Active Projects</h4>
+                    <a href="{% url 'clients:project-list' %}" class="link-subtle">All →</a>
+                </div>
+                <div class="db-project-list">
+                    {% for proj in project_preview %}
+                    <a href="{{ proj.href }}" class="db-project-item">
+                        <div>
+                            <strong>{{ proj.title }}</strong>
+                            <span class="muted">{{ proj.open_roles }} open role{{ proj.open_roles|pluralize }}</span>
+                        </div>
+                        <span class="db-project-sessions">{{ proj.sessions }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Plan Warning #}
+            {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 or plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
+            <div class="db-sidebar-section db-plan-warn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                    {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 %}
+                    <strong>{{ plan_overview.invite_remaining }} invite{{ plan_overview.invite_remaining|pluralize }} left</strong>
+                    <p class="muted">This month's limit is almost reached.</p>
+                    {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
+                    <strong>{{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left</strong>
+                    <p class="muted">You're close to your project limit.</p>
+                    {% endif %}
+                </div>
+                <a href="{{ plan_overview.upgrade_url }}" class="btn btn-outline small">Upgrade</a>
+            </div>
+            {% endif %}
+        </aside>
+    </div>
 
 </div>
 
-{# Anchor sections for temporary navigation #}
 <div id="assessments" style="scroll-margin-top: 2rem;"></div>
 <div id="analytics" style="scroll-margin-top: 2rem;"></div>
 <div id="activity" style="scroll-margin-top: 2rem;"></div>
-
 
 {% endblock %}
