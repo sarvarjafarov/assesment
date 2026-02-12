@@ -520,14 +520,16 @@
     color: #dc2626;
 }
 
-/* Level Selector (manage, questions, custom detail) */
+/* Level Selector — segmented control (manage, questions, custom detail) */
 .level-selector,
 .level-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    display: flex;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    overflow: hidden;
 }
 .level-option {
+    flex: 1;
     position: relative;
     cursor: pointer;
 }
@@ -540,23 +542,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 18px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
+    padding: 14px 8px;
     text-align: center;
     transition: all var(--transition-base);
     position: relative;
-    background: var(--color-white);
+    background: transparent;
+    border-right: 1px solid #e5e7eb;
+}
+.level-option:last-child .level-card {
+    border-right: none;
 }
 .level-card:hover {
-    border-color: rgba(255, 138, 0, 0.5);
-    box-shadow: 0 2px 8px rgba(14, 20, 40, 0.06);
+    background: rgba(14, 20, 40, 0.03);
 }
 .level-option input:checked + .level-card,
 .level-option input:checked + div.level-card {
-    border-color: var(--color-orange);
-    background: linear-gradient(135deg, rgba(255, 138, 0, 0.04) 0%, rgba(255, 107, 0, 0.04) 100%);
-    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+    background: rgba(255, 138, 0, 0.06);
+    box-shadow: inset 0 0 0 2px var(--color-orange);
 }
 .level-name {
     font-weight: 700;
@@ -571,7 +573,7 @@
 .level-desc {
     font-size: 0.75rem;
     color: var(--color-text-muted);
-    margin-top: var(--space-2);
+    margin-top: 2px;
     line-height: 1.3;
 }
 .level-title {
@@ -579,31 +581,6 @@
     color: var(--color-navy);
     font-size: 0.95rem;
     margin-bottom: 2px;
-}
-.level-detail {
-    font-size: 0.7rem;
-    color: #9ca3af;
-}
-.level-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-}
-.level-icon.junior {
-    background: #d1fae5;
-    color: #059669;
-}
-.level-icon.mid {
-    background: #fef3c7;
-    color: #d97706;
-}
-.level-icon.senior {
-    background: #fee2e2;
-    color: #dc2626;
 }
 
 /* Level Selector Group (manage) */
@@ -620,15 +597,6 @@
     font-size: 0.85rem;
     color: var(--color-text-muted);
     margin: 0 0 var(--space-3);
-}
-.level-option.recommended .level-card::before {
-    content: 'Recommended';
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: var(--color-orange);
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    margin-bottom: 2px;
 }
 
 /* btn-icon (custom_assessments: list, questions) */

@@ -428,7 +428,7 @@
                     <label class="form-label">Assessment Level</label>
                     <div class="level-options">
                         {% for value, label in invite_form.level.field.choices %}
-                        <label class="level-option{% if value == 'mid' %} recommended{% endif %}">
+                        <label class="level-option">
                             <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
                             <div class="level-card">
                                 <span class="level-title">{{ label }}</span>
@@ -543,7 +543,7 @@
                     <label class="form-label">Assessment Level</label>
                     <div class="level-options">
                         {% for value, label in bulk_invite_form.level.field.choices %}
-                        <label class="level-option{% if value == 'mid' %} recommended{% endif %}">
+                        <label class="level-option">
                             <input type="radio" name="level" value="{{ value }}" {% if value == 'mid' %}checked{% endif %}>
                             <div class="level-card">
                                 <span class="level-title">{{ label }}</span>
