@@ -5,133 +5,178 @@
 {% block meta_description %}View detailed analytics and reports for your assessments.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
-    <header class="page-header-with-actions">
-        <div>
-            <h1>Analytics & Reports</h1>
-            <p class="muted">Performance insights and trends</p>
+
+    {# ── Header ── #}
+    <header class="an-header">
+        <div class="an-header-left">
+            <h1>Analytics</h1>
+            <p class="muted">Performance insights across your assessment pipeline</p>
         </div>
-        <div class="header-actions">
-            <form method="get" class="period-selector">
-                <select name="period" onchange="this.form.submit()" class="period-select">
+        <div class="an-header-actions">
+            <form method="get" class="an-period-form">
+                <select name="period" onchange="this.form.submit()" class="an-period-select">
                     <option value="7" {% if selected_period == '7' %}selected{% endif %}>Last 7 days</option>
                     <option value="30" {% if selected_period == '30' %}selected{% endif %}>Last 30 days</option>
                     <option value="90" {% if selected_period == '90' %}selected{% endif %}>Last 90 days</option>
                     <option value="all" {% if selected_period == 'all' %}selected{% endif %}>All time</option>
                 </select>
             </form>
-            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline small">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Export CSV
+                Export
             </a>
         </div>
     </header>
 
     {% if analytics.total_invites > 0 %}
-    {# Key Metrics #}
-    <section class="portal-card-grid three-up key-metrics">
-        <article class="portal-card metric-card">
-            <p class="label">Total Invites</p>
-            <h2 class="metric-value">{{ analytics.total_invites }}</h2>
-            <p class="muted">{{ analytics.in_progress_count }} in progress</p>
-        </article>
-        <article class="portal-card metric-card">
-            <p class="label">Completion Rate</p>
-            <h2 class="metric-value">{{ analytics.completion_rate|floatformat:0 }}%</h2>
-            <p class="muted">{{ analytics.completed_count }} completed</p>
-        </article>
-        <article class="portal-card metric-card">
-            <p class="label">Avg. Score</p>
-            <h2 class="metric-value">{% if analytics.average_score %}{{ analytics.average_score|floatformat:1 }}{% else %}—{% endif %}</h2>
-            <p class="muted">Across finished sessions</p>
-        </article>
-    </section>
 
-    {# Charts Section #}
-    <section class="portal-card-grid two-up chart-section">
-        {# Trend Chart #}
-        <article class="portal-card chart-card">
-            <div class="chart-header">
-                <h3>Activity Trend</h3>
-                <p class="muted">Invites and completions over time</p>
+    {# ── Key Metrics Strip ── #}
+    <div class="an-metrics">
+        <article class="an-metric">
+            <div class="an-metric-icon an-metric-icon--invites">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
             </div>
-            <div class="chart-container chart-loading" id="trendChartContainer">
-                <div class="loading-overlay">
-                    <div class="loading-spinner large"></div>
-                </div>
+            <div class="an-metric-body">
+                <span class="an-metric-lbl">Total Invites</span>
+                <span class="an-metric-val">{{ analytics.total_invites }}</span>
+                <span class="an-metric-sub">{{ analytics.in_progress_count }} in progress</span>
+            </div>
+        </article>
+        <article class="an-metric">
+            <div class="an-metric-icon an-metric-icon--rate">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="an-metric-body">
+                <span class="an-metric-lbl">Completion Rate</span>
+                <span class="an-metric-val">{{ analytics.completion_rate|floatformat:0 }}%</span>
+                <span class="an-metric-sub">{{ analytics.completed_count }} completed</span>
+            </div>
+        </article>
+        <article class="an-metric">
+            <div class="an-metric-icon an-metric-icon--score">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="20" x2="12" y2="10"></line>
+                    <line x1="18" y1="20" x2="18" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="16"></line>
+                </svg>
+            </div>
+            <div class="an-metric-body">
+                <span class="an-metric-lbl">Avg. Score</span>
+                <span class="an-metric-val">{% if analytics.average_score %}{{ analytics.average_score|floatformat:1 }}{% else %}—{% endif %}</span>
+                <span class="an-metric-sub">Across finished sessions</span>
+            </div>
+        </article>
+        <article class="an-metric">
+            <div class="an-metric-icon an-metric-icon--time">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+            <div class="an-metric-body">
+                <span class="an-metric-lbl">Avg. Duration</span>
+                <span class="an-metric-val">{% if analytics.average_duration %}{{ analytics.average_duration|floatformat:0 }}m{% else %}—{% endif %}</span>
+                <span class="an-metric-sub">Time to complete</span>
+            </div>
+        </article>
+    </div>
+
+    {# ── Charts Row ── #}
+    <div class="an-charts">
+        <article class="an-chart-card">
+            <div class="an-card-head">
+                <h3>Activity Trend</h3>
+                <span class="an-card-sub">Invites and completions over time</span>
+            </div>
+            <div class="an-chart-wrap" id="trendChartContainer">
                 <canvas id="trendChart"></canvas>
             </div>
         </article>
-
-        {# Assessment Breakdown Chart #}
-        <article class="portal-card chart-card">
-            <div class="chart-header">
+        <article class="an-chart-card">
+            <div class="an-card-head">
                 <h3>Assessment Breakdown</h3>
-                <p class="muted">Completion rates by assessment type</p>
+                <span class="an-card-sub">Completion rates by type</span>
             </div>
-            <div class="chart-container chart-loading" id="breakdownChartContainer">
-                <div class="loading-overlay">
-                    <div class="loading-spinner large"></div>
-                </div>
+            <div class="an-chart-wrap" id="breakdownChartContainer">
                 <canvas id="breakdownChart"></canvas>
             </div>
         </article>
+    </div>
+
+    {# ── Conversion Funnel ── #}
+    <section class="an-section">
+        <div class="an-section-head">
+            <h2>Conversion Funnel</h2>
+            <span class="an-section-sub">Journey from invite to completion</span>
+        </div>
+        <div class="an-funnel">
+            <div class="an-funnel-step">
+                <div class="an-funnel-bar" style="width: 100%;">
+                    <div class="an-funnel-info">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <span class="an-funnel-label">Invited</span>
+                    </div>
+                    <span class="an-funnel-count">{{ analytics.chart_data.funnel.invited }}</span>
+                </div>
+                <span class="an-funnel-pct">100%</span>
+            </div>
+            <div class="an-funnel-arrow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="an-funnel-step">
+                <div class="an-funnel-bar an-funnel-bar--mid" style="width: {% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%;">
+                    <div class="an-funnel-info">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span class="an-funnel-label">Started</span>
+                    </div>
+                    <span class="an-funnel-count">{{ analytics.chart_data.funnel.started }}</span>
+                </div>
+                <span class="an-funnel-pct">{% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%</span>
+            </div>
+            <div class="an-funnel-arrow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="an-funnel-step">
+                <div class="an-funnel-bar an-funnel-bar--end" style="width: {% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%;">
+                    <div class="an-funnel-info">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span class="an-funnel-label">Completed</span>
+                    </div>
+                    <span class="an-funnel-count">{{ analytics.chart_data.funnel.completed }}</span>
+                </div>
+                <span class="an-funnel-pct">{% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%</span>
+            </div>
+        </div>
     </section>
 
-    {# Funnel Visualization #}
-    <section class="portal-card funnel-section">
-        <div class="chart-header">
-            <h3>Conversion Funnel</h3>
-            <p class="muted">Journey from invite to completion</p>
+    {# ── Assessment Performance ── #}
+    <section class="an-section">
+        <div class="an-section-head">
+            <h2>Assessment Performance</h2>
+            <span class="an-section-sub">Breakdown by assessment type</span>
         </div>
-        <div class="funnel-container">
-            <div class="funnel-stage">
-                <div class="funnel-bar" style="width: 100%;">
-                    <span class="funnel-label">Invited</span>
-                    <span class="funnel-count">{{ analytics.chart_data.funnel.invited }}</span>
-                </div>
-                <span class="funnel-percentage">100%</span>
-            </div>
-            <div class="funnel-arrow">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <polyline points="19 12 12 19 5 12"></polyline>
-                </svg>
-            </div>
-            <div class="funnel-stage">
-                <div class="funnel-bar" style="width: {% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%;">
-                    <span class="funnel-label">Started</span>
-                    <span class="funnel-count">{{ analytics.chart_data.funnel.started }}</span>
-                </div>
-                <span class="funnel-percentage">{% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%</span>
-            </div>
-            <div class="funnel-arrow">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <polyline points="19 12 12 19 5 12"></polyline>
-                </svg>
-            </div>
-            <div class="funnel-stage">
-                <div class="funnel-bar" style="width: {% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%;">
-                    <span class="funnel-label">Completed</span>
-                    <span class="funnel-count">{{ analytics.chart_data.funnel.completed }}</span>
-                </div>
-                <span class="funnel-percentage">{% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%</span>
-            </div>
-        </div>
-    </section>
-
-    {# Assessment Performance Table #}
-    <section class="portal-card">
-        <div class="chart-header">
-            <h3>Assessment Performance</h3>
-            <p class="muted">Detailed breakdown by assessment type</p>
-        </div>
-        <div class="performance-table">
-            <table>
+        <div class="an-table-card">
+            <table class="an-table">
                 <thead>
                     <tr>
                         <th>Assessment</th>
@@ -143,15 +188,15 @@
                 <tbody>
                     {% for item in analytics.assessment_breakdown %}
                     <tr>
-                        <td class="assessment-name">{{ item.label }}</td>
+                        <td class="an-cell-name">{{ item.label }}</td>
                         <td>{{ item.total }}</td>
                         <td>{{ item.completed }}</td>
                         <td>
-                            <div class="completion-bar-cell">
-                                <div class="completion-bar">
-                                    <div class="completion-fill" style="width: {{ item.completion_rate }}%;"></div>
+                            <div class="an-bar-cell">
+                                <div class="an-bar-track">
+                                    <div class="an-bar-fill" style="width: {{ item.completion_rate|floatformat:0 }}%;"></div>
                                 </div>
-                                <span class="completion-text">{{ item.completion_rate|floatformat:0 }}%</span>
+                                <span class="an-bar-text">{{ item.completion_rate|floatformat:0 }}%</span>
                             </div>
                         </td>
                     </tr>
@@ -161,23 +206,24 @@
         </div>
     </section>
 
-    {# Score Distribution #}
+    {# ── Score Distribution ── #}
     {% if analytics.score_distribution %}
-    <section class="portal-card">
-        <div class="chart-header">
-            <h3>Score Distribution</h3>
-            <p class="muted">Breakdown of candidate scores</p>
+    <section class="an-section">
+        <div class="an-section-head">
+            <h2>Score Distribution</h2>
+            <span class="an-section-sub">How candidates scored across all assessments</span>
         </div>
-        <div class="score-distribution">
+        <div class="an-dist-card">
             {% for range in analytics.score_distribution %}
-            <div class="score-range">
-                <div class="score-range-header">
-                    <span class="score-label">{{ range.label }}</span>
-                    <span class="score-count">{{ range.count }} ({{ range.percentage|floatformat:0 }}%)</span>
+            <div class="an-dist-row">
+                <span class="an-dist-label">{{ range.label }}</span>
+                <div class="an-dist-bar-wrap">
+                    <div class="an-dist-bar">
+                        <div class="an-dist-fill {% if range.label == '85-100' %}an-dist-fill--top{% elif range.label == 'Below 40' %}an-dist-fill--low{% endif %}" style="width: {{ range.percentage|floatformat:0 }}%;"></div>
+                    </div>
                 </div>
-                <div class="score-bar">
-                    <div class="score-fill" style="width: {{ range.percentage }}%;"></div>
-                </div>
+                <span class="an-dist-count">{{ range.count }}</span>
+                <span class="an-dist-pct">{{ range.percentage|floatformat:0 }}%</span>
             </div>
             {% endfor %}
         </div>
@@ -185,22 +231,21 @@
     {% endif %}
 
     {% else %}
-    {# Empty State #}
-    <section class="portal-card empty-state-card">
-        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 1.5rem; color: var(--orange);">
+
+    {# ── Empty State ── #}
+    <div class="an-empty">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
             <line x1="12" y1="20" x2="12" y2="10"></line>
             <line x1="18" y1="20" x2="18" y2="4"></line>
             <line x1="6" y1="20" x2="6" y2="16"></line>
         </svg>
-        <h2>No Data Yet</h2>
-        <p class="muted" style="max-width: 500px; margin: 0 auto 2rem;">
-            Start inviting candidates to see analytics and performance insights.
-        </p>
-        <a href="{% url 'clients:assessments' %}" class="btn btn-primary">
-            Go to Assessments
-        </a>
-    </section>
+        <h3>No analytics data yet</h3>
+        <p class="muted">Start inviting candidates to see performance insights and trends.</p>
+        <a href="{% url 'clients:assessments' %}" class="btn btn-pill" style="margin-top: 1.25rem;">Go to Assessments</a>
+    </div>
+
     {% endif %}
+
 </div>
 
 {% if analytics.total_invites > 0 %}
@@ -209,140 +254,73 @@
 <script>
 (function() {
     const chartData = JSON.parse(document.getElementById('chart-data').textContent);
-    const colors = {
-        primary: 'rgba(255, 138, 0, 1)',
-        primaryLight: 'rgba(255, 138, 0, 0.1)',
-        secondary: 'rgba(14, 20, 40, 1)',
-        secondaryLight: 'rgba(14, 20, 40, 0.1)',
-        grid: 'rgba(14, 20, 40, 0.08)',
+    const orange = 'rgba(255, 138, 0, 1)';
+    const orangeLight = 'rgba(255, 138, 0, 0.08)';
+    const navy = 'rgba(14, 20, 40, 1)';
+    const navyLight = 'rgba(14, 20, 40, 0.06)';
+    const grid = 'rgba(14, 20, 40, 0.06)';
+    const font = { family: "'Inter', -apple-system, sans-serif", size: 11, weight: '500' };
+
+    const baseOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: true, position: 'bottom', labels: { font, usePointStyle: true, pointStyle: 'circle', padding: 16 } },
+            tooltip: {
+                backgroundColor: '#0e1428',
+                titleFont: { ...font, size: 12 },
+                bodyFont: { ...font, size: 12 },
+                cornerRadius: 8,
+                padding: 10,
+            },
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { color: grid, drawBorder: false }, ticks: { font, padding: 8 } },
+            x: { grid: { display: false }, ticks: { font, padding: 8 } },
+        },
     };
 
-    // Trend Chart
+    /* Activity Trend */
     const trendCtx = document.getElementById('trendChart');
-    const trendContainer = document.getElementById('trendChartContainer');
-
     if (trendCtx && chartData.trend.length > 0) {
         new Chart(trendCtx, {
             type: 'line',
             data: {
                 labels: chartData.trend.map(d => d.date),
                 datasets: [
-                    {
-                        label: 'Total Invites',
-                        data: chartData.trend.map(d => d.count),
-                        borderColor: colors.primary,
-                        backgroundColor: colors.primaryLight,
-                        tension: 0.3,
-                        fill: true,
-                    },
-                    {
-                        label: 'Completed',
-                        data: chartData.trend.map(d => d.completed),
-                        borderColor: colors.secondary,
-                        backgroundColor: colors.secondaryLight,
-                        tension: 0.3,
-                        fill: true,
-                    }
+                    { label: 'Invites', data: chartData.trend.map(d => d.count), borderColor: orange, backgroundColor: orangeLight, tension: 0.35, fill: true, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5 },
+                    { label: 'Completed', data: chartData.trend.map(d => d.completed), borderColor: navy, backgroundColor: navyLight, tension: 0.35, fill: true, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5 },
                 ]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                    },
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: colors.grid,
-                        },
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                    },
-                },
-                animation: {
-                    onComplete: function() {
-                        // Remove loading state once chart is rendered
-                        if (trendContainer) {
-                            trendContainer.classList.remove('chart-loading');
-                            trendContainer.classList.add('chart-loaded');
-                        }
-                    }
-                }
-            },
+            options: baseOpts,
         });
-    } else if (trendContainer) {
-        // Remove loading if no data
-        trendContainer.classList.remove('chart-loading');
     }
 
-    // Assessment Breakdown Chart
-    const breakdownCtx = document.getElementById('breakdownChart');
-    const breakdownContainer = document.getElementById('breakdownChartContainer');
-
-    if (breakdownCtx && chartData.breakdown.length > 0) {
-        new Chart(breakdownCtx, {
+    /* Assessment Breakdown */
+    const brkCtx = document.getElementById('breakdownChart');
+    if (brkCtx && chartData.breakdown.length > 0) {
+        new Chart(brkCtx, {
             type: 'bar',
             data: {
                 labels: chartData.breakdown.map(d => d.label),
-                datasets: [
-                    {
-                        label: 'Completion Rate (%)',
-                        data: chartData.breakdown.map(d => d.completion_rate),
-                        backgroundColor: colors.primary,
-                        borderColor: colors.primary,
-                        borderWidth: 1,
-                    }
-                ]
+                datasets: [{
+                    label: 'Completion %',
+                    data: chartData.breakdown.map(d => d.completion_rate),
+                    backgroundColor: orange,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barPercentage: 0.6,
+                }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-                },
+                ...baseOpts,
+                plugins: { ...baseOpts.plugins, legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: {
-                            color: colors.grid,
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                    },
+                    ...baseOpts.scales,
+                    y: { ...baseOpts.scales.y, max: 100, ticks: { ...baseOpts.scales.y.ticks, callback: v => v + '%' } },
                 },
-                animation: {
-                    onComplete: function() {
-                        // Remove loading state once chart is rendered
-                        if (breakdownContainer) {
-                            breakdownContainer.classList.remove('chart-loading');
-                            breakdownContainer.classList.add('chart-loaded');
-                        }
-                    }
-                }
             },
         });
-    } else if (breakdownContainer) {
-        // Remove loading if no data
-        breakdownContainer.classList.remove('chart-loading');
     }
 })();
 </script>
