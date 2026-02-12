@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Pricing · Evalon{% endblock %}
+{% block meta_description %}Simple, transparent pricing for hiring assessments. Start free, upgrade when you need more. All plans include all 6 assessment types.{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+
+    <main class="pr-main">
+
+        {# ── Hero ── #}
+        <div class="pr-hero">
+            <p class="pr-eyebrow">Pricing</p>
+            <h1 class="pr-title">Simple, transparent pricing</h1>
+            <p class="pr-subtitle">Start free, upgrade when you need more projects and invites. All plans include all six assessment types.</p>
+        </div>
+
+        {# ── Tier Cards ── #}
+        <div class="pr-grid">
+            {% for tier in tiers %}
+            <article class="pr-card {% if tier.highlighted %}pr-card--popular{% endif %}">
+                {% if tier.highlighted %}<div class="pr-ribbon">Most popular</div>{% endif %}
+                <div class="pr-card-top">
+                    <h3 class="pr-card-name">{{ tier.name }}</h3>
+                    <div class="pr-price">
+                        <span class="pr-amount">{{ tier.price }}</span>
+                        <span class="pr-freq">{{ tier.frequency }}</span>
+                    </div>
+                    <p class="pr-desc">{{ tier.desc }}</p>
+                    <p class="pr-limits">{{ tier.limits }}</p>
+                </div>
+                <ul class="pr-features">
+                    {% for f in tier.features %}
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        {{ f }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <a class="pr-cta {% if tier.highlighted %}pr-cta--filled{% endif %}"
+                   href="{{ tier.cta_url }}"
+                   data-gtag-click="pricing_plan_click"
+                   data-gtag-category="pricing"
+                   data-gtag-label="{{ tier.slug }}">{{ tier.cta_label }}</a>
+            </article>
+            {% endfor %}
+        </div>
+
+        <p class="pr-footnote">All plans include unlimited team members. Annual billing saves 20% on the Pro plan.</p>
+
+        {# ── Feature Comparison ── #}
+        <div class="pr-section">
+            <h2 class="pr-section-title">Compare plans</h2>
+            <div class="pr-table-wrap">
+                <table class="pr-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Starter</th>
+                            <th>Pro</th>
+                            <th>Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in comparison %}
+                        <tr>
+                            <td>{{ row.feature }}</td>
+                            {% for plan in "starter,pro,enterprise"|make_list %}{% endfor %}
+                            <td>
+                                {% if row.starter is True %}
+                                <svg class="pr-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                {% elif row.starter is False %}
+                                <span class="pr-dash">&mdash;</span>
+                                {% else %}{{ row.starter }}{% endif %}
+                            </td>
+                            <td>
+                                {% if row.pro is True %}
+                                <svg class="pr-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                {% elif row.pro is False %}
+                                <span class="pr-dash">&mdash;</span>
+                                {% else %}{{ row.pro }}{% endif %}
+                            </td>
+                            <td>
+                                {% if row.enterprise is True %}
+                                <svg class="pr-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                {% elif row.enterprise is False %}
+                                <span class="pr-dash">&mdash;</span>
+                                {% else %}{{ row.enterprise }}{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# ── Included Assessments ── #}
+        <div class="pr-section">
+            <h2 class="pr-section-title">All 6 assessment banks included</h2>
+            <p class="pr-section-sub">Every plan gives you access to our full library of pre-built skill tests.</p>
+            <div class="pr-assess-grid">
+                {% for a in assessments %}
+                <div class="pr-assess-card">
+                    <h4 class="pr-assess-name">{{ a.name }}</h4>
+                    <p class="pr-assess-desc">{{ a.desc }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# ── FAQ ── #}
+        <div class="pr-section">
+            <h2 class="pr-section-title">Frequently asked questions</h2>
+            <div class="pr-faq">
+                {% for item in faqs %}
+                <details class="pr-faq-item">
+                    <summary>{{ item.q }}</summary>
+                    <p>{{ item.a }}</p>
+                </details>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# ── Final CTA ── #}
+        <div class="pr-final">
+            <h2 class="pr-final-title">Ready to hire with confidence?</h2>
+            <p class="pr-final-sub">Create a free account and send your first assessment in minutes.</p>
+            <a class="pr-final-btn" href="{% url 'clients:signup' %}">Get started free</a>
+        </div>
+
+    </main>
+</div>
+{% endblock %}
+{% block site_footer %}
+    {% include 'includes/site_footer.html' %}
+{% endblock %}

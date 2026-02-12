@@ -354,6 +354,141 @@ def home(request):
     )
 
 
+def pricing(request):
+    tiers = [
+        {
+            "slug": "starter",
+            "name": "Starter",
+            "price": "$0",
+            "frequency": "forever",
+            "desc": "Try Evalon with two active roles and a small candidate pool.",
+            "limits": "2 projects · 20 invites/mo",
+            "cta_label": "Create free account",
+            "cta_url": reverse("clients:signup"),
+            "highlighted": False,
+            "features": [
+                "All 6 assessment banks",
+                "Up to 2 active projects",
+                "20 candidate invites per month",
+                "Basic score reports",
+                "CSV export",
+                "Email support",
+            ],
+        },
+        {
+            "slug": "pro",
+            "name": "Pro",
+            "price": "$59",
+            "frequency": "per month",
+            "desc": "Run multiple searches with richer reporting, branding, and pipeline tools.",
+            "limits": "10 projects · 250 invites/mo",
+            "cta_label": "Start 14-day free trial",
+            "cta_url": reverse("clients:signup"),
+            "highlighted": True,
+            "features": [
+                "Everything in Starter, plus:",
+                "Up to 10 active projects",
+                "250 candidate invites per month",
+                "Pipeline kanban & top-candidate spotlights",
+                "Custom branding & shareable reports",
+                "Overage at $0.40 per extra invite",
+                "Priority chat & email support",
+            ],
+        },
+        {
+            "slug": "enterprise",
+            "name": "Enterprise",
+            "price": "Custom",
+            "frequency": "contact us",
+            "desc": "Unlimited everything, tailor-made assessments, SSO, and hands-on rollout.",
+            "limits": "Unlimited projects & invites",
+            "cta_label": "Request a quote",
+            "cta_url": reverse("pages:contact"),
+            "highlighted": False,
+            "features": [
+                "Everything in Pro, plus:",
+                "Unlimited projects & invites",
+                "Custom assessment design",
+                "Dedicated customer success manager",
+                "SSO / SAML integration",
+                "SLA guarantee & SOC 2 readiness",
+                "Full API access",
+                "On-site training & rollout support",
+            ],
+        },
+    ]
+
+    comparison = [
+        {"feature": "Active projects", "starter": "2", "pro": "10", "enterprise": "Unlimited"},
+        {"feature": "Monthly invites", "starter": "20", "pro": "250", "enterprise": "Unlimited"},
+        {"feature": "All 6 assessment banks", "starter": True, "pro": True, "enterprise": True},
+        {"feature": "Basic score reports", "starter": True, "pro": True, "enterprise": True},
+        {"feature": "CSV export", "starter": True, "pro": True, "enterprise": True},
+        {"feature": "Pipeline kanban", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Top-candidate spotlights", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Custom branding", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Shareable reports", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Priority support", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Custom assessments", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "SSO / SAML", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "Dedicated CSM", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "SLA guarantee", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "API access", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "On-site training", "starter": False, "pro": False, "enterprise": True},
+    ]
+
+    assessments = [
+        {"name": "Marketing", "desc": "Paid media, SEO, analytics, and campaign strategy."},
+        {"name": "Product Management", "desc": "Strategy, execution, roadmaps, and product sense."},
+        {"name": "Behavioral", "desc": "Psychometric-backed signals for culture and role fit."},
+        {"name": "UX/UI Design", "desc": "User research, interaction design, and prototyping."},
+        {"name": "HR", "desc": "Talent acquisition, employee relations, and compliance."},
+        {"name": "Finance", "desc": "Financial planning, budgeting, and analysis."},
+    ]
+
+    faqs = [
+        {
+            "q": "Can I switch plans at any time?",
+            "a": "Yes. Upgrade or downgrade whenever you like — changes take effect on your next billing cycle. If you upgrade mid-cycle, we prorate the difference.",
+        },
+        {
+            "q": "What happens when I exceed my invite limit?",
+            "a": "On the Pro plan, additional invites cost $0.40 each. On the Starter plan, you'll need to wait for next month's refresh or upgrade to Pro.",
+        },
+        {
+            "q": "Do all plans include all 6 assessment types?",
+            "a": "Yes. Every plan — including the free Starter — gives you access to all six assessment banks: Marketing, Product, Behavioral, UX/UI, HR, and Finance.",
+        },
+        {
+            "q": "Is there a discount for annual billing?",
+            "a": "Yes. Annual billing on the Pro plan saves you 20%, bringing the price to $47/month billed annually.",
+        },
+        {
+            "q": "What payment methods do you accept?",
+            "a": "We accept all major credit cards (Visa, Mastercard, Amex) and can arrange invoicing for Enterprise customers.",
+        },
+        {
+            "q": "Can I cancel anytime?",
+            "a": "Absolutely. There are no long-term contracts. Cancel from your dashboard settings and you'll retain access until the end of your current billing period.",
+        },
+        {
+            "q": "How does the free trial work?",
+            "a": "The Pro trial gives you full Pro features for 14 days. No credit card required. At the end of the trial, you can subscribe or revert to the Starter plan.",
+        },
+        {
+            "q": "Is my data secure?",
+            "a": "Yes. We use AES-256 encryption at rest, TLS 1.3 in transit, and undergo regular third-party security audits. Enterprise customers can request our SOC 2 report.",
+        },
+    ]
+
+    return render(request, "pages/pricing.html", {
+        "tiers": tiers,
+        "comparison": comparison,
+        "assessments": assessments,
+        "faqs": faqs,
+    })
+
+
 def contact(request):
     fallback = {
         "hero": {
