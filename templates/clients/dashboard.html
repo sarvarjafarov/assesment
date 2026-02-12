@@ -250,9 +250,9 @@
                             <div class="activity-details">
                                 <p class="activity-name">{{ entry.candidate }}</p>
                                 <p class="activity-meta">
-                                    {{ entry.assessment }}
+                                    <span>{{ entry.assessment }}</span>
                                     <span class="db-status-dot {% if entry.status == 'Completed' or entry.status == 'Submitted' %}dot-success{% elif entry.status == 'In Progress' %}dot-active{% else %}dot-pending{% endif %}"></span>
-                                    {{ entry.status }}
+                                    <span>{{ entry.status }}</span>
                                 </p>
                             </div>
                         </div>
