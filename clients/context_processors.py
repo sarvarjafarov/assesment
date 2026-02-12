@@ -24,6 +24,7 @@ def portal_navigation(request):
         'has_custom_assessments': False,
         'account': None,
         'role_label': None,
+        'sidebar_plan': None,
     }
 
     # Only add navigation data for authenticated client users
@@ -88,6 +89,18 @@ def portal_navigation(request):
 
         if project_count > 0:
             context['project_badge_count'] = project_count
+
+        # Sidebar plan usage (lightweight)
+        invite_limit = account.invite_limit()
+        invites_used = account.invites_used() if invite_limit else 0
+        invite_pct = min(100, round((invites_used / invite_limit) * 100)) if invite_limit else None
+        context['sidebar_plan'] = {
+            'name': dict(ClientAccount.PLAN_CHOICES).get(account.plan_slug, 'Starter'),
+            'slug': account.plan_slug,
+            'invites_used': invites_used,
+            'invite_limit': invite_limit,
+            'invite_pct': invite_pct,
+        }
 
     except Exception:
         # Silently fail if there are any issues

@@ -945,6 +945,23 @@ document.addEventListener('DOMContentLoaded', () => {
             globalSearch.focus();
         });
 
+        // Search shortcut hint (⌘K / Ctrl K)
+        const searchShortcut = document.getElementById("search-shortcut");
+        if (searchShortcut) {
+            // Show correct modifier for platform
+            if (!/Mac|iPhone|iPad/.test(navigator.platform || '')) {
+                searchShortcut.textContent = "Ctrl K";
+            }
+            globalSearch.addEventListener("focus", () => {
+                searchShortcut.style.display = "none";
+            });
+            globalSearch.addEventListener("blur", () => {
+                if (!globalSearch.value) {
+                    searchShortcut.style.display = "";
+                }
+            });
+        }
+
         function performSearch(query) {
             const lowercaseQuery = query.toLowerCase();
             const results = [];
