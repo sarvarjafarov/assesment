@@ -6405,22 +6405,30 @@ main {
     gap: 1.5rem;
 }
 
-/* Sections (fieldsets) */
+/* Sections (fieldsets) — reset browser fieldset defaults */
 .su-section {
     border: 1px solid #ebedf0;
     border-radius: 12px;
     background: #fff;
     padding: 2rem;
     margin: 0;
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
 }
 .su-section-title {
+    float: left;
+    width: 100%;
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--color-navy);
     margin: 0 0 1.5rem;
     padding: 0 0 1rem;
     border-bottom: 1px solid #f3f4f6;
-    width: 100%;
+}
+.su-section-title + .su-row,
+.su-section-title + .su-assess-header {
+    clear: both;
 }
 
 /* Rows */
