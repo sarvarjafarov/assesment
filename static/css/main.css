@@ -9581,16 +9581,7 @@ main {
 .activity-card li:last-child {
     border-bottom: none;
 }
-.activity-name {
-    font-weight: 600;
-    margin: 0;
-}
-.activity-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.35rem;
-}
+/* activity-name and activity-meta styles moved to db-* dashboard block below */
 .mini-funnel {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -9996,9 +9987,7 @@ main {
         flex-direction: column;
         align-items: flex-start;
     }
-    .activity-meta {
-        align-items: flex-start;
-    }
+    /* activity-meta responsive styles moved to db-* block */
 }
 .divider {
     width: 100%;
@@ -11031,6 +11020,7 @@ main {
     overflow: hidden;
     text-overflow: ellipsis;
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 0.35rem;
 }
