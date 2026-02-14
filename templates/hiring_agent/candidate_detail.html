@@ -352,8 +352,8 @@
             </div>
             {% endif %}
 
-            {# ── Human Review (main area on larger screens) ── #}
-            {% if pc.stage == 'shortlisted' or pc.stage == 'decision_made' %}
+            {# ── Human Review ── #}
+            {% if pc.stage == 'shortlisted' or pc.stage == 'decision_made' or pc.stage == 'hired' or pc.stage == 'rejected' %}
             <div class="cd-card">
                 <div class="cd-card-header">
                     <div class="cd-card-icon" style="background: rgba(255, 138, 0, 0.1); color: var(--color-orange, #ff8a00);">
@@ -361,6 +361,18 @@
                     </div>
                     <h3 class="cd-card-title">Your Review</h3>
                 </div>
+
+                {% if pc.human_decision %}
+                <div style="margin-bottom: 1rem;">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: var(--color-text-muted, #5b647b); margin-right: 0.5rem;">Current decision:</span>
+                    <span class="cd-rec cd-rec--{{ pc.human_decision }}">{{ pc.human_decision|title }}</span>
+                </div>
+                {% if pc.human_notes %}
+                <p style="margin: 0 0 1.25rem; color: #334155; font-size: 0.88rem; line-height: 1.6;">{{ pc.human_notes }}</p>
+                {% endif %}
+                <details style="margin-bottom: 0;">
+                    <summary style="cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--color-orange, #ff8a00); margin-bottom: 1rem;">Change decision</summary>
+                {% endif %}
 
                 <form method="post" action="{% url 'hiring_agent:candidate-review' pipeline_uuid=pipeline.uuid pk=pc.pk %}">
                     {% csrf_token %}
@@ -381,6 +393,10 @@
                     </div>
                     <button type="submit" class="btn btn-pill">Submit Review</button>
                 </form>
+
+                {% if pc.human_decision %}
+                </details>
+                {% endif %}
             </div>
             {% endif %}
 
