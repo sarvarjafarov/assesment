@@ -7,9 +7,20 @@
     --brand-secondary: {{ session.client.brand_secondary_color|default:"#0e1428" }};
     --brand-background: {{ session.client.brand_background_color|default:"#ffffff" }};
 }
+/* Page background */
+.candidate-shell { background: var(--brand-background, #ffffff) !important; }
+/* Text & headings */
+.intro-title-group h1, .question-title, .question-card-enhanced h2 { color: var(--brand-secondary, #0e1428) !important; }
+.intro-title-group .lede, .candidate-panel .lede { color: var(--brand-secondary, #0e1428) !important; opacity: 0.7; }
+/* Primary color: buttons, progress, selections */
 .progress-bar-fill { background: var(--brand-primary, #ff8a00) !important; }
 .btn-submit-enhanced, .submit-btn, .btn.btn-primary { background: var(--brand-primary, #ff8a00) !important; border-color: var(--brand-primary, #ff8a00) !important; }
-.option-button.selected { border-color: var(--brand-primary, #ff8a00); }
+.btn.btn-outline { color: var(--brand-primary, #ff8a00) !important; border-color: var(--brand-primary, #ff8a00) !important; }
+.option-button.selected { border-color: var(--brand-primary, #ff8a00); background: color-mix(in srgb, var(--brand-primary, #ff8a00) 5%, transparent); }
 .option-button.selected .option-radio::before { background: var(--brand-primary, #ff8a00); }
+/* Links */
+.candidate-panel a:not(.btn) { color: var(--brand-primary, #ff8a00); }
+/* Assessment badge */
+.assessment-badge { color: var(--brand-primary, #ff8a00); }
 </style>
 {% endif %}

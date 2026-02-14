@@ -2,18 +2,9 @@
 {% load humanize %}
 {% block title %}{{ assessment.name }} - Get Ready{% endblock %}
 {% block content %}
-{# Apply client branding CSS variables #}
-{% if session.client %}
-<style>
-:root {
-    --brand-primary: {{ session.client.brand_primary_color|default:"#ff8a00" }};
-    --brand-secondary: {{ session.client.brand_secondary_color|default:"#0e1428" }};
-    --brand-background: {{ session.client.brand_background_color|default:"#ffffff" }};
-}
-</style>
-{% endif %}
+{% include 'candidate/_branding.html' %}
 
-<div class="candidate-shell single-column" style="{% if session.client.brand_background_color %}background: {{ session.client.brand_background_color }};{% endif %}">
+<div class="candidate-shell single-column">
     <section class="candidate-panel intro-panel">
         <!-- Header with Client Logo -->
         <div class="intro-header">
