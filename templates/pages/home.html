@@ -76,16 +76,16 @@
         <div class="hero-wrapper">
             <section class="hero-v2 reveal">
                 <div class="hero-v2-inner">
-                    <a class="hero-badge" href="#how-it-works">
+                    <a class="hero-badge hero-anim hero-anim-1" href="#how-it-works">
                         <span class="hero-badge-dot"></span>
                         {{ hero_content.badge }}
                         <svg class="hero-badge-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </a>
-                    <h1 class="hero-title">
+                    <h1 class="hero-title hero-anim hero-anim-2">
                         {{ hero_content.title }} {% if hero_content.title_accent %}<span class="hero-title-accent">{{ hero_content.title_accent }}</span>{% endif %}
                     </h1>
-                    <p class="hero-subtitle">{{ hero_content.subtitle }}</p>
-                    <div class="hero-cta-group">
+                    <p class="hero-subtitle hero-anim hero-anim-3">{{ hero_content.subtitle }}</p>
+                    <div class="hero-cta-group hero-anim hero-anim-4">
                         <a class="hero-btn-primary" href="{{ hero_content.primary_url }}" data-gtag-click="get_started_click">
                             {{ hero_content.primary_label }}
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -95,7 +95,7 @@
                             See how it works
                         </a>
                     </div>
-                    <div class="hero-social-proof">
+                    <div class="hero-social-proof hero-anim hero-anim-5">
                         <div class="hero-proof-avatars">
                             <span class="proof-avatar" style="background: #4f46e5;">S</span>
                             <span class="proof-avatar" style="background: #0891b2;">M</span>
@@ -109,8 +109,8 @@
             </section>
 
             {# Product preview mockup #}
-            <div class="hero-product-preview reveal">
-                <div class="hero-mockup">
+            <div class="hero-product-preview hero-anim hero-anim-6 reveal">
+                <div class="hero-mockup mockup-float">
                     <div class="mockup-toolbar">
                         <div class="mockup-dots">
                             <span></span><span></span><span></span>
@@ -147,21 +147,21 @@
                             <div class="mockup-topbar">
                                 <span class="mockup-greeting">Welcome back, Sarah</span>
                                 <div class="mockup-topbar-actions">
-                                    <span class="mockup-notif"></span>
+                                    <span class="mockup-notif pulse-dot"></span>
                                     <span class="mockup-user-avatar">S</span>
                                 </div>
                             </div>
                             <div class="mockup-stats-row">
-                                <div class="mockup-stat-card">
-                                    <span class="mockup-stat-num">24</span>
+                                <div class="mockup-stat-card mockup-card-anim" style="--card-delay: 0.8s">
+                                    <span class="mockup-stat-num" data-count="24">0</span>
                                     <span class="mockup-stat-label">Active Candidates</span>
                                 </div>
-                                <div class="mockup-stat-card accent">
-                                    <span class="mockup-stat-num">89%</span>
+                                <div class="mockup-stat-card accent mockup-card-anim" style="--card-delay: 0.95s">
+                                    <span class="mockup-stat-num" data-count="89" data-suffix="%">0%</span>
                                     <span class="mockup-stat-label">Completion Rate</span>
                                 </div>
-                                <div class="mockup-stat-card">
-                                    <span class="mockup-stat-num">6</span>
+                                <div class="mockup-stat-card mockup-card-anim" style="--card-delay: 1.1s">
+                                    <span class="mockup-stat-num" data-count="6">0</span>
                                     <span class="mockup-stat-label">Assessments</span>
                                 </div>
                             </div>
@@ -172,19 +172,19 @@
                                     <span>Score</span>
                                     <span>Status</span>
                                 </div>
-                                <div class="mockup-table-row">
+                                <div class="mockup-table-row mockup-row-anim" style="--row-delay: 1.2s">
                                     <span class="mockup-name"><span class="mockup-avatar" style="background:#4f46e5;">J</span> James Wilson</span>
                                     <span>Marketing IQ</span>
                                     <span class="mockup-score high">92%</span>
                                     <span class="mockup-status done">Completed</span>
                                 </div>
-                                <div class="mockup-table-row">
+                                <div class="mockup-table-row mockup-row-anim" style="--row-delay: 1.35s">
                                     <span class="mockup-name"><span class="mockup-avatar" style="background:#0891b2;">A</span> Anna Chen</span>
                                     <span>Product Management</span>
                                     <span class="mockup-score high">87%</span>
                                     <span class="mockup-status done">Completed</span>
                                 </div>
-                                <div class="mockup-table-row">
+                                <div class="mockup-table-row mockup-row-anim" style="--row-delay: 1.5s">
                                     <span class="mockup-name"><span class="mockup-avatar" style="background:#d97706;">M</span> Michael Park</span>
                                     <span>UX Design</span>
                                     <span class="mockup-score mid">--</span>
@@ -513,6 +513,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.1 });
 
     reveals.forEach(reveal => observer.observe(reveal));
+
+    /* Hero staggered entrance animations */
+    document.querySelectorAll('.hero-anim').forEach(el => {
+        el.classList.add('hero-anim-ready');
+    });
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.hero-anim').forEach(el => {
+            el.classList.add('hero-anim-go');
+        });
+    });
+
+    /* Animated number counters in mockup */
+    const counters = document.querySelectorAll('[data-count]');
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            if (el.dataset.counted) return;
+            el.dataset.counted = '1';
+            const target = parseInt(el.dataset.count);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1200;
+            const start = performance.now();
+            function tick(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                el.textContent = Math.round(target * eased) + suffix;
+                if (progress < 1) requestAnimationFrame(tick);
+            }
+            setTimeout(() => requestAnimationFrame(tick), 600);
+        });
+    }, { threshold: 0.5 });
+    counters.forEach(c => counterObserver.observe(c));
 });
 </script>
 {% endblock %}
