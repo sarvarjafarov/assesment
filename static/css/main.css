@@ -17574,6 +17574,7 @@ main {
     position: relative;
     overflow: hidden;
     background: var(--color-bg-body);
+    cursor: default;
 }
 
 .hero-v2 {
@@ -17645,6 +17646,99 @@ main {
 
 .hero-title-accent {
     color: var(--color-orange);
+}
+
+/* Rotating words in headline */
+.hero-rotating-wrapper {
+    display: inline-block;
+    position: relative;
+    height: 1.15em;
+    overflow: hidden;
+    vertical-align: bottom;
+}
+
+.hero-rotating-words {
+    display: block;
+    position: relative;
+}
+
+.hero-word {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: max-content;
+    opacity: 0;
+    transform: translateY(50%);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    background: linear-gradient(135deg, #ff8a00, #ff6b00, #e85d04, #ff8a00);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 4s ease infinite;
+}
+
+.hero-word.active {
+    position: relative;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Dot grid background */
+.hero-dot-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: radial-gradient(circle, rgba(14, 20, 40, 0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Mockup glow border */
+.mockup-glow-border {
+    position: relative;
+    border-radius: 14px;
+    padding: 2px;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.5), rgba(255, 138, 0, 0.1), rgba(14, 20, 40, 0.08), rgba(255, 138, 0, 0.3));
+    background-size: 300% 300%;
+    animation: glow-rotate 6s ease infinite;
+}
+
+@keyframes glow-rotate {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.mockup-glow-border .hero-mockup {
+    border: none;
+}
+
+/* Live cursor inside mockup */
+.mockup-cursor {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    transform: translate(60px, 55px);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.mockup-cursor.cursor-click {
+    transform-origin: top left;
+    animation: cursor-tap 0.2s ease;
+}
+
+@keyframes cursor-tap {
+    0%, 100% { scale: 1; }
+    50% { scale: 0.85; }
 }
 
 /* Subtitle */
@@ -17893,6 +17987,9 @@ main {
     .hero-btn-primary::after { animation: none; display: none; }
     .mockup-card-anim, .mockup-row-anim { opacity: 1; transform: none; animation: none; }
     .hero-anim-go .proof-avatar { animation: none; opacity: 1; transform: none; }
+    .hero-word { animation: none; transition: none; }
+    .mockup-glow-border { animation: none; }
+    .mockup-cursor { display: none; }
 }
 
 /* Product preview mockup */
@@ -18186,6 +18283,7 @@ main {
 /* Mockup responsive */
 @media (max-width: 768px) {
     .mockup-sidebar { display: none; }
+    .mockup-cursor { display: none; }
     .hero-product-preview { padding: 0 1rem 4rem; margin-top: 0; }
     .mockup-content { min-height: 240px; }
     .mockup-stats-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -18194,6 +18292,7 @@ main {
     .mockup-table-row { grid-template-columns: 2fr 1fr 0.8fr 1fr; font-size: 0.65rem; }
     .mockup-name { font-size: 0.65rem; }
     .mockup-avatar { width: 20px; height: 20px; font-size: 0.5rem; }
+    .hero-dot-grid { background-size: 24px 24px; }
 }
 
 @media (max-width: 480px) {
@@ -18777,6 +18876,11 @@ main {
     border-radius: 50%;
     z-index: 0;
     pointer-events: none;
+    transition: transform 0.3s ease-out;
+}
+
+.hero-shape {
+    transition: transform 0.3s ease-out;
 }
 
 .orb-one {
@@ -18786,7 +18890,6 @@ main {
     left: -80px;
     background: radial-gradient(circle at 40% 40%, rgba(255, 158, 44, 0.28), rgba(255, 200, 120, 0.08) 70%, transparent);
     filter: blur(40px);
-    animation: float-orb-1 18s ease-in-out infinite;
 }
 
 .orb-two {
@@ -18796,7 +18899,6 @@ main {
     right: -60px;
     background: radial-gradient(circle at 60% 60%, rgba(255, 138, 0, 0.24), rgba(255, 180, 80, 0.06) 70%, transparent);
     filter: blur(35px);
-    animation: float-orb-2 22s ease-in-out infinite;
 }
 
 .orb-three {
@@ -18806,7 +18908,6 @@ main {
     right: 5%;
     background: radial-gradient(circle at 50% 50%, rgba(255, 170, 60, 0.20), rgba(255, 200, 120, 0.04) 70%, transparent);
     filter: blur(30px);
-    animation: float-orb-3 25s ease-in-out infinite;
 }
 
 .orb-four {
@@ -18816,7 +18917,6 @@ main {
     left: 3%;
     background: radial-gradient(circle at 50% 50%, rgba(255, 148, 20, 0.22), rgba(255, 190, 100, 0.05) 70%, transparent);
     filter: blur(25px);
-    animation: float-orb-4 20s ease-in-out infinite;
 }
 
 @keyframes float-orb-1 {
