@@ -42,6 +42,9 @@
     {% else %}
     <link rel="icon" href="{% static 'img/logo-glyph.svg' %}">
     {% endif %}
+    <link rel="apple-touch-icon" href="{% static 'img/logo-glyph.svg' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <meta name="theme-color" content="#ff8a00">
     {% block extra_meta %}{% endblock %}
     {% block canonical %}<link rel="canonical" href="{{ seo_metadata.canonical_url|default:request.build_absolute_uri }}">{% endblock %}
     {% render_seo_jsonld seo_metadata %}

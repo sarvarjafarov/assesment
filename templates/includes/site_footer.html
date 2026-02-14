@@ -4,7 +4,7 @@
         <div class="footer-main-inner">
             <div class="footer-brand-v2">
                 <a class="footer-logo" href="{% url 'pages:home' %}">
-                    <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" />
+                    <img src="{% static 'img/evalon-logo.png' %}" alt="Evalon logo" width="120" height="40" loading="lazy" />
                 </a>
                 <p class="footer-tagline">Structured hiring assessments for modern teams. Evaluate real skills, reduce bias, and hire with confidence.</p>
                 <div class="footer-social">
@@ -20,25 +20,26 @@
                 <div class="footer-col">
                     <p class="footer-col-heading">Platform</p>
                     <ul>
-                        <li><a href="#assessments">Assessment suite</a></li>
-                        <li><a href="#how-it-works">How it works</a></li>
-                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="{% url 'pages:assessment_list' %}">Assessment suite</a></li>
+                        <li><a href="{% url 'pages:role_assessment_list' %}">Role assessments</a></li>
+                        <li><a href="{% url 'pages:interview_questions_list' %}">Interview questions</a></li>
+                        <li><a href="{% url 'pages:pricing' %}">Pricing</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <p class="footer-col-heading">Resources</p>
                     <ul>
-                        <li><a href="#resources">Blog &amp; insights</a></li>
-                        <li><a href="#results">Customer stories</a></li>
+                        <li><a href="{% url 'blog:list' %}">Blog &amp; insights</a></li>
+                        <li><a href="{% url 'pages:resources' %}">Resources</a></li>
                         <li><a href="{% url 'marketing_assessments:api' %}">API docs</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <p class="footer-col-heading">Company</p>
                     <ul>
-                        <li><a href="#cta">Contact us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Security</a></li>
+                        <li><a href="{% url 'pages:contact' %}">Contact us</a></li>
+                        <li><a href="{% url 'pages:careers' %}">Careers</a></li>
+                        <li><a href="{% url 'pages:security' %}">Security</a></li>
                     </ul>
                 </div>
             </nav>
@@ -63,8 +64,8 @@
         <div class="footer-bar-inner">
             <span class="footer-copyright">&copy; {% now "Y" %} Evalon. All rights reserved.</span>
             <div class="footer-legal">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
+                <a href="{% url 'pages:privacy' %}">Privacy Policy</a>
+                <a href="{% url 'pages:terms' %}">Terms of Service</a>
             </div>
         </div>
     </div>

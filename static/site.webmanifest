@@ -1,0 +1,17 @@
+{
+    "name": "Evalon",
+    "short_name": "Evalon",
+    "description": "Structured hiring assessments for modern teams",
+    "start_url": "/",
+    "display": "browser",
+    "background_color": "#ffffff",
+    "theme_color": "#ff8a00",
+    "icons": [
+        {
+            "src": "/static/img/logo-glyph.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

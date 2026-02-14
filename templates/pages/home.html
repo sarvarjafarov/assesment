@@ -1,6 +1,60 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}{{ marketing_settings.meta_title|default:"Evalon · Structured Hiring Assessments" }}{% endblock %}
+{% block extra_meta %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Evalon",
+    "url": "https://www.evalon.tech",
+    "logo": "https://www.evalon.tech{% static 'img/evalon-logo.png' %}",
+    "description": "Structured hiring assessments for modern teams. Evaluate real skills, reduce bias, and hire with confidence.",
+    "foundingDate": "2024",
+    "sameAs": [],
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": "https://www.evalon.tech{% url 'pages:contact' %}"
+    },
+    "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "USD",
+        "lowPrice": "0",
+        "offerCount": "3",
+        "offers": [
+            {
+                "@type": "Offer",
+                "name": "Starter",
+                "price": "0",
+                "priceCurrency": "USD",
+                "url": "https://www.evalon.tech{% url 'pages:pricing' %}"
+            },
+            {
+                "@type": "Offer",
+                "name": "Pro",
+                "price": "99",
+                "priceCurrency": "USD",
+                "url": "https://www.evalon.tech{% url 'pages:pricing' %}"
+            }
+        ]
+    }
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Evalon",
+    "url": "https://www.evalon.tech",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.evalon.tech{% url 'pages:assessment_list' %}?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
+{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' %}
@@ -215,7 +269,7 @@
                         <blockquote class="testimonial-quote">"{{ testimonial.quote }}"</blockquote>
                         <div class="testimonial-footer">
                             <div class="testimonial-avatar">
-                                <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" />
+                                <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" width="48" height="48" loading="lazy" />
                             </div>
                             <div>
                                 <p class="testimonial-name">{{ testimonial.name }}</p>
