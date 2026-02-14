@@ -18800,3 +18800,268 @@ main {
         padding: 1rem 1.25rem;
     }
 }
+
+/* ========================================================================
+   ANNOUNCEMENT BANNER
+   ======================================================================== */
+
+.announce-bar {
+    background: linear-gradient(135deg, #0e1428, #1a2340);
+    color: #fff;
+    padding: 0.65rem 1.5rem;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.announce-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.announce-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: linear-gradient(135deg, #ff8a00, #ff6b00);
+    color: #fff;
+    line-height: 1.5;
+}
+
+.announce-text {
+    font-size: 0.88rem;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.announce-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ff8a00;
+    text-decoration: none;
+    transition: gap 0.2s ease;
+}
+
+.announce-link:hover {
+    gap: 0.55rem;
+}
+
+@media (max-width: 600px) {
+    .announce-bar { padding: 0.6rem 1rem; }
+    .announce-text { font-size: 0.8rem; }
+    .announce-link { display: none; }
+}
+
+/* ========================================================================
+   AI PIPELINE SHOWCASE SECTION
+   ======================================================================== */
+
+.ai-showcase {
+    padding: 6rem 2rem;
+    background: linear-gradient(180deg, #fffdf8 0%, #fff7ed 50%, #fffdf8 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-showcase::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(255, 138, 0, 0.04);
+    pointer-events: none;
+}
+
+.ai-showcase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.ai-showcase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.12), rgba(255, 138, 0, 0.06));
+    color: #ff8a00;
+    border: 1px solid rgba(255, 138, 0, 0.2);
+    margin-bottom: 1.25rem;
+}
+
+.ai-showcase-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1.15;
+    color: #0e1428;
+    margin: 0 0 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.ai-showcase-desc {
+    font-size: 1.05rem;
+    color: #5b647b;
+    line-height: 1.7;
+    margin: 0 0 2rem;
+}
+
+.ai-showcase-modes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.ai-showcase-mode {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 12px;
+}
+
+.ai-showcase-mode svg {
+    color: #ff8a00;
+    flex-shrink: 0;
+}
+
+.ai-showcase-mode strong {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0e1428;
+}
+
+.ai-showcase-mode span {
+    font-size: 0.8rem;
+    color: #5b647b;
+}
+
+.ai-showcase-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    background: linear-gradient(135deg, #ff8a00, #ff6b00);
+    color: #fff;
+    font-size: 0.92rem;
+    font-weight: 700;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, gap 0.2s ease;
+    box-shadow: 0 2px 12px rgba(255, 138, 0, 0.25);
+}
+
+.ai-showcase-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(255, 138, 0, 0.35);
+    gap: 0.75rem;
+}
+
+/* Right column: vertical steps */
+
+.ai-showcase-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+}
+
+.ai-step {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+    position: relative;
+}
+
+.ai-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: calc(1.5rem + 46px);
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, rgba(255, 138, 0, 0.3), rgba(255, 138, 0, 0.08));
+}
+
+.ai-step-num {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.1), rgba(255, 138, 0, 0.04));
+    border: 1px solid rgba(255, 138, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff8a00;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.ai-step-content {
+    flex: 1;
+    padding-top: 0.15rem;
+}
+
+.ai-step-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #ff8a00;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.ai-step-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0e1428;
+    margin: 0 0 0.3rem;
+}
+
+.ai-step-desc {
+    font-size: 0.88rem;
+    color: #5b647b;
+    line-height: 1.55;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .ai-showcase { padding: 4rem 1.5rem; }
+    .ai-showcase-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+    .ai-showcase-title { font-size: 2rem; }
+}
+
+@media (max-width: 600px) {
+    .ai-showcase-title { font-size: 1.65rem; }
+    .ai-showcase-desc { font-size: 0.95rem; }
+    .ai-showcase-modes { gap: 0.5rem; }
+}

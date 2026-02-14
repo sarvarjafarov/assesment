@@ -6,6 +6,18 @@
     {% include 'includes/site_header.html' %}
 
     <main>
+        {# ANNOUNCEMENT BANNER #}
+        <div class="announce-bar">
+            <div class="announce-inner">
+                <span class="announce-badge">New</span>
+                <span class="announce-text">Agentic AI Hiring Pipelines — automate resume screening to final decisions</span>
+                <a class="announce-link" href="#ai-pipeline">
+                    Learn more
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+        </div>
+
         {# HERO SECTION — Minimal sira-style with soft orbs #}
         <div class="hero-wrapper">
             <section class="hero-v2 reveal">
@@ -107,6 +119,74 @@
                        data-gtag-click="see_all_assessments"
                        data-gtag-category="engagement"
                        data-gtag-label="see_all_assessments">See all assessments</a>
+                </div>
+            </div>
+        </section>
+
+        {# AI PIPELINE SHOWCASE #}
+        <section class="ai-showcase reveal" id="ai-pipeline">
+            <div class="section-shell">
+                <div class="ai-showcase-grid">
+                    <div class="ai-showcase-text">
+                        <span class="ai-showcase-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            Enterprise
+                        </span>
+                        <h2 class="ai-showcase-title">Agentic AI<br>Hiring Pipelines</h2>
+                        <p class="ai-showcase-desc">Let AI handle the heavy lifting. Upload resumes, and our agentic pipeline screens candidates, sends assessments, and delivers hiring recommendations — with human checkpoints at every step.</p>
+                        <div class="ai-showcase-modes">
+                            <div class="ai-showcase-mode">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                <div>
+                                    <strong>Recommend</strong>
+                                    <span>AI suggests, you decide</span>
+                                </div>
+                            </div>
+                            <div class="ai-showcase-mode">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                <div>
+                                    <strong>Semi-Auto</strong>
+                                    <span>AI screens, you approve</span>
+                                </div>
+                            </div>
+                            <div class="ai-showcase-mode">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <div>
+                                    <strong>Full-Auto</strong>
+                                    <span>AI handles everything</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="ai-showcase-cta" href="{% url 'pages:contact' %}"
+                           data-gtag-click="ai_pipeline_cta"
+                           data-gtag-category="engagement"
+                           data-gtag-label="ai_pipeline_learn_more">
+                            Talk to Sales
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                    </div>
+                    <div class="ai-showcase-steps">
+                        {% for step in ai_pipeline_steps %}
+                        <div class="ai-step">
+                            <div class="ai-step-num">
+                                {% if step.icon == 'upload' %}
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                {% elif step.icon == 'brain' %}
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                {% elif step.icon == 'send' %}
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                {% elif step.icon == 'check' %}
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                {% endif %}
+                            </div>
+                            <div class="ai-step-content">
+                                <span class="ai-step-label">Step {{ forloop.counter }}</span>
+                                <h4 class="ai-step-title">{{ step.title }}</h4>
+                                <p class="ai-step-desc">{{ step.desc }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </section>

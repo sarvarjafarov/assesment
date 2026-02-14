@@ -339,6 +339,29 @@ def home(request):
     else:
         form = DemoRequestForm()
 
+    ai_pipeline_steps = [
+        {
+            "title": "Upload Resumes",
+            "desc": "Drop in PDFs or DOCX files — the AI reads and understands each one.",
+            "icon": "upload",
+        },
+        {
+            "title": "AI Screens & Scores",
+            "desc": "Claude evaluates skills, experience, and role fit on a 0-100 scale.",
+            "icon": "brain",
+        },
+        {
+            "title": "Auto-Send Assessments",
+            "desc": "Shortlisted candidates automatically receive the right skill tests.",
+            "icon": "send",
+        },
+        {
+            "title": "AI Makes Decisions",
+            "desc": "Resume analysis + assessment scores = smart hiring recommendations.",
+            "icon": "check",
+        },
+    ]
+
     return render(
         request,
         "pages/home.html",
@@ -352,6 +375,7 @@ def home(request):
             "hero_content": hero_content,
             "invite_form": form,
             "case_studies": case_studies,
+            "ai_pipeline_steps": ai_pipeline_steps,
         },
     )
 
