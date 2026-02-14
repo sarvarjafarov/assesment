@@ -610,6 +610,11 @@ def _advance_candidate(
 
     # Stage: uploaded → screen resume
     if pc.stage == 'uploaded':
+        # Clear any stale human decisions from previous runs
+        if pc.human_decision:
+            pc.human_decision = ''
+            pc.human_notes = ''
+            pc.save(update_fields=['human_decision', 'human_notes', 'updated_at'])
         screen_resume(pc)
         stats['screened'] += 1
         if pc.stage == 'shortlisted':
@@ -649,7 +654,13 @@ def _advance_candidate(
             or pc.human_decision in ('advance', 'reject')
         )
         if can_finalize:
-            recommendation = pc.human_decision or pc.ai_final_recommendation
+            # In full_auto mode, always use the AI recommendation.
+            # In recommend/semi_auto modes, the human decision takes priority.
+            if mode == 'full_auto':
+                recommendation = pc.ai_final_recommendation
+            else:
+                recommendation = pc.human_decision or pc.ai_final_recommendation
+
             if recommendation == 'advance':
                 pc.stage = 'hired'
             elif recommendation == 'reject':
