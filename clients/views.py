@@ -1234,10 +1234,15 @@ class ClientSettingsView(LoginRequiredMixin, View):
                 messages.error(request, "You don't have permission to modify branding settings.")
                 return redirect("clients:settings")
 
-            # Update color settings (available to all plans)
-            account.brand_primary_color = request.POST.get("brand_primary_color", "#ff8a00")
-            account.brand_secondary_color = request.POST.get("brand_secondary_color", "#0e1428")
-            account.brand_background_color = request.POST.get("brand_background_color", "#ffffff")
+            # Validate and update color settings (available to all plans)
+            import re
+            _hex_re = re.compile(r'^#[0-9A-Fa-f]{6}$')
+            def _safe_color(val, default):
+                return val if val and _hex_re.match(val) else default
+
+            account.brand_primary_color = _safe_color(request.POST.get("brand_primary_color"), "#ff8a00")
+            account.brand_secondary_color = _safe_color(request.POST.get("brand_secondary_color"), "#0e1428")
+            account.brand_background_color = _safe_color(request.POST.get("brand_background_color"), "#ffffff")
 
             # Update text settings
             account.custom_welcome_message = request.POST.get("custom_welcome_message", "").strip()

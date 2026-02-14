@@ -12,9 +12,9 @@
 }
 .progress-bar-fill { background: var(--brand-primary, #ff8a00) !important; }
 .question-card-enhanced h2 { color: var(--brand-secondary, #0e1428); }
-.option-button.selected { border-color: var(--brand-primary, #ff8a00); background: rgba(255, 138, 0, 0.05); }
+.option-button.selected { border-color: var(--brand-primary, #ff8a00); background: color-mix(in srgb, var(--brand-primary, #ff8a00) 5%, transparent); }
 .option-button.selected .option-radio::before { background: var(--brand-primary, #ff8a00); }
-.submit-btn { background: linear-gradient(135deg, var(--brand-primary, #ff8a00) 0%, var(--brand-primary, #ff6b00) 100%) !important; }
+.btn-submit-enhanced { background: linear-gradient(135deg, var(--brand-primary, #ff8a00) 0%, var(--brand-primary, #ff6b00) 100%) !important; }
 </style>
 {% endif %}
 
@@ -511,7 +511,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         ['dragenter', 'dragover'].forEach(eventName => {
             uploadBox.addEventListener(eventName, () => {
-                uploadBox.style.borderColor = '#ff8a00';
+                const brandColor = getComputedStyle(document.documentElement).getPropertyValue('--brand-primary').trim() || '#ff8a00';
+                uploadBox.style.borderColor = brandColor;
                 uploadBox.style.background = '#fff9f5';
             });
         });

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+{% include 'candidate/_branding.html' %}
 <div class="candidate-shell single-column">
     <section class="candidate-panel response-panel completion-panel">
         <!-- Celebration Header -->
@@ -148,7 +149,11 @@
 
         <!-- Footer -->
         <p class="completion-footer">
-            Powered by <strong style="color: #ff8a00;">Evalon</strong> · Assessment Platform
+            {% if session.client %}
+                {{ session.client.get_footer_text }}
+            {% else %}
+                Powered by <strong style="color: var(--brand-primary, #ff8a00);">Evalon</strong> · Assessment Platform
+            {% endif %}
         </p>
     </section>
 </div>

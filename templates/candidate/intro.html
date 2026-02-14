@@ -1,16 +1,23 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% block content %}
+{% include 'candidate/_branding.html' %}
 <div class="candidate-shell single-column">
     <section class="candidate-panel intro-panel">
         <!-- Header -->
         <div class="intro-header">
+            {% if session.client and session.client.logo_data_url %}
+            <div class="client-logo">
+                <img src="{{ session.client.logo_data_url }}" alt="{{ session.client.company_name }}" class="client-logo-img">
+            </div>
+            {% else %}
             <div class="intro-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 11l3 3L22 4"></path>
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                 </svg>
             </div>
+            {% endif %}
             <div class="intro-title-group">
                 <p class="eyebrow">Assessment Invitation</p>
                 <h1>{{ assessment.title }}</h1>
@@ -189,7 +196,11 @@
 
         <!-- Footer Note -->
         <p class="intro-footer">
-            Powered by <strong style="color: #ff8a00;">Evalon</strong> · Secure & confidential
+            {% if session.client %}
+                {{ session.client.get_footer_text }}
+            {% else %}
+                Powered by <strong style="color: var(--brand-primary, #ff8a00);">Evalon</strong> · Secure & confidential
+            {% endif %}
         </p>
     </section>
 </div>

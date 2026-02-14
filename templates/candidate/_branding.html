@@ -1,0 +1,15 @@
+{# Reusable client branding block — include in all candidate-facing templates #}
+{# Expects `session` with a `.client` FK to ClientAccount #}
+{% if session.client %}
+<style>
+:root {
+    --brand-primary: {{ session.client.brand_primary_color|default:"#ff8a00" }};
+    --brand-secondary: {{ session.client.brand_secondary_color|default:"#0e1428" }};
+    --brand-background: {{ session.client.brand_background_color|default:"#ffffff" }};
+}
+.progress-bar-fill { background: var(--brand-primary, #ff8a00) !important; }
+.btn-submit-enhanced, .submit-btn, .btn.btn-primary { background: var(--brand-primary, #ff8a00) !important; border-color: var(--brand-primary, #ff8a00) !important; }
+.option-button.selected { border-color: var(--brand-primary, #ff8a00); }
+.option-button.selected .option-radio::before { background: var(--brand-primary, #ff8a00); }
+</style>
+{% endif %}
