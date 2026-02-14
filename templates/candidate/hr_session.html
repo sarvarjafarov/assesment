@@ -279,7 +279,8 @@ function toggleHelp() {
             previewBody.style.color = '#0e1428';
         }
         charCount.textContent = len + ' character' + (len !== 1 ? 's' : '');
-        charCount.style.color = len >= minLength ? '#10b981' : '#ff8a00';
+        const brandPrimary = getComputedStyle(document.documentElement).getPropertyValue('--brand-primary').trim() || '#ff8a00';
+        charCount.style.color = len >= minLength ? '#10b981' : brandPrimary;
     }
 
     textarea.addEventListener('input', update);
