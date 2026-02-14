@@ -37,27 +37,35 @@ class BlogCategorySitemap(Sitemap):
 
 
 class StaticPagesSitemap(Sitemap):
-    """Sitemap for static marketing pages."""
-    changefreq = "monthly"
-    priority = 0.5
+    """Sitemap for static marketing pages with individual priorities."""
+
+    # (url_name, changefreq, priority)
+    _pages = [
+        ('pages:home', 'daily', 1.0),
+        ('pages:pricing', 'weekly', 0.9),
+        ('pages:assessment_list', 'weekly', 0.9),
+        ('pages:interview_questions_list', 'weekly', 0.8),
+        ('pages:role_assessment_list', 'weekly', 0.8),
+        ('blog:list', 'daily', 0.8),
+        ('pages:contact', 'monthly', 0.7),
+        ('pages:resources', 'monthly', 0.6),
+        ('pages:careers', 'monthly', 0.5),
+        ('pages:security', 'monthly', 0.4),
+        ('pages:privacy', 'monthly', 0.3),
+        ('pages:terms', 'monthly', 0.3),
+    ]
 
     def items(self):
-        return [
-            'pages:home',
-            'pages:contact',
-            'pages:careers',
-            'pages:security',
-            'pages:privacy',
-            'pages:terms',
-            'pages:resources',
-            'pages:assessment_list',
-            'pages:interview_questions_list',
-            'pages:role_assessment_list',
-            'blog:list',
-        ]
+        return self._pages
 
     def location(self, item):
-        return reverse(item)
+        return reverse(item[0])
+
+    def changefreq(self, item):
+        return item[1]
+
+    def priority(self, item):
+        return item[2]
 
 
 class PublicAssessmentSitemap(Sitemap):
