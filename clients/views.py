@@ -2753,6 +2753,7 @@ class ClientBillingView(LoginRequiredMixin, TemplateView):
                 'invite_quota': None,
                 'project_quota': None,
                 'features': [
+                    'AI hiring pipelines',
                     'Dedicated CSM + success playbooks',
                     'Custom assessments & security reviews',
                     'SLA, SSO/SAML, and SOC 2 readiness',
