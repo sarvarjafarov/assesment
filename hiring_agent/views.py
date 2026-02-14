@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -172,15 +173,25 @@ class ResumeUploadView(HiringAgentMixin, View):
                     errors += 1
                     continue
 
-                # Extract name from filename (basic heuristic)
+                # Extract email from resume text
+                email_match = re.search(
+                    r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}',
+                    resume_text,
+                )
+                if not email_match:
+                    messages.warning(
+                        request,
+                        f'No email found in {f.name} — skipped.',
+                    )
+                    errors += 1
+                    continue
+                candidate_email = email_match.group(0).lower()
+
+                # Extract name from filename as fallback
                 base_name = f.name.rsplit('.', 1)[0].replace('_', ' ').replace('-', ' ')
                 parts = base_name.split()
                 first_name = parts[0].title() if parts else 'Candidate'
                 last_name = ' '.join(parts[1:]).title() if len(parts) > 1 else ''
-
-                # Create or get candidate profile
-                # Use a generated email if none found in resume
-                candidate_email = f"{base_name.lower().replace(' ', '.')}@candidate.placeholder"
                 candidate, _ = CandidateProfile.objects.get_or_create(
                     email=candidate_email,
                     defaults={
