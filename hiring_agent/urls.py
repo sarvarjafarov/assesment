@@ -5,6 +5,7 @@ from . import views
 app_name = 'hiring_agent'
 
 urlpatterns = [
+    path('upgrade/', views.UpgradeView.as_view(), name='upgrade'),
     path('', views.PipelineListView.as_view(), name='pipeline-list'),
     path('create/', views.PipelineCreateView.as_view(), name='pipeline-create'),
     path(

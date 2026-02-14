@@ -363,6 +363,11 @@ class ClientAccount(TimeStampedModel):
         return self.plan_slug in ("pro", "enterprise")
 
     @property
+    def can_use_ai_hiring(self) -> bool:
+        """Check if the client's plan supports AI hiring pipelines."""
+        return self.plan_slug == "enterprise"
+
+    @property
     def branding_css_vars(self) -> dict:
         """Return CSS custom properties for client branding."""
         return {

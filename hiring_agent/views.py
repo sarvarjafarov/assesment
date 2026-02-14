@@ -30,6 +30,8 @@ class HiringAgentMixin(LoginRequiredMixin):
         self.account = request.user.client_account
         if self.account.status != 'approved':
             return redirect('clients:pending_approval')
+        if not self.account.can_use_ai_hiring:
+            return redirect('hiring_agent:upgrade')
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -348,6 +350,25 @@ class CandidateReviewView(HiringAgentMixin, View):
 # ---------------------------------------------------------------------------
 # Pipeline Stats (JSON endpoint)
 # ---------------------------------------------------------------------------
+
+class UpgradeView(LoginRequiredMixin, TemplateView):
+    """Show upgrade page for non-enterprise users trying to access AI Hiring."""
+    template_name = 'hiring_agent/upgrade.html'
+    login_url = reverse_lazy('clients:login')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'client_account'):
+            return redirect('clients:login')
+        # If user already has enterprise, redirect to pipeline list
+        if request.user.client_account.can_use_ai_hiring:
+            return redirect('hiring_agent:pipeline-list')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['account'] = self.request.user.client_account
+        return ctx
+
 
 class PipelineStatsView(HiringAgentMixin, View):
     """Return pipeline statistics as JSON."""

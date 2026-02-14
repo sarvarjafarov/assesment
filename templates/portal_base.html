@@ -117,6 +117,7 @@
                 </a>
                 {% endif %}
 
+                {% if has_ai_hiring %}
                 <a href="{% url 'hiring_agent:pipeline-list' %}" class="nav-item {% if 'hiring_agent' in request.resolver_match.app_name %}active{% endif %}" {% if 'hiring_agent' in request.resolver_match.app_name %}aria-current="page"{% endif %}>
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
@@ -127,6 +128,7 @@
                     <span class="nav-label">AI Hiring</span>
                     <span class="nav-badge premium">AI</span>
                 </a>
+                {% endif %}
             </div>
 
             {# ── Account ── #}

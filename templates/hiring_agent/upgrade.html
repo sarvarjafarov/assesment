@@ -1,0 +1,123 @@
+{% extends 'portal_base.html' %}
+{% block title %}AI Hiring · Enterprise Feature · Evalon{% endblock %}
+{% block meta_description %}Upgrade to Enterprise to unlock AI-powered hiring pipelines.{% endblock %}
+{% block portal_content %}
+<style>
+    .up-shell { max-width: 680px; margin: 0 auto; padding: 3rem 0; text-align: center; }
+
+    .up-icon {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: rgba(255, 138, 0, 0.08);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1.5rem; color: var(--color-orange, #ff8a00);
+    }
+
+    .up-title { font-size: 1.6rem; font-weight: 800; color: var(--color-text, #0e1428); margin: 0 0 0.5rem; }
+    .up-subtitle { font-size: 1rem; color: var(--color-text-muted, #5b647b); margin: 0 0 2.5rem; line-height: 1.6; }
+
+    .up-features {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+        text-align: left; margin-bottom: 2.5rem;
+    }
+    @media (max-width: 600px) { .up-features { grid-template-columns: 1fr; } }
+
+    .up-feature {
+        background: #fff;
+        border: 1px solid rgba(14, 20, 40, 0.08);
+        border-radius: var(--radius-xl, 16px);
+        padding: 1.25rem;
+        display: flex; gap: 0.75rem; align-items: flex-start;
+    }
+    .up-feature-icon {
+        width: 36px; height: 36px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .up-feature-title { font-size: 0.88rem; font-weight: 700; color: var(--color-text, #0e1428); margin: 0 0 0.2rem; }
+    .up-feature-desc { font-size: 0.8rem; color: var(--color-text-muted, #5b647b); margin: 0; line-height: 1.5; }
+
+    .up-cta { margin-bottom: 1rem; }
+    .up-plan {
+        font-size: 0.82rem; color: var(--color-text-muted, #5b647b);
+        display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .up-plan-badge {
+        display: inline-block;
+        padding: 0.15rem 0.5rem; border-radius: 999px;
+        font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background: rgba(14, 20, 40, 0.06); color: var(--color-text-muted, #5b647b);
+    }
+</style>
+
+<div class="portal-shell">
+<div class="up-shell">
+
+    <div class="up-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+    </div>
+
+    <h1 class="up-title">AI Hiring Pipelines</h1>
+    <p class="up-subtitle">Automate your entire hiring workflow with AI-powered resume screening, candidate evaluation, and smart decision-making. Available exclusively on the Enterprise plan.</p>
+
+    <div class="up-features">
+        <div class="up-feature">
+            <div class="up-feature-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            </div>
+            <div>
+                <p class="up-feature-title">AI Resume Screening</p>
+                <p class="up-feature-desc">Upload resumes and let AI score candidates against your job requirements automatically.</p>
+            </div>
+        </div>
+        <div class="up-feature">
+            <div class="up-feature-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            </div>
+            <div>
+                <p class="up-feature-title">Automated Assessments</p>
+                <p class="up-feature-desc">Shortlisted candidates automatically receive assessment invitations.</p>
+            </div>
+        </div>
+        <div class="up-feature">
+            <div class="up-feature-icon" style="background: rgba(255, 138, 0, 0.1); color: #ff8a00;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <div>
+                <p class="up-feature-title">AI Final Decisions</p>
+                <p class="up-feature-desc">AI combines resume analysis and assessment scores to recommend hiring decisions.</p>
+            </div>
+        </div>
+        <div class="up-feature">
+            <div class="up-feature-icon" style="background: rgba(16, 185, 129, 0.1); color: #059669;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </div>
+            <div>
+                <p class="up-feature-title">3 Automation Modes</p>
+                <p class="up-feature-desc">Choose between recommend, semi-auto, or full-auto pipelines to match your workflow.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="up-cta">
+        <a href="mailto:sales@evalon.tech?subject=Enterprise%20Plan%20Inquiry&body=Hi%2C%20I'm%20interested%20in%20upgrading%20to%20the%20Enterprise%20plan%20for%20AI%20Hiring%20Pipelines." class="btn btn-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="13 17 18 12 13 7"></polyline>
+                <polyline points="6 17 11 12 6 7"></polyline>
+            </svg>
+            Contact Sales to Upgrade
+        </a>
+    </div>
+
+    <div class="up-plan">
+        Your current plan: <span class="up-plan-badge">{{ account.get_plan_slug_display }}</span>
+    </div>
+
+</div>
+</div>
+{% endblock %}
