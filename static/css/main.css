@@ -7032,6 +7032,35 @@ main {
 .pr-check { vertical-align: middle; }
 .pr-dash { color: #d1d5db; font-size: 1.1rem; }
 
+/* AI feature emphasis */
+.pr-feature--ai {
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.06), rgba(255, 138, 0, 0.02));
+    border: 1px solid rgba(255, 138, 0, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem !important;
+    margin: 0 -0.65rem;
+    font-weight: 600;
+}
+.pr-feature--ai svg { color: #ff8a00 !important; stroke: #ff8a00 !important; }
+.pr-new-tag {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: linear-gradient(135deg, #ff8a00, #ff6b00);
+    color: #fff;
+    vertical-align: middle;
+    margin-left: 0.25rem;
+    line-height: 1.4;
+}
+.pr-row--highlight {
+    background: rgba(255, 138, 0, 0.04) !important;
+}
+.pr-row--highlight td:first-child { font-weight: 600; color: #0e1428; }
+
 /* Assessment grid */
 .pr-assess-grid {
     display: grid;

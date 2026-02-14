@@ -207,7 +207,7 @@ def home(request):
             "cta_url": reverse("pages:contact"),
             "highlighted": False,
             "features": [
-                "AI hiring pipelines",
+                "Agentic AI hiring pipelines",
                 "Dedicated CSM + success playbooks",
                 "Custom assessments & security reviews",
                 "SLA, SSO/SAML, and SOC 2 readiness",
@@ -410,7 +410,7 @@ def pricing(request):
             "features": [
                 "Everything in Pro, plus:",
                 "Unlimited projects & invites",
-                "AI hiring pipelines",
+                "Agentic AI hiring pipelines",
                 "Custom assessment design",
                 "Dedicated customer success manager",
                 "SSO / SAML integration",
@@ -432,7 +432,7 @@ def pricing(request):
         {"feature": "Custom branding", "starter": False, "pro": True, "enterprise": True},
         {"feature": "Shareable reports", "starter": False, "pro": True, "enterprise": True},
         {"feature": "Priority support", "starter": False, "pro": True, "enterprise": True},
-        {"feature": "AI hiring pipelines", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "Agentic AI hiring pipelines", "starter": False, "pro": False, "enterprise": True, "highlight": True},
         {"feature": "Custom assessments", "starter": False, "pro": False, "enterprise": True},
         {"feature": "SSO / SAML", "starter": False, "pro": False, "enterprise": True},
         {"feature": "Dedicated CSM", "starter": False, "pro": False, "enterprise": True},

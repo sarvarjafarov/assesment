@@ -31,9 +31,14 @@
                 </div>
                 <ul class="pr-features">
                     {% for f in tier.features %}
-                    <li>
+                    <li {% if 'Agentic AI' in f %}class="pr-feature--ai"{% endif %}>
+                        {% if 'Agentic AI' in f %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        {{ f }} <span class="pr-new-tag">New</span>
+                        {% else %}
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         {{ f }}
+                        {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
@@ -63,8 +68,8 @@
                     </thead>
                     <tbody>
                         {% for row in comparison %}
-                        <tr>
-                            <td>{{ row.feature }}</td>
+                        <tr {% if row.highlight %}class="pr-row--highlight"{% endif %}>
+                            <td>{{ row.feature }}{% if row.highlight %} <span class="pr-new-tag">New</span>{% endif %}</td>
                             {% for plan in "starter,pro,enterprise"|make_list %}{% endfor %}
                             <td>
                                 {% if row.starter is True %}
