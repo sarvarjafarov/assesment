@@ -1,10 +1,10 @@
 {% extends "portal_base.html" %}
+{% load humanize %}
 {% block title %}{{ pc.candidate.first_name }} {{ pc.candidate.last_name }} · {{ pipeline.title }} · Evalon{% endblock %}
 
 {% block portal_content %}
 <style>
-    .cd-shell { max-width: 900px; margin: 0 auto; }
-
+    /* ── Layout ── */
     .cd-back {
         display: inline-flex; align-items: center; gap: 0.35rem;
         color: var(--color-orange, #ff8a00); text-decoration: none;
@@ -14,7 +14,7 @@
     .cd-back:hover { opacity: 0.8; }
 
     /* ── Header ── */
-    .cd-header { margin-bottom: 2rem; }
+    .cd-header { margin-bottom: 1.75rem; }
     .cd-header-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
     .cd-header h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--color-text, #0e1428); }
     .cd-stage {
@@ -33,6 +33,17 @@
     .cd-stage--decision_made { background: rgba(168, 85, 247, 0.1); color: #7c3aed; }
     .cd-stage--hired { background: rgba(34, 197, 94, 0.12); color: #16a34a; }
     .cd-email { font-size: 0.88rem; color: var(--color-text-muted, #5b647b); }
+
+    /* ── Two-Column Grid ── */
+    .cd-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+    @media (max-width: 1080px) {
+        .cd-grid { grid-template-columns: 1fr; }
+    }
 
     /* ── Cards ── */
     .cd-card {
@@ -54,6 +65,23 @@
         flex-shrink: 0;
     }
     .cd-card-title { font-size: 1rem; font-weight: 700; color: var(--color-text, #0e1428); margin: 0; }
+
+    /* ── Sidebar Summary Card ── */
+    .cd-summary-grid {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .cd-summary-item { display: flex; flex-direction: column; }
+    .cd-summary-label {
+        font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.04em; color: var(--color-text-muted, #5b647b);
+        margin-bottom: 0.25rem;
+    }
+    .cd-summary-val { font-size: 0.88rem; font-weight: 600; color: var(--color-text, #0e1428); }
+    .cd-summary-val--green { color: #16a34a; }
+    .cd-summary-val--red { color: #dc2626; }
+    .cd-summary-val--amber { color: #d97706; }
+    .cd-summary-divider { grid-column: 1 / -1; border: none; border-top: 1px solid rgba(14, 20, 40, 0.06); margin: 0.25rem 0; }
 
     /* ── Score Display ── */
     .cd-score-row { display: flex; align-items: flex-start; gap: 1.75rem; flex-wrap: wrap; }
@@ -178,23 +206,42 @@
     }
     .cd-log-table .cd-log-right { text-align: right; color: var(--color-text-muted, #5b647b); }
 
-    /* ── Timestamps ── */
-    .cd-timestamps {
-        display: flex; gap: 1.5rem; flex-wrap: wrap;
-        font-size: 0.78rem; color: #94a3b8; margin-bottom: 2rem;
+    /* ── Timeline ── */
+    .cd-timeline { list-style: none; padding: 0; margin: 0; }
+    .cd-timeline li {
+        display: flex; align-items: flex-start; gap: 0.75rem;
+        padding-bottom: 1rem; position: relative;
     }
-    .cd-timestamps span { display: inline-flex; align-items: center; gap: 0.3rem; }
+    .cd-timeline li:not(:last-child)::before {
+        content: ''; position: absolute;
+        left: 11px; top: 24px; bottom: 0;
+        width: 1px; background: rgba(14, 20, 40, 0.08);
+    }
+    .cd-timeline-dot {
+        width: 22px; height: 22px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; margin-top: 1px;
+    }
+    .cd-timeline-dot--done { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    .cd-timeline-dot--active { background: rgba(255, 138, 0, 0.12); color: #ff8a00; }
+    .cd-timeline-dot--pending { background: rgba(14, 20, 40, 0.05); color: #94a3b8; }
+    .cd-timeline-text { flex: 1; }
+    .cd-timeline-label { font-size: 0.82rem; font-weight: 600; color: var(--color-text, #0e1428); }
+    .cd-timeline-time { font-size: 0.72rem; color: #94a3b8; margin-top: 0.1rem; }
+
+    /* ── Sidebar sticky ── */
+    .cd-sidebar { position: sticky; top: 1.5rem; }
 </style>
 
 <div class="portal-shell">
-<div class="cd-shell">
 
-    {# ── Header ── #}
+    {# ── Back Link ── #}
     <a href="{% url 'hiring_agent:pipeline-detail' pipeline.uuid %}" class="cd-back">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
         Back to {{ pipeline.title }}
     </a>
 
+    {# ── Header ── #}
     <div class="cd-header">
         <div class="cd-header-row">
             <h1>{{ pc.candidate.first_name }} {{ pc.candidate.last_name }}</h1>
@@ -203,229 +250,386 @@
         <div class="cd-email">{{ pc.candidate.email }}</div>
     </div>
 
-    {# ── AI Resume Screening ── #}
-    {% if pc.ai_screen_score is not None %}
-    <div class="cd-card">
-        <div class="cd-card-header">
-            <div class="cd-card-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-            </div>
-            <h3 class="cd-card-title">AI Resume Screening</h3>
-        </div>
+    {# ── Two Column Layout ── #}
+    <div class="cd-grid">
 
-        <div class="cd-score-row">
-            <div class="cd-score-circle {% if pc.ai_screen_score >= 70 %}cd-score--high{% elif pc.ai_screen_score >= 50 %}cd-score--mid{% else %}cd-score--low{% endif %}">
-                <div class="cd-score-val">{{ pc.ai_screen_score }}</div>
-                <div class="cd-score-label">Score</div>
-            </div>
-            <div class="cd-score-content">
-                <p>{{ pc.ai_screen_summary }}</p>
-                {% if pc.ai_screen_skills_matched %}
-                <div class="cd-skills">
-                    <span class="cd-skills-label">Matched:</span>
-                    {% for skill in pc.ai_screen_skills_matched %}
-                        <span class="cd-skill cd-skill--match">{{ skill }}</span>
-                    {% endfor %}
+        {# ── LEFT: Main Content ── #}
+        <div class="cd-main">
+
+            {# ── AI Resume Screening ── #}
+            {% if pc.ai_screen_score is not None %}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h3 class="cd-card-title">AI Resume Screening</h3>
                 </div>
-                {% endif %}
-                {% if pc.ai_screen_skills_missing %}
-                <div class="cd-skills">
-                    <span class="cd-skills-label">Missing:</span>
-                    {% for skill in pc.ai_screen_skills_missing %}
-                        <span class="cd-skill cd-skill--miss">{{ skill }}</span>
-                    {% endfor %}
+
+                <div class="cd-score-row">
+                    <div class="cd-score-circle {% if pc.ai_screen_score >= 70 %}cd-score--high{% elif pc.ai_screen_score >= 50 %}cd-score--mid{% else %}cd-score--low{% endif %}">
+                        <div class="cd-score-val">{{ pc.ai_screen_score }}</div>
+                        <div class="cd-score-label">Score</div>
+                    </div>
+                    <div class="cd-score-content">
+                        <p>{{ pc.ai_screen_summary }}</p>
+                        {% if pc.ai_screen_skills_matched %}
+                        <div class="cd-skills">
+                            <span class="cd-skills-label">Matched:</span>
+                            {% for skill in pc.ai_screen_skills_matched %}
+                                <span class="cd-skill cd-skill--match">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if pc.ai_screen_skills_missing %}
+                        <div class="cd-skills">
+                            <span class="cd-skills-label">Missing:</span>
+                            {% for skill in pc.ai_screen_skills_missing %}
+                                <span class="cd-skill cd-skill--miss">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}
             </div>
-        </div>
-    </div>
-    {% endif %}
+            {% endif %}
 
-    {# ── Assessment Results ── #}
-    {% if pc.assessment_sessions %}
-    <div class="cd-card">
-        <div class="cd-card-header">
-            <div class="cd-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-            </div>
-            <h3 class="cd-card-title">Assessment Results</h3>
-        </div>
-
-        <table class="cd-table">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for session in pc.assessment_sessions %}
-                <tr>
-                    <td>{{ session.type|title }}</td>
-                    <td>
-                        <span class="cd-status-pill cd-status-pill--{{ session.status }}">{{ session.status|title }}</span>
-                    </td>
-                    <td>{% if session.score is not None %}{{ session.score|floatformat:1 }}{% else %}&mdash;{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
-
-    {# ── AI Final Decision ── #}
-    {% if pc.ai_final_score is not None %}
-    <div class="cd-card">
-        <div class="cd-card-header">
-            <div class="cd-card-icon" style="background: rgba(255, 138, 0, 0.1); color: var(--color-orange, #ff8a00);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-            <h3 class="cd-card-title">AI Final Decision</h3>
-        </div>
-
-        <div class="cd-score-row">
-            <div class="cd-score-circle {% if pc.ai_final_score >= 70 %}cd-score--high{% elif pc.ai_final_score >= 50 %}cd-score--mid{% else %}cd-score--low{% endif %}">
-                <div class="cd-score-val">{{ pc.ai_final_score }}</div>
-                <div class="cd-score-label">Score</div>
-            </div>
-            <div class="cd-score-content">
-                {% if pc.ai_final_recommendation %}
-                <span class="cd-rec cd-rec--{{ pc.ai_final_recommendation }}">{{ pc.ai_final_recommendation|title }}</span>
-                {% endif %}
-                <p>{{ pc.ai_final_summary }}</p>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    {# ── Human Review ── #}
-    <div class="cd-card">
-        <div class="cd-card-header">
-            <div class="cd-card-icon" style="background: rgba(14, 20, 40, 0.06); color: var(--color-text, #0e1428);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-            </div>
-            <h3 class="cd-card-title">Human Review</h3>
-        </div>
-
-        {% if pc.human_decision %}
-        <div style="margin-bottom: 0.75rem;">
-            <span style="font-size: 0.82rem; font-weight: 700; color: var(--color-text-muted, #5b647b); margin-right: 0.5rem;">Decision:</span>
-            <span class="cd-rec cd-rec--{{ pc.human_decision }}">{{ pc.human_decision|title }}</span>
-        </div>
-        {% if pc.human_notes %}
-        <div>
-            <span style="font-size: 0.82rem; font-weight: 700; color: var(--color-text-muted, #5b647b);">Notes:</span>
-            <p style="margin: 0.4rem 0 0; color: #334155; font-size: 0.88rem; line-height: 1.6;">{{ pc.human_notes }}</p>
-        </div>
-        {% endif %}
-
-        {% elif pc.stage == 'shortlisted' or pc.stage == 'decision_made' %}
-        <form method="post" action="{% url 'hiring_agent:candidate-review' pipeline_uuid=pipeline.uuid pk=pc.pk %}">
-            {% csrf_token %}
-            <div style="margin-bottom: 1.25rem;">
-                <label style="font-size: 0.85rem; font-weight: 700; color: var(--color-text, #0e1428); display: block; margin-bottom: 0.6rem;">Decision</label>
-                <div class="cd-review-decision">
-                    {% for radio in review_form.decision %}
-                    <label class="cd-review-option">{{ radio.tag }} {{ radio.choice_label }}</label>
-                    {% endfor %}
+            {# ── Assessment Results ── #}
+            {% if pc.assessment_sessions %}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    </div>
+                    <h3 class="cd-card-title">Assessment Results</h3>
                 </div>
-                {% if review_form.decision.errors %}
-                <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.3rem;">{{ review_form.decision.errors.0 }}</div>
+
+                <table class="cd-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in pc.assessment_sessions %}
+                        <tr>
+                            <td>{{ session.type|title }}</td>
+                            <td>
+                                <span class="cd-status-pill cd-status-pill--{{ session.status }}">{{ session.status|title }}</span>
+                            </td>
+                            <td>{% if session.score is not None %}{{ session.score|floatformat:1 }}{% else %}&mdash;{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            {# ── AI Final Decision ── #}
+            {% if pc.ai_final_score is not None %}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(255, 138, 0, 0.1); color: var(--color-orange, #ff8a00);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <h3 class="cd-card-title">AI Final Decision</h3>
+                </div>
+
+                <div class="cd-score-row">
+                    <div class="cd-score-circle {% if pc.ai_final_score >= 70 %}cd-score--high{% elif pc.ai_final_score >= 50 %}cd-score--mid{% else %}cd-score--low{% endif %}">
+                        <div class="cd-score-val">{{ pc.ai_final_score }}</div>
+                        <div class="cd-score-label">Score</div>
+                    </div>
+                    <div class="cd-score-content">
+                        {% if pc.ai_final_recommendation %}
+                        <span class="cd-rec cd-rec--{{ pc.ai_final_recommendation }}">{{ pc.ai_final_recommendation|title }}</span>
+                        {% endif %}
+                        <p>{{ pc.ai_final_summary }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Human Review (main area on larger screens) ── #}
+            {% if pc.stage == 'shortlisted' or pc.stage == 'decision_made' %}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(255, 138, 0, 0.1); color: var(--color-orange, #ff8a00);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+                    </div>
+                    <h3 class="cd-card-title">Your Review</h3>
+                </div>
+
+                <form method="post" action="{% url 'hiring_agent:candidate-review' pipeline_uuid=pipeline.uuid pk=pc.pk %}">
+                    {% csrf_token %}
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="font-size: 0.85rem; font-weight: 700; color: var(--color-text, #0e1428); display: block; margin-bottom: 0.6rem;">Decision</label>
+                        <div class="cd-review-decision">
+                            {% for radio in review_form.decision %}
+                            <label class="cd-review-option">{{ radio.tag }} {{ radio.choice_label }}</label>
+                            {% endfor %}
+                        </div>
+                        {% if review_form.decision.errors %}
+                        <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.3rem;">{{ review_form.decision.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div style="margin-bottom: 1.25rem;">
+                        <label for="{{ review_form.notes.id_for_label }}" style="font-size: 0.85rem; font-weight: 700; color: var(--color-text, #0e1428); display: block; margin-bottom: 0.5rem;">Notes</label>
+                        <textarea name="{{ review_form.notes.html_name }}" id="{{ review_form.notes.id_for_label }}" class="cd-review-textarea" placeholder="Optional notes about your decision...">{{ review_form.notes.value|default_if_none:'' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-pill">Submit Review</button>
+                </form>
+            </div>
+            {% endif %}
+
+            {# ── Action Log ── #}
+            {% if action_logs %}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(14, 20, 40, 0.06); color: var(--color-text, #0e1428);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <h3 class="cd-card-title">Action Log</h3>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="cd-log-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Status</th>
+                                <th class="cd-log-right">Tokens</th>
+                                <th class="cd-log-right">Duration</th>
+                                <th class="cd-log-right">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in action_logs %}
+                            <tr>
+                                <td>{{ log.get_action_display }}</td>
+                                <td>
+                                    <span class="cd-status-pill {% if log.status == 'success' %}cd-status-pill--submitted{% endif %}"
+                                          {% if log.status == 'error' %}style="background: rgba(239,68,68,0.1); color: #dc2626;"{% endif %}>
+                                        {{ log.status|title }}
+                                    </span>
+                                </td>
+                                <td class="cd-log-right">{% if log.tokens_used %}{{ log.tokens_used|intcomma }}{% else %}&mdash;{% endif %}</td>
+                                <td class="cd-log-right">{% if log.duration_ms is not None %}{{ log.duration_ms|intcomma }}ms{% else %}&mdash;{% endif %}</td>
+                                <td class="cd-log-right">{{ log.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        {# ── RIGHT: Sidebar ── #}
+        <div class="cd-sidebar">
+
+            {# ── Candidate Overview Card ── #}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(14, 20, 40, 0.06); color: var(--color-text, #0e1428);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <h3 class="cd-card-title">Overview</h3>
+                </div>
+
+                <div class="cd-summary-grid">
+                    <div class="cd-summary-item">
+                        <span class="cd-summary-label">Screen Score</span>
+                        {% if pc.ai_screen_score is not None %}
+                        <span class="cd-summary-val {% if pc.ai_screen_score >= 70 %}cd-summary-val--green{% elif pc.ai_screen_score >= 50 %}cd-summary-val--amber{% else %}cd-summary-val--red{% endif %}">{{ pc.ai_screen_score }}/100</span>
+                        {% else %}
+                        <span class="cd-summary-val" style="color: #94a3b8;">&mdash;</span>
+                        {% endif %}
+                    </div>
+                    <div class="cd-summary-item">
+                        <span class="cd-summary-label">Final Score</span>
+                        {% if pc.ai_final_score is not None %}
+                        <span class="cd-summary-val {% if pc.ai_final_score >= 70 %}cd-summary-val--green{% elif pc.ai_final_score >= 50 %}cd-summary-val--amber{% else %}cd-summary-val--red{% endif %}">{{ pc.ai_final_score }}/100</span>
+                        {% else %}
+                        <span class="cd-summary-val" style="color: #94a3b8;">&mdash;</span>
+                        {% endif %}
+                    </div>
+
+                    <hr class="cd-summary-divider">
+
+                    <div class="cd-summary-item">
+                        <span class="cd-summary-label">AI Decision</span>
+                        {% if pc.ai_final_recommendation %}
+                        <span class="cd-summary-val {% if pc.ai_final_recommendation == 'advance' %}cd-summary-val--green{% elif pc.ai_final_recommendation == 'reject' %}cd-summary-val--red{% else %}cd-summary-val--amber{% endif %}">{{ pc.ai_final_recommendation|title }}</span>
+                        {% else %}
+                        <span class="cd-summary-val" style="color: #94a3b8;">Pending</span>
+                        {% endif %}
+                    </div>
+                    <div class="cd-summary-item">
+                        <span class="cd-summary-label">Human Decision</span>
+                        {% if pc.human_decision %}
+                        <span class="cd-summary-val {% if pc.human_decision == 'advance' %}cd-summary-val--green{% elif pc.human_decision == 'reject' %}cd-summary-val--red{% else %}cd-summary-val--amber{% endif %}">{{ pc.human_decision|title }}</span>
+                        {% else %}
+                        <span class="cd-summary-val" style="color: #94a3b8;">Pending</span>
+                        {% endif %}
+                    </div>
+
+                    {% if pc.assessment_sessions %}
+                    <hr class="cd-summary-divider">
+                    <div class="cd-summary-item" style="grid-column: 1 / -1;">
+                        <span class="cd-summary-label">Assessments</span>
+                        {% for session in pc.assessment_sessions %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem;">
+                            <span style="font-size: 0.82rem; color: #334155;">{{ session.type|title }}</span>
+                            <span style="font-size: 0.82rem; font-weight: 700; color: var(--color-text, #0e1428);">{% if session.score is not None %}{{ session.score|floatformat:1 }}{% else %}<span style="color: #94a3b8;">—</span>{% endif %}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# ── Pipeline Progress ── #}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    </div>
+                    <h3 class="cd-card-title">Pipeline Progress</h3>
+                </div>
+
+                {% with stage=pc.stage %}
+                <ul class="cd-timeline">
+                    <li>
+                        <div class="cd-timeline-dot {% if stage != 'uploaded' %}cd-timeline-dot--done{% else %}cd-timeline-dot--active{% endif %}">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div class="cd-timeline-text">
+                            <div class="cd-timeline-label">Resume Uploaded</div>
+                            <div class="cd-timeline-time">{{ pc.created_at|naturaltime }}</div>
+                        </div>
+                    </li>
+                    <li>
+                        {% if stage == 'uploaded' %}
+                        <div class="cd-timeline-dot cd-timeline-dot--pending"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="4"></circle></svg></div>
+                        {% elif stage == 'screening' %}
+                        <div class="cd-timeline-dot cd-timeline-dot--active"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="4"></circle></svg></div>
+                        {% else %}
+                        <div class="cd-timeline-dot cd-timeline-dot--done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        {% endif %}
+                        <div class="cd-timeline-text">
+                            <div class="cd-timeline-label">AI Screening</div>
+                            {% if pc.ai_screen_score is not None %}<div class="cd-timeline-time">Score: {{ pc.ai_screen_score }}/100</div>{% endif %}
+                        </div>
+                    </li>
+                    {% if stage != 'rejected_at_screen' %}
+                    <li>
+                        {% if stage == 'shortlisted' %}
+                        <div class="cd-timeline-dot cd-timeline-dot--active"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="4"></circle></svg></div>
+                        {% elif stage == 'uploaded' or stage == 'screening' %}
+                        <div class="cd-timeline-dot cd-timeline-dot--pending"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="4"></circle></svg></div>
+                        {% else %}
+                        <div class="cd-timeline-dot cd-timeline-dot--done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        {% endif %}
+                        <div class="cd-timeline-text">
+                            <div class="cd-timeline-label">Assessment</div>
+                            {% if pc.assessment_sessions %}<div class="cd-timeline-time">{{ pc.assessment_sessions|length }} sent</div>{% endif %}
+                        </div>
+                    </li>
+                    <li>
+                        {% if stage == 'decision_made' %}
+                        <div class="cd-timeline-dot cd-timeline-dot--active"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="4"></circle></svg></div>
+                        {% elif stage == 'hired' or stage == 'rejected' %}
+                        <div class="cd-timeline-dot cd-timeline-dot--done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        {% else %}
+                        <div class="cd-timeline-dot cd-timeline-dot--pending"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="4"></circle></svg></div>
+                        {% endif %}
+                        <div class="cd-timeline-text">
+                            <div class="cd-timeline-label">Final Decision</div>
+                            {% if pc.ai_final_recommendation %}<div class="cd-timeline-time">{{ pc.ai_final_recommendation|title }}</div>{% endif %}
+                        </div>
+                    </li>
+                    {% endif %}
+                    <li>
+                        {% if stage == 'hired' %}
+                        <div class="cd-timeline-dot cd-timeline-dot--done" style="background: rgba(34, 197, 94, 0.15); color: #16a34a;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        <div class="cd-timeline-text"><div class="cd-timeline-label" style="color: #16a34a;">Hired</div></div>
+                        {% elif stage == 'rejected' or stage == 'rejected_at_screen' %}
+                        <div class="cd-timeline-dot" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="4" y1="4" x2="20" y2="20"></line><line x1="20" y1="4" x2="4" y2="20"></line></svg></div>
+                        <div class="cd-timeline-text"><div class="cd-timeline-label" style="color: #dc2626;">Rejected</div></div>
+                        {% else %}
+                        <div class="cd-timeline-dot cd-timeline-dot--pending"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="4"></circle></svg></div>
+                        <div class="cd-timeline-text"><div class="cd-timeline-label">Outcome</div></div>
+                        {% endif %}
+                    </li>
+                </ul>
+                {% endwith %}
+            </div>
+
+            {# ── Human Decision (if already decided) ── #}
+            {% if pc.human_decision %}
+            <div class="cd-card">
+                <div class="cd-card-header">
+                    <div class="cd-card-icon" style="background: rgba(14, 20, 40, 0.06); color: var(--color-text, #0e1428);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                    </div>
+                    <h3 class="cd-card-title">Human Review</h3>
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <span class="cd-rec cd-rec--{{ pc.human_decision }}">{{ pc.human_decision|title }}</span>
+                </div>
+                {% if pc.human_notes %}
+                <p style="margin: 0; color: #334155; font-size: 0.88rem; line-height: 1.6;">{{ pc.human_notes }}</p>
                 {% endif %}
             </div>
-            <div style="margin-bottom: 1.25rem;">
-                <label for="{{ review_form.notes.id_for_label }}" style="font-size: 0.85rem; font-weight: 700; color: var(--color-text, #0e1428); display: block; margin-bottom: 0.5rem;">Notes</label>
-                <textarea name="{{ review_form.notes.html_name }}" id="{{ review_form.notes.id_for_label }}" class="cd-review-textarea" placeholder="Optional notes about your decision...">{{ review_form.notes.value|default_if_none:'' }}</textarea>
-            </div>
-            <button type="submit" class="btn btn-pill">Submit Review</button>
-        </form>
+            {% endif %}
 
-        {% else %}
-        <p style="color: var(--color-text-muted, #5b647b); font-size: 0.88rem; margin: 0;">No review needed at this stage.</p>
-        {% endif %}
-    </div>
-
-    {# ── Resume ── #}
-    {% if pc.resume_text %}
-    <div class="cd-card">
-        <div class="cd-resume-toggle" onclick="var el=document.getElementById('resume-content'); var arrow=document.getElementById('resume-arrow'); if(el.style.display==='none'){el.style.display='block'; arrow.style.transform='rotate(0)';}else{el.style.display='none'; arrow.style.transform='rotate(-90deg)';}">
-            <div class="cd-card-header" style="margin-bottom: 0;">
-                <div class="cd-card-icon" style="background: rgba(14, 20, 40, 0.06); color: var(--color-text, #0e1428);">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            {# ── Resume ── #}
+            {% if pc.resume_text %}
+            <div class="cd-card">
+                <div class="cd-resume-toggle" onclick="var el=document.getElementById('resume-content'); var arrow=document.getElementById('resume-arrow'); if(el.style.display==='none'){el.style.display='block'; arrow.style.transform='rotate(0)';}else{el.style.display='none'; arrow.style.transform='rotate(-90deg)';}">
+                    <div class="cd-card-header" style="margin-bottom: 0;">
+                        <div class="cd-card-icon" style="background: rgba(14, 20, 40, 0.06); color: var(--color-text, #0e1428);">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        </div>
+                        <h3 class="cd-card-title">Resume</h3>
+                    </div>
+                    <svg id="resume-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
-                <h3 class="cd-card-title">Resume</h3>
+                <div id="resume-content" style="margin-top: 1.25rem;">
+                    <div class="cd-resume-content">{{ pc.resume_text }}</div>
+                </div>
             </div>
-            <svg id="resume-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </div>
-        <div id="resume-content" style="margin-top: 1.25rem;">
-            <div class="cd-resume-content">{{ pc.resume_text }}</div>
-        </div>
-    </div>
-    {% endif %}
+            {% endif %}
 
-    {# ── Action Log ── #}
-    {% if action_logs %}
-    <div class="cd-card">
-        <div class="cd-card-header">
-            <div class="cd-card-icon" style="background: rgba(14, 20, 40, 0.06); color: var(--color-text, #0e1428);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            {# ── Timestamps ── #}
+            <div class="cd-card" style="padding: 1.25rem 1.5rem;">
+                <div style="font-size: 0.78rem; color: #94a3b8; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <span style="display: flex; align-items: center; gap: 0.4rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Applied {{ pc.created_at|naturaltime }}
+                    </span>
+                    {% if pc.processed_at %}
+                    <span style="display: flex; align-items: center; gap: 0.4rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Processed {{ pc.processed_at|naturaltime }}
+                    </span>
+                    {% endif %}
+                    {% if pc.decided_at %}
+                    <span style="display: flex; align-items: center; gap: 0.4rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        Decided {{ pc.decided_at|naturaltime }}
+                    </span>
+                    {% endif %}
+                </div>
             </div>
-            <h3 class="cd-card-title">Action Log</h3>
-        </div>
 
-        <div style="overflow-x: auto;">
-            <table class="cd-log-table">
-                <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th>Status</th>
-                        <th class="cd-log-right">Tokens</th>
-                        <th class="cd-log-right">Duration</th>
-                        <th class="cd-log-right">Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for log in action_logs %}
-                    <tr>
-                        <td>{{ log.get_action_display }}</td>
-                        <td>
-                            <span class="cd-status-pill {% if log.status == 'success' %}cd-status-pill--submitted{% elif log.status == 'error' %}{% endif %}"
-                                  {% if log.status == 'error' %}style="background: rgba(239,68,68,0.1); color: #dc2626;"{% endif %}>
-                                {{ log.status|title }}
-                            </span>
-                        </td>
-                        <td class="cd-log-right">{% if log.tokens_used %}{{ log.tokens_used }}{% else %}&mdash;{% endif %}</td>
-                        <td class="cd-log-right">{% if log.duration_ms is not None %}{{ log.duration_ms }}ms{% else %}&mdash;{% endif %}</td>
-                        <td class="cd-log-right">{{ log.created_at|date:"M d, Y H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
+        </div>{# /sidebar #}
 
-    {# ── Timestamps ── #}
-    <div class="cd-timestamps">
-        <span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            Applied: {{ pc.created_at|date:"M d, Y H:i" }}
-        </span>
-        {% if pc.processed_at %}
-        <span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            Processed: {{ pc.processed_at|date:"M d, Y H:i" }}
-        </span>
-        {% endif %}
-        {% if pc.decided_at %}
-        <span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            Decided: {{ pc.decided_at|date:"M d, Y H:i" }}
-        </span>
-        {% endif %}
-    </div>
+    </div>{# /cd-grid #}
 
-</div>
 </div>
 {% endblock %}
