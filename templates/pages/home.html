@@ -363,18 +363,25 @@
             </div>
         </section>
 
-        {# SOCIAL PROOF — stats strip + clean testimonials #}
+        {# SOCIAL PROOF — stats + testimonials #}
         <section class="social-proof reveal" id="results">
             <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Results</p>
+                    <h2>Teams hire faster and smarter with Evalon</h2>
+                </div>
+
                 <div class="stats-strip">
                     <div class="stat-block">
-                        <span class="stat-num">37%</span>
+                        <span class="stat-num" data-count="37" data-suffix="%">0%</span>
                         <span class="stat-lbl">Faster time-to-hire</span>
                     </div>
+                    <div class="stat-divider"></div>
                     <div class="stat-block">
-                        <span class="stat-num">4.8/5</span>
+                        <span class="stat-num">4.8<span class="stat-dim">/5</span></span>
                         <span class="stat-lbl">Candidate satisfaction</span>
                     </div>
+                    <div class="stat-divider"></div>
                     <div class="stat-block">
                         <span class="stat-num">2x</span>
                         <span class="stat-lbl">Hiring confidence</span>
@@ -384,7 +391,18 @@
                 <div class="testimonials-v2">
                     {% for testimonial in testimonials %}
                     <article class="testimonial-card-v2">
+                        <div class="testimonial-stars">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
                         <blockquote class="testimonial-quote">"{{ testimonial.quote }}"</blockquote>
+                        <div class="testimonial-metric">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                            {{ testimonial.metric }}
+                        </div>
                         <div class="testimonial-footer">
                             <div class="testimonial-avatar">
                                 <img src="{% static testimonial.avatar %}" alt="{{ testimonial.name }}" width="48" height="48" loading="lazy" />
