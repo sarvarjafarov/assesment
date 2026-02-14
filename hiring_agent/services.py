@@ -496,14 +496,20 @@ def process_pipeline(pipeline: "HiringPipeline") -> dict:
             )
             stats['errors'] += 1
 
-    # Send notifications for candidates waiting on human review
-    if mode == 'recommend' and stats['shortlisted'] > 0:
+    # Send notifications
+    if stats['shortlisted'] > 0:
         try:
             notify_shortlist_ready(pipeline, stats['shortlisted'])
         except Exception:
             logger.exception('Failed to send shortlist notification')
 
-    if mode in ('recommend', 'semi_auto') and stats['decisions_made'] > 0:
+    if stats['assessments_sent'] > 0:
+        try:
+            notify_assessments_sent(pipeline, stats['assessments_sent'])
+        except Exception:
+            logger.exception('Failed to send assessment notification')
+
+    if stats['decisions_made'] > 0:
         try:
             notify_decision_ready(pipeline, stats['decisions_made'])
         except Exception:
@@ -610,6 +616,25 @@ def notify_shortlist_ready(pipeline: "HiringPipeline", count: int):
     _send_pipeline_email(
         pipeline.client,
         f'{count} candidate(s) shortlisted for {pipeline.title} — Evalon',
+        html_body,
+    )
+
+
+def notify_assessments_sent(pipeline: "HiringPipeline", count: int):
+    """Notify client that assessments have been sent to candidates."""
+    site_url = getattr(settings, 'SITE_URL', 'https://www.evalon.tech')
+    detail_url = site_url.rstrip('/') + reverse(
+        'hiring_agent:pipeline-detail', kwargs={'pipeline_uuid': pipeline.uuid}
+    )
+    html_body = render_to_string('emails/hiring_agent/assessments_sent.html', {
+        'pipeline': pipeline,
+        'client': pipeline.client,
+        'count': count,
+        'detail_url': detail_url,
+    })
+    _send_pipeline_email(
+        pipeline.client,
+        f'Assessments sent to {count} candidate(s) for {pipeline.title} — Evalon',
         html_body,
     )
 
