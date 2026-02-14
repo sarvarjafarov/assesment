@@ -244,10 +244,71 @@ def _seniority_to_level(seniority: str) -> str:
     return mapping.get(seniority, 'mid')
 
 
+def _get_candidate_route():
+    """Map assessment type codes to candidate-facing URL route names."""
+    return {
+        'marketing': 'candidate:marketing-session',
+        'product': 'candidate:pm-session',
+        'behavioral': 'candidate:behavioral-session',
+        'ux_design': 'candidate:ux-session',
+        'hr': 'candidate:hr-session',
+        'finance': 'candidate:finance-session',
+    }
+
+
+def _get_assessment_labels():
+    """Map assessment type codes to human-readable labels."""
+    return {
+        'marketing': 'Digital Marketing Assessment',
+        'product': 'Product Management Assessment',
+        'behavioral': 'Behavioral Assessment',
+        'ux_design': 'UX Design Assessment',
+        'hr': 'HR Assessment',
+        'finance': 'Finance Assessment',
+    }
+
+
+def _send_candidate_assessment_email(
+    candidate_email: str,
+    candidate_first_name: str,
+    company_name: str,
+    session,
+    assessment_label: str,
+    route_name: str,
+):
+    """Send an assessment invite email to the candidate."""
+    site_url = getattr(settings, 'SITE_URL', 'https://www.evalon.tech')
+    start_link = site_url.rstrip('/') + reverse(route_name, args=[session.uuid])
+
+    context = {
+        'company_name': company_name,
+        'invited_by': company_name,
+        'candidate': {'first_name': candidate_first_name},
+        'assessment': {'title': assessment_label},
+        'start_link': start_link,
+        'session_link': start_link,
+        'due_at': None,
+        'notes': '',
+    }
+    subject = f'{company_name} invited you to the {assessment_label}'
+    html_body = render_to_string('emails/invite_candidate.html', context)
+    text_body = strip_tags(html_body)
+
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[candidate_email],
+    )
+    email.attach_alternative(html_body, 'text/html')
+    email.send()
+    logger.info('Assessment invite sent to %s for %s', candidate_email, assessment_label)
+
+
 def send_assessments(pipeline_candidate: PipelineCandidate) -> list[dict]:
     """
     Send all configured assessment types to the candidate.
-    Creates session objects and tracks them in assessment_sessions JSON.
+    Creates session objects, emails the candidate, and tracks in assessment_sessions JSON.
     Returns list of created session info dicts.
     """
     pipeline = pipeline_candidate.pipeline
@@ -255,7 +316,10 @@ def send_assessments(pipeline_candidate: PipelineCandidate) -> list[dict]:
     assessment_types = pipeline.assessment_types or []
     level = _seniority_to_level(pipeline.seniority_level)
     candidate_email = pipeline_candidate.candidate.email
+    candidate_first_name = pipeline_candidate.candidate.first_name or 'Candidate'
     config = _get_assessment_config()
+    routes = _get_candidate_route()
+    labels = _get_assessment_labels()
     sessions_created = []
 
     for atype in assessment_types:
@@ -279,6 +343,24 @@ def send_assessments(pipeline_candidate: PipelineCandidate) -> list[dict]:
             session.save(update_fields=[
                 'question_set', 'status', 'level', 'updated_at',
             ])
+
+        # Email the candidate their assessment link
+        route_name = routes.get(atype)
+        if route_name and created:
+            try:
+                _send_candidate_assessment_email(
+                    candidate_email=candidate_email,
+                    candidate_first_name=candidate_first_name,
+                    company_name=client.company_name,
+                    session=session,
+                    assessment_label=labels.get(atype, atype),
+                    route_name=route_name,
+                )
+            except Exception as exc:
+                logger.error(
+                    'Failed to email assessment invite to %s: %s',
+                    candidate_email, exc,
+                )
 
         sessions_created.append({
             'type': atype,
