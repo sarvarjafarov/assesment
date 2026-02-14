@@ -18577,20 +18577,22 @@ main {
 }
 
 .testimonial-footer {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 0.7rem;
     padding-top: 1.2rem;
     border-top: 1px solid #f1f5f9;
+    justify-content: flex-start;
 }
 
-.testimonial-avatar {
+.testimonial-card-v2 .testimonial-avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
     background: #f1f5f9;
+    margin: 0;
 }
 
 .testimonial-avatar img {
