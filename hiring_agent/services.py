@@ -275,6 +275,7 @@ def _send_candidate_assessment_email(
     session,
     assessment_label: str,
     route_name: str,
+    client=None,
 ):
     """Send an assessment invite email to the candidate."""
     site_url = getattr(settings, 'SITE_URL', 'https://www.evalon.tech')
@@ -290,6 +291,12 @@ def _send_candidate_assessment_email(
         'due_at': None,
         'notes': '',
     }
+    # Add client branding if available
+    if client:
+        context['brand_primary'] = client.brand_primary_color or '#ff8a00'
+        context['brand_secondary'] = client.brand_secondary_color or '#0e1428'
+        context['hide_evalon_branding'] = client.hide_evalon_branding
+        context['client_footer_text'] = client.get_footer_text()
     subject = f'{company_name} invited you to the {assessment_label}'
     html_body = render_to_string('emails/invite_candidate.html', context)
     text_body = strip_tags(html_body)
@@ -355,6 +362,7 @@ def send_assessments(pipeline_candidate: PipelineCandidate) -> list[dict]:
                     session=session,
                     assessment_label=labels.get(atype, atype),
                     route_name=route_name,
+                    client=client,
                 )
             except Exception as exc:
                 logger.error(

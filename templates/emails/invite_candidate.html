@@ -12,7 +12,10 @@
                 <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); overflow: hidden;">
                     <!-- Header with gradient -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #0e1428 0%, #1a2847 100%); padding: 40px 40px 30px; text-align: center;">
+                        <td style="background: linear-gradient(135deg, {{ brand_secondary|default:'#0e1428' }} 0%, {{ brand_secondary|default:'#1a2847' }} 100%); padding: 40px 40px 30px; text-align: center;">
+                            {% if client_logo_url %}
+                            <img src="{{ client_logo_url }}" alt="{{ company_name }}" style="max-width: 140px; max-height: 60px; margin-bottom: 16px;">
+                            {% endif %}
                             <h1 style="margin: 0 0 10px; color: #ffffff; font-size: 28px; font-weight: 700;">
                                 You're Invited! 🎯
                             </h1>
@@ -25,17 +28,17 @@
                     <!-- Main content -->
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 20px; color: #0e1428; font-size: 16px; line-height: 1.6;">
+                            <p style="margin: 0 0 20px; color: {{ brand_secondary|default:'#0e1428' }}; font-size: 16px; line-height: 1.6;">
                                 Hi{% if candidate.first_name %} {{ candidate.first_name }}{% endif %},
                             </p>
 
                             <p style="margin: 0 0 24px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                                {{ invited_by }} has invited you to complete the <strong style="color: #0e1428;">{{ assessment.title }}</strong> assessment via Evalon. This is your chance to showcase your skills and experience.
+                                {{ invited_by }} has invited you to complete the <strong style="color: {{ brand_secondary|default:'#0e1428' }};">{{ assessment.title }}</strong> assessment via Evalon. This is your chance to showcase your skills and experience.
                             </p>
 
                             {% if due_at %}
-                            <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%); border-left: 4px solid #ff8a00; padding: 16px 20px; margin: 0 0 24px; border-radius: 8px;">
-                                <p style="margin: 0; color: #0e1428; font-size: 15px;">
+                            <div style="border-left: 4px solid {{ brand_primary|default:'#ff8a00' }}; padding: 16px 20px; margin: 0 0 24px; border-radius: 8px; background-color: #f7fafc;">
+                                <p style="margin: 0; color: {{ brand_secondary|default:'#0e1428' }}; font-size: 15px;">
                                     <strong>⏰ Deadline:</strong> {{ due_at|date:"l, F j, Y at h:i A" }}
                                 </p>
                             </div>
@@ -43,7 +46,7 @@
 
                             <!-- Assessment details -->
                             <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 24px; margin: 0 0 28px;">
-                                <h3 style="margin: 0 0 16px; color: #0e1428; font-size: 18px; font-weight: 600;">
+                                <h3 style="margin: 0 0 16px; color: {{ brand_secondary|default:'#0e1428' }}; font-size: 18px; font-weight: 600;">
                                     📋 What to Expect
                                 </h3>
                                 <ul style="margin: 0; padding-left: 20px; color: #4a5568; font-size: 15px; line-height: 1.8;">
@@ -56,7 +59,7 @@
 
                             {% if notes %}
                             <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 16px 20px; margin: 0 0 28px; border-radius: 8px;">
-                                <p style="margin: 0 0 8px; color: #0e1428; font-size: 15px; font-weight: 600;">
+                                <p style="margin: 0 0 8px; color: {{ brand_secondary|default:'#0e1428' }}; font-size: 15px; font-weight: 600;">
                                     💬 Message from the team:
                                 </p>
                                 <p style="margin: 0; color: #4a5568; font-size: 15px; line-height: 1.6; white-space: pre-line;">{{ notes }}</p>
@@ -67,7 +70,7 @@
                             <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="{{ start_link }}" style="display: inline-block; background: linear-gradient(135deg, #ff8a00 0%, #ff6b00 100%); color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-size: 17px; font-weight: 700; box-shadow: 0 4px 16px rgba(255, 138, 0, 0.3);">
+                                        <a href="{{ start_link }}" style="display: inline-block; background: {{ brand_primary|default:'#ff8a00' }}; color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-size: 17px; font-weight: 700;">
                                             Start Assessment →
                                         </a>
                                     </td>
@@ -87,12 +90,18 @@
                     <tr>
                         <td style="background: #f7fafc; padding: 30px 40px; border-top: 1px solid #e2e8f0;">
                             <p style="margin: 0 0 16px; color: #718096; font-size: 14px; line-height: 1.6;">
-                                <strong style="color: #0e1428;">Need help?</strong><br>
+                                <strong style="color: {{ brand_secondary|default:'#0e1428' }};">Need help?</strong><br>
                                 Reply to this email or contact {{ company_name }} directly. We're here to assist you.
                             </p>
+                            {% if hide_evalon_branding %}
                             <p style="margin: 0; color: #a0aec0; font-size: 13px; line-height: 1.5;">
-                                This assessment is powered by <strong style="color: #ff8a00;">Evalon</strong> · <a href="https://www.evalon.tech" style="color: #ff8a00; text-decoration: none;">evalon.tech</a>
+                                {{ client_footer_text|default:"Secure & confidential assessment" }}
                             </p>
+                            {% else %}
+                            <p style="margin: 0; color: #a0aec0; font-size: 13px; line-height: 1.5;">
+                                This assessment is powered by <strong style="color: {{ brand_primary|default:'#ff8a00' }};">Evalon</strong> · <a href="https://www.evalon.tech" style="color: {{ brand_primary|default:'#ff8a00' }}; text-decoration: none;">evalon.tech</a>
+                            </p>
+                            {% endif %}
                         </td>
                     </tr>
                 </table>

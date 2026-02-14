@@ -1610,6 +1610,11 @@ class ClientAssessmentMixin(LoginRequiredMixin):
             'session_link': session_link,
             'due_at': due_at,
             'notes': getattr(session, 'notes', ''),
+            # Client branding
+            'brand_primary': self.account.brand_primary_color or '#ff8a00',
+            'brand_secondary': self.account.brand_secondary_color or '#0e1428',
+            'hide_evalon_branding': self.account.hide_evalon_branding,
+            'client_footer_text': self.account.get_footer_text(),
         }
 
         # Render HTML and text versions
