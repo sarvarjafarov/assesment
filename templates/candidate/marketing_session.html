@@ -7,35 +7,42 @@
     <!-- Sticky Progress Header -->
     <div class="session-header">
         <div class="session-header-content">
-            <div class="header-left">
+            <div class="header-top-row">
                 <span class="assessment-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                     Digital Marketing Assessment
                 </span>
+                <div class="header-stats">
+                    <div class="header-stat">
+                        <span class="header-stat-value">{{ step_number }}<span class="header-stat-sep">/</span>{{ total_steps }}</span>
+                        <span class="header-stat-label">Question</span>
+                    </div>
+                    <div class="header-stat-divider"></div>
+                    <div class="header-stat">
+                        <span class="header-stat-value">{{ progress_percent }}%</span>
+                        <span class="header-stat-label">Complete</span>
+                    </div>
+                    {% if remaining_minutes %}
+                    <div class="header-stat-divider"></div>
+                    <div class="header-stat stat-time">
+                        <span class="header-stat-value">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            {{ remaining_minutes }} min
+                        </span>
+                        <span class="header-stat-label">Remaining</span>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="header-progress">
+            <div class="header-progress-row">
                 <div class="progress-bar-container">
                     <div class="progress-bar-fill" style="width: {{ progress_percent }}%"></div>
-                </div>
-                <div class="progress-stats-compact">
-                    <span class="stat-item">
-                        <strong>{{ step_number }}</strong>/{{ total_steps }}
-                    </span>
-                    <span class="stat-item">
-                        <strong>{{ progress_percent }}%</strong>
-                    </span>
-                    {% if remaining_minutes %}
-                    <span class="stat-item time-left">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        {{ remaining_minutes }} min
-                    </span>
-                    {% endif %}
                 </div>
             </div>
         </div>
