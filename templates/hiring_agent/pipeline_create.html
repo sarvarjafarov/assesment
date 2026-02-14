@@ -1,247 +1,220 @@
 {% extends 'portal_base.html' %}
-
+{% block title %}{% if is_edit %}Edit Pipeline{% else %}Create Pipeline{% endif %} · Evalon{% endblock %}
 {% block portal_content %}
 <style>
-    .pipeline-form-card {
+    .ha-form-shell { max-width: 720px; }
+    .ha-back {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        color: var(--color-text-muted, #5b647b);
+        text-decoration: none; font-size: 0.85rem; font-weight: 600;
+        margin-bottom: 1.25rem;
+        transition: color 0.2s;
+    }
+    .ha-back:hover { color: var(--color-orange, #ff8a00); }
+    .ha-form-title { font-size: 1.6rem; font-weight: 800; color: var(--color-text, #0e1428); margin: 0 0 1.75rem; }
+
+    .ha-form-card {
         background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 2rem;
-        max-width: 720px;
+        border: 1px solid rgba(14, 20, 40, 0.08);
+        border-radius: var(--radius-2xl, 24px);
+        padding: 2.25rem;
     }
-    .pipeline-form-card .form-section-header {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #0e1428;
-        margin: 1.5rem 0 0.8rem;
+
+    .ha-section-label {
+        font-size: 0.75rem; font-weight: 700; color: var(--color-orange, #ff8a00);
+        text-transform: uppercase; letter-spacing: 0.08em;
+        margin: 2rem 0 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(14, 20, 40, 0.06);
     }
-    .pipeline-form-card .form-section-header:first-of-type {
-        margin-top: 0;
+    .ha-section-label:first-of-type { margin-top: 0; }
+
+    .ha-field { margin-bottom: 1.25rem; }
+    .ha-field label {
+        display: block; font-weight: 600; font-size: 0.9rem;
+        color: var(--color-text, #0e1428); margin-bottom: 0.4rem;
     }
-    .pipeline-form-card .form-group {
-        margin-bottom: 1rem;
+    .ha-field input[type="text"],
+    .ha-field input[type="number"],
+    .ha-field textarea,
+    .ha-field select {
+        width: 100%; box-sizing: border-box;
+        padding: 0.7rem 0.9rem;
+        border: 1px solid rgba(14, 20, 40, 0.12);
+        border-radius: var(--radius-md, 8px);
+        font-size: 0.9rem; font-family: inherit;
+        color: var(--color-text, #0e1428);
+        background: var(--color-bg, #fff);
+        transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .pipeline-form-card .form-group label {
-        font-weight: 600;
-        color: #1a202c;
-        margin-bottom: 0.3rem;
-        display: block;
+    .ha-field input:focus,
+    .ha-field textarea:focus,
+    .ha-field select:focus {
+        outline: none;
+        border-color: var(--color-orange, #ff8a00);
+        box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
     }
-    .pipeline-form-card .form-group input[type="text"],
-    .pipeline-form-card .form-group input[type="number"],
-    .pipeline-form-card .form-group textarea,
-    .pipeline-form-card .form-group select {
-        width: 100%;
-        padding: 0.6rem 0.8rem;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        box-sizing: border-box;
+    .ha-field textarea { resize: vertical; min-height: 100px; }
+    .ha-field .ha-help { font-size: 0.78rem; color: var(--color-text-muted, #5b647b); margin-top: 0.3rem; line-height: 1.4; }
+    .ha-field .ha-errors { color: #dc2626; font-size: 0.82rem; margin-top: 0.3rem; }
+    .ha-field .ha-errors ul { margin: 0; padding: 0 0 0 1.2rem; }
+
+    .ha-non-field-errors {
+        background: #fef2f2; border: 1px solid rgba(220, 38, 38, 0.2);
+        color: #dc2626; border-radius: var(--radius-lg, 12px);
+        padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.88rem;
     }
-    .pipeline-form-card .form-group textarea {
-        resize: vertical;
+    .ha-non-field-errors ul { margin: 0; padding: 0 0 0 1.2rem; }
+
+    .ha-checkbox-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .ha-checkbox-group label {
+        font-weight: 500; color: #334155;
+        display: flex; align-items: center; gap: 0.5rem;
+        cursor: pointer; font-size: 0.88rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid rgba(14, 20, 40, 0.08);
+        transition: background 0.15s, border-color 0.15s;
     }
-    .pipeline-form-card .form-group .help-text {
-        font-size: 0.8rem;
-        color: #6b7280;
-        margin-top: 0.2rem;
-    }
-    .pipeline-form-card .form-group .field-errors {
-        color: #dc2626;
-        font-size: 0.85rem;
-        margin-top: 0.2rem;
-    }
-    .pipeline-form-card .form-group .field-errors ul {
-        margin: 0;
-        padding: 0 0 0 1.2rem;
-    }
-    .pipeline-form-card .non-field-errors {
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        color: #dc2626;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-    }
-    .pipeline-form-card .non-field-errors ul {
-        margin: 0;
-        padding: 0 0 0 1.2rem;
-    }
-    .pipeline-form-card .checkbox-list label {
-        font-weight: 400;
-        color: #374151;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        margin-bottom: 0.35rem;
-    }
-    .pipeline-form-card .checkbox-list input[type="checkbox"] {
-        width: auto;
-    }
-    .pipeline-form-card .form-actions {
-        margin-top: 1.5rem;
-    }
-    .pipeline-form-card .btn-submit {
-        background: #ff8a00;
-        color: #fff;
-        border: none;
-        padding: 0.7rem 1.5rem;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 1rem;
-    }
-    .pipeline-form-card .btn-submit:hover {
-        background: #e67a00;
-    }
-    .pipeline-back-link {
-        display: inline-block;
-        margin-bottom: 1rem;
-        color: #6b7280;
-        text-decoration: none;
-        font-size: 0.9rem;
-    }
-    .pipeline-back-link:hover {
-        color: #0e1428;
-    }
-    .pipeline-page-header {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #0e1428;
-        margin-bottom: 0.5rem;
-    }
+    .ha-checkbox-group label:hover { background: var(--color-bg-muted, #f7f8fb); border-color: rgba(14, 20, 40, 0.12); }
+    .ha-checkbox-group input[type="checkbox"] { width: auto; accent-color: var(--color-orange, #ff8a00); }
+
+    .ha-form-actions { margin-top: 2rem; display: flex; gap: 0.75rem; }
+
+    .ha-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .ha-row { grid-template-columns: 1fr; } }
 </style>
 
-<a href="{% url 'hiring_agent:pipeline-list' %}" class="pipeline-back-link">&larr; Back to Pipelines</a>
+<div class="portal-shell">
+<div class="ha-form-shell">
 
-<h1 class="pipeline-page-header">
-    {% if is_edit %}
-        Edit Pipeline: {{ pipeline.title }}
-    {% else %}
-        Create Pipeline
-    {% endif %}
-</h1>
+    <a href="{% url 'hiring_agent:pipeline-list' %}" class="ha-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Back to Pipelines
+    </a>
 
-<div class="pipeline-form-card">
-    <form method="post">
-        {% csrf_token %}
+    <h1 class="ha-form-title">
+        {% if is_edit %}Edit: {{ pipeline.title }}{% else %}Create Pipeline{% endif %}
+    </h1>
 
-        {% if form.non_field_errors %}
-        <div class="non-field-errors">
-            {{ form.non_field_errors }}
-        </div>
-        {% endif %}
+    <div class="ha-form-card">
+        <form method="post">
+            {% csrf_token %}
 
-        {# ── Job Details ── #}
-        <h3 class="form-section-header">Job Details</h3>
+            {% if form.non_field_errors %}
+            <div class="ha-non-field-errors">{{ form.non_field_errors }}</div>
+            {% endif %}
 
-        <div class="form-group">
-            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-            {{ form.title }}
-            {% if form.title.help_text %}<p class="help-text">{{ form.title.help_text }}</p>{% endif %}
-            {% if form.title.errors %}<div class="field-errors">{{ form.title.errors }}</div>{% endif %}
-        </div>
+            {# ── Job Details ── #}
+            <div class="ha-section-label">Job Details</div>
 
-        <div class="form-group">
-            <label for="{{ form.job_description.id_for_label }}">{{ form.job_description.label }}</label>
-            {{ form.job_description }}
-            {% if form.job_description.help_text %}<p class="help-text">{{ form.job_description.help_text }}</p>{% endif %}
-            {% if form.job_description.errors %}<div class="field-errors">{{ form.job_description.errors }}</div>{% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.experience_range.id_for_label }}">{{ form.experience_range.label }}</label>
-            {{ form.experience_range }}
-            {% if form.experience_range.help_text %}<p class="help-text">{{ form.experience_range.help_text }}</p>{% endif %}
-            {% if form.experience_range.errors %}<div class="field-errors">{{ form.experience_range.errors }}</div>{% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.seniority_level.id_for_label }}">{{ form.seniority_level.label }}</label>
-            {{ form.seniority_level }}
-            {% if form.seniority_level.help_text %}<p class="help-text">{{ form.seniority_level.help_text }}</p>{% endif %}
-            {% if form.seniority_level.errors %}<div class="field-errors">{{ form.seniority_level.errors }}</div>{% endif %}
-        </div>
-
-        {# ── Skills ── #}
-        <h3 class="form-section-header">Skills</h3>
-
-        <div class="form-group">
-            <label for="{{ form.required_skills_text.id_for_label }}">{{ form.required_skills_text.label }}</label>
-            {{ form.required_skills_text }}
-            {% if form.required_skills_text.help_text %}<p class="help-text">{{ form.required_skills_text.help_text }}</p>{% endif %}
-            {% if form.required_skills_text.errors %}<div class="field-errors">{{ form.required_skills_text.errors }}</div>{% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.preferred_skills_text.id_for_label }}">{{ form.preferred_skills_text.label }}</label>
-            {{ form.preferred_skills_text }}
-            {% if form.preferred_skills_text.help_text %}<p class="help-text">{{ form.preferred_skills_text.help_text }}</p>{% endif %}
-            {% if form.preferred_skills_text.errors %}<div class="field-errors">{{ form.preferred_skills_text.errors }}</div>{% endif %}
-        </div>
-
-        {# ── Assessment Configuration ── #}
-        <h3 class="form-section-header">Assessment Configuration</h3>
-
-        <div class="form-group">
-            <label>{{ form.assessment_types.label }}</label>
-            <div class="checkbox-list">
-                {{ form.assessment_types }}
+            <div class="ha-field">
+                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                {{ form.title }}
+                {% if form.title.help_text %}<p class="ha-help">{{ form.title.help_text }}</p>{% endif %}
+                {% if form.title.errors %}<div class="ha-errors">{{ form.title.errors }}</div>{% endif %}
             </div>
-            {% if form.assessment_types.help_text %}<p class="help-text">{{ form.assessment_types.help_text }}</p>{% endif %}
-            {% if form.assessment_types.errors %}<div class="field-errors">{{ form.assessment_types.errors }}</div>{% endif %}
-        </div>
 
-        <div class="form-group">
-            <label for="{{ form.automation_mode.id_for_label }}">{{ form.automation_mode.label }}</label>
-            {{ form.automation_mode }}
-            {% if form.automation_mode.help_text %}<p class="help-text">{{ form.automation_mode.help_text }}</p>{% endif %}
-            {% if form.automation_mode.errors %}<div class="field-errors">{{ form.automation_mode.errors }}</div>{% endif %}
-        </div>
+            <div class="ha-field">
+                <label for="{{ form.job_description.id_for_label }}">{{ form.job_description.label }}</label>
+                {{ form.job_description }}
+                {% if form.job_description.help_text %}<p class="ha-help">{{ form.job_description.help_text }}</p>{% endif %}
+                {% if form.job_description.errors %}<div class="ha-errors">{{ form.job_description.errors }}</div>{% endif %}
+            </div>
 
-        {# ── Thresholds ── #}
-        <h3 class="form-section-header">Thresholds</h3>
+            <div class="ha-row">
+                <div class="ha-field">
+                    <label for="{{ form.experience_range.id_for_label }}">{{ form.experience_range.label }}</label>
+                    {{ form.experience_range }}
+                    {% if form.experience_range.help_text %}<p class="ha-help">{{ form.experience_range.help_text }}</p>{% endif %}
+                    {% if form.experience_range.errors %}<div class="ha-errors">{{ form.experience_range.errors }}</div>{% endif %}
+                </div>
+                <div class="ha-field">
+                    <label for="{{ form.seniority_level.id_for_label }}">{{ form.seniority_level.label }}</label>
+                    {{ form.seniority_level }}
+                    {% if form.seniority_level.help_text %}<p class="ha-help">{{ form.seniority_level.help_text }}</p>{% endif %}
+                    {% if form.seniority_level.errors %}<div class="ha-errors">{{ form.seniority_level.errors }}</div>{% endif %}
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="{{ form.screening_threshold.id_for_label }}">{{ form.screening_threshold.label }}</label>
-            {{ form.screening_threshold }}
-            {% if form.screening_threshold.help_text %}<p class="help-text">{{ form.screening_threshold.help_text }}</p>{% endif %}
-            {% if form.screening_threshold.errors %}<div class="field-errors">{{ form.screening_threshold.errors }}</div>{% endif %}
-        </div>
+            {# ── Skills ── #}
+            <div class="ha-section-label">Skills</div>
 
-        <div class="form-group">
-            <label for="{{ form.passing_score.id_for_label }}">{{ form.passing_score.label }}</label>
-            {{ form.passing_score }}
-            {% if form.passing_score.help_text %}<p class="help-text">{{ form.passing_score.help_text }}</p>{% endif %}
-            {% if form.passing_score.errors %}<div class="field-errors">{{ form.passing_score.errors }}</div>{% endif %}
-        </div>
+            <div class="ha-field">
+                <label for="{{ form.required_skills_text.id_for_label }}">{{ form.required_skills_text.label }}</label>
+                {{ form.required_skills_text }}
+                {% if form.required_skills_text.help_text %}<p class="ha-help">{{ form.required_skills_text.help_text }}</p>{% endif %}
+                {% if form.required_skills_text.errors %}<div class="ha-errors">{{ form.required_skills_text.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-group">
-            <label for="{{ form.max_candidates.id_for_label }}">{{ form.max_candidates.label }}</label>
-            {{ form.max_candidates }}
-            {% if form.max_candidates.help_text %}<p class="help-text">{{ form.max_candidates.help_text }}</p>{% endif %}
-            {% if form.max_candidates.errors %}<div class="field-errors">{{ form.max_candidates.errors }}</div>{% endif %}
-        </div>
+            <div class="ha-field">
+                <label for="{{ form.preferred_skills_text.id_for_label }}">{{ form.preferred_skills_text.label }}</label>
+                {{ form.preferred_skills_text }}
+                {% if form.preferred_skills_text.help_text %}<p class="ha-help">{{ form.preferred_skills_text.help_text }}</p>{% endif %}
+                {% if form.preferred_skills_text.errors %}<div class="ha-errors">{{ form.preferred_skills_text.errors }}</div>{% endif %}
+            </div>
 
-        {# ── Project (optional) ── #}
-        <h3 class="form-section-header">Project</h3>
+            {# ── Assessment Configuration ── #}
+            <div class="ha-section-label">Assessment Configuration</div>
 
-        <div class="form-group">
-            <label for="{{ form.project.id_for_label }}">{{ form.project.label }}</label>
-            {{ form.project }}
-            {% if form.project.help_text %}<p class="help-text">{{ form.project.help_text }}</p>{% endif %}
-            {% if form.project.errors %}<div class="field-errors">{{ form.project.errors }}</div>{% endif %}
-        </div>
+            <div class="ha-field">
+                <label>{{ form.assessment_types.label }}</label>
+                <div class="ha-checkbox-group">{{ form.assessment_types }}</div>
+                {% if form.assessment_types.help_text %}<p class="ha-help">{{ form.assessment_types.help_text }}</p>{% endif %}
+                {% if form.assessment_types.errors %}<div class="ha-errors">{{ form.assessment_types.errors }}</div>{% endif %}
+            </div>
 
-        {# ── Submit ── #}
-        <div class="form-actions">
-            <button type="submit" class="btn-submit">
-                {% if is_edit %}Save Changes{% else %}Create Pipeline{% endif %}
-            </button>
-        </div>
-    </form>
+            <div class="ha-field">
+                <label for="{{ form.automation_mode.id_for_label }}">{{ form.automation_mode.label }}</label>
+                {{ form.automation_mode }}
+                {% if form.automation_mode.help_text %}<p class="ha-help">{{ form.automation_mode.help_text }}</p>{% endif %}
+                {% if form.automation_mode.errors %}<div class="ha-errors">{{ form.automation_mode.errors }}</div>{% endif %}
+            </div>
+
+            {# ── Thresholds ── #}
+            <div class="ha-section-label">Thresholds</div>
+
+            <div class="ha-row">
+                <div class="ha-field">
+                    <label for="{{ form.screening_threshold.id_for_label }}">{{ form.screening_threshold.label }}</label>
+                    {{ form.screening_threshold }}
+                    {% if form.screening_threshold.help_text %}<p class="ha-help">{{ form.screening_threshold.help_text }}</p>{% endif %}
+                    {% if form.screening_threshold.errors %}<div class="ha-errors">{{ form.screening_threshold.errors }}</div>{% endif %}
+                </div>
+                <div class="ha-field">
+                    <label for="{{ form.passing_score.id_for_label }}">{{ form.passing_score.label }}</label>
+                    {{ form.passing_score }}
+                    {% if form.passing_score.help_text %}<p class="ha-help">{{ form.passing_score.help_text }}</p>{% endif %}
+                    {% if form.passing_score.errors %}<div class="ha-errors">{{ form.passing_score.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="ha-field">
+                <label for="{{ form.max_candidates.id_for_label }}">{{ form.max_candidates.label }}</label>
+                {{ form.max_candidates }}
+                {% if form.max_candidates.help_text %}<p class="ha-help">{{ form.max_candidates.help_text }}</p>{% endif %}
+                {% if form.max_candidates.errors %}<div class="ha-errors">{{ form.max_candidates.errors }}</div>{% endif %}
+            </div>
+
+            {# ── Project ── #}
+            <div class="ha-section-label">Project</div>
+
+            <div class="ha-field">
+                <label for="{{ form.project.id_for_label }}">{{ form.project.label }}</label>
+                {{ form.project }}
+                {% if form.project.help_text %}<p class="ha-help">{{ form.project.help_text }}</p>{% endif %}
+                {% if form.project.errors %}<div class="ha-errors">{{ form.project.errors }}</div>{% endif %}
+            </div>
+
+            <div class="ha-form-actions">
+                <button type="submit" class="btn btn-pill">
+                    {% if is_edit %}Save Changes{% else %}Create Pipeline{% endif %}
+                </button>
+                <a href="{% url 'hiring_agent:pipeline-list' %}" class="btn btn-outline btn-pill">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+</div>
 </div>
 {% endblock %}

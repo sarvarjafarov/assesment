@@ -4,16 +4,103 @@
 {% block title %}AI Hiring Pipelines · Evalon{% endblock %}
 {% block meta_description %}Manage your AI-powered hiring pipelines and candidate screening.{% endblock %}
 {% block portal_content %}
+<style>
+    /* ── Pipeline List ── */
+    .ha-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .ha-header h1 { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--color-text, #0e1428); }
+    .ha-header .ha-subtitle { margin: 0.25rem 0 0; color: var(--color-text-muted, #5b647b); font-size: 0.9rem; }
+
+    .ha-count { margin-bottom: 1rem; font-size: 0.85rem; color: var(--color-text-muted, #5b647b); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+
+    .ha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
+
+    .ha-pipeline-card {
+        display: block; text-decoration: none; color: inherit;
+        border: 1px solid rgba(14, 20, 40, 0.08);
+        border-radius: var(--radius-2xl, 24px);
+        padding: 1.75rem;
+        background: #fff;
+        transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .ha-pipeline-card::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--color-orange, #ff8a00);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+    .ha-pipeline-card:hover {
+        box-shadow: 0 20px 45px rgba(14, 20, 40, 0.08);
+        transform: translateY(-2px);
+        border-color: rgba(14, 20, 40, 0.12);
+    }
+    .ha-pipeline-card:hover::before { opacity: 1; }
+
+    .ha-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
+    .ha-card-title { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--color-text, #0e1428); line-height: 1.4; }
+
+    .ha-badge {
+        display: inline-flex; align-items: center;
+        padding: 0.2rem 0.7rem;
+        border-radius: var(--radius-full, 999px);
+        font-size: 0.7rem; font-weight: 700;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .ha-badge--active { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    .ha-badge--draft { background: rgba(14, 20, 40, 0.06); color: var(--color-text-muted, #5b647b); }
+    .ha-badge--paused { background: rgba(245, 158, 11, 0.12); color: #d97706; }
+    .ha-badge--completed { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+    .ha-badge--archived { background: rgba(14, 20, 40, 0.04); color: #94a3b8; }
+
+    .ha-card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
+    .ha-tag {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        font-size: 0.75rem; color: var(--color-text-muted, #5b647b);
+        background: var(--color-bg-muted, #f7f8fb);
+        padding: 0.25rem 0.6rem;
+        border-radius: var(--radius-sm, 6px);
+        border: 1px solid rgba(14, 20, 40, 0.06);
+    }
+    .ha-tag svg { opacity: 0.5; }
+
+    .ha-card-footer {
+        display: flex; align-items: flex-end; gap: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgba(14, 20, 40, 0.06);
+    }
+    .ha-card-stat { display: flex; flex-direction: column; }
+    .ha-card-stat-val { font-size: 1.25rem; font-weight: 800; color: var(--color-text, #0e1428); line-height: 1; }
+    .ha-card-stat-label { font-size: 0.72rem; color: var(--color-text-muted, #5b647b); font-weight: 600; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .ha-card-time { margin-left: auto; text-align: right; font-size: 0.78rem; color: #94a3b8; }
+
+    /* ── Empty State ── */
+    .ha-empty {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: #fff;
+        border: 1px solid rgba(14, 20, 40, 0.08);
+        border-radius: var(--radius-2xl, 24px);
+    }
+    .ha-empty-icon { margin-bottom: 1.5rem; color: var(--color-orange, #ff8a00); opacity: 0.15; }
+    .ha-empty h3 { margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 700; color: var(--color-text, #0e1428); }
+    .ha-empty p { margin: 0 0 2rem; color: var(--color-text-muted, #5b647b); max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+</style>
+
 <div class="portal-shell">
 
     {# ── Page Header ── #}
-    <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <header class="ha-header">
         <div>
-            <h1 style="margin: 0; font-size: 1.75rem; font-weight: 700; color: #1a202c;">AI Hiring Pipelines</h1>
-            <p class="muted" style="margin: 0.25rem 0 0; color: #718096; font-size: 0.95rem;">Automate candidate screening and evaluation with AI-powered pipelines</p>
+            <h1>AI Hiring Pipelines</h1>
+            <p class="ha-subtitle">Automate candidate screening and evaluation with AI</p>
         </div>
-        <a href="{% url 'hiring_agent:pipeline-create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ff8a00; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: background 0.2s;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <a href="{% url 'hiring_agent:pipeline-create' %}" class="btn btn-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
@@ -23,73 +110,43 @@
 
     {% if pipelines %}
 
-    {# ── Count Bar ── #}
-    <div style="margin-bottom: 1.25rem; font-size: 0.9rem; color: #718096; font-weight: 500;">
-        {{ pipelines|length }} pipeline{{ pipelines|length|pluralize }}
-    </div>
+    <div class="ha-count">{{ pipelines|length }} pipeline{{ pipelines|length|pluralize }}</div>
 
-    {# ── Pipeline Cards Grid ── #}
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
+    <div class="ha-grid">
         {% for pipeline in pipelines %}
-        <a href="{% url 'hiring_agent:pipeline-detail' pipeline_uuid=pipeline.uuid %}" style="display: block; text-decoration: none; color: inherit; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; transition: box-shadow 0.2s, border-color 0.2s;"
-           onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; this.style.borderColor='#cbd5e0';"
-           onmouseout="this.style.boxShadow='none'; this.style.borderColor='#e2e8f0';">
-
-            {# Card Top: Title + Status Badge #}
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem;">
-                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1a202c; line-height: 1.4;">{{ pipeline.title }}</h3>
-                {% if pipeline.status == 'active' %}
-                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #c6f6d5; color: #22543d;">Active</span>
-                {% elif pipeline.status == 'draft' %}
-                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #e2e8f0; color: #4a5568;">Draft</span>
-                {% elif pipeline.status == 'paused' %}
-                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #feebc8; color: #7b341e;">Paused</span>
-                {% elif pipeline.status == 'completed' %}
-                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #bee3f8; color: #2a4365;">Completed</span>
-                {% elif pipeline.status == 'archived' %}
-                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #f7fafc; color: #a0aec0;">Archived</span>
-                {% endif %}
+        <a href="{% url 'hiring_agent:pipeline-detail' pipeline_uuid=pipeline.uuid %}" class="ha-pipeline-card">
+            <div class="ha-card-top">
+                <h3 class="ha-card-title">{{ pipeline.title }}</h3>
+                <span class="ha-badge ha-badge--{{ pipeline.status }}">{{ pipeline.get_status_display }}</span>
             </div>
 
-            {# Card Meta: Automation Mode, Seniority, Project #}
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+            <div class="ha-card-tags">
                 {% if pipeline.automation_mode %}
-                <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #718096; background: #f7fafc; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
-                    </svg>
+                <span class="ha-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>
                     {{ pipeline.get_automation_mode_display|default:pipeline.automation_mode }}
                 </span>
                 {% endif %}
                 {% if pipeline.seniority_level %}
-                <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #718096; background: #f7fafc; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                    </svg>
+                <span class="ha-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                     {{ pipeline.get_seniority_level_display|default:pipeline.seniority_level }}
                 </span>
                 {% endif %}
                 {% if pipeline.project %}
-                <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #718096; background: #f7fafc; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                    </svg>
+                <span class="ha-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                     {{ pipeline.project.title }}
                 </span>
                 {% endif %}
             </div>
 
-            {# Card Stats Row #}
-            <div style="display: flex; gap: 1.5rem; padding-top: 1rem; border-top: 1px solid #f0f0f0;">
-                <div style="display: flex; flex-direction: column;">
-                    <span style="font-size: 1.2rem; font-weight: 700; color: #1a202c;">{{ pipeline.candidate_count }}</span>
-                    <span style="font-size: 0.78rem; color: #a0aec0; font-weight: 500;">Candidate{{ pipeline.candidate_count|pluralize }}</span>
+            <div class="ha-card-footer">
+                <div class="ha-card-stat">
+                    <span class="ha-card-stat-val">{{ pipeline.candidate_count }}</span>
+                    <span class="ha-card-stat-label">Candidate{{ pipeline.candidate_count|pluralize }}</span>
                 </div>
-                <div style="display: flex; flex-direction: column; margin-left: auto; text-align: right;">
-                    <span style="font-size: 0.82rem; color: #a0aec0;">Created</span>
-                    <span style="font-size: 0.82rem; color: #4a5568; font-weight: 500;">{{ pipeline.created_at|naturaltime }}</span>
-                </div>
+                <div class="ha-card-time">{{ pipeline.created_at|naturaltime }}</div>
             </div>
         </a>
         {% endfor %}
@@ -97,20 +154,19 @@
 
     {% else %}
 
-    {# ── Empty State ── #}
-    <div style="text-align: center; padding: 4rem 2rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;">
-        <div style="margin-bottom: 1rem;">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: #ff8a00;">
+    <div class="ha-empty">
+        <div class="ha-empty-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
         </div>
-        <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 600; color: #1a202c;">No Pipelines Yet</h3>
-        <p class="muted" style="margin: 0 0 1.5rem; color: #718096; max-width: 420px; margin-left: auto; margin-right: auto;">Create your first AI hiring pipeline to start automating candidate screening and evaluation.</p>
-        <a href="{% url 'hiring_agent:pipeline-create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ff8a00; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.95rem;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <h3>No Pipelines Yet</h3>
+        <p>Create your first AI hiring pipeline to start automating candidate screening and evaluation.</p>
+        <a href="{% url 'hiring_agent:pipeline-create' %}" class="btn btn-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
