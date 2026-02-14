@@ -117,8 +117,7 @@
                 </a>
                 {% endif %}
 
-                {% if has_ai_hiring %}
-                <a href="{% url 'hiring_agent:pipeline-list' %}" class="nav-item {% if 'hiring_agent' in request.resolver_match.app_name %}active{% endif %}" {% if 'hiring_agent' in request.resolver_match.app_name %}aria-current="page"{% endif %}>
+                <a href="{% if has_ai_hiring %}{% url 'hiring_agent:pipeline-list' %}{% else %}{% url 'hiring_agent:upgrade' %}{% endif %}" class="nav-item {% if 'hiring_agent' in request.resolver_match.app_name %}active{% endif %}" {% if 'hiring_agent' in request.resolver_match.app_name %}aria-current="page"{% endif %}>
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
@@ -126,9 +125,12 @@
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
                     <span class="nav-label">AI Hiring</span>
+                    {% if has_ai_hiring %}
                     <span class="nav-badge premium">AI</span>
+                    {% else %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="flex-shrink: 0; margin-left: auto;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    {% endif %}
                 </a>
-                {% endif %}
             </div>
 
             {# ── Account ── #}
