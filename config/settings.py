@@ -141,6 +141,7 @@ INSTALLED_APPS = [
     'finance_assessments',
     'clients',
     'seo',
+    'hiring_agent',
 ]
 
 SITE_ID = 1

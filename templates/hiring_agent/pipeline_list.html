@@ -1,0 +1,124 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}AI Hiring Pipelines · Evalon{% endblock %}
+{% block meta_description %}Manage your AI-powered hiring pipelines and candidate screening.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+
+    {# ── Page Header ── #}
+    <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="margin: 0; font-size: 1.75rem; font-weight: 700; color: #1a202c;">AI Hiring Pipelines</h1>
+            <p class="muted" style="margin: 0.25rem 0 0; color: #718096; font-size: 0.95rem;">Automate candidate screening and evaluation with AI-powered pipelines</p>
+        </div>
+        <a href="{% url 'hiring_agent:pipeline-create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ff8a00; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: background 0.2s;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Create Pipeline
+        </a>
+    </header>
+
+    {% if pipelines %}
+
+    {# ── Count Bar ── #}
+    <div style="margin-bottom: 1.25rem; font-size: 0.9rem; color: #718096; font-weight: 500;">
+        {{ pipelines|length }} pipeline{{ pipelines|length|pluralize }}
+    </div>
+
+    {# ── Pipeline Cards Grid ── #}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
+        {% for pipeline in pipelines %}
+        <a href="{% url 'hiring_agent:pipeline-detail' pipeline_uuid=pipeline.uuid %}" style="display: block; text-decoration: none; color: inherit; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; transition: box-shadow 0.2s, border-color 0.2s;"
+           onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; this.style.borderColor='#cbd5e0';"
+           onmouseout="this.style.boxShadow='none'; this.style.borderColor='#e2e8f0';">
+
+            {# Card Top: Title + Status Badge #}
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1a202c; line-height: 1.4;">{{ pipeline.title }}</h3>
+                {% if pipeline.status == 'active' %}
+                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #c6f6d5; color: #22543d;">Active</span>
+                {% elif pipeline.status == 'draft' %}
+                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #e2e8f0; color: #4a5568;">Draft</span>
+                {% elif pipeline.status == 'paused' %}
+                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #feebc8; color: #7b341e;">Paused</span>
+                {% elif pipeline.status == 'completed' %}
+                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #bee3f8; color: #2a4365;">Completed</span>
+                {% elif pipeline.status == 'archived' %}
+                <span style="display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; background: #f7fafc; color: #a0aec0;">Archived</span>
+                {% endif %}
+            </div>
+
+            {# Card Meta: Automation Mode, Seniority, Project #}
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                {% if pipeline.automation_mode %}
+                <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #718096; background: #f7fafc; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
+                    </svg>
+                    {{ pipeline.get_automation_mode_display|default:pipeline.automation_mode }}
+                </span>
+                {% endif %}
+                {% if pipeline.seniority_level %}
+                <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #718096; background: #f7fafc; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                    </svg>
+                    {{ pipeline.get_seniority_level_display|default:pipeline.seniority_level }}
+                </span>
+                {% endif %}
+                {% if pipeline.project %}
+                <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: #718096; background: #f7fafc; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    {{ pipeline.project.title }}
+                </span>
+                {% endif %}
+            </div>
+
+            {# Card Stats Row #}
+            <div style="display: flex; gap: 1.5rem; padding-top: 1rem; border-top: 1px solid #f0f0f0;">
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 1.2rem; font-weight: 700; color: #1a202c;">{{ pipeline.candidate_count }}</span>
+                    <span style="font-size: 0.78rem; color: #a0aec0; font-weight: 500;">Candidate{{ pipeline.candidate_count|pluralize }}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; margin-left: auto; text-align: right;">
+                    <span style="font-size: 0.82rem; color: #a0aec0;">Created</span>
+                    <span style="font-size: 0.82rem; color: #4a5568; font-weight: 500;">{{ pipeline.created_at|naturaltime }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% else %}
+
+    {# ── Empty State ── #}
+    <div style="text-align: center; padding: 4rem 2rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;">
+        <div style="margin-bottom: 1rem;">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: #ff8a00;">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        </div>
+        <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 600; color: #1a202c;">No Pipelines Yet</h3>
+        <p class="muted" style="margin: 0 0 1.5rem; color: #718096; max-width: 420px; margin-left: auto; margin-right: auto;">Create your first AI hiring pipeline to start automating candidate screening and evaluation.</p>
+        <a href="{% url 'hiring_agent:pipeline-create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ff8a00; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Create Your First Pipeline
+        </a>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}

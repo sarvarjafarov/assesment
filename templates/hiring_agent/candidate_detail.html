@@ -1,0 +1,301 @@
+{% extends "portal_base.html" %}
+
+{% block portal_content %}
+<div style="max-width: 900px; margin: 0 auto;">
+
+  <!-- Header -->
+  <div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'hiring_agent:pipeline-detail' pipeline.uuid %}" style="color: #ff8a00; text-decoration: none; font-size: 0.9rem; font-weight: 600;">&larr; Back to {{ pipeline.title }}</a>
+    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem; flex-wrap: wrap;">
+      <h1 style="font-size: 1.6rem; font-weight: 800; color: #0e1428; margin: 0;">
+        {{ pc.candidate.first_name }} {{ pc.candidate.last_name }}
+      </h1>
+      <span style="
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        {% if pc.stage == 'uploaded' %}
+          background: #e0e7ff; color: #3730a3;
+        {% elif pc.stage == 'screening' %}
+          background: #fef3c7; color: #92400e;
+        {% elif pc.stage == 'shortlisted' %}
+          background: #dcfce7; color: #166534;
+        {% elif pc.stage == 'rejected_at_screen' %}
+          background: #fee2e2; color: #991b1b;
+        {% elif pc.stage == 'assessment_pending' or pc.stage == 'assessment_sent' or pc.stage == 'assessment_completed' %}
+          background: #dbeafe; color: #1e40af;
+        {% elif pc.stage == 'decision_made' %}
+          background: #f3e8ff; color: #6b21a8;
+        {% elif pc.stage == 'rejected' %}
+          background: #fee2e2; color: #991b1b;
+        {% elif pc.stage == 'hired' %}
+          background: #dcfce7; color: #166534;
+        {% else %}
+          background: #f1f5f9; color: #475569;
+        {% endif %}
+      ">{{ pc.get_stage_display }}</span>
+    </div>
+    <div style="margin-top: 0.4rem; font-size: 0.9rem; color: #64748b;">{{ pc.candidate.email }}</div>
+  </div>
+
+  <!-- AI Resume Screening -->
+  {% if pc.ai_screen_score is not None %}
+  <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; margin-bottom: 1.5rem;">
+    <div style="font-size: 1.1rem; font-weight: 700; color: #0e1428; margin-bottom: 1rem;">AI Resume Screening</div>
+    <div style="display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+      <div style="text-align: center; min-width: 80px;">
+        <div style="
+          font-size: 2rem;
+          font-weight: 800;
+          {% if pc.ai_screen_score >= 70 %}
+            color: #166534;
+          {% elif pc.ai_screen_score >= 50 %}
+            color: #92400e;
+          {% else %}
+            color: #991b1b;
+          {% endif %}
+        ">{{ pc.ai_screen_score }}</div>
+        <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">SCORE</div>
+      </div>
+      <div style="flex: 1; min-width: 200px;">
+        <p style="margin: 0 0 1rem 0; color: #334155; font-size: 0.9rem; line-height: 1.6;">{{ pc.ai_screen_summary }}</p>
+        {% if pc.ai_screen_skills_matched %}
+        <div style="margin-bottom: 0.5rem;">
+          <span style="font-size: 0.8rem; font-weight: 600; color: #64748b; margin-right: 0.4rem;">Matched:</span>
+          {% for skill in pc.ai_screen_skills_matched %}
+            <span style="display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin: 0.2rem; background: #dcfce7; color: #166534;">{{ skill }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if pc.ai_screen_skills_missing %}
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 600; color: #64748b; margin-right: 0.4rem;">Missing:</span>
+          {% for skill in pc.ai_screen_skills_missing %}
+            <span style="display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin: 0.2rem; background: #fee2e2; color: #991b1b;">{{ skill }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Assessment Results -->
+  {% if pc.assessment_sessions %}
+  <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; margin-bottom: 1.5rem;">
+    <div style="font-size: 1.1rem; font-weight: 700; color: #0e1428; margin-bottom: 1rem;">Assessment Results</div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid #e2e8f0;">
+          <th style="text-align: left; padding: 0.5rem 0.75rem; color: #64748b; font-weight: 600;">Type</th>
+          <th style="text-align: left; padding: 0.5rem 0.75rem; color: #64748b; font-weight: 600;">Status</th>
+          <th style="text-align: right; padding: 0.5rem 0.75rem; color: #64748b; font-weight: 600;">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in pc.assessment_sessions %}
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 0.6rem 0.75rem; color: #334155;">{{ session.type }}</td>
+          <td style="padding: 0.6rem 0.75rem;">
+            <span style="
+              display: inline-block;
+              padding: 0.2rem 0.6rem;
+              border-radius: 999px;
+              font-size: 0.8rem;
+              font-weight: 600;
+              margin: 0.2rem;
+              {% if session.status == 'submitted' %}
+                background: #dcfce7; color: #166534;
+              {% elif session.status == 'in_progress' %}
+                background: #dbeafe; color: #1e40af;
+              {% else %}
+                background: #f1f5f9; color: #64748b;
+              {% endif %}
+            ">{{ session.status }}</span>
+          </td>
+          <td style="padding: 0.6rem 0.75rem; text-align: right; font-weight: 700; color: #0e1428;">
+            {% if session.score is not None %}{{ session.score }}{% else %}&mdash;{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- AI Final Decision -->
+  {% if pc.ai_final_score is not None %}
+  <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; margin-bottom: 1.5rem;">
+    <div style="font-size: 1.1rem; font-weight: 700; color: #0e1428; margin-bottom: 1rem;">AI Final Decision</div>
+    <div style="display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+      <div style="text-align: center; min-width: 80px;">
+        <div style="
+          font-size: 2rem;
+          font-weight: 800;
+          {% if pc.ai_final_score >= 70 %}
+            color: #166534;
+          {% elif pc.ai_final_score >= 50 %}
+            color: #92400e;
+          {% else %}
+            color: #991b1b;
+          {% endif %}
+        ">{{ pc.ai_final_score }}</div>
+        <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">SCORE</div>
+      </div>
+      <div style="flex: 1; min-width: 200px;">
+        {% if pc.ai_final_recommendation %}
+        <div style="margin-bottom: 0.75rem;">
+          <span style="
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            {% if pc.ai_final_recommendation == 'advance' %}
+              background: #dcfce7; color: #166534;
+            {% elif pc.ai_final_recommendation == 'hold' %}
+              background: #fef3c7; color: #92400e;
+            {% elif pc.ai_final_recommendation == 'reject' %}
+              background: #fee2e2; color: #991b1b;
+            {% endif %}
+          ">{{ pc.ai_final_recommendation|title }}</span>
+        </div>
+        {% endif %}
+        <p style="margin: 0; color: #334155; font-size: 0.9rem; line-height: 1.6;">{{ pc.ai_final_summary }}</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Human Review -->
+  <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; margin-bottom: 1.5rem;">
+    <div style="font-size: 1.1rem; font-weight: 700; color: #0e1428; margin-bottom: 1rem;">Human Review</div>
+    {% if pc.human_decision %}
+      <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: #64748b; margin-right: 0.5rem;">Decision:</span>
+        <span style="
+          display: inline-block;
+          padding: 0.25rem 0.75rem;
+          border-radius: 999px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          {% if pc.human_decision == 'advance' %}
+            background: #dcfce7; color: #166534;
+          {% elif pc.human_decision == 'hold' %}
+            background: #fef3c7; color: #92400e;
+          {% elif pc.human_decision == 'reject' %}
+            background: #fee2e2; color: #991b1b;
+          {% endif %}
+        ">{{ pc.human_decision|title }}</span>
+      </div>
+      {% if pc.human_notes %}
+      <div style="margin-top: 0.75rem;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">Notes:</span>
+        <p style="margin: 0.4rem 0 0 0; color: #334155; font-size: 0.9rem; line-height: 1.6;">{{ pc.human_notes }}</p>
+      </div>
+      {% endif %}
+    {% elif pc.stage == 'shortlisted' or pc.stage == 'decision_made' %}
+      <form method="post" action="{% url 'hiring_agent:candidate-review' pipeline_uuid=pipeline.uuid pk=pc.pk %}">
+        {% csrf_token %}
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.9rem; font-weight: 600; color: #334155; display: block; margin-bottom: 0.5rem;">Decision</label>
+          <div style="display: flex; gap: 1.25rem; flex-wrap: wrap;">
+            {% for radio in review_form.decision %}
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: #334155; cursor: pointer;">
+                {{ radio.tag }}
+                {{ radio.choice_label }}
+              </label>
+            {% endfor %}
+          </div>
+          {% if review_form.decision.errors %}
+            <div style="color: #991b1b; font-size: 0.8rem; margin-top: 0.3rem;">{{ review_form.decision.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label for="{{ review_form.notes.id_for_label }}" style="font-size: 0.9rem; font-weight: 600; color: #334155; display: block; margin-bottom: 0.5rem;">Notes</label>
+          <textarea name="{{ review_form.notes.html_name }}" id="{{ review_form.notes.id_for_label }}" rows="4" style="width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem; color: #334155; resize: vertical; font-family: inherit; box-sizing: border-box;">{{ review_form.notes.value|default_if_none:'' }}</textarea>
+          {% if review_form.notes.errors %}
+            <div style="color: #991b1b; font-size: 0.8rem; margin-top: 0.3rem;">{{ review_form.notes.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <button type="submit" style="background: #ff8a00; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Submit Review</button>
+      </form>
+    {% else %}
+      <p style="color: #64748b; font-size: 0.9rem; margin: 0;">No review needed at this stage.</p>
+    {% endif %}
+  </div>
+
+  <!-- Resume -->
+  {% if pc.resume_text %}
+  <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; cursor: pointer;" onclick="var el=document.getElementById('resume-content'); var arrow=document.getElementById('resume-arrow'); if(el.style.display==='none'){el.style.display='block'; arrow.textContent='\u25BC';}else{el.style.display='none'; arrow.textContent='\u25B6';}">
+      <div style="font-size: 1.1rem; font-weight: 700; color: #0e1428;">Resume</div>
+      <span id="resume-arrow" style="font-size: 0.85rem; color: #64748b;">&#9660;</span>
+    </div>
+    <div id="resume-content">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; font-size: 0.85rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; color: #334155; line-height: 1.5;">{{ pc.resume_text }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Action Log -->
+  {% if action_logs %}
+  <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #fff; margin-bottom: 1.5rem;">
+    <div style="font-size: 1.1rem; font-weight: 700; color: #0e1428; margin-bottom: 1rem;">Action Log</div>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid #e2e8f0;">
+            <th style="text-align: left; padding: 0.5rem 0.6rem; color: #64748b; font-weight: 600;">Action</th>
+            <th style="text-align: left; padding: 0.5rem 0.6rem; color: #64748b; font-weight: 600;">Status</th>
+            <th style="text-align: right; padding: 0.5rem 0.6rem; color: #64748b; font-weight: 600;">Tokens</th>
+            <th style="text-align: right; padding: 0.5rem 0.6rem; color: #64748b; font-weight: 600;">Duration</th>
+            <th style="text-align: right; padding: 0.5rem 0.6rem; color: #64748b; font-weight: 600;">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in action_logs %}
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 0.5rem 0.6rem; color: #334155;">{{ log.get_action_display }}</td>
+            <td style="padding: 0.5rem 0.6rem;">
+              <span style="
+                display: inline-block;
+                padding: 0.15rem 0.5rem;
+                border-radius: 999px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                {% if log.status == 'success' %}
+                  background: #dcfce7; color: #166534;
+                {% elif log.status == 'error' %}
+                  background: #fee2e2; color: #991b1b;
+                {% else %}
+                  background: #f1f5f9; color: #64748b;
+                {% endif %}
+              ">{{ log.status }}</span>
+            </td>
+            <td style="padding: 0.5rem 0.6rem; text-align: right; color: #64748b;">{% if log.tokens_used %}{{ log.tokens_used }}{% else %}&mdash;{% endif %}</td>
+            <td style="padding: 0.5rem 0.6rem; text-align: right; color: #64748b;">{% if log.duration_ms is not None %}{{ log.duration_ms }}ms{% else %}&mdash;{% endif %}</td>
+            <td style="padding: 0.5rem 0.6rem; text-align: right; color: #64748b;">{{ log.created_at|date:"M d, Y H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Timestamps -->
+  <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.8rem; color: #94a3b8; margin-bottom: 2rem;">
+    <span>Applied: {{ pc.created_at|date:"M d, Y H:i" }}</span>
+    {% if pc.processed_at %}
+      <span>Processed: {{ pc.processed_at|date:"M d, Y H:i" }}</span>
+    {% endif %}
+    {% if pc.decided_at %}
+      <span>Decided: {{ pc.decided_at|date:"M d, Y H:i" }}</span>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a202c;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="color: #0e1428; margin-bottom: 0.5rem;">Hiring Decisions Ready</h2>
+        <p style="color: #6b7280;">AI recommendations are ready for your review</p>
+    </div>
+
+    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <p>Hi {{ client.full_name }},</p>
+        <p>The AI hiring agent has completed assessment reviews for <strong>{{ pipeline.title }}</strong> and generated final recommendations for <strong>{{ count }} candidate{{ count|pluralize }}</strong>.</p>
+        <p>Please review the AI recommendations and make your final hiring decisions.</p>
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <a href="{{ detail_url }}" style="display: inline-block; background: #ff8a00; color: #fff; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">Review Decisions</a>
+        </div>
+    </div>
+
+    <p style="font-size: 0.8rem; color: #9ca3af; text-align: center;">
+        Evalon AI Hiring Agent &middot; This is an automated notification
+    </p>
+</body>
+</html>

@@ -1,0 +1,247 @@
+{% extends 'portal_base.html' %}
+
+{% block portal_content %}
+<style>
+    .pipeline-form-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 720px;
+    }
+    .pipeline-form-card .form-section-header {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0e1428;
+        margin: 1.5rem 0 0.8rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .pipeline-form-card .form-section-header:first-of-type {
+        margin-top: 0;
+    }
+    .pipeline-form-card .form-group {
+        margin-bottom: 1rem;
+    }
+    .pipeline-form-card .form-group label {
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 0.3rem;
+        display: block;
+    }
+    .pipeline-form-card .form-group input[type="text"],
+    .pipeline-form-card .form-group input[type="number"],
+    .pipeline-form-card .form-group textarea,
+    .pipeline-form-card .form-group select {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+    }
+    .pipeline-form-card .form-group textarea {
+        resize: vertical;
+    }
+    .pipeline-form-card .form-group .help-text {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.2rem;
+    }
+    .pipeline-form-card .form-group .field-errors {
+        color: #dc2626;
+        font-size: 0.85rem;
+        margin-top: 0.2rem;
+    }
+    .pipeline-form-card .form-group .field-errors ul {
+        margin: 0;
+        padding: 0 0 0 1.2rem;
+    }
+    .pipeline-form-card .non-field-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+    .pipeline-form-card .non-field-errors ul {
+        margin: 0;
+        padding: 0 0 0 1.2rem;
+    }
+    .pipeline-form-card .checkbox-list label {
+        font-weight: 400;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.35rem;
+    }
+    .pipeline-form-card .checkbox-list input[type="checkbox"] {
+        width: auto;
+    }
+    .pipeline-form-card .form-actions {
+        margin-top: 1.5rem;
+    }
+    .pipeline-form-card .btn-submit {
+        background: #ff8a00;
+        color: #fff;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .pipeline-form-card .btn-submit:hover {
+        background: #e67a00;
+    }
+    .pipeline-back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .pipeline-back-link:hover {
+        color: #0e1428;
+    }
+    .pipeline-page-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0e1428;
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<a href="{% url 'hiring_agent:pipeline-list' %}" class="pipeline-back-link">&larr; Back to Pipelines</a>
+
+<h1 class="pipeline-page-header">
+    {% if is_edit %}
+        Edit Pipeline: {{ pipeline.title }}
+    {% else %}
+        Create Pipeline
+    {% endif %}
+</h1>
+
+<div class="pipeline-form-card">
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {# ── Job Details ── #}
+        <h3 class="form-section-header">Job Details</h3>
+
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+            {% if form.title.help_text %}<p class="help-text">{{ form.title.help_text }}</p>{% endif %}
+            {% if form.title.errors %}<div class="field-errors">{{ form.title.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.job_description.id_for_label }}">{{ form.job_description.label }}</label>
+            {{ form.job_description }}
+            {% if form.job_description.help_text %}<p class="help-text">{{ form.job_description.help_text }}</p>{% endif %}
+            {% if form.job_description.errors %}<div class="field-errors">{{ form.job_description.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.experience_range.id_for_label }}">{{ form.experience_range.label }}</label>
+            {{ form.experience_range }}
+            {% if form.experience_range.help_text %}<p class="help-text">{{ form.experience_range.help_text }}</p>{% endif %}
+            {% if form.experience_range.errors %}<div class="field-errors">{{ form.experience_range.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.seniority_level.id_for_label }}">{{ form.seniority_level.label }}</label>
+            {{ form.seniority_level }}
+            {% if form.seniority_level.help_text %}<p class="help-text">{{ form.seniority_level.help_text }}</p>{% endif %}
+            {% if form.seniority_level.errors %}<div class="field-errors">{{ form.seniority_level.errors }}</div>{% endif %}
+        </div>
+
+        {# ── Skills ── #}
+        <h3 class="form-section-header">Skills</h3>
+
+        <div class="form-group">
+            <label for="{{ form.required_skills_text.id_for_label }}">{{ form.required_skills_text.label }}</label>
+            {{ form.required_skills_text }}
+            {% if form.required_skills_text.help_text %}<p class="help-text">{{ form.required_skills_text.help_text }}</p>{% endif %}
+            {% if form.required_skills_text.errors %}<div class="field-errors">{{ form.required_skills_text.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.preferred_skills_text.id_for_label }}">{{ form.preferred_skills_text.label }}</label>
+            {{ form.preferred_skills_text }}
+            {% if form.preferred_skills_text.help_text %}<p class="help-text">{{ form.preferred_skills_text.help_text }}</p>{% endif %}
+            {% if form.preferred_skills_text.errors %}<div class="field-errors">{{ form.preferred_skills_text.errors }}</div>{% endif %}
+        </div>
+
+        {# ── Assessment Configuration ── #}
+        <h3 class="form-section-header">Assessment Configuration</h3>
+
+        <div class="form-group">
+            <label>{{ form.assessment_types.label }}</label>
+            <div class="checkbox-list">
+                {{ form.assessment_types }}
+            </div>
+            {% if form.assessment_types.help_text %}<p class="help-text">{{ form.assessment_types.help_text }}</p>{% endif %}
+            {% if form.assessment_types.errors %}<div class="field-errors">{{ form.assessment_types.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.automation_mode.id_for_label }}">{{ form.automation_mode.label }}</label>
+            {{ form.automation_mode }}
+            {% if form.automation_mode.help_text %}<p class="help-text">{{ form.automation_mode.help_text }}</p>{% endif %}
+            {% if form.automation_mode.errors %}<div class="field-errors">{{ form.automation_mode.errors }}</div>{% endif %}
+        </div>
+
+        {# ── Thresholds ── #}
+        <h3 class="form-section-header">Thresholds</h3>
+
+        <div class="form-group">
+            <label for="{{ form.screening_threshold.id_for_label }}">{{ form.screening_threshold.label }}</label>
+            {{ form.screening_threshold }}
+            {% if form.screening_threshold.help_text %}<p class="help-text">{{ form.screening_threshold.help_text }}</p>{% endif %}
+            {% if form.screening_threshold.errors %}<div class="field-errors">{{ form.screening_threshold.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.passing_score.id_for_label }}">{{ form.passing_score.label }}</label>
+            {{ form.passing_score }}
+            {% if form.passing_score.help_text %}<p class="help-text">{{ form.passing_score.help_text }}</p>{% endif %}
+            {% if form.passing_score.errors %}<div class="field-errors">{{ form.passing_score.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.max_candidates.id_for_label }}">{{ form.max_candidates.label }}</label>
+            {{ form.max_candidates }}
+            {% if form.max_candidates.help_text %}<p class="help-text">{{ form.max_candidates.help_text }}</p>{% endif %}
+            {% if form.max_candidates.errors %}<div class="field-errors">{{ form.max_candidates.errors }}</div>{% endif %}
+        </div>
+
+        {# ── Project (optional) ── #}
+        <h3 class="form-section-header">Project</h3>
+
+        <div class="form-group">
+            <label for="{{ form.project.id_for_label }}">{{ form.project.label }}</label>
+            {{ form.project }}
+            {% if form.project.help_text %}<p class="help-text">{{ form.project.help_text }}</p>{% endif %}
+            {% if form.project.errors %}<div class="field-errors">{{ form.project.errors }}</div>{% endif %}
+        </div>
+
+        {# ── Submit ── #}
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                {% if is_edit %}Save Changes{% else %}Create Pipeline{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
