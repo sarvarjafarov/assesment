@@ -175,7 +175,21 @@
                             <div class="mockup-topbar">
                                 <span class="mockup-greeting">Welcome back, Sarah</span>
                                 <div class="mockup-topbar-actions">
-                                    <span class="mockup-notif pulse-dot"></span>
+                                    <span class="mockup-notif pulse-dot" id="mockupNotif"></span>
+                                    <div class="mockup-notif-dropdown" id="mockupNotifDrop">
+                                        <div class="notif-drop-item new">
+                                            <span class="notif-drop-dot" style="background:#22c55e"></span>
+                                            <span>Anna Chen completed assessment</span>
+                                        </div>
+                                        <div class="notif-drop-item">
+                                            <span class="notif-drop-dot" style="background:#3b82f6"></span>
+                                            <span>New candidate registered</span>
+                                        </div>
+                                        <div class="notif-drop-item">
+                                            <span class="notif-drop-dot" style="background:#f59e0b"></span>
+                                            <span>Assessment due tomorrow</span>
+                                        </div>
+                                    </div>
                                     <span class="mockup-user-avatar">S</span>
                                 </div>
                             </div>
@@ -673,6 +687,120 @@ document.addEventListener('DOMContentLoaded', () => {
     var ringEl = document.querySelector('.mockup-ring-progress');
     if (ringEl) {
         setTimeout(function() { ringEl.classList.add('animated'); }, 2000);
+    }
+
+    /* Typing animation on greeting */
+    var greetEl = document.querySelector('.mockup-greeting');
+    if (greetEl) {
+        var fullGreet = greetEl.textContent;
+        greetEl.textContent = '';
+        greetEl.classList.add('typing');
+        var gi = 0;
+        setTimeout(function typeChar() {
+            if (gi < fullGreet.length) {
+                greetEl.textContent += fullGreet[gi];
+                gi++;
+                setTimeout(typeChar, 45 + Math.random() * 35);
+            } else {
+                greetEl.classList.remove('typing');
+            }
+        }, 1500);
+    }
+
+    /* Loading bar on toolbar */
+    var toolbar = document.querySelector('.mockup-toolbar');
+    if (toolbar) {
+        setTimeout(function() { toolbar.classList.add('loading'); }, 800);
+    }
+
+    /* Notification dropdown popup */
+    var notifDrop = document.getElementById('mockupNotifDrop');
+    if (notifDrop) {
+        setTimeout(function() {
+            notifDrop.classList.add('show');
+            setTimeout(function() { notifDrop.classList.remove('show'); }, 2500);
+        }, 7000);
+    }
+
+    /* Live status update — Michael Park completes his assessment */
+    setTimeout(function() {
+        var allRows = document.querySelectorAll('[data-mockup-row]');
+        var mpRow = allRows[2];
+        if (!mpRow) return;
+        var scoreEl = mpRow.querySelector('.mockup-score');
+        var statusEl = mpRow.querySelector('.mockup-status');
+        if (!scoreEl || !statusEl) return;
+        scoreEl.classList.remove('mid');
+        scoreEl.classList.add('high');
+        var st = performance.now();
+        function tickS(now) {
+            var p = Math.min((now - st) / 800, 1);
+            var e = 1 - Math.pow(1 - p, 3);
+            var v = Math.round(76 * e);
+            scoreEl.childNodes[scoreEl.childNodes.length - 1].textContent = v + '%';
+            if (p < 1) requestAnimationFrame(tickS);
+            else {
+                var bar = document.createElement('span');
+                bar.className = 'mockup-score-bar';
+                bar.style.setProperty('--sw', '76%');
+                bar.style.animation = 'score-grow 0.8s ease forwards';
+                scoreEl.appendChild(bar);
+            }
+        }
+        requestAnimationFrame(tickS);
+        statusEl.classList.remove('progress');
+        statusEl.classList.add('done');
+        statusEl.textContent = 'Completed';
+        mpRow.classList.add('row-flash');
+        /* Confetti burst */
+        var mockup = document.querySelector('.hero-mockup');
+        if (mockup) {
+            var colors = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+            for (var ci = 0; ci < 12; ci++) {
+                var dot = document.createElement('span');
+                dot.className = 'mockup-confetti';
+                dot.style.background = colors[ci % colors.length];
+                dot.style.left = '75%';
+                dot.style.top = '82%';
+                dot.style.setProperty('--cx', (Math.random() * 80 - 40) + 'px');
+                dot.style.setProperty('--cy', (Math.random() * -50 - 10) + 'px');
+                dot.style.setProperty('--cr', (Math.random() * 360) + 'deg');
+                dot.style.animationDelay = (ci * 0.04) + 's';
+                mockup.appendChild(dot);
+                setTimeout(function(d) { d.remove(); }, 1200, dot);
+            }
+        }
+    }, 11000);
+
+    /* Card value increment — candidates count ticks up */
+    setTimeout(function() {
+        var numEl = document.querySelector('.mockup-stat-num[data-count="24"]');
+        if (numEl) {
+            numEl.textContent = '25';
+            numEl.classList.add('bump');
+            setTimeout(function() { numEl.classList.remove('bump'); }, 600);
+        }
+    }, 14000);
+
+    /* 3D perspective tilt on mouse hover */
+    var preview = document.querySelector('.hero-product-preview');
+    var glowBorder = preview ? preview.querySelector('.mockup-glow-border') : null;
+    if (preview && glowBorder) {
+        var tiltTick = false;
+        preview.addEventListener('mousemove', function(e) {
+            if (tiltTick) return;
+            tiltTick = true;
+            requestAnimationFrame(function() {
+                var r = preview.getBoundingClientRect();
+                var nx = (e.clientX - r.left) / r.width - 0.5;
+                var ny = (e.clientY - r.top) / r.height - 0.5;
+                glowBorder.style.transform = 'perspective(1200px) rotateY(' + (nx * 5) + 'deg) rotateX(' + (-ny * 5) + 'deg)';
+                tiltTick = false;
+            });
+        });
+        preview.addEventListener('mouseleave', function() {
+            glowBorder.style.transform = '';
+        });
     }
 
     /* Live cursor animation with row highlighting */
