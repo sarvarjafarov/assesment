@@ -21,6 +21,8 @@ from django.contrib.auth import views as auth_views
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
 
+import config.admin_dashboard  # noqa: F401 — patches AdminSite.index with analytics
+
 from blog.sitemaps import (
     BlogPostSitemap, BlogCategorySitemap, StaticPagesSitemap,
     PublicAssessmentSitemap, InterviewQuestionsSitemap, RoleAssessmentSitemap,

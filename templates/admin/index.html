@@ -1,0 +1,565 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static jazzmin %}
+{% get_jazzmin_ui_tweaks as jazzmin_ui %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block content_title %} {% trans 'Dashboard' %} {% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+    <li class="breadcrumb-item">{% trans 'Dashboard' %}</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --ev-orange: #ff8a00;
+        --ev-orange-light: #ffb347;
+        --ev-blue: #4e73df;
+        --ev-green: #1cc88a;
+        --ev-teal: #36b9cc;
+        --ev-red: #e74a3b;
+        --ev-purple: #6f42c1;
+        --ev-indigo: #6610f2;
+    }
+    .ev-kpi { border-left: 4px solid var(--ev-orange); border-radius: 4px; }
+    .ev-kpi .inner h3 { font-size: 2rem; font-weight: 700; margin: 0; }
+    .ev-kpi .inner p { margin: 0; font-size: .85rem; opacity: .8; }
+    .ev-kpi .icon { font-size: 3rem; opacity: .15; position: absolute; right: 15px; top: 12px; }
+    .ev-chart-card { border-radius: 4px; }
+    .ev-chart-card .card-header { border-bottom: 2px solid var(--ev-orange); font-weight: 600; }
+    .ev-table-card .card-header { border-bottom: 2px solid var(--ev-orange); font-weight: 600; }
+    .ev-badge { font-size: .75rem; padding: 3px 8px; border-radius: 3px; }
+    .ev-badge-success { background: var(--ev-green); color: #fff; }
+    .ev-badge-warning { background: var(--ev-orange); color: #fff; }
+    .ev-badge-info { background: var(--ev-teal); color: #fff; }
+    .ev-badge-danger { background: var(--ev-red); color: #fff; }
+    .ev-badge-secondary { background: #6c757d; color: #fff; }
+    .ev-section-title { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin: 1.5rem 0 .75rem; color: var(--ev-orange); }
+    .ev-section-title:first-of-type { margin-top: .5rem; }
+</style>
+
+<!-- ===== KPI CARDS ===== -->
+<div class="ev-section-title"><i class="fas fa-tachometer-alt"></i> Key Metrics</div>
+<div class="row">
+    <!-- Total Clients -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi">
+            <div class="inner">
+                <h3>{{ total_clients|default:"0" }}</h3>
+                <p>Total Clients</p>
+            </div>
+            <div class="icon"><i class="fas fa-building"></i></div>
+            <a href="{% url 'admin:clients_clientaccount_changelist' %}" class="small-box-footer">
+                +{{ new_clients_month|default:"0" }} this month <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+    <!-- Active Sessions -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-blue);">
+            <div class="inner">
+                <h3>{{ all_active|default:"0" }}</h3>
+                <p>Active Sessions</p>
+            </div>
+            <div class="icon"><i class="fas fa-spinner"></i></div>
+            <a href="{% url 'admin:assessments_assessmentsession_changelist' %}" class="small-box-footer">
+                {{ all_sessions|default:"0" }} total sessions <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+    <!-- Completions This Month -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-green);">
+            <div class="inner">
+                <h3>{{ all_completed_month|default:"0" }}</h3>
+                <p>Completions This Month</p>
+            </div>
+            <div class="icon"><i class="fas fa-check-circle"></i></div>
+            <a href="{% url 'admin:assessments_assessmentsession_changelist' %}" class="small-box-footer">
+                {{ all_completed|default:"0" }} all time <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+    <!-- Pending Demos -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-red);">
+            <div class="inner">
+                <h3>{{ pending_demos|default:"0" }}</h3>
+                <p>Pending Demo Requests</p>
+            </div>
+            <div class="icon"><i class="fas fa-calendar-check"></i></div>
+            <a href="{% url 'admin:pages_demorequest_changelist' %}" class="small-box-footer">
+                {{ total_demos|default:"0" }} total demos <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Second row of KPIs -->
+<div class="row">
+    <!-- Total Candidates -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-purple);">
+            <div class="inner">
+                <h3>{{ total_candidates|default:"0" }}</h3>
+                <p>Total Candidates</p>
+            </div>
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <a href="{% url 'admin:assessments_candidateprofile_changelist' %}" class="small-box-footer">
+                View all <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+    <!-- Active Projects -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-teal);">
+            <div class="inner">
+                <h3>{{ active_projects|default:"0" }}</h3>
+                <p>Active Projects</p>
+            </div>
+            <div class="icon"><i class="fas fa-project-diagram"></i></div>
+            <a href="{% url 'admin:clients_clientproject_changelist' %}" class="small-box-footer">
+                {{ total_projects|default:"0" }} total <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+    <!-- Newsletter Subscribers -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-indigo);">
+            <div class="inner">
+                <h3>{{ newsletter_active|default:"0" }}</h3>
+                <p>Newsletter Subscribers</p>
+            </div>
+            <div class="icon"><i class="fas fa-envelope-open-text"></i></div>
+            <a href="{% url 'admin:pages_newslettersubscriber_changelist' %}" class="small-box-footer">
+                Active subscribers <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+    <!-- Open Support Tickets -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: #fd7e14;">
+            <div class="inner">
+                <h3>{{ open_tickets|default:"0" }}</h3>
+                <p>Open Support Tickets</p>
+            </div>
+            <div class="icon"><i class="fas fa-life-ring"></i></div>
+            <a href="{% url 'admin:candidate_candidatesupportrequest_changelist' %}" class="small-box-footer">
+                View tickets <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CHARTS ===== -->
+<div class="ev-section-title"><i class="fas fa-chart-bar"></i> Analytics</div>
+<div class="row">
+    <!-- Monthly Activity Chart -->
+    <div class="col-lg-8 col-12">
+        <div class="card ev-chart-card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Monthly Activity (Last 6 Months)
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyActivityChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- Clients by Plan -->
+    <div class="col-lg-4 col-12">
+        <div class="card ev-chart-card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Clients by Plan
+            </div>
+            <div class="card-body">
+                <canvas id="clientsPlanChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Assessment Types -->
+    <div class="col-lg-6 col-12">
+        <div class="card ev-chart-card">
+            <div class="card-header">
+                <i class="fas fa-clipboard-list"></i> Assessment Types Distribution
+            </div>
+            <div class="card-body">
+                <canvas id="assessmentTypesChart" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- Session Statuses -->
+    <div class="col-lg-6 col-12">
+        <div class="card ev-chart-card">
+            <div class="card-header">
+                <i class="fas fa-signal"></i> Session Status Breakdown
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <div style="max-width: 280px; width: 100%;">
+                    <canvas id="sessionStatusChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== AI HIRING PIPELINE ===== -->
+{% if active_pipelines or pipeline_candidates %}
+<div class="ev-section-title"><i class="fas fa-robot"></i> AI Hiring Agent</div>
+<div class="row">
+    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-green);">
+            <div class="inner">
+                <h3>{{ active_pipelines|default:"0" }}</h3>
+                <p>Active Pipelines</p>
+            </div>
+            <div class="icon"><i class="fas fa-robot"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-blue);">
+            <div class="inner">
+                <h3>{{ pipeline_candidates|default:"0" }}</h3>
+                <p>Pipeline Candidates</p>
+            </div>
+            <div class="icon"><i class="fas fa-user-tie"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+        <div class="small-box bg-dark ev-kpi" style="border-left-color: var(--ev-purple);">
+            <div class="inner">
+                <h3>{{ pipeline_hired|default:"0" }}</h3>
+                <p>Hired via AI</p>
+            </div>
+            <div class="icon"><i class="fas fa-handshake"></i></div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ===== RECENT ACTIVITY TABLES ===== -->
+<div class="ev-section-title"><i class="fas fa-clock"></i> Recent Activity</div>
+<div class="row">
+    <!-- Recent Clients -->
+    <div class="col-lg-6 col-12">
+        <div class="card ev-table-card">
+            <div class="card-header">
+                <i class="fas fa-building"></i> Recent Clients
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Plan</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in recent_clients %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin:clients_clientaccount_change' c.id %}">
+                                    {{ c.company_name|default:"—" }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="ev-badge ev-badge-info">{{ c.plan_slug|default:"—" }}</span>
+                            </td>
+                            <td>
+                                {% if c.status == "approved" %}
+                                    <span class="ev-badge ev-badge-success">Approved</span>
+                                {% elif c.status == "pending" %}
+                                    <span class="ev-badge ev-badge-warning">Pending</span>
+                                {% else %}
+                                    <span class="ev-badge ev-badge-secondary">{{ c.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ c.created_at }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted">No clients yet</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Recent Demo Requests -->
+    <div class="col-lg-6 col-12">
+        <div class="card ev-table-card">
+            <div class="card-header">
+                <i class="fas fa-calendar-check"></i> Recent Demo Requests
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in recent_demos %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin:pages_demorequest_change' d.id %}">
+                                    {{ d.full_name|default:"—" }}
+                                </a>
+                            </td>
+                            <td>{{ d.company|default:"—" }}</td>
+                            <td>
+                                {% if d.status == "new" %}
+                                    <span class="ev-badge ev-badge-warning">New</span>
+                                {% elif d.status == "completed" or d.status == "converted" %}
+                                    <span class="ev-badge ev-badge-success">{{ d.status|title }}</span>
+                                {% elif d.status == "scheduled" %}
+                                    <span class="ev-badge ev-badge-info">Scheduled</span>
+                                {% else %}
+                                    <span class="ev-badge ev-badge-secondary">{{ d.status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ d.created_at }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted">No demo requests yet</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Open Support Tickets -->
+{% if recent_tickets %}
+<div class="row">
+    <div class="col-lg-6 col-12">
+        <div class="card ev-table-card">
+            <div class="card-header">
+                <i class="fas fa-life-ring"></i> Open Support Tickets
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Topic</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in recent_tickets %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin:candidate_candidatesupportrequest_change' t.id %}">
+                                    #{{ t.id }}
+                                </a>
+                            </td>
+                            <td>{{ t.topic|title }}</td>
+                            <td><span class="ev-badge ev-badge-danger">{{ t.status|title }}</span></td>
+                            <td>{{ t.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ===== ORIGINAL JAZZMIN MODEL LIST ===== -->
+<div class="ev-section-title"><i class="fas fa-database"></i> Models</div>
+{% get_side_menu using="app_list" as dashboard_list %}
+{% if dashboard_list %}
+    {% widthratio dashboard_list|length 2 1 as middle %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-6 col-sm-12">
+        {% for app in dashboard_list %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="m-0">{{ app.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                        {% for model in app.models %}
+                            <tr>
+                                <td>
+                                    {% if model.url %}<a href="{{ model.url }}">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group float-right">
+                                        {% if model.add_url %}
+                                            <a href="{{ model.add_url }}" class="btn btn-xs {{ jazzmin_ui.button_classes.success }} addlink">{% trans 'Add' %}</a>
+                                        {% endif %}
+                                        {% if model.url %}
+                                            {% if model.view_only %}
+                                                <a href="{{ model.url }}" class="btn btn-xs {{ jazzmin_ui.button_classes.info }} viewlink">{% trans 'View' %}</a>
+                                            {% else %}
+                                                <a href="{{ model.url }}" class="btn btn-xs {{ jazzmin_ui.button_classes.info }} changelink">{% if model.custom %}{% trans 'Go' %}{% else %}{% trans 'Change' %}{% endif %}</a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if forloop.counter == middle|add:"0" %}
+            </div>
+            <div class="col-md-6 col-sm-12">
+            {% endif %}
+
+        {% endfor %}
+        </div>
+</div>
+
+<!-- ===== CHART.JS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const ORANGE  = '#ff8a00';
+    const BLUE    = '#4e73df';
+    const GREEN   = '#1cc88a';
+    const TEAL    = '#36b9cc';
+    const RED     = '#e74a3b';
+    const PURPLE  = '#6f42c1';
+    const INDIGO  = '#6610f2';
+    const YELLOW  = '#f6c23e';
+    const PINK    = '#e83e8c';
+
+    const CHART_COLORS = [ORANGE, BLUE, GREEN, TEAL, RED, PURPLE, INDIGO, YELLOW, PINK];
+
+    const defaultOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { labels: { color: '#adb5bd', font: { size: 12 } } },
+        },
+        scales: {
+            x: { ticks: { color: '#adb5bd' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { ticks: { color: '#adb5bd' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+        }
+    };
+
+    // 1. Monthly Activity — dual bar chart
+    const clientMonths = {{ client_months|safe }};
+    const clientCounts = {{ client_month_counts|safe }};
+    const compMonths   = {{ completion_months|safe }};
+    const compCounts   = {{ completion_counts|safe }};
+
+    // Merge month labels
+    const allMonths = [...new Set([...clientMonths, ...compMonths])].sort();
+    const clientMap = Object.fromEntries(clientMonths.map((m, i) => [m, clientCounts[i]]));
+    const compMap   = Object.fromEntries(compMonths.map((m, i) => [m, compCounts[i]]));
+
+    new Chart(document.getElementById('monthlyActivityChart'), {
+        type: 'bar',
+        data: {
+            labels: allMonths,
+            datasets: [
+                {
+                    label: 'New Clients',
+                    data: allMonths.map(m => clientMap[m] || 0),
+                    backgroundColor: ORANGE,
+                    borderRadius: 3,
+                },
+                {
+                    label: 'Completions',
+                    data: allMonths.map(m => compMap[m] || 0),
+                    backgroundColor: BLUE,
+                    borderRadius: 3,
+                }
+            ]
+        },
+        options: defaultOptions
+    });
+
+    // 2. Clients by Plan — doughnut
+    new Chart(document.getElementById('clientsPlanChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ plan_labels|safe }},
+            datasets: [{
+                data: {{ plan_counts|safe }},
+                backgroundColor: CHART_COLORS,
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '60%',
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#adb5bd', padding: 15, font: { size: 12 } } }
+            }
+        }
+    });
+
+    // 3. Assessment Types — horizontal bar
+    const typeData = {{ assessment_type_counts|safe }};
+    new Chart(document.getElementById('assessmentTypesChart'), {
+        type: 'bar',
+        data: {
+            labels: typeData.map(d => d.label),
+            datasets: [
+                {
+                    label: 'Total',
+                    data: typeData.map(d => d.total),
+                    backgroundColor: BLUE,
+                    borderRadius: 3,
+                },
+                {
+                    label: 'Completed',
+                    data: typeData.map(d => d.completed),
+                    backgroundColor: GREEN,
+                    borderRadius: 3,
+                }
+            ]
+        },
+        options: {
+            ...defaultOptions,
+            indexAxis: 'y',
+        }
+    });
+
+    // 4. Session Status — doughnut
+    new Chart(document.getElementById('sessionStatusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ status_labels|safe }},
+            datasets: [{
+                data: {{ status_counts|safe }},
+                backgroundColor: CHART_COLORS,
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '55%',
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#adb5bd', padding: 12, font: { size: 11 } } }
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}
