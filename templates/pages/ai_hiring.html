@@ -417,24 +417,43 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="aih-screening-card">
+                    <div class="aih-screening-card" id="aiScreenCard">
                         <div class="aih-screen-result">
-                            <div class="aih-screen-header">
+                            {# Scan overlay — sweeps down then fades out #}
+                            <div class="aih-scan-overlay" data-aih-scan>
+                                <div class="aih-scan-line"></div>
+                                <div class="aih-scan-text">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                    <span>Analyzing resume...</span>
+                                </div>
+                            </div>
+                            <div class="aih-screen-header" data-aih-reveal>
                                 <span class="aih-screen-badge">AI Screening Result</span>
-                                <span class="aih-screen-score">92<span>/100</span></span>
+                                <div class="aih-score-ring-wrap">
+                                    <svg class="aih-score-ring" viewBox="0 0 80 80">
+                                        <circle class="aih-ring-bg" cx="40" cy="40" r="34" fill="none" stroke="#e5e7eb" stroke-width="6"/>
+                                        <circle class="aih-ring-fill" cx="40" cy="40" r="34" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" transform="rotate(-90 40 40)"/>
+                                    </svg>
+                                    <span class="aih-score-num" data-aih-count="92">0</span>
+                                    <span class="aih-score-max">/100</span>
+                                </div>
                             </div>
-                            <div class="aih-screen-summary">
-                                <p>"Strong match for Senior Frontend Engineer. 6+ years React/TypeScript experience with demonstrated leadership. Missing GraphQL experience but compensated by strong system design skills."</p>
+                            <div class="aih-screen-summary" data-aih-typewriter>
+                                <p data-aih-text="&quot;Strong match for Senior Frontend Engineer. 6+ years React/TypeScript experience with demonstrated leadership. Missing GraphQL experience but compensated by strong system design skills.&quot;"></p>
+                                <span class="aih-cursor">|</span>
                             </div>
-                            <div class="aih-screen-skills">
-                                <span class="aih-skill aih-skill--match">React</span>
-                                <span class="aih-skill aih-skill--match">TypeScript</span>
-                                <span class="aih-skill aih-skill--match">System Design</span>
-                                <span class="aih-skill aih-skill--match">CI/CD</span>
-                                <span class="aih-skill aih-skill--missing">GraphQL</span>
+                            <div class="aih-screen-skills" data-aih-skills>
+                                <span class="aih-skill aih-skill--match" data-aih-skill>React</span>
+                                <span class="aih-skill aih-skill--match" data-aih-skill>TypeScript</span>
+                                <span class="aih-skill aih-skill--match" data-aih-skill>System Design</span>
+                                <span class="aih-skill aih-skill--match" data-aih-skill>CI/CD</span>
+                                <span class="aih-skill aih-skill--missing" data-aih-skill>GraphQL</span>
                             </div>
-                            <div class="aih-screen-action">
-                                <span class="aih-screen-rec aih-rec-advance">Advance</span>
+                            <div class="aih-screen-action" data-aih-verdict>
+                                <span class="aih-screen-rec aih-rec-advance">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Advance
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -537,4 +556,91 @@
 
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var card = document.getElementById('aiScreenCard');
+    if (!card) return;
+
+    var activated = false;
+    var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (!e.isIntersecting || activated) return;
+            activated = true;
+            runScreeningAnimation(card);
+        });
+    }, { threshold: 0.4 });
+    obs.observe(card);
+
+    function runScreeningAnimation(el) {
+        var scanOverlay = el.querySelector('[data-aih-scan]');
+        var header = el.querySelector('[data-aih-reveal]');
+        var ring = el.querySelector('.aih-ring-fill');
+        var scoreNum = el.querySelector('[data-aih-count]');
+        var typewriter = el.querySelector('[data-aih-typewriter]');
+        var twP = typewriter.querySelector('p');
+        var twCursor = typewriter.querySelector('.aih-cursor');
+        var skills = el.querySelectorAll('[data-aih-skill]');
+        var verdict = el.querySelector('[data-aih-verdict]');
+
+        /* Phase 1: Scan overlay sweeps (0–1.5s) */
+        scanOverlay.classList.add('aih-scanning');
+
+        /* Phase 2: Scan complete — fade out overlay, reveal header + ring (1.5s) */
+        setTimeout(function() {
+            scanOverlay.classList.add('aih-scan-done');
+            header.classList.add('aih-revealed');
+
+            /* Animate score ring fill */
+            var target = parseInt(scoreNum.getAttribute('data-aih-count'));
+            var circumference = 2 * Math.PI * 34; /* r=34 */
+            var offset = circumference - (target / 100) * circumference;
+            ring.style.transition = 'stroke-dashoffset 1.2s ease-out';
+            ring.style.strokeDashoffset = offset;
+
+            /* Count up the number */
+            var current = 0;
+            var step = target / 40;
+            var counter = setInterval(function() {
+                current += step;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(counter);
+                }
+                scoreNum.textContent = Math.round(current);
+            }, 30);
+        }, 1600);
+
+        /* Phase 3: Typewriter text (2.8s) */
+        var fullText = twP.getAttribute('data-aih-text');
+        var charIndex = 0;
+        setTimeout(function() {
+            typewriter.classList.add('aih-tw-active');
+            twCursor.classList.add('aih-cursor-blink');
+            var typeInterval = setInterval(function() {
+                charIndex++;
+                twP.textContent = fullText.substring(0, charIndex);
+                if (charIndex >= fullText.length) {
+                    clearInterval(typeInterval);
+                    /* Hide cursor after done */
+                    setTimeout(function() { twCursor.classList.add('aih-cursor-hide'); }, 600);
+                }
+            }, 14);
+        }, 2800);
+
+        /* Phase 4: Skills pop in (5.5s) */
+        var skillDelay = 5500;
+        skills.forEach(function(sk, i) {
+            setTimeout(function() {
+                sk.classList.add('aih-skill-visible');
+            }, skillDelay + i * 180);
+        });
+
+        /* Phase 5: Verdict badge bounces in (6.8s) */
+        setTimeout(function() {
+            verdict.classList.add('aih-verdict-visible');
+        }, skillDelay + skills.length * 180 + 300);
+    }
+});
+</script>
 {% endblock %}

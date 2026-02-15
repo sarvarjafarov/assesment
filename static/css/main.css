@@ -21294,12 +21294,88 @@ main {
     width: 100%;
     max-width: 440px;
     box-shadow: 0 8px 32px rgba(14, 20, 40, 0.06);
+    position: relative;
+    overflow: hidden;
 }
+
+/* ── Scan overlay ── */
+.aih-scan-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+.aih-scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-orange), transparent);
+    box-shadow: 0 0 16px rgba(255, 138, 0, 0.4);
+    top: 0;
+    opacity: 0;
+}
+.aih-scan-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-orange);
+    opacity: 0;
+}
+.aih-scan-text svg {
+    animation: aih-spin 1s linear infinite;
+}
+@keyframes aih-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Scanning active */
+.aih-scanning .aih-scan-line {
+    opacity: 1;
+    animation: aih-scan-sweep 1.4s ease-in-out forwards;
+}
+.aih-scanning .aih-scan-text {
+    opacity: 1;
+    animation: aih-fade-in 0.3s ease both;
+}
+@keyframes aih-scan-sweep {
+    0% { top: 0; }
+    50% { top: calc(100% - 3px); }
+    100% { top: 0; }
+}
+@keyframes aih-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scan done — fade out overlay */
+.aih-scan-done {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ── Header & score ring (hidden until revealed) ── */
 .aih-screen-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.aih-revealed {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
 }
 .aih-screen-badge {
     font-size: 0.7rem;
@@ -21311,21 +21387,60 @@ main {
     padding: 0.3rem 0.7rem;
     border-radius: 6px;
 }
-.aih-screen-score {
-    font-size: 2rem;
+
+/* Score ring */
+.aih-score-ring-wrap {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+.aih-score-ring {
+    width: 100%;
+    height: 100%;
+}
+.aih-ring-bg {
+    stroke: #e5e7eb;
+}
+.aih-ring-fill {
+    stroke: #22c55e;
+    transition: stroke-dashoffset 1.2s ease-out;
+}
+.aih-score-num {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    font-size: 1.5rem;
     font-weight: 800;
     color: #22c55e;
+    line-height: 1;
 }
-.aih-screen-score span {
-    font-size: 0.9rem;
+.aih-score-max {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 55%);
+    font-size: 0.65rem;
     font-weight: 600;
     color: #9ca3af;
 }
+
+/* ── Typewriter summary ── */
 .aih-screen-summary {
     background: #f8f9fb;
     border-radius: 10px;
     padding: 1rem 1.25rem;
     margin-bottom: 1rem;
+    min-height: 82px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.aih-tw-active {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
 }
 .aih-screen-summary p {
     font-size: 0.82rem;
@@ -21333,7 +21448,29 @@ main {
     color: #374151;
     margin: 0;
     font-style: italic;
+    display: inline;
 }
+.aih-cursor {
+    display: inline;
+    font-style: normal;
+    font-weight: 300;
+    color: var(--color-orange);
+    opacity: 0;
+    margin-left: 1px;
+}
+.aih-cursor-blink {
+    opacity: 1;
+    animation: aih-blink 0.6s step-end infinite;
+}
+.aih-cursor-hide {
+    animation: none;
+    opacity: 0;
+}
+@keyframes aih-blink {
+    50% { opacity: 0; }
+}
+
+/* ── Skills (hidden, pop in) ── */
 .aih-screen-skills {
     display: flex;
     flex-wrap: wrap;
@@ -21345,6 +21482,13 @@ main {
     font-weight: 600;
     padding: 0.25rem 0.6rem;
     border-radius: 6px;
+    opacity: 0;
+    transform: scale(0.5) translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.aih-skill-visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
 }
 .aih-skill--match {
     background: rgba(34, 197, 94, 0.1);
@@ -21354,21 +21498,52 @@ main {
     background: rgba(239, 68, 68, 0.08);
     color: #ef4444;
 }
+
+/* ── Verdict badge (hidden, bounces in) ── */
 .aih-screen-action {
     display: flex;
     justify-content: flex-end;
+    opacity: 0;
+    transform: scale(0.3);
+    transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.aih-verdict-visible {
+    opacity: 1;
+    transform: scale(1);
 }
 .aih-screen-rec {
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 0.3rem 0.85rem;
+    padding: 0.4rem 1rem;
     border-radius: 8px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 .aih-rec-advance {
     background: rgba(34, 197, 94, 0.12);
     color: #16a34a;
+}
+.aih-verdict-visible .aih-rec-advance {
+    animation: aih-verdict-pulse 0.6s ease 0.3s;
+}
+@keyframes aih-verdict-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Reduced motion: skip animations */
+@media (prefers-reduced-motion: reduce) {
+    .aih-scan-overlay { display: none; }
+    .aih-screen-header { opacity: 1; transform: none; }
+    .aih-screen-summary { opacity: 1; transform: none; }
+    .aih-skill { opacity: 1; transform: none; }
+    .aih-screen-action { opacity: 1; transform: none; }
+    .aih-ring-fill { stroke-dashoffset: 17.1 !important; transition: none; }
+    .aih-cursor { display: none; }
 }
 
 /* ── Assessment Integration ── */
