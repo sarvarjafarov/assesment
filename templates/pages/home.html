@@ -292,6 +292,20 @@
                     <div class="how-step" data-how-step="{{ forloop.counter0 }}">
                         <div class="how-card">
                             <div class="how-card-glow"></div>
+                            <div class="how-step-icon-wrap">
+                                <div class="how-step-icon">
+                                    {% if forloop.counter == 1 %}
+                                    <svg class="how-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path class="how-draw" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline class="how-draw" points="14 2 14 8 20 8"/><line class="how-draw" x1="12" y1="18" x2="12" y2="12"/><line class="how-draw" x1="9" y1="15" x2="15" y2="15"/></svg>
+                                    {% elif forloop.counter == 2 %}
+                                    <svg class="how-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path class="how-draw" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline class="how-draw" points="22 6 12 13 2 6"/></svg>
+                                    {% elif forloop.counter == 3 %}
+                                    <svg class="how-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line class="how-draw" x1="18" y1="20" x2="18" y2="10"/><line class="how-draw" x1="12" y1="20" x2="12" y2="4"/><line class="how-draw" x1="6" y1="20" x2="6" y2="14"/></svg>
+                                    {% else %}
+                                    <svg class="how-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path class="how-draw" d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline class="how-draw" points="22 4 12 14.01 9 11.01"/></svg>
+                                    {% endif %}
+                                </div>
+                                <span class="how-step-num">{{ forloop.counter }}</span>
+                            </div>
                             {% if forloop.counter == 1 %}
                             <span class="how-badge">< 2 min</span>
                             {% elif forloop.counter == 2 %}
@@ -301,20 +315,6 @@
                             {% else %}
                             <span class="how-badge">Data-driven</span>
                             {% endif %}
-                            <div class="how-step-icon-wrap">
-                                <div class="how-step-icon">
-                                    {% if forloop.counter == 1 %}
-                                    <svg class="how-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path class="how-draw" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline class="how-draw" points="14 2 14 8 20 8"/><line class="how-draw" x1="12" y1="18" x2="12" y2="12"/><line class="how-draw" x1="9" y1="15" x2="15" y2="15"/></svg>
-                                    {% elif forloop.counter == 2 %}
-                                    <svg class="how-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path class="how-draw" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline class="how-draw" points="22 6 12 13 2 6"/></svg>
-                                    {% elif forloop.counter == 3 %}
-                                    <svg class="how-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line class="how-draw" x1="18" y1="20" x2="18" y2="10"/><line class="how-draw" x1="12" y1="20" x2="12" y2="4"/><line class="how-draw" x1="6" y1="20" x2="6" y2="14"/></svg>
-                                    {% else %}
-                                    <svg class="how-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path class="how-draw" d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline class="how-draw" points="22 4 12 14.01 9 11.01"/></svg>
-                                    {% endif %}
-                                </div>
-                                <span class="how-step-num">{{ forloop.counter }}</span>
-                            </div>
                             <h3 class="how-step-title">{{ feature.title }}</h3>
                             <p class="how-step-desc">{{ feature.description }}</p>
                             {# Mini illustration previews #}
@@ -687,30 +687,18 @@ document.addEventListener('DOMContentLoaded', () => {
         var howSteps = howSection.querySelectorAll('[data-how-step]');
         var howActivated = false;
 
-        /* Calculate SVG path lengths for draw animation */
-        howSteps.forEach(function(step) {
-            var paths = step.querySelectorAll('.how-draw');
-            paths.forEach(function(p) {
-                var len = p.getTotalLength ? p.getTotalLength() : 100;
-                p.style.strokeDasharray = len;
-                p.style.strokeDashoffset = len;
-            });
-        });
-
         var howObs = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
                 if (!entry.isIntersecting || howActivated) return;
                 howActivated = true;
-                /* Staggered entrance */
                 howSteps.forEach(function(step, i) {
-                    setTimeout(function() { step.classList.add('visible'); }, i * 180);
+                    setTimeout(function() { step.classList.add('visible'); }, i * 150);
                 });
-                /* Sequential activation with icon draw + mini preview */
                 howSteps.forEach(function(step, i) {
-                    setTimeout(function() { step.classList.add('active'); }, 700 + i * 700);
+                    setTimeout(function() { step.classList.add('active'); }, 600 + i * 600);
                 });
             });
-        }, { threshold: 0.25 });
+        }, { threshold: 0.2 });
         howObs.observe(howSection);
 
         /* Floating background shapes parallax */
