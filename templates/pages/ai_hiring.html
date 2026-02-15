@@ -339,50 +339,61 @@
                     <h2>Nine stages from resume to hire</h2>
                     <p class="lede">Every candidate moves through a transparent, trackable state machine with clear transitions and decision points.</p>
                 </div>
-                <div class="aih-pipeline-flow">
-                    <div class="aih-pipe-stage aih-pipe-stage--start">
+                <div class="aih-pipeline-flow" id="aihPipeFlow">
+                    {# Traveling pulse particle #}
+                    <div class="aih-pipe-pulse"></div>
+
+                    <div class="aih-pipe-stage aih-pipe-stage--start" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">Uploaded</span>
                     </div>
-                    <div class="aih-pipe-arrow"></div>
-                    <div class="aih-pipe-stage aih-pipe-stage--ai">
+                    <div class="aih-pipe-arrow" data-pipe-arrow></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--ai" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">AI Screening</span>
                     </div>
-                    <div class="aih-pipe-arrow"></div>
-                    <div class="aih-pipe-stage aih-pipe-stage--human">
+                    <div class="aih-pipe-arrow" data-pipe-arrow></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--human" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">Shortlisted</span>
                         <span class="aih-pipe-checkpoint">Checkpoint</span>
                     </div>
-                    <div class="aih-pipe-arrow"></div>
-                    <div class="aih-pipe-stage aih-pipe-stage--ai">
+                    <div class="aih-pipe-arrow" data-pipe-arrow></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--ai" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">Assessment Sent</span>
                     </div>
-                    <div class="aih-pipe-arrow"></div>
-                    <div class="aih-pipe-stage aih-pipe-stage--wait">
+                    <div class="aih-pipe-arrow" data-pipe-arrow></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--wait" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">Completed</span>
                     </div>
-                    <div class="aih-pipe-arrow"></div>
-                    <div class="aih-pipe-stage aih-pipe-stage--ai">
+                    <div class="aih-pipe-arrow" data-pipe-arrow></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--ai" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">AI Decision</span>
                     </div>
-                    <div class="aih-pipe-arrow"></div>
-                    <div class="aih-pipe-stage aih-pipe-stage--human">
+                    <div class="aih-pipe-arrow" data-pipe-arrow></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--human" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">Review</span>
                         <span class="aih-pipe-checkpoint">Checkpoint</span>
                     </div>
-                    <div class="aih-pipe-arrow"></div>
-                    <div class="aih-pipe-stage aih-pipe-stage--end">
+                    <div class="aih-pipe-arrow" data-pipe-arrow></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--end" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-ring"></span>
                         <span class="aih-pipe-label">Hired</span>
                     </div>
                 </div>
-                <div class="aih-pipe-legend">
+                <div class="aih-pipe-legend" id="aihPipeLegend">
                     <span class="aih-pipe-legend-item"><span class="aih-legend-dot aih-legend-ai"></span> AI automated</span>
                     <span class="aih-pipe-legend-item"><span class="aih-legend-dot aih-legend-human"></span> Human checkpoint</span>
                     <span class="aih-pipe-legend-item"><span class="aih-legend-dot aih-legend-wait"></span> Waiting for candidate</span>
@@ -640,6 +651,54 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
             verdict.classList.add('aih-verdict-visible');
         }, skillDelay + skills.length * 180 + 300);
+    }
+
+    /* ── Pipeline flow animation ── */
+    var pipeFlow = document.getElementById('aihPipeFlow');
+    var pipeLegend = document.getElementById('aihPipeLegend');
+    if (pipeFlow) {
+        var pipeActivated = false;
+        var pipeObs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) {
+                if (!e.isIntersecting || pipeActivated) return;
+                pipeActivated = true;
+                runPipelineAnimation();
+            });
+        }, { threshold: 0.3 });
+        pipeObs.observe(pipeFlow);
+
+        function runPipelineAnimation() {
+            var nodes = pipeFlow.querySelectorAll('[data-pipe-node]');
+            var arrows = pipeFlow.querySelectorAll('[data-pipe-arrow]');
+            var pulse = pipeFlow.querySelector('.aih-pipe-pulse');
+            var interval = 350; /* ms between each node */
+
+            /* Light up nodes sequentially */
+            nodes.forEach(function(node, i) {
+                /* Activate dot + ring ripple */
+                setTimeout(function() {
+                    node.classList.add('aih-pipe-lit');
+                }, i * interval);
+
+                /* Grow arrow before this node (arrow[i-1] connects node[i-1] → node[i]) */
+                if (i > 0 && arrows[i - 1]) {
+                    setTimeout(function() {
+                        arrows[i - 1].classList.add('aih-arrow-lit');
+                    }, (i - 1) * interval + interval / 2);
+                }
+            });
+
+            /* After all nodes lit, launch the traveling pulse */
+            var totalNodeTime = nodes.length * interval;
+            setTimeout(function() {
+                pulse.classList.add('aih-pulse-go');
+            }, totalNodeTime + 200);
+
+            /* Fade in legend */
+            setTimeout(function() {
+                if (pipeLegend) pipeLegend.classList.add('aih-legend-visible');
+            }, totalNodeTime + 1800);
+        }
     }
 });
 </script>

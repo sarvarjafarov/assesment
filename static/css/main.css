@@ -21154,7 +21154,7 @@ main {
     margin: 0;
 }
 
-/* ── Pipeline Flow Visual ── */
+/* ── Pipeline Flow Visual (animated) ── */
 .aih-pipeline-visual {
     padding: 5rem 0;
     background: #f8f9fb;
@@ -21166,8 +21166,11 @@ main {
     gap: 0;
     margin-top: 3rem;
     overflow-x: auto;
-    padding: 1rem 0;
+    padding: 1.5rem 0 1rem;
+    position: relative;
 }
+
+/* ── Nodes start dimmed ── */
 .aih-pipe-stage {
     display: flex;
     flex-direction: column;
@@ -21181,22 +21184,36 @@ main {
     height: 20px;
     border-radius: 50%;
     border: 3px solid #d1d5db;
-    background: var(--color-white);
+    background: #e5e7eb;
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    transition: background 0.4s ease, border-color 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.aih-pipe-stage--start .aih-pipe-dot { border-color: #6b7280; background: #6b7280; }
-.aih-pipe-stage--ai .aih-pipe-dot { border-color: var(--color-orange); background: var(--color-orange); }
-.aih-pipe-stage--human .aih-pipe-dot { border-color: #3b82f6; background: #3b82f6; }
-.aih-pipe-stage--wait .aih-pipe-dot { border-color: #d1d5db; background: var(--color-white); }
-.aih-pipe-stage--end .aih-pipe-dot { border-color: #22c55e; background: #22c55e; }
 
+/* Ripple ring behind the dot */
+.aih-pipe-ring {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    z-index: 1;
+    opacity: 0;
+    transform: scale(1);
+    pointer-events: none;
+}
+
+/* Labels start invisible */
 .aih-pipe-label {
     font-size: 0.72rem;
     font-weight: 600;
     color: #374151;
     text-align: center;
     white-space: nowrap;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
 }
 .aih-pipe-checkpoint {
     font-size: 0.6rem;
@@ -21207,19 +21224,106 @@ main {
     background: rgba(59, 130, 246, 0.08);
     padding: 0.15rem 0.45rem;
     border-radius: 4px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.3s ease 0.15s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s;
 }
+
+/* ── Lit state — node activated ── */
+.aih-pipe-lit .aih-pipe-dot {
+    transform: scale(1.15);
+}
+.aih-pipe-lit .aih-pipe-label {
+    opacity: 1;
+    transform: translateY(0);
+}
+.aih-pipe-lit .aih-pipe-checkpoint {
+    opacity: 1;
+    transform: scale(1);
+}
+.aih-pipe-lit .aih-pipe-ring {
+    animation: aih-ring-ripple 0.7s ease-out forwards;
+}
+
+/* Color overrides when lit */
+.aih-pipe-stage--start.aih-pipe-lit .aih-pipe-dot { border-color: #6b7280; background: #6b7280; }
+.aih-pipe-stage--start.aih-pipe-lit .aih-pipe-ring { border-color: rgba(107, 114, 128, 0.4); }
+.aih-pipe-stage--ai.aih-pipe-lit .aih-pipe-dot { border-color: var(--color-orange); background: var(--color-orange); }
+.aih-pipe-stage--ai.aih-pipe-lit .aih-pipe-ring { border-color: rgba(255, 138, 0, 0.4); }
+.aih-pipe-stage--human.aih-pipe-lit .aih-pipe-dot { border-color: #3b82f6; background: #3b82f6; }
+.aih-pipe-stage--human.aih-pipe-lit .aih-pipe-ring { border-color: rgba(59, 130, 246, 0.4); }
+.aih-pipe-stage--wait.aih-pipe-lit .aih-pipe-dot { border-color: #9ca3af; background: var(--color-white); }
+.aih-pipe-stage--wait.aih-pipe-lit .aih-pipe-ring { border-color: rgba(156, 163, 175, 0.3); }
+.aih-pipe-stage--end.aih-pipe-lit .aih-pipe-dot { border-color: #22c55e; background: #22c55e; }
+.aih-pipe-stage--end.aih-pipe-lit .aih-pipe-ring { border-color: rgba(34, 197, 94, 0.4); }
+
+@keyframes aih-ring-ripple {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(2.5); }
+}
+
+/* ── Arrows start invisible, grow on activation ── */
 .aih-pipe-arrow {
     width: 32px;
     height: 2px;
-    background: #d1d5db;
+    background: #e5e7eb;
     margin-top: 9px;
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
 }
+.aih-pipe-arrow::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--color-orange), #3b82f6);
+    transition: width 0.35s ease;
+}
+.aih-arrow-lit::after {
+    width: 100%;
+}
+
+/* ── Traveling pulse particle ── */
+.aih-pipe-pulse {
+    position: absolute;
+    top: 9px;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-orange);
+    box-shadow: 0 0 12px rgba(255, 138, 0, 0.6), 0 0 24px rgba(255, 138, 0, 0.3);
+    z-index: 3;
+    opacity: 0;
+    transform: translateY(-3px);
+    pointer-events: none;
+}
+.aih-pulse-go {
+    animation: aih-pulse-travel 2s ease-in-out forwards;
+}
+@keyframes aih-pulse-travel {
+    0% { left: 2%; opacity: 1; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { left: 98%; opacity: 0; }
+}
+
+/* ── Legend fades in ── */
 .aih-pipe-legend {
     display: flex;
     justify-content: center;
     gap: 2rem;
     margin-top: 2rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.aih-legend-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 .aih-pipe-legend-item {
     display: inline-flex;
@@ -21234,6 +21338,17 @@ main {
     border-radius: 50%;
 }
 .aih-legend-ai { background: var(--color-orange); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .aih-pipe-dot { background: revert; border-color: revert; }
+    .aih-pipe-label { opacity: 1; transform: none; }
+    .aih-pipe-checkpoint { opacity: 1; transform: none; }
+    .aih-pipe-arrow::after { width: 100%; }
+    .aih-pipe-legend { opacity: 1; transform: none; }
+    .aih-pipe-pulse { display: none; }
+    .aih-pipe-ring { display: none; }
+}
 .aih-legend-human { background: #3b82f6; }
 .aih-legend-wait { border: 2px solid #d1d5db; background: var(--color-white); }
 
