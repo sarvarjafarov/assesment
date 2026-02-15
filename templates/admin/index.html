@@ -122,7 +122,8 @@
                 <p>Active Projects</p>
             </div>
             <div class="icon"><i class="fas fa-project-diagram"></i></div>
-            <a href="{% url 'admin:clients_clientproject_changelist' %}" class="small-box-footer">
+            {% url 'admin:clients_clientproject_changelist' as projects_url %}
+            <a href="{{ projects_url|default:'#' }}" class="small-box-footer">
                 {{ total_projects|default:"0" }} total <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
@@ -148,7 +149,8 @@
                 <p>Open Support Tickets</p>
             </div>
             <div class="icon"><i class="fas fa-life-ring"></i></div>
-            <a href="{% url 'admin:candidate_candidatesupportrequest_changelist' %}" class="small-box-footer">
+            {% url 'admin:candidate_candidatesupportrequest_changelist' as tickets_url %}
+            <a href="{{ tickets_url|default:'#' }}" class="small-box-footer">
                 View tickets <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
@@ -361,11 +363,7 @@
                     <tbody>
                         {% for t in recent_tickets %}
                         <tr>
-                            <td>
-                                <a href="{% url 'admin:candidate_candidatesupportrequest_change' t.id %}">
-                                    #{{ t.id }}
-                                </a>
-                            </td>
+                            <td>#{{ t.id }}</td>
                             <td>{{ t.topic|title }}</td>
                             <td><span class="ev-badge ev-badge-danger">{{ t.status|title }}</span></td>
                             <td>{{ t.created_at }}</td>
