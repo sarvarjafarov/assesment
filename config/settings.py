@@ -284,10 +284,7 @@ STATICFILES_DIRS = (
     if (BASE_DIR / 'static').exists()
     else []
 )
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# Allow missing source-map files referenced in third-party CSS (e.g. jazzmin/bootswatch)
-import whitenoise.storage
-whitenoise.storage.CompressedManifestStaticFilesStorage.manifest_strict = False
+STATICFILES_STORAGE = 'config.storage.StaticStorage'
 if "test" in sys.argv:
     WHITENOISE_USE_FINDERS = True
 
