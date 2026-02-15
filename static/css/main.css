@@ -21773,6 +21773,7 @@ main {
     gap: 1rem;
 }
 .aih-final-actions .btn-outline {
+    background: transparent;
     border-color: rgba(255, 255, 255, 0.25);
     color: var(--color-white);
 }
