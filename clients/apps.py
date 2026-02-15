@@ -99,6 +99,7 @@ def _patched_unstash_state(request, state_id):
 class ClientsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'clients'
+    verbose_name = 'Clients & Accounts'
 
     def ready(self):
         from allauth.socialaccount.internal import statekit

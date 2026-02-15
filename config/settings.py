@@ -110,6 +110,7 @@ if not DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -397,4 +398,179 @@ LOGGING = {
             'propagate': False,
         },
     },
+}
+
+# ---------------------------------------------------------------------------
+# Django Jazzmin — Modern admin UI
+# ---------------------------------------------------------------------------
+
+JAZZMIN_SETTINGS = {
+    # Window / tab title
+    "site_title": "Evalon Admin",
+    # Brand text in top-left of sidebar
+    "site_header": "Evalon",
+    "site_brand": "Evalon",
+    # Logo — shown in sidebar and login page
+    "site_logo": "img/logo-glyph.svg",
+    "site_logo_classes": "",
+    "site_icon": "img/logo-glyph.svg",
+    "login_logo": "img/evalon-logo.png",
+    "login_logo_dark": None,
+    # Welcome text on login page
+    "welcome_sign": "Welcome to Evalon Admin",
+    "copyright": "Evalon",
+    # Search bar in top nav — most common lookups
+    "search_model": [
+        "clients.ClientAccount",
+        "assessments.CandidateProfile",
+        "assessments.AssessmentSession",
+    ],
+    # Top menu links (shown above page content)
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "View Site", "url": "/", "new_window": True},
+    ],
+    # ----- Sidebar -----
+    "show_sidebar": True,
+    "navigation_expanded": False,
+    # Hide cluttering allauth / sites / auth models
+    "hide_apps": [
+        "sites",
+        "socialaccount",
+        "account",
+    ],
+    "hide_models": [
+        "auth.Group",
+    ],
+    # Sidebar app ordering (most important first)
+    "order_with_respect_to": [
+        "clients",
+        "hiring_agent",
+        "assessments",
+        "custom_assessments",
+        "marketing_assessments",
+        "pm_assessments",
+        "behavioral_assessments",
+        "ux_assessments",
+        "hr_assessments",
+        "finance_assessments",
+        "pages",
+        "blog",
+        "seo",
+        "marketing",
+        "console",
+        "candidate",
+        "auth",
+    ],
+    # ----- Icons (Font Awesome 5) -----
+    "icons": {
+        # Auth
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user-shield",
+        # Clients
+        "clients.ClientAccount": "fas fa-building",
+        "clients.SupportRequest": "fas fa-life-ring",
+        # AI Hiring
+        "hiring_agent.HiringPipeline": "fas fa-robot",
+        "hiring_agent.PipelineCandidate": "fas fa-user-check",
+        "hiring_agent.AgentActionLog": "fas fa-clipboard-list",
+        # Core Assessments
+        "assessments.RoleCategory": "fas fa-layer-group",
+        "assessments.Assessment": "fas fa-clipboard-check",
+        "assessments.Question": "fas fa-question-circle",
+        "assessments.CandidateProfile": "fas fa-user-graduate",
+        "assessments.CompanyProfile": "fas fa-city",
+        "assessments.PositionTask": "fas fa-tasks",
+        "assessments.AssessmentSession": "fas fa-play-circle",
+        "assessments.Response": "fas fa-reply",
+        # Custom Assessments
+        "custom_assessments.CustomAssessment": "fas fa-puzzle-piece",
+        "custom_assessments.CustomQuestion": "fas fa-edit",
+        "custom_assessments.CustomAssessmentSession": "fas fa-laptop-code",
+        # Marketing Assessments
+        "marketing_assessments.DigitalMarketingQuestion": "fas fa-bullhorn",
+        "marketing_assessments.DigitalMarketingAssessmentSession": "fas fa-chart-line",
+        # Product Management
+        "pm_assessments.ProductQuestion": "fas fa-box-open",
+        "pm_assessments.ProductAssessmentSession": "fas fa-project-diagram",
+        # Behavioral
+        "behavioral_assessments.BehavioralQuestion": "fas fa-brain",
+        "behavioral_assessments.BehavioralAssessmentSession": "fas fa-user-friends",
+        # UX Design
+        "ux_assessments.UXDesignQuestion": "fas fa-palette",
+        "ux_assessments.UXDesignAssessmentSession": "fas fa-pencil-ruler",
+        # HR
+        "hr_assessments.HRQuestion": "fas fa-id-badge",
+        "hr_assessments.HRAssessmentSession": "fas fa-handshake",
+        # Finance
+        "finance_assessments.FinanceQuestion": "fas fa-dollar-sign",
+        "finance_assessments.FinanceAssessmentSession": "fas fa-file-invoice-dollar",
+        # Pages & Leads
+        "pages.DemoRequest": "fas fa-calendar-check",
+        "pages.APIAccessRequest": "fas fa-key",
+        "pages.NewsletterSubscriber": "fas fa-envelope-open-text",
+        "pages.PublicAssessment": "fas fa-star",
+        "pages.Role": "fas fa-briefcase",
+        "pages.InterviewQuestion": "fas fa-comments",
+        # Blog
+        "blog.BlogCategory": "fas fa-folder",
+        "blog.BlogPost": "fas fa-newspaper",
+        # SEO
+        "seo.SeoPage": "fas fa-search",
+        # Marketing Settings
+        "marketing.MarketingSettings": "fas fa-cog",
+        "marketing.MarketingEmailSettings": "fas fa-mail-bulk",
+        # Console
+        "console.SiteContentBlock": "fas fa-cubes",
+        "console.ResourceAsset": "fas fa-file-download",
+        # Candidate
+        "candidate.CandidateSupportRequest": "fas fa-headset",
+    },
+    "default_icon_parents": "fas fa-folder-open",
+    "default_icon_children": "fas fa-circle",
+    # ----- Change form layout -----
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "clients.ClientAccount": "horizontal_tabs",
+        "pages.PublicAssessment": "horizontal_tabs",
+        "custom_assessments.CustomAssessmentSession": "horizontal_tabs",
+    },
+    # Modals for related objects
+    "related_modal_active": True,
+    "show_ui_builder": False,
+    "language_chooser": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": True,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-warning",
+    "navbar": "navbar-dark",
+    "no_navbar_border": True,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-warning",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "darkly",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+    "actions_sticky_top": True,
 }
