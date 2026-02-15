@@ -1,0 +1,540 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Agentic AI Hiring Pipelines · Evalon{% endblock %}
+{% block meta_description %}Automate your hiring pipeline with AI. Upload resumes, screen candidates, send assessments, and get hiring recommendations — with human checkpoints at every step.{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+
+    <main class="aih-main">
+
+        {# ── Hero ── #}
+        <section class="aih-hero">
+            <div class="aih-hero-glow"></div>
+            <div class="section-shell">
+                <div class="aih-hero-grid">
+                    <div class="aih-hero-text">
+                        <span class="aih-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            Enterprise Feature
+                        </span>
+                        <h1 class="aih-hero-title">Agentic AI<br><span class="aih-accent">Hiring Pipelines</span></h1>
+                        <p class="aih-hero-sub">Let AI handle the heavy lifting. Upload resumes, and our agentic pipeline screens candidates, sends assessments, and delivers hiring recommendations — with human checkpoints at every step.</p>
+                        <div class="aih-hero-actions">
+                            <a class="btn btn-pill aih-cta-primary" href="{% url 'pages:contact' %}"
+                               data-gtag-click="ai_hiring_hero_cta"
+                               data-gtag-category="engagement"
+                               data-gtag-label="ai_hiring_request_demo">Request a Demo</a>
+                            <a class="aih-cta-secondary" href="#how-it-works">
+                                See how it works
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            </a>
+                        </div>
+                        <div class="aih-hero-stats">
+                            <div class="aih-hero-stat">
+                                <span class="aih-hero-stat-val">80%</span>
+                                <span class="aih-hero-stat-lbl">Less manual screening</span>
+                            </div>
+                            <div class="aih-hero-stat">
+                                <span class="aih-hero-stat-val">3x</span>
+                                <span class="aih-hero-stat-lbl">Faster time-to-hire</span>
+                            </div>
+                            <div class="aih-hero-stat">
+                                <span class="aih-hero-stat-val">100%</span>
+                                <span class="aih-hero-stat-lbl">Audit trail</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aih-hero-visual">
+                        <div class="aih-hero-mockup">
+                            <div class="aih-mock-header">
+                                <span class="aih-mock-dot" style="background:#ff5f57"></span>
+                                <span class="aih-mock-dot" style="background:#febc2e"></span>
+                                <span class="aih-mock-dot" style="background:#28c840"></span>
+                                <span class="aih-mock-title">AI Pipeline — Senior Frontend Engineer</span>
+                            </div>
+                            <div class="aih-mock-body">
+                                <div class="aih-mock-candidate aih-mock-c1">
+                                    <div class="aih-mock-avatar">JD</div>
+                                    <div class="aih-mock-info">
+                                        <span class="aih-mock-name">Jane Doe</span>
+                                        <span class="aih-mock-score">AI Score: <strong>92</strong></span>
+                                    </div>
+                                    <span class="aih-mock-tag aih-tag-advance">Advance</span>
+                                </div>
+                                <div class="aih-mock-candidate aih-mock-c2">
+                                    <div class="aih-mock-avatar">MC</div>
+                                    <div class="aih-mock-info">
+                                        <span class="aih-mock-name">Marcus Chen</span>
+                                        <span class="aih-mock-score">AI Score: <strong>85</strong></span>
+                                    </div>
+                                    <span class="aih-mock-tag aih-tag-assess">Assessing</span>
+                                </div>
+                                <div class="aih-mock-candidate aih-mock-c3">
+                                    <div class="aih-mock-avatar">PS</div>
+                                    <div class="aih-mock-info">
+                                        <span class="aih-mock-name">Priya Sharma</span>
+                                        <span class="aih-mock-score">AI Score: <strong>78</strong></span>
+                                    </div>
+                                    <span class="aih-mock-tag aih-tag-review">Review</span>
+                                </div>
+                                <div class="aih-mock-candidate aih-mock-c4">
+                                    <div class="aih-mock-avatar">AL</div>
+                                    <div class="aih-mock-info">
+                                        <span class="aih-mock-name">Alex Liu</span>
+                                        <span class="aih-mock-score">AI Score: <strong>44</strong></span>
+                                    </div>
+                                    <span class="aih-mock-tag aih-tag-reject">Rejected</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ── Trusted by ── #}
+        <section class="aih-trust-bar">
+            <div class="section-shell">
+                <p class="aih-trust-label">Built on technology trusted by hiring teams worldwide</p>
+                <div class="aih-trust-logos">
+                    <span class="aih-trust-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        SOC 2 Ready
+                    </span>
+                    <span class="aih-trust-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        AES-256 Encrypted
+                    </span>
+                    <span class="aih-trust-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                        Powered by Claude AI
+                    </span>
+                    <span class="aih-trust-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        99.9% Uptime
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        {# ── How It Works ── #}
+        <section class="aih-how" id="how-it-works">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">How it works</p>
+                    <h2>From resumes to recommendations in four steps</h2>
+                    <p class="lede">Your AI hiring assistant handles the entire screening pipeline — you stay in control of every decision.</p>
+                </div>
+                <div class="aih-steps">
+                    <div class="aih-step" data-aih-step="0">
+                        <div class="aih-step-connector"></div>
+                        <div class="aih-step-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        </div>
+                        <div class="aih-step-body">
+                            <span class="aih-step-num">Step 1</span>
+                            <h3>Upload resumes</h3>
+                            <p>Drop in PDFs or DOCX files — the AI reads and understands each candidate's experience, skills, and background in seconds.</p>
+                            <div class="aih-step-detail">
+                                <span>PDF & DOCX</span>
+                                <span>Bulk upload</span>
+                                <span>Auto-parse</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aih-step" data-aih-step="1">
+                        <div class="aih-step-connector"></div>
+                        <div class="aih-step-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
+                        <div class="aih-step-body">
+                            <span class="aih-step-num">Step 2</span>
+                            <h3>AI screens & scores</h3>
+                            <p>Claude AI evaluates each resume against your job description, matching skills, experience, and role fit on a 0-100 scale.</p>
+                            <div class="aih-step-detail">
+                                <span>Skill matching</span>
+                                <span>0-100 scoring</span>
+                                <span>Reasoning</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aih-step" data-aih-step="2">
+                        <div class="aih-step-connector"></div>
+                        <div class="aih-step-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </div>
+                        <div class="aih-step-body">
+                            <span class="aih-step-num">Step 3</span>
+                            <h3>Auto-send assessments</h3>
+                            <p>Shortlisted candidates automatically receive the right skill tests — marketing, behavioral, product, or any of your six assessment types.</p>
+                            <div class="aih-step-detail">
+                                <span>6 assessment types</span>
+                                <span>Auto-invite</span>
+                                <span>Track progress</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aih-step" data-aih-step="3">
+                        <div class="aih-step-connector"></div>
+                        <div class="aih-step-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        </div>
+                        <div class="aih-step-body">
+                            <span class="aih-step-num">Step 4</span>
+                            <h3>AI hiring recommendations</h3>
+                            <p>Resume analysis + assessment scores combine into a smart hiring recommendation with strengths, concerns, and a final score.</p>
+                            <div class="aih-step-detail">
+                                <span>Combined scoring</span>
+                                <span>Strengths & gaps</span>
+                                <span>Audit trail</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ── Three Automation Modes ── #}
+        <section class="aih-modes">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Control levels</p>
+                    <h2>Choose your level of automation</h2>
+                    <p class="lede">From full human oversight to fully autonomous — pick the mode that matches your team's comfort level.</p>
+                </div>
+                <div class="aih-modes-grid">
+                    <div class="aih-mode-card">
+                        <div class="aih-mode-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+                        </div>
+                        <h3>Recommend</h3>
+                        <p class="aih-mode-sub">AI suggests, you decide</p>
+                        <p class="aih-mode-desc">The AI screens resumes and provides recommendations, but every action — shortlisting, sending assessments, and final decisions — requires your approval.</p>
+                        <ul class="aih-mode-checks">
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Human approves screening
+                            </li>
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Human approves assessments
+                            </li>
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Human makes final decision
+                            </li>
+                        </ul>
+                        <span class="aih-mode-tag">Default</span>
+                    </div>
+                    <div class="aih-mode-card aih-mode-card--featured">
+                        <div class="aih-mode-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3>Semi-Auto</h3>
+                        <p class="aih-mode-sub">AI screens, you approve key steps</p>
+                        <p class="aih-mode-desc">AI automatically screens resumes and sends assessments to shortlisted candidates. You approve the final hiring decisions with full context.</p>
+                        <ul class="aih-mode-checks">
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                AI auto-screens resumes
+                            </li>
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                AI auto-sends assessments
+                            </li>
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Human makes final decision
+                            </li>
+                        </ul>
+                        <span class="aih-mode-tag">Recommended</span>
+                    </div>
+                    <div class="aih-mode-card">
+                        <div class="aih-mode-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </div>
+                        <h3>Full-Auto</h3>
+                        <p class="aih-mode-sub">AI handles everything</p>
+                        <p class="aih-mode-desc">The pipeline runs autonomously from resume upload to hiring recommendation. You can intervene at any stage, but the AI handles it all by default.</p>
+                        <ul class="aih-mode-checks">
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                AI auto-screens resumes
+                            </li>
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                AI auto-sends assessments
+                            </li>
+                            <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                AI auto-decides (override anytime)
+                            </li>
+                        </ul>
+                        <span class="aih-mode-tag">Power users</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ── Feature Deep Dive ── #}
+        <section class="aih-features">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Capabilities</p>
+                    <h2>Everything you need for AI-powered hiring</h2>
+                </div>
+                <div class="aih-feat-grid">
+                    <div class="aih-feat-card">
+                        <div class="aih-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        </div>
+                        <h4>Smart resume parsing</h4>
+                        <p>Upload PDF or DOCX resumes. AI extracts skills, experience, education, and matches them against your job requirements.</p>
+                    </div>
+                    <div class="aih-feat-card">
+                        <div class="aih-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        </div>
+                        <h4>AI scoring (0-100)</h4>
+                        <p>Every candidate gets a transparent score based on skill match, experience relevance, and role fit — with written reasoning.</p>
+                    </div>
+                    <div class="aih-feat-card">
+                        <div class="aih-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <h4>Human checkpoints</h4>
+                        <p>The AI never makes a decision without your awareness. Review, approve, or override at any stage of the pipeline.</p>
+                    </div>
+                    <div class="aih-feat-card">
+                        <div class="aih-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22 6 12 13 2 6"></polyline></svg>
+                        </div>
+                        <h4>Auto assessment invites</h4>
+                        <p>Shortlisted candidates automatically receive assessment invitations — marketing, behavioral, product, or any of six types.</p>
+                    </div>
+                    <div class="aih-feat-card">
+                        <div class="aih-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h4>Full audit trail</h4>
+                        <p>Every AI action is logged — what it received, what it returned, the model used, and processing time. Complete transparency.</p>
+                    </div>
+                    <div class="aih-feat-card">
+                        <div class="aih-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </div>
+                        <h4>Pipeline dashboard</h4>
+                        <p>See every candidate's stage at a glance — from uploaded to hired. Filter by score, stage, or assessment status.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ── Pipeline State Machine Visual ── #}
+        <section class="aih-pipeline-visual">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Candidate journey</p>
+                    <h2>Nine stages from resume to hire</h2>
+                    <p class="lede">Every candidate moves through a transparent, trackable state machine with clear transitions and decision points.</p>
+                </div>
+                <div class="aih-pipeline-flow">
+                    <div class="aih-pipe-stage aih-pipe-stage--start">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">Uploaded</span>
+                    </div>
+                    <div class="aih-pipe-arrow"></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--ai">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">AI Screening</span>
+                    </div>
+                    <div class="aih-pipe-arrow"></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--human">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">Shortlisted</span>
+                        <span class="aih-pipe-checkpoint">Checkpoint</span>
+                    </div>
+                    <div class="aih-pipe-arrow"></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--ai">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">Assessment Sent</span>
+                    </div>
+                    <div class="aih-pipe-arrow"></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--wait">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">Completed</span>
+                    </div>
+                    <div class="aih-pipe-arrow"></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--ai">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">AI Decision</span>
+                    </div>
+                    <div class="aih-pipe-arrow"></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--human">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">Review</span>
+                        <span class="aih-pipe-checkpoint">Checkpoint</span>
+                    </div>
+                    <div class="aih-pipe-arrow"></div>
+                    <div class="aih-pipe-stage aih-pipe-stage--end">
+                        <span class="aih-pipe-dot"></span>
+                        <span class="aih-pipe-label">Hired</span>
+                    </div>
+                </div>
+                <div class="aih-pipe-legend">
+                    <span class="aih-pipe-legend-item"><span class="aih-legend-dot aih-legend-ai"></span> AI automated</span>
+                    <span class="aih-pipe-legend-item"><span class="aih-legend-dot aih-legend-human"></span> Human checkpoint</span>
+                    <span class="aih-pipe-legend-item"><span class="aih-legend-dot aih-legend-wait"></span> Waiting for candidate</span>
+                </div>
+            </div>
+        </section>
+
+        {# ── AI Resume Screening Deep Dive ── #}
+        <section class="aih-screening">
+            <div class="section-shell">
+                <div class="aih-screening-grid">
+                    <div class="aih-screening-text">
+                        <p class="eyebrow">Resume intelligence</p>
+                        <h2>AI that reads resumes like a senior recruiter</h2>
+                        <p>Every resume is analyzed by Claude AI against your full job description, required skills, preferred qualifications, and seniority level. The result is a structured evaluation — not a keyword match.</p>
+                        <ul class="aih-screening-list">
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Skills matched & skills missing
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Experience relevance scoring
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Written summary explaining the score
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Advance / Hold / Reject recommendation
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="aih-screening-card">
+                        <div class="aih-screen-result">
+                            <div class="aih-screen-header">
+                                <span class="aih-screen-badge">AI Screening Result</span>
+                                <span class="aih-screen-score">92<span>/100</span></span>
+                            </div>
+                            <div class="aih-screen-summary">
+                                <p>"Strong match for Senior Frontend Engineer. 6+ years React/TypeScript experience with demonstrated leadership. Missing GraphQL experience but compensated by strong system design skills."</p>
+                            </div>
+                            <div class="aih-screen-skills">
+                                <span class="aih-skill aih-skill--match">React</span>
+                                <span class="aih-skill aih-skill--match">TypeScript</span>
+                                <span class="aih-skill aih-skill--match">System Design</span>
+                                <span class="aih-skill aih-skill--match">CI/CD</span>
+                                <span class="aih-skill aih-skill--missing">GraphQL</span>
+                            </div>
+                            <div class="aih-screen-action">
+                                <span class="aih-screen-rec aih-rec-advance">Advance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ── Integration with Assessments ── #}
+        <section class="aih-integration">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">Assessment integration</p>
+                    <h2>Connects to all six Evalon assessment types</h2>
+                    <p class="lede">The AI pipeline automatically selects and sends the right assessments based on role requirements.</p>
+                </div>
+                <div class="aih-assess-grid">
+                    <div class="aih-assess-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                        <span>Marketing</span>
+                    </div>
+                    <div class="aih-assess-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        <span>Product</span>
+                    </div>
+                    <div class="aih-assess-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <span>Behavioral</span>
+                    </div>
+                    <div class="aih-assess-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                        <span>UX/UI Design</span>
+                    </div>
+                    <div class="aih-assess-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="17" y1="11" x2="23" y2="11"></line><line x1="20" y1="8" x2="20" y2="14"></line></svg>
+                        <span>HR</span>
+                    </div>
+                    <div class="aih-assess-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <span>Finance</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ── FAQ ── #}
+        <section class="aih-faq">
+            <div class="section-shell">
+                <div class="section-heading section-heading-tight">
+                    <p class="eyebrow">FAQ</p>
+                    <h2>Common questions</h2>
+                </div>
+                <div class="aih-faq-list">
+                    <details class="aih-faq-item">
+                        <summary>How does the AI screen resumes?</summary>
+                        <p>The AI uses Claude by Anthropic to read the full resume text and evaluate it against your job description, required skills, preferred qualifications, and seniority level. It produces a 0-100 score with written reasoning, skill matches, and a recommendation (advance, hold, or reject).</p>
+                    </details>
+                    <details class="aih-faq-item">
+                        <summary>Can I override AI decisions?</summary>
+                        <p>Yes, always. In all three modes (Recommend, Semi-Auto, Full-Auto), you can review any candidate, override any AI recommendation, add notes, and make your own decision at any stage of the pipeline.</p>
+                    </details>
+                    <details class="aih-faq-item">
+                        <summary>What file types are supported for resumes?</summary>
+                        <p>We support PDF and DOCX formats. You can upload individual files or do bulk uploads of up to 50 resumes at a time. The AI extracts text content automatically.</p>
+                    </details>
+                    <details class="aih-faq-item">
+                        <summary>Is the AI data secure?</summary>
+                        <p>Absolutely. All resume data and AI interactions are encrypted (AES-256 at rest, TLS 1.3 in transit). AI processing happens in isolated sessions with no data retention by the AI provider. We maintain SOC 2 readiness and provide full audit trails.</p>
+                    </details>
+                    <details class="aih-faq-item">
+                        <summary>Which plan includes AI Hiring Pipelines?</summary>
+                        <p>AI Hiring Pipelines are available on the Enterprise plan. Contact our sales team for pricing and a personalized demo of the feature.</p>
+                    </details>
+                    <details class="aih-faq-item">
+                        <summary>How does it connect to existing assessments?</summary>
+                        <p>The pipeline integrates directly with all six Evalon assessment types. When a candidate is shortlisted, the AI automatically creates assessment sessions and sends invitation emails using the same infrastructure your team already uses.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        {# ── Final CTA ── #}
+        <section class="aih-final-cta">
+            <div class="section-shell">
+                <div class="aih-final-content">
+                    <h2>Ready to automate your hiring pipeline?</h2>
+                    <p>Talk to our team about how AI Hiring Pipelines can transform your recruitment process.</p>
+                    <div class="aih-final-actions">
+                        <a class="btn btn-pill aih-cta-primary" href="{% url 'pages:contact' %}"
+                           data-gtag-click="ai_hiring_final_cta"
+                           data-gtag-category="engagement"
+                           data-gtag-label="ai_hiring_final_demo">Request a Demo</a>
+                        <a class="btn btn-outline" href="{% url 'pages:pricing' %}"
+                           data-gtag-click="ai_hiring_pricing_cta"
+                           data-gtag-category="engagement"
+                           data-gtag-label="ai_hiring_view_pricing">View Pricing</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+{% endblock %}

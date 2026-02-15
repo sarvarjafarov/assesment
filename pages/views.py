@@ -380,6 +380,11 @@ def home(request):
     )
 
 
+def ai_hiring(request):
+    """Dedicated marketing page for Agentic AI Hiring Pipelines."""
+    return render(request, "pages/ai_hiring.html", {"active": "ai_hiring"})
+
+
 def pricing(request):
     tiers = [
         {
