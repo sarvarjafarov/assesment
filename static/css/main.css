@@ -18004,7 +18004,15 @@ main {
     .mockup-confetti { display: none; }
     .how-step { opacity: 1; transform: none; transition: none; }
     .how-step-icon::after { animation: none !important; }
-    .how-line-fill { width: 100%; transition: none; }
+    .how-mini-preview { opacity: 1; transform: none; transition: none; }
+    .how-arrow { opacity: 1; }
+    .how-arrow-line { stroke-dashoffset: 0; }
+    .how-arrow-head { opacity: 1; }
+    .how-card { transform: none !important; transition: none; }
+    .hp-bar::after { width: 70%; transition: none; }
+    .hp-score-bar { height: var(--bh); transition: none; }
+    .hp-row { opacity: 1; transform: none; transition: none; }
+    .how-draw { stroke-dashoffset: 0; transition: none; }
 }
 
 /* Product preview mockup */
@@ -18660,49 +18668,47 @@ main {
 
 /* How It Works */
 .how-it-works {
-    padding: 6rem 2rem;
-    background: var(--color-white);
+    padding: 7rem 2rem;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f5f7 50%, #fafbfc 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Floating background shapes */
+.how-bg-shapes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.how-bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+.how-bg-c1 { width: 400px; height: 400px; top: -120px; right: -100px; background: radial-gradient(circle, rgba(255,138,0,0.06) 0%, transparent 70%); }
+.how-bg-c2 { width: 300px; height: 300px; bottom: -80px; left: -60px; background: radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%); }
+.how-bg-c3 { width: 200px; height: 200px; top: 40%; left: 50%; background: radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%); }
+
+.how-subhead {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    margin: 0.75rem auto 0;
+    max-width: 520px;
+    line-height: 1.6;
 }
 
 .how-steps {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
+    gap: 0;
     margin-top: 3.5rem;
     position: relative;
 }
 
-/* Connecting line track + animated gradient fill */
-.how-line-track {
-    position: absolute;
-    top: 32px;
-    left: calc(12.5%);
-    right: calc(12.5%);
-    height: 2px;
-    background: var(--color-border);
-    z-index: 0;
-    border-radius: 1px;
-}
-
-.how-line-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-orange), #f59e0b);
-    width: 0;
-    transition: width 2.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border-radius: 1px;
-}
-
-.how-line-fill.active {
-    width: 100%;
-}
-
 .how-step {
     text-align: center;
-    padding: 0 1rem;
     position: relative;
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: stretch;
 }
 
 .how-step.visible {
@@ -18710,11 +18716,79 @@ main {
     transform: translateY(0);
 }
 
-/* Icon wrapper — holds circle + number badge */
+/* Glass card */
+.how-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    padding: 2rem 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.how-step:hover .how-card {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-color: rgba(255, 138, 0, 0.25);
+}
+
+.how-step.active .how-card {
+    border-color: rgba(255, 138, 0, 0.35);
+    box-shadow: 0 8px 32px rgba(255, 138, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Card glow effect */
+.how-card-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 138, 0, 0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.how-step.active .how-card-glow,
+.how-step:hover .how-card-glow {
+    opacity: 1;
+}
+
+/* Badge */
+.how-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(255, 138, 0, 0.08);
+    color: var(--color-orange);
+    transition: all 0.3s ease;
+}
+
+.how-step.active .how-badge {
+    background: var(--color-orange);
+    color: #fff;
+}
+
+/* Icon wrapper */
 .how-step-icon-wrap {
     position: relative;
     display: inline-block;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 .how-step-icon {
@@ -18746,7 +18820,7 @@ main {
     transform: scale(1.05);
 }
 
-/* Pulse ring on activation */
+/* Pulse ring */
 .how-step.active .how-step-icon::after {
     content: '';
     position: absolute;
@@ -18761,7 +18835,18 @@ main {
     100% { transform: scale(1.3); opacity: 0; }
 }
 
-/* Step number badge (top-right of icon) */
+/* SVG icon path draw animation */
+.how-draw {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.how-step.active .how-draw {
+    stroke-dashoffset: 0;
+}
+
+/* Step number badge */
 .how-step-num {
     position: absolute;
     top: -4px;
@@ -18800,13 +18885,242 @@ main {
 
 .how-step-desc {
     color: var(--color-text-muted);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     line-height: 1.55;
-    margin: 0;
+    margin: 0 0 1rem;
     max-width: 220px;
     margin-left: auto;
     margin-right: auto;
 }
+
+/* Arrow connectors */
+.how-arrow {
+    position: absolute;
+    right: -20px;
+    top: 46px;
+    width: 40px;
+    height: 24px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.3s;
+}
+
+.how-step.active .how-arrow { opacity: 1; }
+
+.how-arrow-svg { width: 100%; height: 100%; }
+
+.how-arrow-line {
+    stroke-dasharray: 4 3;
+    stroke-dashoffset: 40;
+    transition: stroke-dashoffset 1.2s ease;
+}
+
+.how-step.active .how-arrow-line { stroke-dashoffset: 0; }
+
+.how-arrow-head {
+    opacity: 0;
+    transition: opacity 0.3s ease 0.8s;
+}
+
+.how-step.active .how-arrow-head { opacity: 1; }
+
+/* ── Mini preview illustrations ── */
+.how-mini-preview {
+    width: 100%;
+    height: 48px;
+    margin-top: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.how-step.active .how-mini-preview {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Preview: Create Project — form bars + check */
+.how-prev-create {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 80%;
+}
+
+.hp-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    position: relative;
+    overflow: hidden;
+}
+
+.hp-bar::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    border-radius: 3px;
+    background: var(--color-orange);
+    transition: width 0.6s ease;
+}
+
+.how-step.active .hp-bar-1::after { width: 90%; transition-delay: 0.3s; }
+.how-step.active .hp-bar-2::after { width: 65%; transition-delay: 0.5s; }
+.how-step.active .hp-bar-3::after { width: 80%; transition-delay: 0.7s; }
+
+.hp-check {
+    position: absolute;
+    right: 4px;
+    bottom: 0;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 1s;
+}
+
+.how-step.active .hp-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Preview: Invite — envelope + send dots */
+.how-prev-invite {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.hp-envelope {
+    width: 28px;
+    height: 20px;
+    position: relative;
+}
+
+.hp-env-body {
+    width: 100%;
+    height: 100%;
+    border: 1.5px solid var(--color-orange);
+    border-radius: 2px;
+    background: #fff7ed;
+}
+
+.hp-env-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 10px solid var(--color-orange);
+    transform-origin: top center;
+    transition: transform 0.4s ease 0.4s;
+}
+
+.how-step.active .hp-env-flap {
+    transform: rotateX(180deg);
+}
+
+.hp-send-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-orange);
+    opacity: 0;
+}
+
+.how-step.active .hp-sd-1 { animation: send-dot 0.6s ease 0.6s forwards; }
+.how-step.active .hp-sd-2 { animation: send-dot 0.6s ease 0.8s forwards; }
+.how-step.active .hp-sd-3 { animation: send-dot 0.6s ease 1s forwards; }
+
+@keyframes send-dot {
+    0% { opacity: 0; transform: translateX(-8px) scale(0); }
+    50% { opacity: 1; transform: translateX(0) scale(1); }
+    100% { opacity: 0.3; transform: translateX(6px) scale(0.7); }
+}
+
+/* Preview: Auto-score — growing bars */
+.how-prev-score {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 40px;
+    padding: 0 10%;
+    width: 100%;
+}
+
+.hp-score-bar {
+    flex: 1;
+    height: 0;
+    border-radius: 2px 2px 0 0;
+    background: linear-gradient(0deg, var(--color-orange), #f59e0b);
+    transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.how-step.active .hp-score-bar {
+    height: var(--bh);
+    transition-delay: calc(var(--i, 0) * 0.1s + 0.3s);
+}
+
+.hp-score-bar:nth-child(1) { --i: 0; }
+.hp-score-bar:nth-child(2) { --i: 1; }
+.hp-score-bar:nth-child(3) { --i: 2; }
+.hp-score-bar:nth-child(4) { --i: 3; }
+.hp-score-bar:nth-child(5) { --i: 4; }
+
+/* Preview: Decide — candidate rows */
+.how-prev-decide {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 85%;
+}
+
+.hp-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.4s ease;
+}
+
+.how-step.active .hp-row-1 { opacity: 1; transform: translateX(0); transition-delay: 0.3s; }
+.how-step.active .hp-row-2 { opacity: 1; transform: translateX(0); transition-delay: 0.5s; }
+.how-step.active .hp-row-3 { opacity: 1; transform: translateX(0); transition-delay: 0.7s; }
+
+.hp-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.hp-lbl {
+    flex: 1;
+    height: 5px;
+    border-radius: 2px;
+    background: #e5e7eb;
+}
+
+.hp-tag {
+    font-size: 0.5rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.hp-tag.yes { background: rgba(34, 197, 94, 0.12); color: #16a34a; }
+.hp-tag.maybe { background: rgba(245, 158, 11, 0.12); color: #d97706; }
 
 /* Suite Section */
 .suite-v2 {
@@ -19758,10 +20072,10 @@ main {
 
     .how-steps {
         grid-template-columns: repeat(2, 1fr);
-        gap: 2.5rem 2rem;
+        gap: 1.5rem;
     }
 
-    .how-line-track {
+    .how-arrow {
         display: none;
     }
 
@@ -19850,11 +20164,13 @@ main {
 
     .how-steps {
         grid-template-columns: 1fr;
-        gap: 2rem;
-        max-width: 320px;
+        gap: 1.25rem;
+        max-width: 360px;
         margin-left: auto;
         margin-right: auto;
     }
+
+    .how-arrow { display: none; }
 
     .suite-grid-v2 {
         grid-template-columns: 1fr;
