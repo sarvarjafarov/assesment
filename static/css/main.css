@@ -19753,6 +19753,35 @@ main {
     color: #b0b7c3;
 }
 
+/* ── Custom select ── */
+.final-cta-form select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    background-size: 12px;
+    cursor: pointer;
+}
+
+.final-cta-form select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff8a00' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* Placeholder-like color for unselected option */
+.final-cta-form select:invalid,
+.final-cta-form select option[value=""] {
+    color: #b0b7c3;
+}
+
+.final-cta-form select option {
+    color: var(--color-navy);
+    background: var(--color-white);
+    padding: 0.5rem;
+}
+
 .final-cta-form textarea {
     min-height: 72px;
     resize: vertical;
