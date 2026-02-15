@@ -538,6 +538,7 @@ JAZZMIN_SETTINGS = {
     },
     # Modals for related objects
     "related_modal_active": True,
+    "custom_js": "jazzmin/js/admin_tabs_fix.js",
     "show_ui_builder": False,
     "language_chooser": False,
 }

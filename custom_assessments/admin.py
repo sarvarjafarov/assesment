@@ -35,11 +35,9 @@ class CustomAssessmentAdmin(admin.ModelAdmin):
         }),
         ("AI Generation", {
             "fields": ("role_description", "skills_to_test", "ai_generated"),
-            "classes": ("collapse",),
         }),
         ("Timestamps", {
             "fields": ("created_at", "updated_at", "published_at"),
-            "classes": ("collapse",),
         }),
     )
 
@@ -96,13 +94,11 @@ class CustomAssessmentSessionAdmin(admin.ModelAdmin):
         }),
         ("Results", {
             "fields": ("score", "passed", "answers"),
-            "classes": ("collapse",),
         }),
         ("Pipeline", {
             "fields": ("pipeline_stage", "pipeline_stage_updated_at", "deadline_at"),
         }),
         ("Internal", {
             "fields": ("question_order", "created_at", "updated_at"),
-            "classes": ("collapse",),
         }),
     )

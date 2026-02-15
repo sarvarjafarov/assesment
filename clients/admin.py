@@ -42,7 +42,6 @@ class ClientAccountAdmin(admin.ModelAdmin):
         }),
         ("Branding", {
             "fields": ("logo",),
-            "classes": ("collapse",),
             "description": "Upload a company logo (PNG, JPG, or SVG, max 2MB). The logo is automatically processed and stored."
         }),
         ("Notes & Settings", {
@@ -50,11 +49,9 @@ class ClientAccountAdmin(admin.ModelAdmin):
         }),
         ("Onboarding", {
             "fields": ("has_completed_onboarding", "onboarding_completed_at", "onboarding_step_data"),
-            "classes": ("collapse",)
         }),
         ("Timestamps", {
             "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",)
         }),
     )
 
@@ -125,11 +122,9 @@ class SupportRequestAdmin(admin.ModelAdmin):
         }),
         ("Resolution", {
             "fields": ("resolved_at", "resolved_by"),
-            "classes": ("collapse",)
         }),
         ("Timestamps", {
             "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",)
         }),
     )
 

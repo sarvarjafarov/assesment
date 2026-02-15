@@ -40,10 +40,8 @@ class BlogPostAdmin(admin.ModelAdmin):
         }),
         ("SEO", {
             "fields": ("meta_title", "meta_description", "meta_keywords", "meta_image"),
-            "classes": ("collapse",)
         }),
         ("Metadata", {
             "fields": ("preview_key", "created_at", "updated_at"),
-            "classes": ("collapse",)
         }),
     )
