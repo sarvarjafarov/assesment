@@ -63,19 +63,19 @@ def portal_navigation(request):
 
         # Count marketing assessments
         marketing_count = DigitalMarketingAssessmentSession.objects.filter(
-            client_account=account,
+            client=account,
             status='completed'
         ).count()
 
         # Count product assessments
         product_count = ProductAssessmentSession.objects.filter(
-            client_account=account,
+            client=account,
             status='completed'
         ).count()
 
         # Count behavioral assessments
         behavioral_count = BehavioralAssessmentSession.objects.filter(
-            client_account=account,
+            client=account,
             status='completed'
         ).count()
 
@@ -85,10 +85,10 @@ def portal_navigation(request):
         if assessment_count > 0:
             context['assessment_badge_count'] = assessment_count
 
-        # Count active projects
+        # Count active positions
         project_count = ClientProject.objects.filter(
-            client_account=account,
-            is_active=True
+            client=account,
+            status=ClientProject.STATUS_ACTIVE
         ).count()
 
         if project_count > 0:

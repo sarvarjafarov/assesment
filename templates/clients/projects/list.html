@@ -1,16 +1,16 @@
 {% extends 'portal_base.html' %}
 {% load static %}
 {% load humanize %}
-{% block title %}Projects · Evalon{% endblock %}
-{% block meta_description %}Manage your hiring projects and candidate pipelines.{% endblock %}
+{% block title %}Positions · Evalon{% endblock %}
+{% block meta_description %}Manage your open positions and candidate pipelines.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
 
     {# ── Page Header ── #}
     <header class="pj-header">
         <div>
-            <h1>Projects</h1>
-            <p class="muted">Organize candidates by role and track hiring progress</p>
+            <h1>Positions</h1>
+            <p class="muted">Organize candidates by position and track hiring progress</p>
         </div>
         {% if is_manager %}
         <button type="button" class="btn btn-pill pj-create-btn" id="pj-toggle-create">
@@ -18,7 +18,7 @@
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            New Project
+            New Position
         </button>
         {% endif %}
     </header>
@@ -30,7 +30,7 @@
             {% csrf_token %}
             <div class="pj-form-grid">
                 <div class="pj-field">
-                    <label for="{{ form.title.id_for_label }}">Project title</label>
+                    <label for="{{ form.title.id_for_label }}">Position title</label>
                     {{ form.title }}
                     {% for error in form.title.errors %}
                     <span class="field-error">{{ error }}</span>
@@ -47,8 +47,16 @@
                     <label for="{{ form.priority.id_for_label }}">Priority</label>
                     {{ form.priority }}
                 </div>
+                <div class="pj-field">
+                    <label for="{{ form.employment_type.id_for_label }}">Employment type</label>
+                    {{ form.employment_type }}
+                </div>
+                <div class="pj-field">
+                    <label for="{{ form.work_model.id_for_label }}">Work model</label>
+                    {{ form.work_model }}
+                </div>
                 <div class="pj-field pj-field-action">
-                    <button type="submit" class="btn btn-primary">Create Project</button>
+                    <button type="submit" class="btn btn-primary">Create Position</button>
                 </div>
             </div>
         </form>
@@ -58,11 +66,11 @@
     {# ── Filter / Count Bar ── #}
     {% if projects %}
     <div class="pj-toolbar">
-        <span class="pj-count">{{ projects|length }} project{{ projects|length|pluralize }}</span>
+        <span class="pj-count">{{ projects|length }} position{{ projects|length|pluralize }}</span>
     </div>
     {% endif %}
 
-    {# ── Projects Grid ── #}
+    {# ── Positions Grid ── #}
     {% if projects %}
     <div class="pj-grid">
         {% for project in projects %}
@@ -80,6 +88,17 @@
                 </div>
                 <span class="pj-status pj-status-{{ project.status }}">{{ project.get_status_display }}</span>
             </div>
+
+            {% if project.employment_type or project.work_model %}
+            <div class="pj-card-tags">
+                {% if project.employment_type %}
+                <span class="pj-tag">{{ project.get_employment_type_display }}</span>
+                {% endif %}
+                {% if project.work_model %}
+                <span class="pj-tag">{{ project.get_work_model_display }}</span>
+                {% endif %}
+            </div>
+            {% endif %}
 
             <div class="pj-stats-row">
                 <div class="pj-stat">
@@ -118,13 +137,14 @@
     {% else %}
     <div class="pj-empty">
         <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path>
         </svg>
-        <h3>No projects yet</h3>
+        <h3>No positions yet</h3>
         {% if is_manager %}
-        <p class="muted">Create your first project to start organizing candidates by role.</p>
+        <p class="muted">Create your first position to start organizing candidates.</p>
         {% else %}
-        <p class="muted">Projects will appear here once your manager creates them.</p>
+        <p class="muted">Positions will appear here once your manager creates them.</p>
         {% endif %}
     </div>
     {% endif %}

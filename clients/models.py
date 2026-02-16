@@ -557,6 +557,18 @@ class ClientProject(TimeStampedModel):
         ("p2", "Medium"),
         ("p3", "Low"),
     ]
+    EMPLOYMENT_TYPE_CHOICES = [
+        ("full_time", "Full-time"),
+        ("part_time", "Part-time"),
+        ("contract", "Contract"),
+        ("internship", "Internship"),
+        ("freelance", "Freelance"),
+    ]
+    WORK_MODEL_CHOICES = [
+        ("onsite", "On-site"),
+        ("remote", "Remote"),
+        ("hybrid", "Hybrid"),
+    ]
 
     client = models.ForeignKey(ClientAccount, related_name="projects", on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -564,11 +576,18 @@ class ClientProject(TimeStampedModel):
     role_level = models.CharField(max_length=120, blank=True)
     department = models.CharField(max_length=120, blank=True)
     location = models.CharField(max_length=120, blank=True)
+    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE_CHOICES, blank=True)
+    work_model = models.CharField(max_length=20, choices=WORK_MODEL_CHOICES, blank=True)
+    salary_min = models.PositiveIntegerField(null=True, blank=True)
+    salary_max = models.PositiveIntegerField(null=True, blank=True)
+    salary_currency = models.CharField(max_length=3, default="USD", blank=True)
+    required_skills = models.TextField(blank=True, help_text="Comma-separated skills")
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default="p1")
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
     open_roles = models.PositiveIntegerField(default=1)
     target_start_date = models.DateField(blank=True, null=True)
     description = models.TextField(blank=True)
+    published = models.BooleanField(default=True)
 
     class Meta:
         ordering = ("-created_at",)
@@ -586,6 +605,39 @@ class ClientProject(TimeStampedModel):
             if qs is not None:
                 total += qs.count()
         return total
+
+    def total_sessions_completed(self):
+        total = 0
+        for rel in (
+            "marketing_sessions", "pm_sessions", "behavioral_sessions",
+            "ux_sessions", "hr_sessions", "finance_sessions",
+        ):
+            qs = getattr(self, rel, None)
+            if qs is not None:
+                total += qs.filter(status="completed").count()
+        return total
+
+    @property
+    def salary_display(self):
+        if not self.salary_min and not self.salary_max:
+            return ""
+        cur = self.salary_currency or "USD"
+        if self.salary_min and self.salary_max:
+            return f"{cur} {self.salary_min:,}\u2013{self.salary_max:,}"
+        if self.salary_min:
+            return f"{cur} {self.salary_min:,}+"
+        return f"Up to {cur} {self.salary_max:,}"
+
+    @property
+    def skills_list(self):
+        if not self.required_skills:
+            return []
+        return [s.strip() for s in self.required_skills.split(",") if s.strip()]
+
+    @property
+    def remaining_roles(self):
+        filled = self.total_sessions_completed()
+        return max(0, self.open_roles - filled)
 
 
 class WebhookDelivery(TimeStampedModel):

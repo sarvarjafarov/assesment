@@ -1,7 +1,7 @@
 {% extends 'portal_base.html' %}
 {% load static %}
 {% load humanize %}
-{% block title %}{{ project.title }} · Projects · Evalon{% endblock %}
+{% block title %}{{ project.title }} · Positions · Evalon{% endblock %}
 {% block meta_description %}Manage candidates and track progress for {{ project.title }}.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
@@ -10,7 +10,7 @@
     <header class="pd-header">
         <div class="pd-header-left">
             <nav class="pd-breadcrumb">
-                <a href="{% url 'clients:project-list' %}">Projects</a>
+                <a href="{% url 'clients:project-list' %}">Positions</a>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 <span>{{ project.title }}</span>
             </nav>
@@ -41,7 +41,7 @@
             </a>
             {% endif %}
             {% if request.user.client_account.role == 'manager' %}
-            <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-outline small" title="Duplicate project">
+            <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-outline small" title="Duplicate position">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -89,6 +89,40 @@
     {% if project.description %}
     <div class="pd-description">
         <p>{{ project.description }}</p>
+    </div>
+    {% endif %}
+
+    {# ── Position Details ── #}
+    {% if project.employment_type or project.work_model or project.salary_display or project.skills_list %}
+    <div class="pd-details">
+        {% if project.employment_type %}
+        <div class="pd-detail-item">
+            <span class="pd-detail-label">Employment</span>
+            <span class="pd-detail-val">{{ project.get_employment_type_display }}</span>
+        </div>
+        {% endif %}
+        {% if project.work_model %}
+        <div class="pd-detail-item">
+            <span class="pd-detail-label">Work Model</span>
+            <span class="pd-detail-val">{{ project.get_work_model_display }}</span>
+        </div>
+        {% endif %}
+        {% if project.salary_display %}
+        <div class="pd-detail-item">
+            <span class="pd-detail-label">Salary Range</span>
+            <span class="pd-detail-val">{{ project.salary_display }}</span>
+        </div>
+        {% endif %}
+        {% if project.skills_list %}
+        <div class="pd-detail-item pd-detail-skills">
+            <span class="pd-detail-label">Required Skills</span>
+            <div class="pd-skills">
+                {% for skill in project.skills_list %}
+                <span class="pd-skill-pill">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 
@@ -223,7 +257,7 @@
             <line x1="23" y1="11" x2="17" y2="11"></line>
         </svg>
         <h3>Ready to add candidates?</h3>
-        <p class="muted">Invite candidates to take an assessment for this project.</p>
+        <p class="muted">Invite candidates to take an assessment for this position.</p>
         {% if request.user.client_account.role == 'manager' or request.user.client_account.role == 'recruiter' %}
         <a href="{% url 'clients:assessments' %}" class="btn btn-pill" style="margin-top: 1.25rem;">Invite Candidates</a>
         {% endif %}

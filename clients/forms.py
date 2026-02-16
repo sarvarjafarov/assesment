@@ -235,9 +235,9 @@ class BaseClientInviteForm(forms.Form):
         }),
     )
     project = forms.ModelChoiceField(
-        label="Project",
+        label="Position",
         queryset=ClientProject.objects.none(),
-        help_text="Each invite must be tied to a project/role.",
+        help_text="Each invite must be tied to a position.",
     )
     deadline_type = forms.ChoiceField(
         required=False,
@@ -277,12 +277,12 @@ class BaseClientInviteForm(forms.Form):
         project_qs = client.projects.order_by("-created_at")
         self.fields["project"].queryset = project_qs
         if not project_qs.exists():
-            self.fields["project"].help_text = "Create a project first."
+            self.fields["project"].help_text = "Create a position first."
 
     def clean(self):
         cleaned = super().clean()
         if not self.client.projects.exists():
-            raise forms.ValidationError("Create a project before inviting candidates.")
+            raise forms.ValidationError("Create a position before inviting candidates.")
         generator = self.generate_question_set
         if not generator:
             raise forms.ValidationError("Assessment configuration missing.")
@@ -623,7 +623,7 @@ class ClientLogoForm(forms.Form):
 
 class ClientBulkInviteForm(forms.Form):
     project = forms.ModelChoiceField(
-        label="Project",
+        label="Position",
         queryset=ClientProject.objects.none(),
     )
     csv_file = forms.FileField(
@@ -695,15 +695,25 @@ class ClientProjectForm(forms.ModelForm):
             "role_level",
             "department",
             "location",
+            "employment_type",
+            "work_model",
+            "salary_min",
+            "salary_max",
+            "salary_currency",
+            "required_skills",
             "priority",
             "status",
             "open_roles",
             "target_start_date",
             "description",
+            "published",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "target_start_date": forms.DateInput(attrs={"type": "date"}),
+            "required_skills": forms.TextInput(attrs={"placeholder": "e.g. Python, SQL, Leadership"}),
+            "salary_min": forms.NumberInput(attrs={"placeholder": "Min"}),
+            "salary_max": forms.NumberInput(attrs={"placeholder": "Max"}),
         }
 
     def __init__(self, *args, client: ClientAccount, **kwargs):

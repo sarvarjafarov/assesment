@@ -2057,16 +2057,16 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
         if remaining is not None and remaining <= 0:
             messages.error(
                 request,
-                "Your current plan reached the active project limit. Archive a project or upgrade to add more roles.",
+                "Your current plan reached the active position limit. Archive a position or upgrade to add more.",
             )
             return redirect("clients:project-list")
         if self.account.role != "manager":
-            messages.error(request, "Only managers can create projects.")
+            messages.error(request, "Only managers can create positions.")
             return redirect("clients:project-list")
         form = self.form_class(request.POST, client=self.account)
         if form.is_valid():
             project = form.save()
-            messages.success(request, "Project created.")
+            messages.success(request, "Position created.")
             return redirect("clients:project-detail", project_uuid=project.uuid)
         self.form = form
         return self.render_to_response(self.get_context_data(), status=400)
@@ -2171,7 +2171,7 @@ class ClientProjectCloneView(ClientProjectAccessMixin, FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.account.role != "manager":
-            messages.error(request, "Only managers can duplicate projects.")
+            messages.error(request, "Only managers can duplicate positions.")
             return redirect("clients:project-list")
         self.source_project = get_object_or_404(
             self.account.projects, uuid=kwargs.get("project_uuid")
@@ -2186,11 +2186,18 @@ class ClientProjectCloneView(ClientProjectAccessMixin, FormView):
                 "role_level",
                 "department",
                 "location",
+                "employment_type",
+                "work_model",
+                "salary_min",
+                "salary_max",
+                "salary_currency",
+                "required_skills",
                 "priority",
                 "status",
                 "open_roles",
                 "target_start_date",
                 "description",
+                "published",
             ],
         )
         data["title"] = f"{self.source_project.title} copy"
