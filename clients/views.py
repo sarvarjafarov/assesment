@@ -51,9 +51,35 @@ from .forms import (
     SocialProfileCompleteForm,
 )
 from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote, SupportRequest
-from .services import send_verification_email, send_approval_notification, send_welcome_email
+from .services import send_verification_email, send_approval_notification, send_welcome_email, is_ssrf_target
 
 logger = logging.getLogger(__name__)
+
+_LOGIN_MAX_ATTEMPTS = 10
+_LOGIN_WINDOW_SECONDS = 900  # 15 minutes
+
+
+def _get_client_ip(request):
+    xff = request.META.get("HTTP_X_FORWARDED_FOR")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "")
+
+
+def _is_login_rate_limited(request):
+    from django.core.cache import cache
+    ip = _get_client_ip(request)
+    key = f"login_ratelimit:{ip}"
+    attempts = cache.get(key, 0)
+    return attempts >= _LOGIN_MAX_ATTEMPTS
+
+
+def _record_failed_login(request):
+    from django.core.cache import cache
+    ip = _get_client_ip(request)
+    key = f"login_ratelimit:{ip}"
+    attempts = cache.get(key, 0)
+    cache.set(key, attempts + 1, _LOGIN_WINDOW_SECONDS)
 
 ACTIVITY_STATUS_CHOICES = {"all", "draft", "in_progress", "submitted"}
 ACTIVITY_ASSESSMENT_CHOICES = {"all"} | {choice[0] for choice in ClientAccount.ASSESSMENT_CHOICES}
@@ -487,6 +513,12 @@ class ClientLoginView(FormView):
     form_class = ClientLoginForm
     success_url = reverse_lazy("clients:dashboard")
 
+    def dispatch(self, request, *args, **kwargs):
+        if _is_login_rate_limited(request):
+            messages.error(request, "Too many login attempts. Please try again in 15 minutes.")
+            return self.render_to_response(self.get_context_data())
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         user = form.get_user()
         login(self.request, user)
@@ -494,6 +526,7 @@ class ClientLoginView(FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        _record_failed_login(self.request)
         email = form.data.get("username", "")
         logger.warning("Login failed: email=%s ip=%s", email, self.request.META.get("REMOTE_ADDR"))
         return super().form_invalid(form)
@@ -1279,6 +1312,10 @@ class ClientSettingsView(LoginRequiredMixin, View):
             # Validate webhook URL if provided
             if webhook_url and not webhook_url.startswith("https://"):
                 messages.error(request, "Webhook URL must use HTTPS for security.")
+                return redirect("clients:settings")
+
+            if webhook_url and is_ssrf_target(webhook_url):
+                messages.error(request, "Webhook URL must not point to internal or private addresses.")
                 return redirect("clients:settings")
 
             account.webhook_url = webhook_url

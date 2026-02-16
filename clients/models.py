@@ -257,11 +257,11 @@ class ClientAccount(TimeStampedModel):
         self.save(update_fields=["email_verified_at", "verification_token"])
 
     def is_verification_token_valid(self) -> bool:
-        """Check if the verification token is still within the 48-hour expiry window."""
+        """Check if the verification token is still within the 24-hour expiry window."""
         if not self.verification_token or not self.verification_sent_at:
             return False
         from datetime import timedelta
-        return timezone.now() - self.verification_sent_at < timedelta(hours=48)
+        return timezone.now() - self.verification_sent_at < timedelta(hours=24)
 
     @property
     def is_email_verified(self) -> bool:
@@ -390,7 +390,7 @@ class ClientAccount(TimeStampedModel):
 
     def generate_api_key(self) -> str:
         """Generate a new API key for this client."""
-        key = f"evl_{uuid.uuid4().hex}"
+        key = f"evl_{secrets.token_urlsafe(32)}"
         self.api_key = key
         self.api_key_created_at = timezone.now()
         self.save(update_fields=["api_key", "api_key_created_at", "updated_at"])
@@ -398,7 +398,7 @@ class ClientAccount(TimeStampedModel):
 
     def generate_webhook_secret(self) -> str:
         """Generate a new webhook signing secret."""
-        secret = f"whsec_{uuid.uuid4().hex}"
+        secret = f"whsec_{secrets.token_urlsafe(32)}"
         self.webhook_secret = secret
         self.save(update_fields=["webhook_secret", "updated_at"])
         return secret

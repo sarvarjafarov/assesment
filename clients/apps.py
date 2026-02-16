@@ -89,8 +89,11 @@ def _patched_unstash_state(request, state_id):
         cache = caches["oauth_state"]
         payload = cache.get(_oauth_state_cache_key(state_id))
         if payload is not None:
-            state, _ = payload
+            state, ts = payload
             cache.delete(_oauth_state_cache_key(state_id))
+            # Reject stale states older than 5 minutes
+            if time.time() - ts > 300:
+                return None
     except Exception:
         pass
     return state

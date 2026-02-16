@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 
 from django.contrib import messages
@@ -162,10 +163,26 @@ class ResumeUploadView(HiringAgentMixin, View):
 
         uploaded = 0
         errors = 0
+        max_resume_size = 10 * 1024 * 1024  # 10 MB
 
         for f in files:
+            # Check file size before processing
+            if f.size > max_resume_size:
+                errors += 1
+                continue
+
             name = f.name.lower()
             if not (name.endswith('.pdf') or name.endswith('.docx')):
+                errors += 1
+                continue
+
+            # Validate magic bytes
+            header = f.read(4)
+            f.seek(0)
+            if name.endswith('.pdf') and not header.startswith(b'%PDF'):
+                errors += 1
+                continue
+            if name.endswith('.docx') and not header.startswith(b'PK'):
                 errors += 1
                 continue
 
@@ -213,12 +230,14 @@ class ResumeUploadView(HiringAgentMixin, View):
                     },
                 )
                 if created:
-                    pc.resume_file.save(f.name, f, save=True)
+                    safe_name = os.path.basename(f.name)
+                    pc.resume_file.save(safe_name, f, save=True)
                     uploaded += 1
                 else:
                     # Update resume if candidate already exists
+                    safe_name = os.path.basename(f.name)
                     pc.resume_text = resume_text
-                    pc.resume_file.save(f.name, f, save=False)
+                    pc.resume_file.save(safe_name, f, save=False)
                     pc.stage = 'uploaded'
                     pc.save(update_fields=['resume_text', 'resume_file', 'stage', 'updated_at'])
                     uploaded += 1

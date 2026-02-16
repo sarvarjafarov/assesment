@@ -34,12 +34,17 @@ def _validate_logo_file(file_obj):
     if not file_obj:
         return file_obj
     content_type = getattr(file_obj, "content_type", "")
-    allowed_types = {"image/png", "image/jpeg", "image/svg+xml"}
+    allowed_types = {"image/png", "image/jpeg"}
     if content_type and content_type not in allowed_types:
-        raise forms.ValidationError("Upload a PNG, JPG, or SVG file.")
+        raise forms.ValidationError("Upload a PNG or JPG file.")
     max_size = 2 * 1024 * 1024
     if file_obj.size > max_size:
         raise forms.ValidationError("Logo must be smaller than 2MB.")
+    # Validate magic bytes to prevent spoofed content-type
+    header = file_obj.read(8)
+    file_obj.seek(0)
+    if not (header.startswith(b"\x89PNG\r\n\x1a\n") or header.startswith(b"\xff\xd8\xff")):
+        raise forms.ValidationError("File content does not match a valid PNG or JPG image.")
     return file_obj
 
 
@@ -78,7 +83,7 @@ class ClientSignupForm(forms.ModelForm):
         label="Company logo",
         required=False,
         help_text="Optional. Upload a PNG, JPG, or SVG (max 2MB) for dashboard branding",
-        widget=forms.FileInput(attrs={"accept": "image/png,image/jpeg,image/svg+xml"}),
+        widget=forms.FileInput(attrs={"accept": "image/png,image/jpeg"}),
     )
 
     class Meta:
@@ -608,7 +613,7 @@ class ClientFinanceInviteForm(BaseClientInviteForm):
 class ClientLogoForm(forms.Form):
     logo = forms.FileField(
         label="Upload new logo",
-        widget=forms.FileInput(attrs={"accept": "image/png,image/jpeg,image/svg+xml"}),
+        widget=forms.FileInput(attrs={"accept": "image/png,image/jpeg"}),
     )
 
     def clean_logo(self):

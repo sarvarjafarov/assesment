@@ -88,7 +88,7 @@ CSRF_TRUSTED_ORIGINS = list({*DEFAULT_CSRF_TRUSTED_ORIGINS, *env_csrf_origins})
 
 # Session cookie: must be sent when Google redirects back (SameSite=Lax, Secure on HTTPS)
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
-SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_COOKIE_AGE = 604800  # 1 week
 SESSION_SAVE_EVERY_REQUEST = False  # Don't extend session on every request (defeats timeout)
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "0" if DEBUG else "1") == "1"
@@ -97,6 +97,9 @@ SESSION_COOKIE_SAMESITE = "Lax"  # allow cookie on redirect from Google back to 
 # is sent when Google redirects back (fixes "unknown" / session lost for both login and sign-up).
 _session_domain = os.environ.get("SESSION_COOKIE_DOMAIN", "").strip()
 SESSION_COOKIE_DOMAIN = _session_domain or None
+CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "0" if DEBUG else "1") == "1"
+X_FRAME_OPTIONS = "DENY"
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # Security headers (enabled in production only)
 if not DEBUG:
@@ -196,7 +199,7 @@ DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
-        ssl_require=False,
+        ssl_require=bool(os.environ.get("DATABASE_URL")),
     )
 }
 
@@ -237,7 +240,7 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "oauth_state_cache",
         "OPTIONS": {"MAX_ENTRIES": 1000},
-        "TIMEOUT": 600,  # 10 minutes
+        "TIMEOUT": 300,  # 5 minutes
     },
 }
 

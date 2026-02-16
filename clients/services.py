@@ -6,9 +6,12 @@ Also includes webhook delivery services.
 
 import hashlib
 import hmac
+import ipaddress
 import json
 import logging
+import socket
 from datetime import datetime
+from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
@@ -19,6 +22,25 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
+
+
+def is_ssrf_target(url: str) -> bool:
+    """Check if a URL resolves to a private, loopback, or reserved IP address."""
+    try:
+        parsed = urlparse(url)
+        hostname = (parsed.hostname or "").lower()
+        if not hostname:
+            return True
+        if hostname in ("localhost", "127.0.0.1", "0.0.0.0", "::1", "169.254.169.254"):
+            return True
+        addrs = socket.getaddrinfo(hostname, None)
+        for addr_info in addrs:
+            ip = ipaddress.ip_address(addr_info[4][0])
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+                return True
+    except Exception:
+        return True
+    return False
 
 
 def send_verification_email(client_account):
@@ -357,6 +379,11 @@ def send_webhook(client_account, event_type: str, data: dict) -> bool:
         status=WebhookDelivery.STATUS_PENDING,
     )
 
+    # SSRF protection: reject internal/private URLs
+    if is_ssrf_target(client_account.webhook_url):
+        delivery.mark_failed(error="Webhook URL resolves to a private or internal address")
+        return False
+
     # Generate signature
     signature = generate_webhook_signature(payload_json, client_account.webhook_secret)
 
@@ -375,6 +402,7 @@ def send_webhook(client_account, event_type: str, data: dict) -> bool:
             data=payload_json,
             headers=headers,
             timeout=30,
+            allow_redirects=False,
         )
 
         if response.status_code >= 200 and response.status_code < 300:
@@ -492,6 +520,10 @@ def retry_failed_webhooks():
             delivery.status = WebhookDelivery.STATUS_FAILED
             delivery.error_message = "Webhook configuration removed"
             delivery.save(update_fields=["status", "error_message", "updated_at"])
+            continue
+
+        if is_ssrf_target(client.webhook_url):
+            delivery.mark_failed(error="Webhook URL resolves to a private or internal address")
             continue
 
         payload_json = json.dumps(delivery.payload, default=str)

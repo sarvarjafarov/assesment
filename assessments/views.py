@@ -22,8 +22,13 @@ class ApiKeyRequiredMixin:
 
     def dispatch(self, request, *args, **kwargs):
         api_key = getattr(settings, "API_ACCESS_TOKEN", None)
-        if self.require_key and api_key:
-            provided = request.headers.get("X-API-Key") or request.GET.get("api_key")
+        if self.require_key:
+            if not api_key:
+                return JsonResponse(
+                    {"detail": "API access is not configured. Set API_ACCESS_TOKEN."},
+                    status=503,
+                )
+            provided = request.headers.get("X-API-Key")
             if provided != api_key:
                 return JsonResponse({"detail": "Invalid or missing API key"}, status=401)
         return super().dispatch(request, *args, **kwargs)
