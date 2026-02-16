@@ -14121,36 +14121,28 @@ main {
 .ad-shell {
     --ad-accent: var(--color-orange);
     --ad-accent-rgb: 255, 138, 0;
-    max-width: 800px;
+    max-width: 1080px;
     margin: 0 auto;
     padding: 0 2rem 4rem;
 }
 
-/* Detail Hero — accent bar at top */
+/* Detail Hero — centered with accent top border */
 .ad-hero {
-    padding: 3rem 0 2.5rem;
+    padding: 2.5rem 0 2.5rem;
     border-bottom: 1px solid #ebedf0;
-    position: relative;
-}
-
-.ad-hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 80px;
-    height: 4px;
-    background: var(--ad-accent);
-    border-radius: 2px;
+    border-top: 3px solid var(--ad-accent);
 }
 
 .ad-hero-inner {
-    max-width: 640px;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .ad-breadcrumb {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
     font-size: 0.8rem;
     color: #9ca3af;
@@ -14213,12 +14205,13 @@ main {
 }
 
 .ad-meta-row {
-    display: flex;
-    gap: 2rem;
+    display: inline-flex;
+    gap: 2.5rem;
     margin-bottom: 1.75rem;
-    padding: 1.25rem 0;
-    border-top: 1px solid #ebedf0;
-    border-bottom: 1px solid #ebedf0;
+    padding: 1.25rem 2.5rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid #ebedf0;
 }
 
 .ad-meta-item {
@@ -14251,6 +14244,7 @@ main {
     display: flex;
     gap: 0.75rem;
     align-items: center;
+    justify-content: center;
 }
 
 /* Buttons — larger for better conversion */
@@ -14294,9 +14288,11 @@ main {
 .ad-trust-stats {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
     flex-wrap: wrap;
-    padding: 1.5rem 0;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid #ebedf0;
 }
 
 .ad-trust-stat {
@@ -14381,6 +14377,9 @@ main {
 /* Sections — accent-colored title bar */
 .ad-section {
     padding: 3rem 0;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .ad-section--alt {
@@ -14388,6 +14387,7 @@ main {
     padding: 3rem 2rem;
     margin-left: -2rem;
     margin-right: -2rem;
+    max-width: none;
 }
 
 .ad-section-inner {
@@ -14442,7 +14442,7 @@ main {
 .ad-skills {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .ad-skill {
@@ -14528,7 +14528,8 @@ main {
     background: rgba(var(--ad-accent-rgb), 0.04);
     border: 1px solid rgba(var(--ad-accent-rgb), 0.12);
     border-radius: 14px;
-    margin: 0.5rem 0;
+    margin: 0.5rem auto;
+    max-width: 800px;
 }
 
 .ad-mid-cta p {
@@ -14698,7 +14699,6 @@ main {
 .ad-cta {
     text-align: center;
     padding: 3.5rem 2rem;
-    margin: 0 -2rem;
     background: linear-gradient(135deg, rgba(255, 138, 0, 0.04) 0%, rgba(255, 138, 0, 0.08) 100%);
     border: 1px solid rgba(255, 138, 0, 0.12);
     border-radius: var(--radius-xl);
@@ -14754,7 +14754,7 @@ main {
 /* Related */
 .ad-related {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
 }
 
@@ -14809,10 +14809,21 @@ main {
     font-weight: 500;
 }
 
-/* Responsive */
+/* Responsive — tablet */
+@media (max-width: 900px) {
+    .ad-related {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Responsive — mobile */
 @media (max-width: 640px) {
     .ad-shell {
         padding: 0 1.25rem 3rem;
+    }
+
+    .ad-hero {
+        padding: 2rem 0 2rem;
     }
 
     .ad-section--alt {
@@ -14822,14 +14833,15 @@ main {
     }
 
     .ad-cta {
-        margin-left: -1.25rem;
-        margin-right: -1.25rem;
         padding: 2.5rem 1.25rem;
         border-radius: 0;
+        margin-left: -1.25rem;
+        margin-right: -1.25rem;
     }
 
     .ad-meta-row {
         gap: 1.25rem;
+        padding: 1rem;
     }
 
     .ad-skills {
@@ -14871,6 +14883,10 @@ main {
     .ad-trust-stat {
         font-size: 0.75rem;
         padding: 0.3rem 0.65rem;
+    }
+
+    .ad-section {
+        padding: 2.5rem 0;
     }
 }
 
