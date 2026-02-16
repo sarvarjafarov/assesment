@@ -41,8 +41,12 @@
         gap: 1.5rem;
         align-items: start;
     }
-    @media (max-width: 1080px) {
+    @media (max-width: 1024px) {
         .cd-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+        .cd-card { padding: 1.25rem; }
+        .cd-header h1 { font-size: 1.3rem; }
     }
 
     /* ── Cards ── */

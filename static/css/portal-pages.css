@@ -1456,7 +1456,7 @@
 /* Webhook & API Styles */
 .webhook-events-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: var(--space-3);
     margin-top: var(--space-2);
 }
@@ -1709,7 +1709,7 @@
 }
 .plan-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: var(--space-5);
     margin-top: var(--space-5);
 }
@@ -1997,7 +1997,7 @@
 /* Grid */
 .as-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     gap: 1.25rem;
     margin-bottom: 2.5rem;
 }
@@ -4335,7 +4335,7 @@
 /* Webhook Events Grid */
 .st-event-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 0.75rem;
     margin-top: 0.5rem;
 }
@@ -5509,7 +5509,7 @@
 /* Assessment Breakdown */
 .pd-assess-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     gap: 1rem;
 }
 .pd-assess-card {
@@ -5762,7 +5762,7 @@
 /* Cards Grid */
 .pj-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     gap: 1.25rem;
     margin-bottom: 3rem;
 }
@@ -6027,7 +6027,7 @@
 /* ── Cards Grid ── */
 .ca-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
     gap: 1.25rem;
 }
 .ca-card {
