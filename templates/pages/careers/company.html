@@ -1,0 +1,79 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Careers at {{ client.company_name }}</title>
+    <meta name="description" content="Explore open positions at {{ client.company_name }} and apply directly.">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/portal-pages.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: {{ client.brand_primary_color|default:"#ff8a00" }};
+            --brand-secondary: {{ client.brand_secondary_color|default:"#0e1428" }};
+        }
+    </style>
+</head>
+<body class="cr-body">
+    <div class="cr-shell">
+        <header class="cr-hero">
+            {% if client.logo_data_url %}
+            <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="cr-logo">
+            {% endif %}
+            <h1>{{ client.company_name }}</h1>
+            <p class="cr-subtitle">Open positions</p>
+        </header>
+
+        {% if positions %}
+        <div class="cr-grid">
+            {% for pos in positions %}
+            <a href="{% url 'pages:position_detail_public' company_slug=client.slug position_uuid=pos.uuid %}" class="cr-card">
+                <div class="cr-card-top">
+                    <h2 class="cr-card-title">{{ pos.title }}</h2>
+                    {% if pos.department or pos.location %}
+                    <span class="cr-card-meta">
+                        {% if pos.department %}{{ pos.department }}{% endif %}
+                        {% if pos.department and pos.location %} &middot; {% endif %}
+                        {% if pos.location %}{{ pos.location }}{% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+
+                {% if pos.employment_type or pos.work_model %}
+                <div class="cr-card-tags">
+                    {% if pos.employment_type %}<span class="cr-tag">{{ pos.get_employment_type_display }}</span>{% endif %}
+                    {% if pos.work_model %}<span class="cr-tag">{{ pos.get_work_model_display }}</span>{% endif %}
+                </div>
+                {% endif %}
+
+                {% if pos.salary_display %}
+                <span class="cr-card-salary">{{ pos.salary_display }}</span>
+                {% endif %}
+
+                <div class="cr-card-foot">
+                    {% if pos.assessment_label %}
+                    <span class="cr-badge">{{ pos.assessment_label }}</span>
+                    {% endif %}
+                    <span class="cr-card-roles">{{ pos.open_roles }} open role{{ pos.open_roles|pluralize }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="cr-empty">
+            <h2>No open positions right now</h2>
+            <p>Check back later for new opportunities.</p>
+        </div>
+        {% endif %}
+
+        <footer class="cr-footer">
+            <span>Powered by <a href="{% url 'pages:home' %}">Evalon</a></span>
+        </footer>
+    </div>
+</body>
+</html>

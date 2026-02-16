@@ -707,6 +707,7 @@ class ClientProjectForm(forms.ModelForm):
             "target_start_date",
             "description",
             "published",
+            "assessment_type",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),

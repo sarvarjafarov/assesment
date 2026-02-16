@@ -119,6 +119,7 @@ class ClientAccount(TimeStampedModel):
     )
     full_name = models.CharField(max_length=120)
     company_name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=220, unique=True, blank=True)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=32)
     employee_size = models.CharField(max_length=16, choices=EMPLOYEE_SIZE_CHOICES)
@@ -285,6 +286,15 @@ class ClientAccount(TimeStampedModel):
         self._original_plan_slug = self.plan_slug
 
     def save(self, *args, **kwargs):
+        if not self.slug and self.company_name:
+            from django.utils.text import slugify
+            base = slugify(self.company_name)[:200] or "company"
+            slug = base
+            n = 1
+            while ClientAccount.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base}-{n}"
+                n += 1
+            self.slug = slug
         self._apply_plan_defaults()
         self._process_logo_upload()
         # Auto-sync the linked user's active flag with client approval status.
@@ -588,6 +598,12 @@ class ClientProject(TimeStampedModel):
     target_start_date = models.DateField(blank=True, null=True)
     description = models.TextField(blank=True)
     published = models.BooleanField(default=True)
+    assessment_type = models.CharField(
+        max_length=32,
+        choices=ClientAccount.ASSESSMENT_CHOICES,
+        blank=True,
+        help_text="Assessment candidates take when applying via public careers page",
+    )
 
     class Meta:
         ordering = ("-created_at",)
@@ -638,6 +654,33 @@ class ClientProject(TimeStampedModel):
     def remaining_roles(self):
         filled = self.total_sessions_completed()
         return max(0, self.open_roles - filled)
+
+
+class PositionApplication(TimeStampedModel):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("session_created", "Session Created"),
+        ("rejected", "Rejected"),
+    ]
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    project = models.ForeignKey(ClientProject, related_name="applications", on_delete=models.CASCADE)
+    client = models.ForeignKey(ClientAccount, related_name="applications", on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=200)
+    email = models.EmailField()
+    resume_data = models.BinaryField(blank=True, null=True, editable=False)
+    resume_mime = models.CharField(max_length=100, blank=True)
+    resume_filename = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    assessment_session_uuid = models.UUIDField(null=True, blank=True)
+    assessment_type = models.CharField(max_length=32, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        unique_together = [("project", "email")]
+
+    def __str__(self):
+        return f"{self.full_name} → {self.project.title}"
 
 
 class WebhookDelivery(TimeStampedModel):

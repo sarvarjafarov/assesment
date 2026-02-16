@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.utils import timezone
 
-from .models import ClientAccount, SupportRequest
+from .models import ClientAccount, PositionApplication, SupportRequest
 from .services import send_welcome_email
 
 
@@ -29,7 +29,7 @@ class ClientAccountAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Account Information", {
-            "fields": ("user", "full_name", "company_name", "email", "phone_number", "employee_size")
+            "fields": ("user", "full_name", "company_name", "slug", "email", "phone_number", "employee_size")
         }),
         ("Status & Verification", {
             "fields": ("status", "email_verified_at", "verification_sent_at")
@@ -156,3 +156,11 @@ class SupportRequestAdmin(admin.ModelAdmin):
         count = queryset.update(status=SupportRequest.STATUS_CLOSED)
         self.message_user(request, f"{count} request(s) marked as closed.")
     mark_closed.short_description = "Mark selected as closed"
+
+
+@admin.register(PositionApplication)
+class PositionApplicationAdmin(admin.ModelAdmin):
+    list_display = ("full_name", "email", "project", "assessment_type", "status", "created_at")
+    list_filter = ("status", "assessment_type")
+    search_fields = ("full_name", "email", "project__title")
+    readonly_fields = ("uuid", "resume_data", "ip_address", "created_at", "updated_at")

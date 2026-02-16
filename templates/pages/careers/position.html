@@ -1,0 +1,123 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ position.title }} &mdash; {{ client.company_name }}</title>
+    <meta name="description" content="Apply for {{ position.title }} at {{ client.company_name }}.">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/portal-pages.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: {{ client.brand_primary_color|default:"#ff8a00" }};
+            --brand-secondary: {{ client.brand_secondary_color|default:"#0e1428" }};
+        }
+    </style>
+</head>
+<body class="cr-body">
+    <div class="cr-shell">
+        <nav class="cr-breadcrumb">
+            <a href="{% url 'pages:company_careers' company_slug=client.slug %}">{{ client.company_name }}</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span>{{ position.title }}</span>
+        </nav>
+
+        <header class="cr-position-hero">
+            {% if client.logo_data_url %}
+            <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="cr-logo-sm">
+            {% endif %}
+            <h1>{{ position.title }}</h1>
+            {% if position.department or position.location %}
+            <p class="cr-position-meta">
+                {% if position.department %}{{ position.department }}{% endif %}
+                {% if position.department and position.location %} &middot; {% endif %}
+                {% if position.location %}{{ position.location }}{% endif %}
+            </p>
+            {% endif %}
+        </header>
+
+        <div class="cr-position-layout">
+            <div class="cr-position-info">
+                {% if position.employment_type or position.work_model or position.salary_display %}
+                <div class="cr-details">
+                    {% if position.employment_type %}
+                    <div class="cr-detail">
+                        <span class="cr-detail-label">Employment</span>
+                        <span class="cr-detail-val">{{ position.get_employment_type_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if position.work_model %}
+                    <div class="cr-detail">
+                        <span class="cr-detail-label">Work Model</span>
+                        <span class="cr-detail-val">{{ position.get_work_model_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if position.salary_display %}
+                    <div class="cr-detail">
+                        <span class="cr-detail-label">Salary Range</span>
+                        <span class="cr-detail-val">{{ position.salary_display }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="cr-detail">
+                        <span class="cr-detail-label">Open Roles</span>
+                        <span class="cr-detail-val">{{ position.open_roles }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if position.description %}
+                <div class="cr-description">
+                    <h2>About this role</h2>
+                    <p>{{ position.description|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+
+                {% if position.skills_list %}
+                <div class="cr-skills">
+                    <h3>Required Skills</h3>
+                    <div class="cr-skill-pills">
+                        {% for skill in position.skills_list %}
+                        <span class="cr-skill-pill">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if assessment_label %}
+                <div class="cr-assessment-info">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <span>You'll take the <strong>{{ assessment_label }}</strong> as part of your application.</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <aside class="cr-apply-panel">
+                <h2>Apply for this position</h2>
+                <form method="post" action="{% url 'pages:position_apply' company_slug=client.slug position_uuid=position.uuid %}" enctype="multipart/form-data" class="cr-apply-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="cr-field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<span class="cr-help">{{ field.help_text }}</span>{% endif %}
+                        {% for error in field.errors %}
+                        <span class="cr-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="cr-submit">Submit Application</button>
+                </form>
+            </aside>
+        </div>
+
+        <footer class="cr-footer">
+            <span>Powered by <a href="{% url 'pages:home' %}">Evalon</a></span>
+        </footer>
+    </div>
+</body>
+</html>

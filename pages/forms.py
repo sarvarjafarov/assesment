@@ -2,6 +2,33 @@ from django import forms
 from .models import DemoRequest
 
 
+class PositionApplyForm(forms.Form):
+    full_name = forms.CharField(max_length=200, label="Full Name")
+    email = forms.EmailField(label="Email Address")
+    resume = forms.FileField(label="Resume", help_text="PDF or DOCX, max 5 MB")
+
+    def clean_resume(self):
+        f = self.cleaned_data.get("resume")
+        if not f:
+            return f
+        if f.size > 5 * 1024 * 1024:
+            raise forms.ValidationError("Resume must be smaller than 5 MB.")
+        allowed = {
+            "application/pdf",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        }
+        if getattr(f, "content_type", "") not in allowed:
+            raise forms.ValidationError("Upload a PDF or DOCX file.")
+        header = f.read(8)
+        f.seek(0)
+        if not (header.startswith(b"%PDF") or header.startswith(b"PK")):
+            raise forms.ValidationError("Invalid file format.")
+        return f
+
+    def clean_email(self):
+        return self.cleaned_data["email"].lower().strip()
+
+
 class DemoRequestForm(forms.ModelForm):
     """Form for capturing demo requests from the homepage."""
 

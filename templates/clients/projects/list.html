@@ -55,6 +55,10 @@
                     <label for="{{ form.work_model.id_for_label }}">Work model</label>
                     {{ form.work_model }}
                 </div>
+                <div class="pj-field">
+                    <label for="{{ form.assessment_type.id_for_label }}">Public assessment</label>
+                    {{ form.assessment_type }}
+                </div>
                 <div class="pj-field pj-field-action">
                     <button type="submit" class="btn btn-primary">Create Position</button>
                 </div>
@@ -129,6 +133,9 @@
 
             <div class="pj-card-foot">
                 <span class="pj-badge pj-badge-{{ project.priority }}">{{ project.get_priority_display }}</span>
+                {% if project.assessment_type %}
+                <span class="pj-tag pj-tag-assess">{{ project.get_assessment_type_display }}</span>
+                {% endif %}
                 <span class="pj-date">{{ project.created_at|naturaltime }}</span>
             </div>
         </a>

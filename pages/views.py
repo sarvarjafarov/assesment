@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
-from .forms import DemoRequestForm
+from .forms import DemoRequestForm, PositionApplyForm
 from django.db.models import Count, Prefetch
 from .models import NewsletterSubscriber, PublicAssessment, Role, InterviewQuestion
 
@@ -1324,4 +1324,259 @@ def role_assessment_detail(request, slug):
         'total_duration': total_duration,
         'total_questions': total_questions,
         'blog_posts': blog_posts,
+    })
+
+
+# ── Public Careers Views ──────────────────────────────────────────────
+
+_CAREERS_SESSION_CONFIG = {
+    "marketing": {
+        "label": "Marketing Assessment",
+        "session_model": "marketing_assessments.DigitalMarketingAssessmentSession",
+        "generate_qs": "marketing_assessments.services.generate_question_set",
+        "candidate_route": "candidate:marketing-session",
+    },
+    "product": {
+        "label": "Product Management Assessment",
+        "session_model": "pm_assessments.ProductAssessmentSession",
+        "generate_qs": "pm_assessments.services.generate_question_set",
+        "candidate_route": "candidate:pm-session",
+    },
+    "behavioral": {
+        "label": "Behavioral Assessment",
+        "session_model": "behavioral_assessments.BehavioralAssessmentSession",
+        "generate_qs": "behavioral_assessments.services.generate_question_set",
+        "candidate_route": "candidate:behavioral-session",
+    },
+    "ux_design": {
+        "label": "UX/UI Design Assessment",
+        "session_model": "ux_assessments.UXDesignAssessmentSession",
+        "generate_qs": "ux_assessments.services.generate_question_set",
+        "candidate_route": "candidate:ux-session",
+    },
+    "hr": {
+        "label": "HR Assessment",
+        "session_model": "hr_assessments.HRAssessmentSession",
+        "generate_qs": "hr_assessments.services.generate_question_set",
+        "candidate_route": "candidate:hr-session",
+    },
+    "finance": {
+        "label": "Finance Manager Assessment",
+        "session_model": "finance_assessments.FinanceAssessmentSession",
+        "generate_qs": "finance_assessments.services.generate_question_set",
+        "candidate_route": "candidate:finance-session",
+    },
+}
+
+
+def _resolve_dotted(path):
+    """Import and return an object from a dotted module path."""
+    module_path, attr = path.rsplit(".", 1)
+    from importlib import import_module
+    return getattr(import_module(module_path), attr)
+
+
+def company_careers(request, company_slug):
+    """Public careers page listing open positions for a company."""
+    from clients.models import ClientAccount, ClientProject
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    positions = ClientProject.objects.filter(
+        client=client,
+        status=ClientProject.STATUS_ACTIVE,
+        published=True,
+    ).exclude(assessment_type="")
+
+    for pos in positions:
+        cfg = _CAREERS_SESSION_CONFIG.get(pos.assessment_type)
+        pos.assessment_label = cfg["label"] if cfg else ""
+
+    return render(request, "pages/careers/company.html", {
+        "client": client,
+        "positions": positions,
+    })
+
+
+def position_detail_public(request, company_slug, position_uuid):
+    """Public position detail page with apply form."""
+    from clients.models import ClientAccount, ClientProject
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    position = get_object_or_404(
+        ClientProject,
+        client=client,
+        uuid=position_uuid,
+        status=ClientProject.STATUS_ACTIVE,
+        published=True,
+    )
+    if not position.assessment_type:
+        raise Http404
+
+    cfg = _CAREERS_SESSION_CONFIG.get(position.assessment_type)
+    form = PositionApplyForm()
+
+    return render(request, "pages/careers/position.html", {
+        "client": client,
+        "position": position,
+        "form": form,
+        "assessment_label": cfg["label"] if cfg else "",
+    })
+
+
+@require_POST
+def position_apply(request, company_slug, position_uuid):
+    """Handle candidate application — create session + send email."""
+    import logging
+    from django.conf import settings as django_settings
+    from django.core.mail import EmailMultiAlternatives
+    from django.db import IntegrityError
+    from django.template.loader import render_to_string
+    from django.utils.html import strip_tags
+    from clients.models import ClientAccount, ClientProject, PositionApplication
+
+    logger = logging.getLogger(__name__)
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    position = get_object_or_404(
+        ClientProject,
+        client=client,
+        uuid=position_uuid,
+        status=ClientProject.STATUS_ACTIVE,
+        published=True,
+    )
+    if not position.assessment_type:
+        raise Http404
+
+    cfg = _CAREERS_SESSION_CONFIG.get(position.assessment_type)
+    if not cfg:
+        raise Http404
+
+    form = PositionApplyForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return render(request, "pages/careers/position.html", {
+            "client": client,
+            "position": position,
+            "form": form,
+            "assessment_label": cfg["label"],
+        })
+
+    email = form.cleaned_data["email"]
+    full_name = form.cleaned_data["full_name"]
+    resume_file = form.cleaned_data.get("resume")
+
+    # Check duplicate application
+    if PositionApplication.objects.filter(project=position, email=email).exists():
+        form.add_error("email", "You have already applied to this position.")
+        return render(request, "pages/careers/position.html", {
+            "client": client,
+            "position": position,
+            "form": form,
+            "assessment_label": cfg["label"],
+        })
+
+    # Resolve session model and question generator
+    SessionModel = _resolve_dotted(cfg["session_model"])
+    generate_question_set = _resolve_dotted(cfg["generate_qs"])
+
+    # Create assessment session
+    level = "mid"
+    question_set = generate_question_set(level=level)
+    session, created = SessionModel.objects.get_or_create(
+        candidate_id=email,
+        client=client,
+        defaults={"status": "draft"},
+    )
+    session.question_set = question_set
+    session.status = "in_progress"
+    session.client = client
+    session.project = position
+    session.level = level
+    session.duration_minutes = 45
+    session.started_at = None
+    session.save()
+
+    # Store resume bytes
+    resume_data = b""
+    resume_mime = ""
+    resume_filename = ""
+    if resume_file:
+        resume_data = resume_file.read()
+        resume_mime = getattr(resume_file, "content_type", "")
+        resume_filename = getattr(resume_file, "name", "")
+
+    # Create application record
+    try:
+        application = PositionApplication.objects.create(
+            project=position,
+            client=client,
+            full_name=full_name,
+            email=email,
+            resume_data=resume_data or None,
+            resume_mime=resume_mime,
+            resume_filename=resume_filename,
+            status="session_created",
+            assessment_session_uuid=session.uuid,
+            assessment_type=position.assessment_type,
+            ip_address=request.META.get("REMOTE_ADDR"),
+        )
+    except IntegrityError:
+        form.add_error("email", "You have already applied to this position.")
+        return render(request, "pages/careers/position.html", {
+            "client": client,
+            "position": position,
+            "form": form,
+            "assessment_label": cfg["label"],
+        })
+
+    # Send invite email
+    if getattr(django_settings, "EMAIL_ENABLED", False):
+        start_link = request.build_absolute_uri(
+            reverse(cfg["candidate_route"], args=[session.uuid])
+        )
+        candidate_first_name = full_name.split()[0] if full_name.strip() else email.split("@")[0].title()
+
+        context = {
+            "company_name": client.company_name,
+            "invited_by": client.company_name,
+            "candidate": {"first_name": candidate_first_name},
+            "assessment": {"title": cfg["label"]},
+            "start_link": start_link,
+            "session_link": start_link,
+            "due_at": None,
+            "notes": "",
+            "brand_primary": client.brand_primary_color or "#ff8a00",
+            "brand_secondary": client.brand_secondary_color or "#0e1428",
+            "hide_evalon_branding": client.hide_evalon_branding,
+            "client_footer_text": client.get_footer_text(),
+        }
+
+        subject = f"{client.company_name} — Your assessment for {position.title}"
+        html_body = render_to_string("emails/invite_candidate.html", context)
+        text_body = strip_tags(html_body)
+
+        try:
+            msg = EmailMultiAlternatives(
+                subject,
+                text_body,
+                getattr(django_settings, "DEFAULT_FROM_EMAIL", None),
+                [email],
+            )
+            msg.attach_alternative(html_body, "text/html")
+            msg.send()
+        except Exception as exc:
+            logger.warning("Failed to email career application for %s: %s", email, exc)
+
+    return redirect("pages:position_applied", company_slug=company_slug, position_uuid=position_uuid)
+
+
+def position_applied(request, company_slug, position_uuid):
+    """Success page after a candidate applies."""
+    from clients.models import ClientAccount, ClientProject
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    position = get_object_or_404(ClientProject, client=client, uuid=position_uuid)
+
+    return render(request, "pages/careers/applied.html", {
+        "client": client,
+        "position": position,
     })

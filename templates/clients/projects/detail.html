@@ -18,6 +18,9 @@
             <div class="pd-badges">
                 <span class="pj-status pj-status-{{ project.status }}">{{ project.get_status_display }}</span>
                 <span class="pj-badge pj-badge-{{ project.priority }}">{{ project.get_priority_display }}</span>
+                {% if project.assessment_type %}
+                <span class="pj-tag pj-tag-assess">{{ project.get_assessment_type_display }}</span>
+                {% endif %}
                 {% if project.department or project.location %}
                 <span class="pd-location">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -123,6 +126,19 @@
             </div>
         </div>
         {% endif %}
+    </div>
+    {% endif %}
+
+    {# ── Public Apply Link ── #}
+    {% if project.assessment_type and project.published and project.client.slug %}
+    <div class="pd-public-link">
+        <div class="pd-public-link-inner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            <div>
+                <span class="pd-public-label">Public apply link</span>
+                <input type="text" class="pd-public-url" readonly value="{{ request.scheme }}://{{ request.get_host }}/careers/{{ project.client.slug }}/{{ project.uuid }}/" onclick="this.select(); document.execCommand('copy');" title="Click to copy">
+            </div>
+        </div>
     </div>
     {% endif %}
 
