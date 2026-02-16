@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Flash messages: dismiss on click and auto-dismiss after 5s
+    document.querySelectorAll('.flash').forEach(flash => {
+        const dismiss = () => {
+            flash.classList.add('removing');
+            setTimeout(() => flash.remove(), 300);
+        };
+        const closeBtn = flash.querySelector('.flash-close');
+        if (closeBtn) closeBtn.addEventListener('click', dismiss);
+        setTimeout(dismiss, 5000);
+    });
+
     const trackEvent = (name, params = {}) => {
         if (typeof window.gtag === 'function' && name) {
             window.gtag('event', name, params);

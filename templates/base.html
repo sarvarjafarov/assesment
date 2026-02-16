@@ -60,9 +60,13 @@
 <body class="{% block body_class %}{% endblock %}" data-page-theme="{% block page_theme %}light{% endblock %}">
     <a class="skip-link" href="#main-content">Skip to content</a>
     {% if messages %}
-    <div class="flash-container">
+    <div class="flash-container" id="flash-container">
         {% for message in messages %}
-        <div class="flash {{ message.tags }}">{{ message }}</div>
+        <div class="flash {{ message.tags }}" role="alert">
+            <span class="flash-icon"></span>
+            <span class="flash-text">{{ message }}</span>
+            <button type="button" class="flash-close" aria-label="Dismiss">&times;</button>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
