@@ -1056,132 +1056,138 @@ document.addEventListener('DOMContentLoaded', () => {
     const markAllRead = document.getElementById("mark-all-read");
 
     if (notificationToggle && notificationDropdown) {
-        // Mock notification data - in production, this would come from an API
-        let notifications = [
-            {
-                id: 1,
-                title: "Assessment Completed",
-                message: "John Doe completed the Digital Marketing Assessment",
-                time: "5 minutes ago",
-                unread: true,
-                link: "/clients/dashboard/assessments/marketing/",
-            },
-            {
-                id: 2,
-                title: "New Invite Response",
-                message: "Jane Smith started the Product Management Assessment",
-                time: "1 hour ago",
-                unread: true,
-                link: "/clients/dashboard/assessments/product/",
-            },
-            {
-                id: 3,
-                title: "Project Updated",
-                message: "Senior Developer role has 3 new candidates",
-                time: "3 hours ago",
-                unread: false,
-                link: "/clients/dashboard/projects/",
-            },
-        ];
+        const CATEGORY_META = {
+            assessment_completed: { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>', color: '#059669' },
+            candidate_started:   { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>', color: '#3b82f6' },
+            pipeline_update:     { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg>', color: '#8b5cf6' },
+            scoring_complete:    { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>', color: '#f59e0b' },
+            decision_recorded:   { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>', color: '#06b6d4' },
+            system:              { icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>', color: '#6b7280' },
+        };
 
-        // Update badge count
-        function updateBadgeCount() {
-            const unreadCount = notifications.filter(n => n.unread).length;
-            if (unreadCount > 0) {
-                notificationBadge.textContent = unreadCount;
-                notificationBadge.style.display = "flex";
-                notificationToggle.classList.add("has-notifications");
+        let notifications = [];
+        let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value
+            || document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        function timeAgo(dateStr) {
+            const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            if (diff < 172800) return 'Yesterday';
+            return Math.floor(diff / 86400) + 'd ago';
+        }
+
+        async function fetchNotifications() {
+            try {
+                const resp = await fetch('/clients/api/notifications/');
+                if (!resp.ok) return;
+                const data = await resp.json();
+                notifications = data.notifications || [];
+                updateBadgeCount(data.unread_count);
+            } catch (e) { /* silent */ }
+        }
+
+        async function markAsRead(id) {
+            try {
+                await fetch('/clients/api/notifications/mark-read/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(id ? { id } : {}),
+                });
+            } catch (e) { /* silent */ }
+        }
+
+        function updateBadgeCount(count) {
+            const c = count !== undefined ? count : notifications.filter(n => !n.is_read).length;
+            if (c > 0) {
+                notificationBadge.textContent = c > 99 ? '99+' : c;
+                notificationBadge.style.display = 'flex';
+                notificationToggle.classList.add('has-notifications');
             } else {
-                notificationBadge.style.display = "none";
-                notificationToggle.classList.remove("has-notifications");
+                notificationBadge.style.display = 'none';
+                notificationToggle.classList.remove('has-notifications');
+            }
+            if (markAllRead) {
+                markAllRead.style.display = c > 0 ? '' : 'none';
             }
         }
 
-        // Render notifications
         function renderNotifications() {
-            // Show loading state
-            notificationList.classList.add('loading');
-            notificationList.innerHTML = `
-                <div class="loading-spinner"></div>
-            `;
-
-            // Simulate brief loading (in production, this would be an actual API call)
-            setTimeout(() => {
-                notificationList.classList.remove('loading');
-
-                if (notifications.length === 0) {
-                    notificationList.innerHTML = `
-                        <div class="notification-empty fade-in">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 0.5rem; color: var(--navy);">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                            </svg>
-                            <p>No new notifications</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const html = notifications.map(notif => `
-                    <div class="notification-item fade-in ${notif.unread ? 'unread' : ''}" data-id="${notif.id}">
-                        <div class="notification-content">
-                            <p class="notification-title">${notif.title}</p>
-                            <p class="notification-message">${notif.message}</p>
-                            <p class="notification-time">${notif.time}</p>
-                        </div>
+            if (notifications.length === 0) {
+                notificationList.innerHTML = `
+                    <div class="notification-empty">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25; margin-bottom: 0.5rem; color: var(--color-navy);">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <p>No notifications yet</p>
+                    </div>`;
+                return;
+            }
+            const html = notifications.map(n => {
+                const cat = CATEGORY_META[n.category] || CATEGORY_META.system;
+                return `
+                <a class="notification-item ${n.is_read ? '' : 'unread'}" data-id="${n.id}" href="${n.link_url || '#'}">
+                    <span class="notif-icon" style="background:${cat.color}15;color:${cat.color}">${cat.icon}</span>
+                    <div class="notification-content">
+                        <p class="notification-title">${n.title}</p>
+                        <p class="notification-message">${n.message}</p>
                     </div>
-                `).join("");
+                    <span class="notification-time">${timeAgo(n.created_at)}</span>
+                </a>`;
+            }).join('');
+            notificationList.innerHTML = html;
 
-                notificationList.innerHTML = html;
-
-                // Add click handlers to notification items
-                document.querySelectorAll(".notification-item").forEach(item => {
-                    item.addEventListener("click", () => {
-                        const id = parseInt(item.dataset.id);
-                        const notif = notifications.find(n => n.id === id);
-                        if (notif) {
-                            notif.unread = false;
-                            updateBadgeCount();
-                            renderNotifications();
-                            if (notif.link) {
-                                window.location.href = notif.link;
-                            }
-                        }
-                    });
+            notificationList.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', async (e) => {
+                    const id = parseInt(item.dataset.id);
+                    const notif = notifications.find(n => n.id === id);
+                    if (notif && !notif.is_read) {
+                        notif.is_read = true;
+                        updateBadgeCount();
+                        await markAsRead(id);
+                    }
+                    if (!notif?.link_url) e.preventDefault();
                 });
-
-                updateBadgeCount();
-            }, 200); // Brief delay to show loading state
+            });
         }
 
         // Toggle dropdown
-        notificationToggle.addEventListener("click", (e) => {
+        notificationToggle.addEventListener('click', async (e) => {
             e.stopPropagation();
-            const isVisible = notificationDropdown.style.display === "block";
-            notificationDropdown.style.display = isVisible ? "none" : "block";
+            const isVisible = notificationDropdown.style.display === 'block';
+            notificationDropdown.style.display = isVisible ? 'none' : 'block';
             if (!isVisible) {
+                notificationList.innerHTML = '<div class="loading-spinner"></div>';
+                await fetchNotifications();
                 renderNotifications();
             }
         });
 
         // Mark all as read
         if (markAllRead) {
-            markAllRead.addEventListener("click", () => {
-                notifications.forEach(n => n.unread = false);
-                updateBadgeCount();
+            markAllRead.addEventListener('click', async () => {
+                notifications.forEach(n => n.is_read = true);
+                updateBadgeCount(0);
                 renderNotifications();
+                await markAsRead(null);
             });
         }
 
         // Close dropdown when clicking outside
-        document.addEventListener("click", (e) => {
+        document.addEventListener('click', (e) => {
             if (!notificationToggle.contains(e.target) && !notificationDropdown.contains(e.target)) {
-                notificationDropdown.style.display = "none";
+                notificationDropdown.style.display = 'none';
             }
         });
 
-        // Initialize badge count
-        updateBadgeCount();
+        // Initialize: set badge from server-rendered count
+        const serverCount = parseInt(notificationBadge?.textContent) || 0;
+        updateBadgeCount(serverCount);
+
+        // Periodically refresh in background (every 60s)
+        setInterval(fetchNotifications, 60000);
     }
 
     // ==================================================================

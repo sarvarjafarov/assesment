@@ -195,7 +195,7 @@
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
-                    <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                    <span class="notification-badge" id="notification-badge" style="display: {% if notification_unread_count %}flex{% else %}none{% endif %};">{{ notification_unread_count|default:"0" }}</span>
                 </button>
                 <a href="{% url 'clients:logout' %}" class="btn-logout" title="Sign out">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -211,15 +211,15 @@
         <div class="notification-dropdown" id="notification-dropdown" style="display: none;">
             <div class="notification-header">
                 <h4>Notifications</h4>
-                <button class="mark-all-read" id="mark-all-read">Mark all read</button>
+                <button class="mark-all-read" id="mark-all-read" style="{% if not notification_unread_count %}display:none{% endif %}">Mark all read</button>
             </div>
             <div class="notification-list" id="notification-list">
                 <div class="notification-empty">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 0.5rem; color: var(--navy);">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25; margin-bottom: 0.5rem; color: var(--color-navy);">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
-                    <p>No new notifications</p>
+                    <p>No notifications yet</p>
                 </div>
             </div>
         </div>

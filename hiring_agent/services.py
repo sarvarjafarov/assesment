@@ -754,6 +754,27 @@ def notify_shortlist_ready(pipeline: "HiringPipeline", count: int):
         html_body,
     )
 
+    # In-app notification
+    try:
+        from clients.services import create_notification
+
+        link_url = reverse(
+            'hiring_agent:pipeline-detail',
+            kwargs={'pipeline_uuid': pipeline.uuid},
+        )
+        create_notification(
+            client=pipeline.client,
+            category="pipeline_update",
+            title="Shortlist Ready",
+            message=(
+                f"{count} candidate(s) have been shortlisted "
+                f"for {pipeline.title}."
+            ),
+            link_url=link_url,
+        )
+    except Exception:
+        logger.exception('Failed to create shortlist ready notification')
+
 
 def notify_assessments_sent(pipeline: "HiringPipeline", count: int):
     """Notify client that assessments have been sent to candidates."""
@@ -773,6 +794,27 @@ def notify_assessments_sent(pipeline: "HiringPipeline", count: int):
         html_body,
     )
 
+    # In-app notification
+    try:
+        from clients.services import create_notification
+
+        link_url = reverse(
+            'hiring_agent:pipeline-detail',
+            kwargs={'pipeline_uuid': pipeline.uuid},
+        )
+        create_notification(
+            client=pipeline.client,
+            category="pipeline_update",
+            title="Assessments Sent",
+            message=(
+                f"Assessments have been sent to {count} candidate(s) "
+                f"for {pipeline.title}."
+            ),
+            link_url=link_url,
+        )
+    except Exception:
+        logger.exception('Failed to create assessments sent notification')
+
 
 def notify_decision_ready(pipeline: "HiringPipeline", count: int):
     """Notify client that AI final decisions are ready for review."""
@@ -791,3 +833,24 @@ def notify_decision_ready(pipeline: "HiringPipeline", count: int):
         f'{count} hiring decision(s) ready for {pipeline.title} — Evalon',
         html_body,
     )
+
+    # In-app notification
+    try:
+        from clients.services import create_notification
+
+        link_url = reverse(
+            'hiring_agent:pipeline-detail',
+            kwargs={'pipeline_uuid': pipeline.uuid},
+        )
+        create_notification(
+            client=pipeline.client,
+            category="decision_recorded",
+            title="Decisions Ready",
+            message=(
+                f"{count} hiring decision(s) are ready for review "
+                f"for {pipeline.title}."
+            ),
+            link_url=link_url,
+        )
+    except Exception:
+        logger.exception('Failed to create decision ready notification')

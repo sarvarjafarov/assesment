@@ -88,8 +88,15 @@ class UXDesignAssessmentView(FormView):
             self.session.save(update_fields=updates + ["updated_at"])
             # Send new candidate notification on first start
             if is_first_start and self.session.client:
-                from clients.services import send_new_candidate_alert, trigger_session_webhook
+                from clients.services import send_new_candidate_alert, trigger_session_webhook, create_notification
                 send_new_candidate_alert(self.session.client, self.session, "ux_design")
+                create_notification(
+                    self.session.client,
+                    "candidate_started",
+                    "New Candidate Started",
+                    message=f"{self.session.candidate_id} started the UX Design Assessment",
+                    link_url=reverse('clients:assessment-manage', kwargs={'assessment_type': 'ux_design'}),
+                )
                 trigger_session_webhook(self.session, "session.started")
         update_session_telemetry(self.session, request=request)
         duration_minutes = self.session.duration_minutes or 0

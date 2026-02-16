@@ -24,6 +24,27 @@ from django.utils.html import strip_tags
 logger = logging.getLogger(__name__)
 
 
+def create_notification(client, category, title, message="", link_url=""):
+    """
+    Create an in-app notification for a client account.
+
+    Args:
+        client: ClientAccount instance
+        category: One of ClientNotification.CATEGORY_CHOICES keys
+        title: Short notification title
+        message: Optional longer description
+        link_url: Optional relative URL to navigate to on click
+    """
+    from clients.models import ClientNotification
+    return ClientNotification.objects.create(
+        client=client,
+        category=category,
+        title=title,
+        message=message,
+        link_url=link_url,
+    )
+
+
 def is_ssrf_target(url: str) -> bool:
     """Check if a URL resolves to a private, loopback, or reserved IP address."""
     try:

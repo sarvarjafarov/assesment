@@ -2967,3 +2967,58 @@ class SupportRequestCreateView(LoginRequiredMixin, View):
             "message": "Your support request has been submitted. We'll get back to you soon.",
             "request_id": support_request.pk,
         })
+
+
+class NotificationsAPIView(LoginRequiredMixin, View):
+    """Return last 20 notifications as JSON (unread first, then by date)."""
+    login_url = reverse_lazy("clients:login")
+
+    def get(self, request):
+        if not hasattr(request.user, "client_account"):
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+        account = request.user.client_account
+        notifications = (
+            account.notifications
+            .order_by("is_read", "-created_at")[:20]
+        )
+        data = [
+            {
+                "id": n.id,
+                "title": n.title,
+                "message": n.message,
+                "category": n.category,
+                "link_url": n.link_url,
+                "is_read": n.is_read,
+                "created_at": n.created_at.isoformat(),
+            }
+            for n in notifications
+        ]
+        unread_count = account.notifications.filter(is_read=False).count()
+        return JsonResponse({"notifications": data, "unread_count": unread_count})
+
+
+class NotificationsMarkReadView(LoginRequiredMixin, View):
+    """Mark one or all notifications as read."""
+    login_url = reverse_lazy("clients:login")
+
+    def post(self, request):
+        if not hasattr(request.user, "client_account"):
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+        account = request.user.client_account
+
+        if request.content_type == "application/json":
+            try:
+                body = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON"}, status=400)
+        else:
+            body = request.POST
+
+        note_id = body.get("id")
+        if note_id:
+            account.notifications.filter(id=note_id, is_read=False).update(is_read=True)
+        else:
+            account.notifications.filter(is_read=False).update(is_read=True)
+
+        unread_count = account.notifications.filter(is_read=False).count()
+        return JsonResponse({"success": True, "unread_count": unread_count})

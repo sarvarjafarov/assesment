@@ -121,8 +121,17 @@ def evaluate_session(session: BehavioralAssessmentSession):
 
     # Send completion notification to client
     if session.client:
-        from clients.services import send_completion_alert, trigger_session_webhook
+        from django.urls import reverse
+        from clients.services import create_notification, send_completion_alert, trigger_session_webhook
         send_completion_alert(session.client, session, "behavioral")
+        link_url = reverse('clients:assessment-detail', kwargs={'assessment_type': 'behavioral', 'session_uuid': session.uuid})
+        create_notification(
+            session.client,
+            "assessment_completed",
+            "Behavioral Assessment Completed",
+            message=f"{session.candidate_id} completed the Behavioral Assessment",
+            link_url=link_url,
+        )
         trigger_session_webhook(session, "session.completed")
 
     return session

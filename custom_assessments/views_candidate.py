@@ -104,9 +104,16 @@ class CustomAssessmentView(FormView):
 
             # Send new candidate notification
             if is_first_start and self.session.client:
-                from clients.services import send_new_candidate_alert, trigger_session_webhook
+                from clients.services import send_new_candidate_alert, trigger_session_webhook, create_notification
                 send_new_candidate_alert(
                     self.session.client, self.session, "custom"
+                )
+                create_notification(
+                    self.session.client,
+                    "candidate_started",
+                    "New Candidate Started",
+                    message=f"{self.session.candidate_id} started the Custom Assessment",
+                    link_url=reverse('clients:assessment-manage', kwargs={'assessment_type': 'custom'}),
                 )
                 # Trigger webhook for session started
                 trigger_session_webhook(self.session, "session.started")

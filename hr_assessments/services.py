@@ -176,8 +176,17 @@ def evaluate_session(session: HRAssessmentSession):
     )
 
     if session.client:
-        from clients.services import send_completion_alert, trigger_session_webhook
+        from django.urls import reverse
+        from clients.services import create_notification, send_completion_alert, trigger_session_webhook
         send_completion_alert(session.client, session, "hr")
+        link_url = reverse('clients:assessment-detail', kwargs={'assessment_type': 'hr', 'session_uuid': session.uuid})
+        create_notification(
+            session.client,
+            "assessment_completed",
+            "HR Assessment Completed",
+            message=f"{session.candidate_id} completed the HR Assessment",
+            link_url=link_url,
+        )
         trigger_session_webhook(session, "session.completed")
 
     return session

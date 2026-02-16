@@ -485,12 +485,21 @@ class ClientNotification(TimeStampedModel):
         ("warning", "Warning"),
         ("success", "Success"),
     ]
+    CATEGORY_CHOICES = [
+        ("assessment_completed", "Assessment Completed"),
+        ("candidate_started", "Candidate Started"),
+        ("pipeline_update", "Pipeline Update"),
+        ("scoring_complete", "Scoring Complete"),
+        ("decision_recorded", "Decision Recorded"),
+        ("system", "System"),
+    ]
 
     client = models.ForeignKey(ClientAccount, on_delete=models.CASCADE, related_name="notifications")
     title = models.CharField(max_length=255)
     message = models.TextField(blank=True)
     level = models.CharField(max_length=16, choices=LEVEL_CHOICES, default="info")
-    link_url = models.URLField(blank=True)
+    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default="system")
+    link_url = models.CharField(max_length=500, blank=True)
     is_read = models.BooleanField(default=False)
 
     class Meta:

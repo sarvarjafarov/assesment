@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import transaction
+from django.urls import reverse
 from django.utils import timezone
 
 from .constants import LEVEL_DIFFICULTY_RANGES
@@ -551,6 +552,30 @@ View results: {results_url}
             client_email,
             session.candidate_id,
         )
+
+        # In-app notification
+        try:
+            from clients.services import create_notification
+
+            link_url = reverse(
+                "custom_assessments:session-result",
+                kwargs={"session_uuid": session.uuid},
+            )
+            status_label = "passed" if session.passed else "completed"
+            create_notification(
+                client=session.client,
+                category="assessment_completed",
+                title="Assessment Completed",
+                message=(
+                    f"{session.candidate_id} has {status_label} the "
+                    f"{session.assessment.name} assessment "
+                    f"(score: {int(session.score) if session.score else 0}%)."
+                ),
+                link_url=link_url,
+            )
+        except Exception:
+            logger.exception("Failed to create assessment completion notification")
+
         return True, None
     except Exception as exc:
         logger.warning(
@@ -786,6 +811,29 @@ def trigger_ai_scoring_for_session(session: "CustomAssessmentSession") -> None:
         results["scored_count"],
         results["failed_count"],
     )
+
+    # In-app notification
+    try:
+        from clients.services import create_notification
+
+        link_url = reverse(
+            "custom_assessments:session-result",
+            kwargs={"session_uuid": session.uuid},
+        )
+        create_notification(
+            client=session.client,
+            category="scoring_complete",
+            title="AI Scoring Complete",
+            message=(
+                f"AI scoring finished for {session.candidate_id} on "
+                f"{session.assessment.name}: "
+                f"{results['scored_count']} scored, "
+                f"{results['failed_count']} failed."
+            ),
+            link_url=link_url,
+        )
+    except Exception:
+        logger.exception("Failed to create AI scoring notification")
 
 
 def manual_score_response(

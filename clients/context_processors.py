@@ -94,6 +94,9 @@ def portal_navigation(request):
         if project_count > 0:
             context['project_badge_count'] = project_count
 
+        # Unread notification count for badge
+        context['notification_unread_count'] = account.notifications.filter(is_read=False).count()
+
         # Sidebar plan usage (lightweight)
         invite_limit = account.invite_limit()
         invites_used = account.invites_used() if invite_limit else 0

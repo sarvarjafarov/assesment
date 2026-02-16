@@ -87,8 +87,15 @@ class FinanceAssessmentView(FormView):
         if updates:
             self.session.save(update_fields=updates + ["updated_at"])
             if is_first_start and self.session.client:
-                from clients.services import send_new_candidate_alert, trigger_session_webhook
+                from clients.services import send_new_candidate_alert, trigger_session_webhook, create_notification
                 send_new_candidate_alert(self.session.client, self.session, "finance")
+                create_notification(
+                    self.session.client,
+                    "candidate_started",
+                    "New Candidate Started",
+                    message=f"{self.session.candidate_id} started the Finance Assessment",
+                    link_url=reverse('clients:assessment-manage', kwargs={'assessment_type': 'finance'}),
+                )
                 trigger_session_webhook(self.session, "session.started")
         update_session_telemetry(self.session, request=request)
         duration_minutes = self.session.duration_minutes or 0
