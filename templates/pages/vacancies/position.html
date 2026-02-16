@@ -1,0 +1,116 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ position.title }} &mdash; {{ client.company_name }}</title>
+    <meta name="description" content="Apply for {{ position.title }} at {{ client.company_name }}.">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/portal-pages.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: {{ client.brand_primary_color|default:"#ff8a00" }};
+            --brand-secondary: {{ client.brand_secondary_color|default:"#0e1428" }};
+        }
+    </style>
+</head>
+<body class="vc-body">
+    <div class="vc-shell">
+        <nav class="vc-breadcrumb">
+            <a href="{% url 'pages:vacancy_list' company_slug=client.slug %}">{{ client.company_name }}</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span>{{ position.title }}</span>
+        </nav>
+
+        <header class="vc-position-hero">
+            {% if client.logo_data_url %}
+            <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo-sm">
+            {% endif %}
+            <h1>{{ position.title }}</h1>
+            {% if position.department or position.location %}
+            <p class="vc-position-meta">
+                {% if position.department %}{{ position.department }}{% endif %}
+                {% if position.department and position.location %} &middot; {% endif %}
+                {% if position.location %}{{ position.location }}{% endif %}
+            </p>
+            {% endif %}
+        </header>
+
+        <div class="vc-position-layout">
+            <div class="vc-position-info">
+                {% if position.employment_type or position.work_model or position.salary_display %}
+                <div class="vc-details">
+                    {% if position.employment_type %}
+                    <div class="vc-detail">
+                        <span class="vc-detail-label">Employment</span>
+                        <span class="vc-detail-val">{{ position.get_employment_type_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if position.work_model %}
+                    <div class="vc-detail">
+                        <span class="vc-detail-label">Work Model</span>
+                        <span class="vc-detail-val">{{ position.get_work_model_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if position.salary_display %}
+                    <div class="vc-detail">
+                        <span class="vc-detail-label">Salary Range</span>
+                        <span class="vc-detail-val">{{ position.salary_display }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="vc-detail">
+                        <span class="vc-detail-label">Open Roles</span>
+                        <span class="vc-detail-val">{{ position.open_roles }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if position.description %}
+                <div class="vc-description">
+                    <h2>About this role</h2>
+                    <p>{{ position.description|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+
+                {% if position.skills_list %}
+                <div class="vc-skills">
+                    <h3>Required Skills</h3>
+                    <div class="vc-skill-pills">
+                        {% for skill in position.skills_list %}
+                        <span class="vc-skill-pill">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <aside class="vc-apply-panel">
+                <h2>Apply for this position</h2>
+                <form method="post" action="{% url 'pages:vacancy_apply' company_slug=client.slug position_uuid=position.uuid %}" enctype="multipart/form-data" class="vc-apply-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="vc-field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<span class="vc-help">{{ field.help_text }}</span>{% endif %}
+                        {% for error in field.errors %}
+                        <span class="vc-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="vc-submit">Submit Application</button>
+                </form>
+            </aside>
+        </div>
+
+        <footer class="vc-footer">
+            <span>Powered by <a href="{% url 'pages:home' %}">Evalon</a></span>
+        </footer>
+    </div>
+</body>
+</html>

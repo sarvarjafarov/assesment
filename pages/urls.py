@@ -14,6 +14,11 @@ urlpatterns = [
     path('careers/<slug:company_slug>/<uuid:position_uuid>/', views.position_detail_public, name='position_detail_public'),
     path('careers/<slug:company_slug>/<uuid:position_uuid>/apply/', views.position_apply, name='position_apply'),
     path('careers/<slug:company_slug>/<uuid:position_uuid>/applied/', views.position_applied, name='position_applied'),
+    # Public Vacancy Pages (no auto-assessment)
+    path('vacancies/<slug:company_slug>/', views.vacancy_list, name='vacancy_list'),
+    path('vacancies/<slug:company_slug>/<uuid:position_uuid>/', views.vacancy_detail, name='vacancy_detail'),
+    path('vacancies/<slug:company_slug>/<uuid:position_uuid>/apply/', views.vacancy_apply, name='vacancy_apply'),
+    path('vacancies/<slug:company_slug>/<uuid:position_uuid>/applied/', views.vacancy_applied, name='vacancy_applied'),
     path('security/', views.security, name='security'),
     path('privacy/', views.privacy, name='privacy'),
     path('terms/', views.terms, name='terms'),

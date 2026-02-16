@@ -659,7 +659,10 @@ class ClientProject(TimeStampedModel):
 class PositionApplication(TimeStampedModel):
     STATUS_CHOICES = [
         ("pending", "Pending"),
+        ("reviewed", "Reviewed"),
+        ("assessment_sent", "Assessment Sent"),
         ("session_created", "Session Created"),
+        ("hired", "Hired"),
         ("rejected", "Rejected"),
     ]
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -667,6 +670,7 @@ class PositionApplication(TimeStampedModel):
     client = models.ForeignKey(ClientAccount, related_name="applications", on_delete=models.CASCADE)
     full_name = models.CharField(max_length=200)
     email = models.EmailField()
+    phone_number = models.CharField(max_length=32, blank=True)
     resume_data = models.BinaryField(blank=True, null=True, editable=False)
     resume_mime = models.CharField(max_length=100, blank=True)
     resume_filename = models.CharField(max_length=255, blank=True)

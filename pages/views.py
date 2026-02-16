@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
-from .forms import DemoRequestForm, PositionApplyForm
+from .forms import DemoRequestForm, PositionApplyForm, VacancyApplyForm
 from django.db.models import Count, Prefetch
 from .models import NewsletterSubscriber, PublicAssessment, Role, InterviewQuestion
 
@@ -1577,6 +1577,129 @@ def position_applied(request, company_slug, position_uuid):
     position = get_object_or_404(ClientProject, client=client, uuid=position_uuid)
 
     return render(request, "pages/careers/applied.html", {
+        "client": client,
+        "position": position,
+    })
+
+
+# ── Public Vacancy Views (no auto-assessment) ─────────────────────────
+
+def vacancy_list(request, company_slug):
+    """Public vacancy page listing open positions for a company."""
+    from clients.models import ClientAccount, ClientProject
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    positions = ClientProject.objects.filter(
+        client=client,
+        status=ClientProject.STATUS_ACTIVE,
+        published=True,
+    )
+
+    return render(request, "pages/vacancies/company.html", {
+        "client": client,
+        "positions": positions,
+    })
+
+
+def vacancy_detail(request, company_slug, position_uuid):
+    """Public position detail with vacancy apply form."""
+    from clients.models import ClientAccount, ClientProject
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    position = get_object_or_404(
+        ClientProject,
+        client=client,
+        uuid=position_uuid,
+        status=ClientProject.STATUS_ACTIVE,
+        published=True,
+    )
+    form = VacancyApplyForm()
+
+    return render(request, "pages/vacancies/position.html", {
+        "client": client,
+        "position": position,
+        "form": form,
+    })
+
+
+@require_POST
+def vacancy_apply(request, company_slug, position_uuid):
+    """Handle vacancy application — just creates record, no assessment."""
+    from django.db import IntegrityError
+    from clients.models import ClientAccount, ClientProject, PositionApplication
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    position = get_object_or_404(
+        ClientProject,
+        client=client,
+        uuid=position_uuid,
+        status=ClientProject.STATUS_ACTIVE,
+        published=True,
+    )
+
+    form = VacancyApplyForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return render(request, "pages/vacancies/position.html", {
+            "client": client,
+            "position": position,
+            "form": form,
+        })
+
+    email = form.cleaned_data["email"]
+    full_name = form.cleaned_data["full_name"]
+    phone_number = form.cleaned_data.get("phone_number", "")
+    resume_file = form.cleaned_data.get("resume")
+
+    # Check duplicate
+    if PositionApplication.objects.filter(project=position, email=email).exists():
+        form.add_error("email", "You have already applied to this position.")
+        return render(request, "pages/vacancies/position.html", {
+            "client": client,
+            "position": position,
+            "form": form,
+        })
+
+    # Store resume bytes
+    resume_data = b""
+    resume_mime = ""
+    resume_filename = ""
+    if resume_file:
+        resume_data = resume_file.read()
+        resume_mime = getattr(resume_file, "content_type", "")
+        resume_filename = getattr(resume_file, "name", "")
+
+    try:
+        PositionApplication.objects.create(
+            project=position,
+            client=client,
+            full_name=full_name,
+            email=email,
+            phone_number=phone_number,
+            resume_data=resume_data or None,
+            resume_mime=resume_mime,
+            resume_filename=resume_filename,
+            status="pending",
+            ip_address=request.META.get("REMOTE_ADDR"),
+        )
+    except IntegrityError:
+        form.add_error("email", "You have already applied to this position.")
+        return render(request, "pages/vacancies/position.html", {
+            "client": client,
+            "position": position,
+            "form": form,
+        })
+
+    return redirect("pages:vacancy_applied", company_slug=company_slug, position_uuid=position_uuid)
+
+
+def vacancy_applied(request, company_slug, position_uuid):
+    """Success page after vacancy application."""
+    from clients.models import ClientAccount, ClientProject
+
+    client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+    position = get_object_or_404(ClientProject, client=client, uuid=position_uuid)
+
+    return render(request, "pages/vacancies/applied.html", {
         "client": client,
         "position": position,
     })

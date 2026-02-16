@@ -50,7 +50,7 @@ from .forms import (
     EmailPreferencesForm,
     SocialProfileCompleteForm,
 )
-from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote, SupportRequest
+from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote, PositionApplication, SupportRequest
 from .services import send_verification_email, send_approval_notification, send_welcome_email, is_ssrf_target
 
 logger = logging.getLogger(__name__)
@@ -3029,3 +3029,185 @@ class NotificationsMarkReadView(LoginRequiredMixin, View):
 
         unread_count = account.notifications.filter(is_read=False).count()
         return JsonResponse({"success": True, "unread_count": unread_count})
+
+
+# ── Application Management Views ──────────────────────────────────────
+
+class ApplicationListView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/applications/list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        applications = PositionApplication.objects.filter(
+            client=self.account,
+        ).select_related("project")
+
+        project_uuid = self.request.GET.get("position")
+        if project_uuid:
+            applications = applications.filter(project__uuid=project_uuid)
+
+        status_filter = self.request.GET.get("status")
+        if status_filter and status_filter in dict(PositionApplication.STATUS_CHOICES):
+            applications = applications.filter(status=status_filter)
+
+        context["applications"] = applications
+        context["projects"] = self.account.projects.order_by("-created_at")
+        context["status_choices"] = PositionApplication.STATUS_CHOICES
+        context["selected_position"] = project_uuid or ""
+        context["selected_status"] = status_filter or ""
+        return context
+
+
+class ApplicationDetailView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/applications/detail.html"
+
+    def get_application(self):
+        if not hasattr(self, "_application"):
+            self._application = get_object_or_404(
+                PositionApplication,
+                client=self.account,
+                uuid=self.kwargs.get("application_uuid"),
+            )
+        return self._application
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        application = self.get_application()
+        context["application"] = application
+        context["position"] = application.project
+
+        from .forms import SendAssessmentFromApplicationForm
+        context["send_assessment_form"] = SendAssessmentFromApplicationForm(client=self.account)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        application = self.get_application()
+        new_status = request.POST.get("new_status")
+        valid_transitions = {
+            "pending": ["reviewed", "rejected"],
+            "reviewed": ["assessment_sent", "hired", "rejected"],
+            "assessment_sent": ["hired", "rejected"],
+        }
+        allowed = valid_transitions.get(application.status, [])
+        if new_status in allowed:
+            application.status = new_status
+            application.save(update_fields=["status", "updated_at"])
+            messages.success(request, f"Application status updated to {application.get_status_display()}.")
+        else:
+            messages.error(request, "Invalid status transition.")
+        return redirect("clients:application-detail", application_uuid=application.uuid)
+
+
+class ApplicationResumeDownloadView(ClientProjectAccessMixin, View):
+    def get(self, request, *args, **kwargs):
+        application = get_object_or_404(
+            PositionApplication,
+            client=self.account,
+            uuid=kwargs.get("application_uuid"),
+        )
+        if not application.resume_data:
+            raise Http404("No resume attached.")
+        response = HttpResponse(
+            bytes(application.resume_data),
+            content_type=application.resume_mime or "application/octet-stream",
+        )
+        filename = application.resume_filename or f"{application.full_name}_resume"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
+
+
+class ApplicationSendAssessmentView(ClientProjectAccessMixin, View):
+    def post(self, request, *args, **kwargs):
+        from .forms import SendAssessmentFromApplicationForm
+
+        application = get_object_or_404(
+            PositionApplication,
+            client=self.account,
+            uuid=kwargs.get("application_uuid"),
+        )
+
+        if application.status not in ("pending", "reviewed"):
+            messages.error(request, "Assessment has already been sent for this application.")
+            return redirect("clients:application-detail", application_uuid=application.uuid)
+
+        form = SendAssessmentFromApplicationForm(request.POST, client=self.account)
+        if not form.is_valid():
+            messages.error(request, "Please select a valid assessment type.")
+            return redirect("clients:application-detail", application_uuid=application.uuid)
+
+        assessment_type = form.cleaned_data["assessment_type"]
+        config = ClientAssessmentMixin.ASSESSMENT_CONFIG.get(assessment_type)
+        if not config:
+            messages.error(request, "Invalid assessment type.")
+            return redirect("clients:application-detail", application_uuid=application.uuid)
+
+        SessionModel = config["session_model"]
+        form_class = config["form_class"]
+        generate_question_set = form_class.generate_question_set
+
+        level = "mid"
+        question_set = generate_question_set(level=level)
+        session, created = SessionModel.objects.get_or_create(
+            candidate_id=application.email,
+            client=self.account,
+            defaults={"status": "draft"},
+        )
+        session.question_set = question_set
+        session.status = "in_progress"
+        session.client = self.account
+        session.project = application.project
+        session.level = level
+        session.duration_minutes = 45
+        session.started_at = None
+        session.save()
+
+        application.status = "assessment_sent"
+        application.assessment_session_uuid = session.uuid
+        application.assessment_type = assessment_type
+        application.save(update_fields=["status", "assessment_session_uuid", "assessment_type", "updated_at"])
+
+        if getattr(settings, "EMAIL_ENABLED", False):
+            route = config["candidate_route"]
+            start_link = request.build_absolute_uri(reverse(route, args=[session.uuid]))
+            candidate_first_name = (
+                application.full_name.split()[0]
+                if application.full_name.strip()
+                else application.email.split("@")[0].title()
+            )
+
+            email_context = {
+                "company_name": self.account.company_name,
+                "invited_by": self.account.company_name,
+                "candidate": {"first_name": candidate_first_name},
+                "assessment": {"title": config["label"]},
+                "start_link": start_link,
+                "session_link": start_link,
+                "due_at": None,
+                "notes": "",
+                "brand_primary": self.account.brand_primary_color or "#ff8a00",
+                "brand_secondary": self.account.brand_secondary_color or "#0e1428",
+                "hide_evalon_branding": self.account.hide_evalon_branding,
+                "client_footer_text": self.account.get_footer_text(),
+            }
+
+            subject = f"{self.account.company_name} invited you to the {config['label']}"
+            html_body = render_to_string("emails/invite_candidate.html", email_context)
+            text_body = strip_tags(html_body)
+
+            try:
+                msg = EmailMultiAlternatives(
+                    subject,
+                    text_body,
+                    getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                    [application.email],
+                )
+                msg.attach_alternative(html_body, "text/html")
+                msg.send()
+                messages.success(request, f"Assessment invitation sent to {application.email}.")
+            except Exception as exc:
+                logger.warning("Failed to email invite for application %s: %s", application.uuid, exc)
+                messages.warning(request, "Assessment created but email failed. Share the link manually.")
+        else:
+            messages.success(request, f"Assessment session created for {application.email}.")
+
+        return redirect("clients:application-detail", application_uuid=application.uuid)

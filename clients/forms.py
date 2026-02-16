@@ -1011,3 +1011,21 @@ class WebhookSettingsForm(forms.ModelForm):
             self.add_error("webhook_url", "Webhook URL is required when webhooks are enabled")
 
         return cleaned
+
+
+class SendAssessmentFromApplicationForm(forms.Form):
+    assessment_type = forms.ChoiceField(
+        choices=ClientAccount.ASSESSMENT_CHOICES,
+        label="Assessment Type",
+    )
+
+    def __init__(self, *args, client=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.client = client
+        if client:
+            allowed = client.approved_assessments
+            self.fields["assessment_type"].choices = [
+                (code, label)
+                for code, label in ClientAccount.ASSESSMENT_CHOICES
+                if code in allowed
+            ]

@@ -79,6 +79,14 @@
                     {% endif %}
                 </a>
 
+                <a href="{% url 'clients:application-list' %}" class="nav-item {% if request.resolver_match.url_name == 'application-list' or request.resolver_match.url_name == 'application-detail' %}active{% endif %}" {% if request.resolver_match.url_name == 'application-list' or request.resolver_match.url_name == 'application-detail' %}aria-current="page"{% endif %}>
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                    <span class="nav-label">Applications</span>
+                </a>
+
                 <a href="{% url 'clients:analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" {% if request.resolver_match.url_name == 'analytics' %}aria-current="page"{% endif %}>
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="20" x2="12" y2="10"></line>

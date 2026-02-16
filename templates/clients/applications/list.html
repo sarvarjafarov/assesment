@@ -1,0 +1,76 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Applications · Evalon{% endblock %}
+{% block meta_description %}Review candidate applications across all positions.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+
+    <header class="ap-header">
+        <div>
+            <h1>Applications</h1>
+            <p class="muted">Review candidate applications across all positions</p>
+        </div>
+    </header>
+
+    <div class="ap-filters">
+        <form method="get" class="ap-filter-form">
+            <select name="position" class="ap-filter-select">
+                <option value="">All positions</option>
+                {% for project in projects %}
+                <option value="{{ project.uuid }}" {% if selected_position == project.uuid|stringformat:"s" %}selected{% endif %}>{{ project.title }}</option>
+                {% endfor %}
+            </select>
+            <select name="status" class="ap-filter-select">
+                <option value="">All statuses</option>
+                {% for code, label in status_choices %}
+                <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-outline small">Filter</button>
+        </form>
+    </div>
+
+    {% if applications %}
+    <div class="ap-table-wrap">
+        <table class="ap-table">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th>Applied</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr class="ap-row">
+                    <td>
+                        <span class="ap-name">{{ app.full_name }}</span>
+                        <span class="ap-email">{{ app.email }}</span>
+                    </td>
+                    <td>{{ app.project.title }}</td>
+                    <td><span class="ap-status ap-status-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                    <td class="ap-cell-muted">{{ app.created_at|naturaltime }}</td>
+                    <td class="ap-cell-action">
+                        <a href="{% url 'clients:application-detail' application_uuid=app.uuid %}" class="ap-view-link">View &rarr;</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="ap-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+        </svg>
+        <h3>No applications yet</h3>
+        <p class="muted">Applications will appear here when candidates apply through your vacancy page.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
