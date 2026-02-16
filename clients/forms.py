@@ -709,10 +709,16 @@ class ClientProjectForm(forms.ModelForm):
     def __init__(self, *args, client: ClientAccount, **kwargs):
         self.client = client
         super().__init__(*args, **kwargs)
+        # status is not rendered in the quick-create template; allow blank so
+        # the form validates and falls back to the model default.
+        self.fields["status"].required = False
+        self.fields["status"].initial = ClientProject.STATUS_ACTIVE
 
     def save(self, commit=True):
         project = super().save(commit=False)
         project.client = self.client
+        if not project.status:
+            project.status = ClientProject.STATUS_ACTIVE
         if commit:
             project.save()
         return project
