@@ -929,6 +929,14 @@ class BrandingSettingsForm(forms.ModelForm):
                 "Upgrade to Pro or Enterprise to customize email sender"
             )
 
+    def clean(self):
+        cleaned = super().clean()
+        # Server-side enforcement of plan restrictions
+        if self.instance and not self.instance.can_use_white_labeling:
+            cleaned["hide_evalon_branding"] = False
+            cleaned["custom_email_sender_name"] = ""
+        return cleaned
+
 
 class WebhookSettingsForm(forms.ModelForm):
     """Form for managing webhook and API integration settings."""

@@ -301,6 +301,9 @@ def _send_candidate_assessment_email(
     client=None,
 ):
     """Send an assessment invite email to the candidate."""
+    if not getattr(settings, 'EMAIL_ENABLED', True):
+        logger.info('EMAIL_ENABLED is False. Skipping invite to %s for %s.', candidate_email, assessment_label)
+        return
     site_url = getattr(settings, 'SITE_URL', 'https://www.evalon.tech')
     start_link = site_url.rstrip('/') + reverse(route_name, args=[session.uuid])
 

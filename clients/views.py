@@ -916,17 +916,18 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         }
 
     def _benchmark_snapshot(self) -> dict:
+        account = self.request.user.client_account
         durations: list[float] = []
         scores: list[float] = []
         total_invites = 0
         total_completed = 0
         datasets = (
-            (DigitalMarketingAssessmentSession.objects.all(), "overall_score"),
-            (ProductAssessmentSession.objects.all(), "overall_score"),
-            (BehavioralAssessmentSession.objects.all(), "eligibility_score"),
-            (UXDesignAssessmentSession.objects.all(), "overall_score"),
-            (HRAssessmentSession.objects.all(), "overall_score"),
-            (FinanceAssessmentSession.objects.all(), "overall_score"),
+            (DigitalMarketingAssessmentSession.objects.filter(client=account), "overall_score"),
+            (ProductAssessmentSession.objects.filter(client=account), "overall_score"),
+            (BehavioralAssessmentSession.objects.filter(client=account), "eligibility_score"),
+            (UXDesignAssessmentSession.objects.filter(client=account), "overall_score"),
+            (HRAssessmentSession.objects.filter(client=account), "overall_score"),
+            (FinanceAssessmentSession.objects.filter(client=account), "overall_score"),
         )
         for queryset, score_field in datasets:
             total_invites += queryset.count()
@@ -1054,10 +1055,9 @@ class ClientAnalyticsView(LoginRequiredMixin, TemplateView):
         if period_days:
             cutoff = timezone.now() - timedelta(days=period_days)
 
-        # Aggregate all sessions
+        # Aggregate all sessions across all assessment types in the dataset
         all_sessions = []
-        for assessment_type in ['marketing', 'product', 'behavioral']:
-            qs = dataset_map.get(assessment_type, [])
+        for assessment_type, qs in dataset_map.items():
             if cutoff:
                 qs = qs.filter(created_at__gte=cutoff)
             all_sessions.extend(list(qs))

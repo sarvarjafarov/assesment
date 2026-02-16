@@ -697,7 +697,11 @@ class BulkInviteView(LoginRequiredMixin, PremiumRequiredMixin, View):
         deadline_at = form.cleaned_data.get("deadline_at")
 
         # Parse CSV
-        content = csv_file.read().decode("utf-8-sig")
+        try:
+            content = csv_file.read().decode("utf-8-sig")
+        except (UnicodeDecodeError, ValueError):
+            messages.error(request, "Could not read CSV file. Please ensure it is saved as UTF-8.")
+            return redirect("custom_assessments:detail", uuid=uuid)
         reader = csv.DictReader(io.StringIO(content))
 
         invited_count = 0
