@@ -22,6 +22,26 @@
                 <p class="al-desc">No assessments found. Try a different search term.</p>
                 {% endif %}
 
+                {# Trust stats #}
+                <div class="al-trust-stats">
+                    <span class="al-trust-stat">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <strong>500+</strong> companies
+                    </span>
+                    <span class="al-trust-stat">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        <strong>6</strong> assessment types
+                    </span>
+                    <span class="al-trust-stat">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        AI-powered scoring
+                    </span>
+                    <span class="al-trust-stat">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <strong>&lt; 45 min</strong> average
+                    </span>
+                </div>
+
                 <form action="{% url 'pages:assessment_list' %}" method="get" class="al-search"
                       data-gtag-submit="assessment_search"
                       data-gtag-category="search"
@@ -36,6 +56,7 @@
             <section class="al-grid" id="grid">
                 {% for assessment in assessments %}
                 <a class="al-card" href="{{ assessment.get_absolute_url }}"
+                   style="--al-accent: {{ assessment.theme_color }}; --al-accent-rgb: {{ assessment.theme_rgb }}"
                    data-assessment-card
                    data-gtag-click="assessment_cta_click"
                    data-gtag-category="engagement"
@@ -58,7 +79,7 @@
                             <span class="al-meta-dot"></span>
                             <span>{{ assessment.question_count }} Qs</span>
                             <span class="al-meta-dot"></span>
-                            <span>{{ assessment.get_difficulty_level_display }}</span>
+                            <span class="al-difficulty al-difficulty--{{ assessment.difficulty_level }}">{{ assessment.get_difficulty_level_display }}</span>
                         </div>
                         <span class="al-card-arrow">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -82,6 +103,24 @@
                    data-gtag-label="load_more">Load more assessments</a>
             </div>
             {% endif %}
+
+            {# Bottom CTA #}
+            <section class="al-cta">
+                <div class="al-cta-inner">
+                    <h2>Not sure which assessment fits?</h2>
+                    <p>Talk to our team for a personalized recommendation — or start free and explore on your own.</p>
+                    <div class="al-cta-actions">
+                        <a class="ad-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="assessment_list_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="list_cta_trial">Start Free Trial</a>
+                        <a class="ad-btn-secondary" href="{% url 'pages:contact' %}"
+                           data-gtag-click="contact_sales_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="list_cta_sales">Contact Sales</a>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 </div>

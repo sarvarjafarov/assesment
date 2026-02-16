@@ -13756,7 +13756,7 @@ main {
    PUBLIC ASSESSMENTS - List and Detail Pages
    ======================================================================== */
 
-/* ── Assessment List V2 — clean minimal cards ── */
+/* ── Assessment List ── */
 .al-shell {
     max-width: 1140px;
     margin: 0 auto;
@@ -13790,8 +13790,39 @@ main {
 .al-desc {
     font-size: 1rem;
     color: #6b7280;
-    margin: 0 0 2rem;
+    margin: 0 0 1.75rem;
     line-height: 1.6;
+}
+
+/* Trust stats */
+.al-trust-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+}
+
+.al-trust-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: #6b7280;
+    padding: 0.4rem 0.85rem;
+    background: rgba(255, 138, 0, 0.04);
+    border: 1px solid rgba(255, 138, 0, 0.1);
+    border-radius: var(--radius-full);
+}
+
+.al-trust-stat svg {
+    color: var(--color-orange);
+}
+
+.al-trust-stat strong {
+    color: var(--color-navy);
+    font-weight: 700;
 }
 
 /* Search — inline with icon */
@@ -13842,8 +13873,9 @@ main {
     gap: 1.25rem;
 }
 
-/* Card — entire thing is a link */
+/* Card — entire thing is a link, per-assessment accent color */
 .al-card {
+    --al-accent: var(--color-orange);
     display: flex;
     flex-direction: column;
     background: var(--color-white);
@@ -13852,12 +13884,13 @@ main {
     padding: 1.5rem;
     text-decoration: none;
     color: inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .al-card:hover {
-    border-color: var(--color-orange);
-    box-shadow: 0 4px 16px rgba(255, 138, 0, 0.08);
+    border-color: var(--al-accent);
+    box-shadow: 0 8px 24px rgba(var(--al-accent-rgb, 255,138,0), 0.1);
+    transform: translateY(-2px);
 }
 
 .al-card-header {
@@ -13873,9 +13906,9 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 138, 0, 0.07);
+    background: rgba(var(--al-accent-rgb, 255,138,0), 0.08);
     border-radius: 10px;
-    color: var(--color-orange);
+    color: var(--al-accent);
 }
 
 .al-card-icon svg {
@@ -13932,13 +13965,23 @@ main {
     background: #d1d5db;
 }
 
+/* Difficulty badge colors */
+.al-difficulty {
+    font-weight: 600;
+}
+
+.al-difficulty--adaptive { color: var(--al-accent, var(--color-orange)); }
+.al-difficulty--beginner { color: #059669; }
+.al-difficulty--intermediate { color: #e07800; }
+.al-difficulty--advanced { color: #dc2626; }
+
 .al-card-arrow {
     color: #d1d5db;
     transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .al-card:hover .al-card-arrow {
-    color: var(--color-orange);
+    color: var(--al-accent);
     transform: translateX(3px);
 }
 
@@ -13989,6 +14032,42 @@ main {
     color: var(--color-orange);
 }
 
+/* Bottom CTA */
+.al-cta {
+    text-align: center;
+    padding: 3.5rem 2rem;
+    margin-top: 3rem;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.04) 0%, rgba(255, 138, 0, 0.08) 100%);
+    border: 1px solid rgba(255, 138, 0, 0.12);
+    border-radius: var(--radius-xl);
+}
+
+.al-cta-inner {
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+.al-cta h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+}
+
+.al-cta p {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0 0 1.5rem;
+}
+
+.al-cta-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .al-grid {
@@ -14009,6 +14088,27 @@ main {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+
+    .al-trust-stats {
+        gap: 0.4rem;
+    }
+
+    .al-trust-stat {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.65rem;
+    }
+
+    .al-cta {
+        padding: 2.5rem 1.25rem;
+        margin-left: -1.25rem;
+        margin-right: -1.25rem;
+        border-radius: 0;
+    }
+
+    .al-cta-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 /* Homepage "See All" Link */
@@ -14017,17 +14117,31 @@ main {
     margin-top: 3rem;
 }
 
-/* ── Assessment Detail V2 — clean minimal design ── */
+/* ── Assessment Detail — per-assessment themed design ── */
 .ad-shell {
+    --ad-accent: var(--color-orange);
+    --ad-accent-rgb: 255, 138, 0;
     max-width: 800px;
     margin: 0 auto;
     padding: 0 2rem 4rem;
 }
 
-/* Detail Hero */
+/* Detail Hero — accent bar at top */
 .ad-hero {
     padding: 3rem 0 2.5rem;
     border-bottom: 1px solid #ebedf0;
+    position: relative;
+}
+
+.ad-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: var(--ad-accent);
+    border-radius: 2px;
 }
 
 .ad-hero-inner {
@@ -14049,7 +14163,7 @@ main {
 }
 
 .ad-breadcrumb a:hover {
-    color: var(--color-orange);
+    color: var(--ad-accent);
 }
 
 .ad-breadcrumb svg {
@@ -14072,7 +14186,7 @@ main {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--color-orange);
+    color: var(--ad-accent);
     margin-bottom: 0.75rem;
 }
 
@@ -14116,7 +14230,7 @@ main {
 .ad-meta-val {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--color-navy);
+    color: var(--ad-accent);
 }
 
 .ad-meta-lbl {
@@ -14126,38 +14240,47 @@ main {
     letter-spacing: 0.04em;
 }
 
+/* Difficulty badge in detail */
+.ad-difficulty { font-weight: 700; }
+.ad-difficulty--adaptive { color: var(--ad-accent); }
+.ad-difficulty--beginner { color: #059669; }
+.ad-difficulty--intermediate { color: #e07800; }
+.ad-difficulty--advanced { color: #dc2626; }
+
 .ad-hero-actions {
     display: flex;
     gap: 0.75rem;
     align-items: center;
 }
 
+/* Buttons — larger for better conversion */
 .ad-btn-primary {
     display: inline-flex;
     align-items: center;
-    padding: 0.65rem 1.5rem;
+    padding: 0.75rem 2rem;
     background: var(--color-orange);
     color: var(--color-white);
     border-radius: var(--radius-full);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     text-decoration: none;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ad-btn-primary:hover {
     background: #e07800;
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 138, 0, 0.25);
 }
 
 .ad-btn-secondary {
     display: inline-flex;
     align-items: center;
-    padding: 0.65rem 1.5rem;
+    padding: 0.75rem 2rem;
     border: 1px solid #e2e5ea;
     border-radius: var(--radius-full);
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--color-navy);
     text-decoration: none;
     transition: border-color 0.2s ease, color 0.2s ease;
@@ -14167,13 +14290,101 @@ main {
     border-color: var(--color-navy);
 }
 
-/* Sections */
+/* Trust Stats (detail page) */
+.ad-trust-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    padding: 1.5rem 0;
+}
+
+.ad-trust-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: #6b7280;
+    padding: 0.4rem 0.85rem;
+    background: rgba(var(--ad-accent-rgb), 0.04);
+    border: 1px solid rgba(var(--ad-accent-rgb), 0.1);
+    border-radius: var(--radius-full);
+}
+
+.ad-trust-stat svg {
+    color: var(--ad-accent);
+}
+
+.ad-trust-stat strong {
+    color: var(--color-navy);
+    font-weight: 700;
+}
+
+/* Sticky TOC */
+.ad-toc {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+    margin: 0;
+    background: rgba(255, 253, 248, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #ebedf0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.ad-toc::-webkit-scrollbar {
+    display: none;
+}
+
+.ad-toc-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ad-toc-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-decoration: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.ad-toc-link:hover {
+    color: var(--color-navy);
+    background: #f3f4f6;
+}
+
+.ad-toc-link--active {
+    color: var(--ad-accent);
+    background: rgba(var(--ad-accent-rgb), 0.08);
+    border-color: rgba(var(--ad-accent-rgb), 0.2);
+    font-weight: 600;
+}
+
+/* Sections — accent-colored title bar */
 .ad-section {
     padding: 3rem 0;
 }
 
 .ad-section--alt {
-    background: #fafafa;
+    background: #f5f6f8;
     padding: 3rem 2rem;
     margin-left: -2rem;
     margin-right: -2rem;
@@ -14189,6 +14400,8 @@ main {
     font-weight: 700;
     color: var(--color-navy);
     margin: 0 0 0.5rem;
+    padding-left: 0.85rem;
+    border-left: 3px solid var(--ad-accent);
 }
 
 .ad-section-desc {
@@ -14207,7 +14420,7 @@ main {
 .ad-prose p { margin: 0 0 1rem; }
 .ad-prose p:last-child { margin: 0; }
 
-/* Focus tags */
+/* Focus tags — accent-tinted */
 .ad-tags {
     display: flex;
     flex-wrap: wrap;
@@ -14215,15 +14428,17 @@ main {
 }
 
 .ad-tag {
-    padding: 0.4rem 0.85rem;
-    border: 1px solid #e2e5ea;
-    border-radius: var(--radius-full);
-    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    background: rgba(var(--ad-accent-rgb), 0.06);
+    border: 1px solid rgba(var(--ad-accent-rgb), 0.15);
+    border-left: 3px solid var(--ad-accent);
+    border-radius: 8px;
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-navy);
 }
 
-/* Skills */
+/* Skills — left accent border */
 .ad-skills {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -14233,6 +14448,7 @@ main {
 .ad-skill {
     padding: 1.25rem;
     border: 1px solid #ebedf0;
+    border-left: 3px solid var(--ad-accent);
     border-radius: 12px;
 }
 
@@ -14250,7 +14466,7 @@ main {
     line-height: 1.55;
 }
 
-/* Samples */
+/* Samples — filled number circles */
 .ad-samples {
     display: flex;
     flex-direction: column;
@@ -14273,9 +14489,9 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--color-orange);
+    background: var(--ad-accent);
     border-radius: 50%;
-    color: var(--color-orange);
+    color: var(--color-white);
     font-weight: 700;
     font-size: 0.8rem;
 }
@@ -14290,7 +14506,7 @@ main {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--color-orange);
+    color: var(--ad-accent);
     margin-bottom: 0.35rem;
 }
 
@@ -14300,6 +14516,66 @@ main {
     margin: 0;
     line-height: 1.55;
     font-weight: 500;
+}
+
+/* Mid-page CTA */
+.ad-mid-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    background: rgba(var(--ad-accent-rgb), 0.04);
+    border: 1px solid rgba(var(--ad-accent-rgb), 0.12);
+    border-radius: 14px;
+    margin: 0.5rem 0;
+}
+
+.ad-mid-cta p {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-navy);
+    margin: 0;
+}
+
+/* Scoring bars visualization */
+.ad-scoring-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ad-scoring-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.35rem;
+}
+
+.ad-scoring-bar-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-navy);
+}
+
+.ad-scoring-bar-pct {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ad-accent);
+}
+
+.ad-scoring-bar-track {
+    height: 10px;
+    background: #ebedf0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.ad-scoring-bar-fill {
+    height: 100%;
+    background: var(--ad-accent);
+    border-radius: 5px;
+    transition: width 0.6s ease;
 }
 
 /* Stats */
@@ -14323,7 +14599,7 @@ main {
     display: block;
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--color-orange);
+    color: var(--ad-accent);
     margin-bottom: 0.25rem;
 }
 
@@ -14352,7 +14628,7 @@ main {
 
 .ad-usecase svg {
     flex-shrink: 0;
-    color: var(--color-orange);
+    color: var(--ad-accent);
     margin-top: 0.1rem;
 }
 
@@ -14403,7 +14679,7 @@ main {
     content: '+';
     flex-shrink: 0;
     font-size: 1.25rem;
-    color: var(--color-orange);
+    color: var(--ad-accent);
     transition: transform 0.2s ease;
 }
 
@@ -14418,17 +14694,18 @@ main {
     line-height: 1.65;
 }
 
-/* CTA */
+/* CTA — warm gradient */
 .ad-cta {
     text-align: center;
     padding: 3.5rem 2rem;
     margin: 0 -2rem;
-    background: #fafafa;
-    border-top: 1px solid #ebedf0;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.04) 0%, rgba(255, 138, 0, 0.08) 100%);
+    border: 1px solid rgba(255, 138, 0, 0.12);
+    border-radius: var(--radius-xl);
 }
 
 .ad-cta-inner {
-    max-width: 480px;
+    max-width: 540px;
     margin: 0 auto;
 }
 
@@ -14441,7 +14718,7 @@ main {
 }
 
 .ad-cta p {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #6b7280;
     margin: 0 0 1.5rem;
 }
@@ -14450,6 +14727,28 @@ main {
     display: flex;
     gap: 0.75rem;
     justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Roles "view all" link */
+.ad-roles-more {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.ad-roles-more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ad-accent);
+    text-decoration: none;
+    transition: gap 0.2s ease;
+}
+
+.ad-roles-more a:hover {
+    gap: 0.6rem;
 }
 
 /* Related */
@@ -14467,11 +14766,13 @@ main {
     border-radius: 14px;
     text-decoration: none;
     color: inherit;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ad-related-card:hover {
-    border-color: var(--color-orange);
+    border-color: var(--al-accent, var(--ad-accent));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .ad-related-label {
@@ -14524,6 +14825,7 @@ main {
         margin-left: -1.25rem;
         margin-right: -1.25rem;
         padding: 2.5rem 1.25rem;
+        border-radius: 0;
     }
 
     .ad-meta-row {
@@ -14547,6 +14849,28 @@ main {
     .ad-btn-primary,
     .ad-btn-secondary {
         justify-content: center;
+    }
+
+    .ad-mid-cta {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.25rem;
+    }
+
+    .ad-toc {
+        margin-left: -1.25rem;
+        margin-right: -1.25rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    .ad-trust-stats {
+        gap: 0.4rem;
+    }
+
+    .ad-trust-stat {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.65rem;
     }
 }
 

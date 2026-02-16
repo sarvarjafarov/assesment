@@ -872,6 +872,21 @@ def robots_txt(request):
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
+ASSESSMENT_THEMES = {
+    'marketing': {'color': '#f59e0b', 'rgb': '245,158,11'},
+    'product': {'color': '#3b82f6', 'rgb': '59,130,246'},
+    'behavioral': {'color': '#8b5cf6', 'rgb': '139,92,246'},
+    'ux_design': {'color': '#ec4899', 'rgb': '236,72,153'},
+    'hr': {'color': '#10b981', 'rgb': '16,185,129'},
+    'finance': {'color': '#06b6d4', 'rgb': '6,182,212'},
+}
+
+
+def _get_assessment_theme(slug):
+    """Return theme dict for an assessment slug, with fallback to orange."""
+    return ASSESSMENT_THEMES.get(slug, {'color': '#ff8a00', 'rgb': '255,138,0'})
+
+
 def assessment_list(request):
     """List all active public assessments with search."""
     assessments = PublicAssessment.objects.filter(is_active=True)
@@ -889,26 +904,40 @@ def assessment_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Annotate assessments with theme colors
+    for a in page_obj:
+        theme = _get_assessment_theme(a.slug)
+        a.theme_color = theme['color']
+        a.theme_rgb = theme['rgb']
+
     return render(request, 'pages/assessments/list.html', {
         'assessments': page_obj,
         'page_obj': page_obj,
         'query': query,
         'is_paginated': page_obj.has_other_pages(),
+        'themes': ASSESSMENT_THEMES,
     })
 
 
 def assessment_detail(request, slug):
     """Display detailed public assessment information."""
     assessment = get_object_or_404(PublicAssessment, slug=slug, is_active=True)
+    theme = _get_assessment_theme(assessment.slug)
 
     # Get related assessments (excluding current)
     related = PublicAssessment.objects.filter(
         is_active=True
     ).exclude(pk=assessment.pk).order_by('order')[:4]
+    for r in related:
+        t = _get_assessment_theme(r.slug)
+        r.theme_color = t['color']
+        r.theme_rgb = t['rgb']
 
     return render(request, 'pages/assessments/detail.html', {
         'assessment': assessment,
         'related_assessments': related,
+        'theme_color': theme['color'],
+        'theme_rgb': theme['rgb'],
     })
 
 
@@ -923,14 +952,22 @@ def assessment_preview(request, slug, token):
     if str(assessment.preview_key) != str(token) and not request.user.is_staff:
         raise Http404
 
+    theme = _get_assessment_theme(assessment.slug)
+
     related = PublicAssessment.objects.filter(
         is_active=True
     ).exclude(pk=assessment.pk).order_by('order')[:4]
+    for r in related:
+        t = _get_assessment_theme(r.slug)
+        r.theme_color = t['color']
+        r.theme_rgb = t['rgb']
 
     return render(request, 'pages/assessments/detail.html', {
         'assessment': assessment,
         'related_assessments': related,
         'preview_mode': True,
+        'theme_color': theme['color'],
+        'theme_rgb': theme['rgb'],
     })
 
 

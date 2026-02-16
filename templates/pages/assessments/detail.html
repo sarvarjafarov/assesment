@@ -31,7 +31,7 @@
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='assessments' %}
     <main>
-        <div class="ad-shell">
+        <div class="ad-shell" style="--ad-accent: {{ theme_color }}; --ad-accent-rgb: {{ theme_rgb }}">
             {# Hero #}
             <header class="ad-hero">
                 <div class="ad-hero-inner">
@@ -59,7 +59,7 @@
                             <span class="ad-meta-lbl">Questions</span>
                         </div>
                         <div class="ad-meta-item">
-                            <span class="ad-meta-val">{{ assessment.get_difficulty_level_display }}</span>
+                            <span class="ad-meta-val ad-difficulty ad-difficulty--{{ assessment.difficulty_level }}">{{ assessment.get_difficulty_level_display }}</span>
                             <span class="ad-meta-lbl">Difficulty</span>
                         </div>
                     </div>
@@ -77,6 +77,35 @@
                     </div>
                 </div>
             </header>
+
+            {# Trust Stats #}
+            <div class="ad-trust-stats">
+                <span class="ad-trust-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <strong>500+</strong> companies
+                </span>
+                <span class="ad-trust-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    AI-powered scoring
+                </span>
+                <span class="ad-trust-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    GDPR compliant
+                </span>
+            </div>
+
+            {# Sticky TOC #}
+            <nav class="ad-toc" id="ad-toc" aria-label="Page sections">
+                <span class="ad-toc-label">On this page</span>
+                {% if assessment.description or assessment.overview_content %}<a class="ad-toc-link" href="#overview">Overview</a>{% endif %}
+                {% if assessment.focus_areas %}<a class="ad-toc-link" href="#focus">Focus Areas</a>{% endif %}
+                {% if assessment.skills_tested %}<a class="ad-toc-link" href="#skills">Skills</a>{% endif %}
+                {% if assessment.sample_questions %}<a class="ad-toc-link" href="#samples">Samples</a>{% endif %}
+                {% if assessment.scoring_rubric %}<a class="ad-toc-link" href="#scoring">Scoring</a>{% endif %}
+                {% if assessment.stats %}<a class="ad-toc-link" href="#stats">Stats</a>{% endif %}
+                {% if assessment.use_cases %}<a class="ad-toc-link" href="#use-cases">Use Cases</a>{% endif %}
+                {% if assessment.faqs %}<a class="ad-toc-link" href="#faqs">FAQs</a>{% endif %}
+            </nav>
 
             {# Overview #}
             {% if assessment.description or assessment.overview_content %}
@@ -146,12 +175,25 @@
             </section>
             {% endif %}
 
+            {# Mid-page CTA #}
+            <div class="ad-mid-cta">
+                <p>Like what you see? Start assessing candidates today.</p>
+                <a class="ad-btn-primary"
+                   href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
+                   data-gtag-click="assessment_mid_cta_click"
+                   data-gtag-category="engagement"
+                   data-gtag-label="{{ assessment.slug }}_mid">{{ assessment.cta_label }}</a>
+            </div>
+
             {# Scoring Rubric #}
             {% if assessment.scoring_rubric %}
             <section class="ad-section" id="scoring">
                 <div class="ad-section-inner">
                     <h2 class="ad-section-title">Scoring Methodology</h2>
-                    <div class="ad-prose">{{ assessment.scoring_rubric|linebreaks }}</div>
+                    <div class="ad-scoring-bars" id="scoring-bars">
+                        {# JS will parse rubric text and render bars; fallback to prose #}
+                    </div>
+                    <div class="ad-prose ad-scoring-fallback" id="scoring-fallback">{{ assessment.scoring_rubric|linebreaks }}</div>
                 </div>
             </section>
             {% endif %}
@@ -230,14 +272,14 @@
                 </div>
             </section>
 
-            {# Roles that use this assessment #}
+            {# Roles that use this assessment — capped at 6 #}
             {% if assessment.roles.exists %}
             <section class="ad-section" id="roles">
                 <div class="ad-section-inner">
                     <h2 class="ad-section-title">Roles That Use This Assessment</h2>
                     <p class="ad-section-desc">See how this assessment fits into hiring for specific positions.</p>
                     <div class="ad-related">
-                        {% for role in assessment.roles.all %}
+                        {% for role in assessment.roles.all|slice:":6" %}
                         <a class="ad-related-card" href="{{ role.get_absolute_url }}">
                             <span class="ad-related-label">{{ role.department }}</span>
                             <h3>{{ role.title }}</h3>
@@ -245,6 +287,13 @@
                         </a>
                         {% endfor %}
                     </div>
+                    {% if assessment.roles.count > 6 %}
+                    <div class="ad-roles-more">
+                        <a href="{% url 'pages:role_assessment_list' %}">View all {{ assessment.roles.count }} roles
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </section>
             {% endif %}
@@ -257,6 +306,7 @@
                     <div class="ad-related">
                         {% for related in related_assessments %}
                         <a class="ad-related-card" href="{{ related.get_absolute_url }}"
+                           style="--al-accent: {{ related.theme_color }}; --al-accent-rgb: {{ related.theme_rgb }}"
                            data-gtag-click="related_assessment_click"
                            data-gtag-category="engagement"
                            data-gtag-label="{{ related.slug }}">
@@ -277,4 +327,58 @@
         </div>
     </main>
 </div>
+
+{# Scoring bars visualization + TOC scrollspy #}
+<script>
+(function() {
+    // Scoring bars: parse rubric text and render visual bars
+    var rubric = document.getElementById('scoring-fallback');
+    var barsEl = document.getElementById('scoring-bars');
+    if (rubric && barsEl) {
+        var text = rubric.textContent || '';
+        var regex = /([A-Za-z\s\/&]+?)\s*[:–—-]\s*(\d+)\s*%/g;
+        var items = [], m;
+        while ((m = regex.exec(text)) !== null) {
+            items.push({ label: m[1].trim(), pct: parseInt(m[2], 10) });
+        }
+        if (items.length >= 2) {
+            rubric.style.display = 'none';
+            barsEl.innerHTML = items.map(function(it) {
+                return '<div class="ad-scoring-bar">' +
+                    '<div class="ad-scoring-bar-header">' +
+                    '<span class="ad-scoring-bar-label">' + it.label + '</span>' +
+                    '<span class="ad-scoring-bar-pct">' + it.pct + '%</span>' +
+                    '</div>' +
+                    '<div class="ad-scoring-bar-track"><div class="ad-scoring-bar-fill" style="width:' + it.pct + '%"></div></div>' +
+                    '</div>';
+            }).join('');
+        }
+    }
+
+    // TOC scrollspy
+    var toc = document.getElementById('ad-toc');
+    if (!toc) return;
+    var links = toc.querySelectorAll('.ad-toc-link');
+    if (!links.length) return;
+    var sections = [];
+    links.forEach(function(link) {
+        var id = link.getAttribute('href').slice(1);
+        var sec = document.getElementById(id);
+        if (sec) sections.push({ el: sec, link: link });
+    });
+    if (!sections.length) return;
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            var match = sections.find(function(s) { return s.el === entry.target; });
+            if (match) {
+                if (entry.isIntersecting) {
+                    links.forEach(function(l) { l.classList.remove('ad-toc-link--active'); });
+                    match.link.classList.add('ad-toc-link--active');
+                }
+            }
+        });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+    sections.forEach(function(s) { observer.observe(s.el); });
+})();
+</script>
 {% endblock %}
