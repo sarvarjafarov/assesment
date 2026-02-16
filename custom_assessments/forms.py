@@ -489,6 +489,12 @@ class ManualScoringForm(forms.ModelForm):
             "score_feedback": "Feedback",
         }
 
+    def clean_score(self):
+        score = self.cleaned_data.get("score")
+        if score is not None and (score < 0 or score > 100):
+            raise forms.ValidationError("Score must be between 0 and 100.")
+        return score
+
 
 class InviteCandidateForm(forms.Form):
     """Form for inviting candidates to a custom assessment."""

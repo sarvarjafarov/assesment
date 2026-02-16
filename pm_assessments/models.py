@@ -140,7 +140,7 @@ class ProductAssessmentSession(TimeStampedModel):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="product_sessions",
+        related_name="pm_sessions",
     )
     pipeline_stage = models.CharField(
         max_length=32,

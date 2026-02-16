@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.db import transaction
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
@@ -55,10 +56,16 @@ def parse_resume(file_obj) -> str:
 
 def _parse_pdf(content: bytes) -> str:
     from PyPDF2 import PdfReader
-    reader = PdfReader(io.BytesIO(content))
+    try:
+        reader = PdfReader(io.BytesIO(content))
+    except Exception as exc:
+        raise ValueError(f'Failed to read PDF: {exc}') from exc
     pages = []
     for page in reader.pages:
-        text = page.extract_text()
+        try:
+            text = page.extract_text()
+        except Exception:
+            continue
         if text:
             pages.append(text)
     return '\n'.join(pages).strip()
@@ -87,6 +94,18 @@ def _get_model():
     return getattr(settings, 'ANTHROPIC_MODEL', 'claude-sonnet-4-20250514')
 
 
+def _strip_code_fences(text: str) -> str:
+    """Remove markdown code fences from Claude responses."""
+    if text.startswith('```'):
+        lines = text.split('\n')
+        # Remove first line (```json) and last line (```)
+        if len(lines) >= 3:
+            text = '\n'.join(lines[1:-1])
+        elif len(lines) == 2:
+            text = lines[1]
+    return text.strip()
+
+
 def _call_claude(prompt: str, max_tokens: int = 2048) -> dict:
     """Call Claude and return parsed JSON response + usage metadata."""
     client = _get_anthropic_client()
@@ -97,17 +116,21 @@ def _call_claude(prompt: str, max_tokens: int = 2048) -> dict:
         model=model,
         max_tokens=max_tokens,
         messages=[{'role': 'user', 'content': prompt}],
+        timeout=60.0,
     )
 
     duration_ms = int((time.time() - start) * 1000)
+
+    if not response.content:
+        raise ValueError('Empty response from Claude API')
     text = response.content[0].text.strip()
+    text = _strip_code_fences(text)
 
-    # Strip markdown code fences if present
-    if text.startswith('```'):
-        lines = text.split('\n')
-        text = '\n'.join(lines[1:-1])
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f'Failed to parse Claude response as JSON: {exc}') from exc
 
-    parsed = json.loads(text)
     return {
         'data': parsed,
         'model': model,
@@ -336,22 +359,24 @@ def send_assessments(pipeline_candidate: PipelineCandidate) -> list[dict]:
 
         SessionModel, gen_questions = config[atype]
 
-        # Create or retrieve session
-        session, created = SessionModel.objects.get_or_create(
-            candidate_id=candidate_email,
-            client=client,
-            defaults={'status': 'draft'},
-        )
+        # Create or retrieve session (atomic to prevent duplicates)
+        with transaction.atomic():
+            session, created = SessionModel.objects.get_or_create(
+                candidate_id=candidate_email,
+                client=client,
+                defaults={'status': 'draft'},
+            )
 
-        if created or session.status == 'draft':
-            session.question_set = gen_questions(level=level)
-            session.status = 'in_progress'
-            session.level = level
-            session.save(update_fields=[
-                'question_set', 'status', 'level', 'updated_at',
-            ])
+            if created or session.status == 'draft':
+                session.question_set = gen_questions(level=level)
+                session.status = 'in_progress'
+                session.level = level
+                session.save(update_fields=[
+                    'question_set', 'status', 'level', 'updated_at',
+                ])
 
         # Email the candidate their assessment link
+        email_sent = False
         route_name = routes.get(atype)
         if route_name and created:
             try:
@@ -364,10 +389,11 @@ def send_assessments(pipeline_candidate: PipelineCandidate) -> list[dict]:
                     route_name=route_name,
                     client=client,
                 )
+                email_sent = True
             except Exception as exc:
                 logger.error(
-                    'Failed to email assessment invite to %s: %s',
-                    candidate_email, exc,
+                    'Failed to email assessment invite to %s for %s: %s',
+                    candidate_email, atype, exc,
                 )
 
         sessions_created.append({
@@ -375,6 +401,7 @@ def send_assessments(pipeline_candidate: PipelineCandidate) -> list[dict]:
             'session_uuid': str(session.uuid),
             'score': None,
             'status': session.status,
+            'email_sent': email_sent,
         })
 
     pipeline_candidate.assessment_sessions = sessions_created
@@ -574,7 +601,7 @@ def process_pipeline(pipeline: "HiringPipeline") -> dict:
         'errors': 0,
     }
 
-    candidates = pipeline.candidates.all()
+    candidates = pipeline.candidates.select_related('pipeline', 'candidate').all()
 
     for pc in candidates:
         try:
@@ -674,7 +701,11 @@ def _advance_candidate(
             elif recommendation == 'reject':
                 pc.stage = 'rejected'
             else:
-                # 'hold' — keep at decision_made
+                # 'hold' — stay at decision_made, but still record the timestamp
+                # so the candidate isn't re-processed indefinitely
+                if not pc.decided_at:
+                    pc.decided_at = timezone.now()
+                    pc.save(update_fields=['decided_at', 'updated_at'])
                 return
 
             pc.decided_at = timezone.now()

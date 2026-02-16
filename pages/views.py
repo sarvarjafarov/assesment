@@ -8,7 +8,7 @@ from django import forms
 from django.utils.text import slugify
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_POST
 
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -845,9 +845,11 @@ def newsletter_subscribe(request):
     })
 
 
-@require_GET
 @cache_page(60 * 60 * 24)  # Cache for 24 hours
 def robots_txt(request):
+    if request.method not in ('GET', 'HEAD'):
+        from django.http import HttpResponseNotAllowed
+        return HttpResponseNotAllowed(['GET', 'HEAD'])
     """
     Generate robots.txt for search engine crawlers.
     Includes sitemap location and disallows private areas.

@@ -65,7 +65,14 @@ def parse_csv_questions(file_content: str | bytes) -> list[dict]:
     questions = []
     errors = []
 
+    MAX_CSV_ROWS = 500
     for row_num, row in enumerate(reader, start=2):  # Start at 2 to account for header
+        if row_num > MAX_CSV_ROWS + 1:
+            raise CSVValidationError([{
+                "row": row_num,
+                "errors": [f"CSV exceeds maximum of {MAX_CSV_ROWS} questions"],
+                "data": {},
+            }])
         row_errors = []
 
         # Required fields
@@ -251,18 +258,27 @@ Return ONLY a valid JSON array with this exact structure (no markdown, no extra 
     response = client.messages.create(
         model=getattr(settings, "ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
         max_tokens=4096,
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        timeout=60.0,
     )
 
     # Parse JSON from response
+    if not response.content:
+        raise ValueError("Empty response from Claude API")
     response_text = response.content[0].text.strip()
 
     # Handle potential markdown code blocks
     if response_text.startswith("```"):
         lines = response_text.split("\n")
-        response_text = "\n".join(lines[1:-1])
+        if len(lines) >= 3:
+            response_text = "\n".join(lines[1:-1])
+        elif len(lines) == 2:
+            response_text = lines[1]
 
-    questions = json.loads(response_text)
+    try:
+        questions = json.loads(response_text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Failed to parse AI response as JSON: {exc}") from exc
 
     # Add difficulty level and mark as AI generated
     difficulty_map = {"junior": 2, "mid": 3, "senior": 4}
@@ -464,10 +480,10 @@ def send_completion_notification(
     # Get client email - try user's email first, fallback to account email
     client_email = None
     if session.client:
-        if session.client.user:
+        if getattr(session.client, 'user', None):
             client_email = session.client.user.email
         if not client_email:
-            client_email = session.client.email
+            client_email = getattr(session.client, 'email', None)
 
     if not client_email:
         return False, "No client email found"
@@ -626,15 +642,21 @@ Return ONLY a valid JSON object (no markdown, no extra text):
         ai_response = client.messages.create(
             model=getattr(settings, "ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
             max_tokens=500,
-            messages=[{"role": "user", "content": prompt}]
+            messages=[{"role": "user", "content": prompt}],
+            timeout=60.0,
         )
 
+        if not ai_response.content:
+            raise ValueError("Empty response from Claude API")
         response_text = ai_response.content[0].text.strip()
 
         # Handle potential markdown code blocks
         if response_text.startswith("```"):
             lines = response_text.split("\n")
-            response_text = "\n".join(lines[1:-1])
+            if len(lines) >= 3:
+                response_text = "\n".join(lines[1:-1])
+            elif len(lines) == 2:
+                response_text = lines[1]
 
         result = json.loads(response_text)
 

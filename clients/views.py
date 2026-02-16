@@ -1277,13 +1277,14 @@ class ClientSettingsView(LoginRequiredMixin, View):
             account.brand_secondary_color = _safe_color(request.POST.get("brand_secondary_color"), "#0e1428")
             account.brand_background_color = _safe_color(request.POST.get("brand_background_color"), "#ffffff")
 
-            # Update text settings
-            account.custom_welcome_message = request.POST.get("custom_welcome_message", "").strip()
-            account.custom_footer_text = request.POST.get("custom_footer_text", "").strip()
+            # Sanitize text settings to prevent stored XSS
+            from django.utils.html import escape
+            account.custom_welcome_message = escape(request.POST.get("custom_welcome_message", "").strip()[:500])
+            account.custom_footer_text = escape(request.POST.get("custom_footer_text", "").strip()[:200])
 
             # Pro/Enterprise only features
             if account.can_use_white_labeling:
-                account.custom_email_sender_name = request.POST.get("custom_email_sender_name", "").strip()
+                account.custom_email_sender_name = escape(request.POST.get("custom_email_sender_name", "").strip()[:100])
                 account.hide_evalon_branding = request.POST.get("hide_evalon_branding") == "on"
 
             account.save(update_fields=[
@@ -1305,9 +1306,16 @@ class ClientSettingsView(LoginRequiredMixin, View):
                 messages.error(request, "You don't have permission to modify webhook settings.")
                 return redirect("clients:settings")
 
-            webhook_url = request.POST.get("webhook_url", "").strip()
+            webhook_url = request.POST.get("webhook_url", "").strip()[:2000]
             webhook_enabled = request.POST.get("webhook_enabled") == "on"
-            webhook_events = request.POST.getlist("webhook_events")
+            ALLOWED_WEBHOOK_EVENTS = {
+                "session.created", "session.started",
+                "session.completed", "session.expired",
+            }
+            webhook_events = [
+                e for e in request.POST.getlist("webhook_events")
+                if e in ALLOWED_WEBHOOK_EVENTS
+            ]
 
             # Validate webhook URL if provided
             if webhook_url and not webhook_url.startswith("https://"):

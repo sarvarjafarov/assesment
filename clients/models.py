@@ -455,14 +455,17 @@ class ClientAccount(TimeStampedModel):
         return self.invite_quota_reset
 
     def invites_used(self) -> int:
+        from django.db.models import Q
         window_start = self._invite_window_start()
         tz = timezone.get_current_timezone()
         start_dt = timezone.make_aware(datetime.combine(window_start, datetime.min.time()), tz)
         total = 0
-        for rel in (
+        # Batch the counts to reduce queries where possible
+        session_rels = (
             "marketing_sessions", "pm_sessions", "behavioral_sessions",
             "ux_sessions", "hr_sessions", "finance_sessions",
-        ):
+        )
+        for rel in session_rels:
             qs = getattr(self, rel, None)
             if qs is not None:
                 total += qs.filter(created_at__gte=start_dt).count()

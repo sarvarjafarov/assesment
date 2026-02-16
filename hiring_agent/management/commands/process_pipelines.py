@@ -36,6 +36,7 @@ class Command(BaseCommand):
             return
 
         self.stdout.write(f'Processing {total} pipeline(s)...\n')
+        has_errors = False
 
         for pipeline in pipelines:
             self.stdout.write(f'  Pipeline: {pipeline.title} (ID={pipeline.id})')
@@ -54,7 +55,13 @@ class Command(BaseCommand):
                         f'Finalized={stats["finalized"]} '
                         f'Errors={stats["errors"]}'
                     )
+                    if stats.get('errors'):
+                        has_errors = True
             except Exception as exc:
                 self.stderr.write(f'    ERROR: {exc}')
+                has_errors = True
 
+        if has_errors:
+            self.stderr.write(self.style.ERROR(f'\nDone with errors. Processed {total} pipeline(s).'))
+            raise SystemExit(1)
         self.stdout.write(self.style.SUCCESS(f'\nDone! Processed {total} pipeline(s).'))

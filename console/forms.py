@@ -142,6 +142,8 @@ class SiteContentBlockForm(forms.ModelForm):
 
 
 class ResourceAssetForm(forms.ModelForm):
+    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
+
     class Meta:
         model = ResourceAsset
         fields = [
@@ -155,3 +157,10 @@ class ResourceAssetForm(forms.ModelForm):
             "order",
             "is_active",
         ]
+
+    def clean_file(self):
+        f = self.cleaned_data.get("file")
+        if f and hasattr(f, 'size'):
+            if f.size > self.MAX_FILE_SIZE:
+                raise forms.ValidationError("File must be smaller than 50 MB.")
+        return f

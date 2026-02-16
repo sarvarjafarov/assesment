@@ -127,7 +127,7 @@ class PipelineCandidate(TimeStampedModel):
     candidate = models.ForeignKey(
         'assessments.CandidateProfile',
         related_name='pipeline_entries',
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     resume_file = models.FileField(upload_to='resumes/', blank=True)
     resume_text = models.TextField(blank=True)

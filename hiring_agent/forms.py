@@ -95,13 +95,29 @@ class MultipleFileInput(forms.ClearableFileInput):
 
 
 class ResumeUploadForm(forms.Form):
+    MAX_RESUME_SIZE = 10 * 1024 * 1024  # 10 MB
+
     resumes = forms.FileField(
         label='Upload Resumes',
-        help_text='Accepted formats: PDF, DOCX. You can select multiple files.',
+        help_text='Accepted formats: PDF, DOCX (max 10 MB each). You can select multiple files.',
         widget=MultipleFileInput(attrs={
             'accept': '.pdf,.docx',
         }),
     )
+
+    def clean_resumes(self):
+        files = self.files.getlist('resumes')
+        for f in files:
+            if f.size > self.MAX_RESUME_SIZE:
+                raise forms.ValidationError(
+                    f'File "{f.name}" exceeds the 10 MB size limit.'
+                )
+            name = f.name.lower()
+            if not (name.endswith('.pdf') or name.endswith('.docx')):
+                raise forms.ValidationError(
+                    f'File "{f.name}" is not a PDF or DOCX file.'
+                )
+        return files
 
 
 class CandidateReviewForm(forms.Form):
