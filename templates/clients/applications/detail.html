@@ -168,6 +168,57 @@
             </section>
             {% endif %}
 
+            {# ── Pipeline Assessment Results ── #}
+            {% if pipeline_candidate and pipeline_candidate.assessment_sessions %}
+            <section class="apd-card">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -3px; margin-right: 6px;"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    Assessment Results
+                </h2>
+                <div class="apd-assess-results">
+                    {% for sess in pipeline_candidate.assessment_sessions %}
+                    <div class="apd-assess-result-row">
+                        <span class="apd-assess-type">{{ sess.type }}</span>
+                        <span class="apd-assess-status ap-status ap-status-{% if sess.status == 'submitted' %}reviewed{% else %}pending{% endif %}">{{ sess.status }}</span>
+                        {% if sess.score is not None %}
+                        <span class="apd-assess-score {% if sess.score >= 60 %}apd-assess-score--pass{% else %}apd-assess-score--fail{% endif %}">{{ sess.score|floatformat:0 }}/100</span>
+                        {% else %}
+                        <span class="apd-assess-score" style="color:#bbb">—</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {# ── AI Final Decision ── #}
+            {% if pipeline_candidate and pipeline_candidate.ai_final_score is not None %}
+            <section class="apd-card">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -3px; margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l2.5 2.5L16 9"></path></svg>
+                    AI Final Decision
+                </h2>
+                <div class="apd-ai-score-row">
+                    <div class="apd-ai-score {% if pipeline_candidate.ai_final_score >= 60 %}apd-ai-score--pass{% else %}apd-ai-score--fail{% endif %}">
+                        <span class="apd-ai-score-num">{{ pipeline_candidate.ai_final_score }}</span>
+                        <span class="apd-ai-score-label">/ 100</span>
+                    </div>
+                    <div class="apd-ai-verdict">
+                        {% if pipeline_candidate.ai_final_recommendation == 'advance' %}
+                        <span class="ap-status ap-status-reviewed">Advance</span>
+                        {% elif pipeline_candidate.ai_final_recommendation == 'reject' %}
+                        <span class="ap-status ap-status-rejected">Reject</span>
+                        {% elif pipeline_candidate.ai_final_recommendation == 'hold' %}
+                        <span class="ap-status ap-status-pending">Hold</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if pipeline_candidate.ai_final_summary %}
+                <p class="apd-ai-summary">{{ pipeline_candidate.ai_final_summary }}</p>
+                {% endif %}
+            </section>
+            {% endif %}
+
             {# ── Assessment Status ── #}
             {% if application.assessment_type %}
             <section class="apd-card">
