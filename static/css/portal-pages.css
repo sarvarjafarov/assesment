@@ -10172,6 +10172,92 @@
     font-style: italic;
 }
 
+/* AI Screening Results */
+.apd-ai-score-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.apd-ai-score {
+    display: flex;
+    align-items: baseline;
+    gap: 0.2rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+}
+.apd-ai-score--pass { background: rgba(16, 185, 129, 0.08); }
+.apd-ai-score--fail { background: rgba(220, 38, 38, 0.08); }
+.apd-ai-score-num {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.apd-ai-score--pass .apd-ai-score-num { color: #059669; }
+.apd-ai-score--fail .apd-ai-score-num { color: #dc2626; }
+.apd-ai-score-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #888;
+}
+.apd-ai-summary {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: #444;
+    margin: 0 0 1.25rem;
+    padding: 0.75rem 1rem;
+    background: #faf9f7;
+    border-radius: 8px;
+    border-left: 3px solid var(--color-orange, #ff8a00);
+}
+.apd-ai-skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.apd-ai-skills-col {}
+.apd-ai-skills-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.5rem;
+}
+.apd-ai-skills--matched { color: #059669; }
+.apd-ai-skills--missing { color: #dc2626; }
+.apd-ai-pills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.apd-ai-pill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+}
+.apd-ai-pill--matched {
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+}
+.apd-ai-pill--missing {
+    background: rgba(220, 38, 38, 0.08);
+    color: #991b1b;
+}
+.apd-ai-pipeline-link {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f0ede8;
+}
+.apd-ai-pipeline-link a {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-orange, #ff8a00);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.apd-ai-pipeline-link a:hover {
+    text-decoration: underline;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .apd-grid {

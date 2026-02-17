@@ -3260,6 +3260,7 @@ class ApplicationDetailView(ClientProjectAccessMixin, TemplateView):
         application = self.get_application()
         context["application"] = application
         context["position"] = application.project
+        context["pipeline_candidate"] = application.pipeline_candidate
 
         from .forms import SendAssessmentFromApplicationForm
         context["send_assessment_form"] = SendAssessmentFromApplicationForm(client=self.account)

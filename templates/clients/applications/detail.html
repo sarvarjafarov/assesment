@@ -112,6 +112,62 @@
             </section>
             {% endif %}
 
+            {# ── AI Screening Results ── #}
+            {% if pipeline_candidate and pipeline_candidate.ai_screen_score is not None %}
+            <section class="apd-card">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -3px; margin-right: 6px;"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>
+                    AI Screening
+                </h2>
+                <div class="apd-ai-score-row">
+                    <div class="apd-ai-score {% if pipeline_candidate.ai_screen_score >= 60 %}apd-ai-score--pass{% else %}apd-ai-score--fail{% endif %}">
+                        <span class="apd-ai-score-num">{{ pipeline_candidate.ai_screen_score }}</span>
+                        <span class="apd-ai-score-label">/ 100</span>
+                    </div>
+                    <div class="apd-ai-verdict">
+                        {% if pipeline_candidate.stage == 'rejected_at_screen' %}
+                        <span class="ap-status ap-status-rejected">Below threshold</span>
+                        {% else %}
+                        <span class="ap-status ap-status-reviewed">Passed screening</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if pipeline_candidate.ai_screen_summary %}
+                <p class="apd-ai-summary">{{ pipeline_candidate.ai_screen_summary }}</p>
+                {% endif %}
+                <div class="apd-ai-skills-grid">
+                    {% if pipeline_candidate.ai_screen_skills_matched %}
+                    <div class="apd-ai-skills-col">
+                        <h4 class="apd-ai-skills-title apd-ai-skills--matched">Skills Matched</h4>
+                        <div class="apd-ai-pills">
+                            {% for skill in pipeline_candidate.ai_screen_skills_matched %}
+                            <span class="apd-ai-pill apd-ai-pill--matched">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if pipeline_candidate.ai_screen_skills_missing %}
+                    <div class="apd-ai-skills-col">
+                        <h4 class="apd-ai-skills-title apd-ai-skills--missing">Skills Missing</h4>
+                        <div class="apd-ai-pills">
+                            {% for skill in pipeline_candidate.ai_screen_skills_missing %}
+                            <span class="apd-ai-pill apd-ai-pill--missing">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if pipeline_candidate.pipeline %}
+                <div class="apd-ai-pipeline-link">
+                    <a href="{% url 'hiring_agent:candidate-detail' pipeline_uuid=pipeline_candidate.pipeline.uuid pk=pipeline_candidate.pk %}">
+                        View full pipeline details
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </a>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
             {# ── Assessment Status ── #}
             {% if application.assessment_type %}
             <section class="apd-card">
