@@ -22,50 +22,71 @@
 <body class="vc-body">
     <div class="vc-shell">
         <nav class="vc-breadcrumb">
-            <a href="{% url 'pages:vacancy_list' company_slug=client.slug %}">{{ client.company_name }}</a>
+            <a href="{% url 'pages:vacancy_list' company_slug=client.slug %}">
+                {% if client.logo_data_url %}
+                <img src="{{ client.logo_data_url }}" alt="" class="vc-bc-logo">
+                {% endif %}
+                {{ client.company_name }}
+            </a>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
             <span>{{ position.title }}</span>
         </nav>
 
-        <header class="vc-position-hero">
-            {% if client.logo_data_url %}
-            <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo-sm">
-            {% endif %}
-            <h1>{{ position.title }}</h1>
-            {% if position.department or position.location %}
-            <p class="vc-position-meta">
-                {% if position.department %}{{ position.department }}{% endif %}
-                {% if position.department and position.location %} &middot; {% endif %}
-                {% if position.location %}{{ position.location }}{% endif %}
-            </p>
-            {% endif %}
+        <header class="vc-pos-hero">
+            <div class="vc-pos-hero-text">
+                <h1>{{ position.title }}</h1>
+                {% if position.department or position.location %}
+                <div class="vc-pos-meta">
+                    {% if position.department %}
+                    <span class="vc-pos-meta-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        {{ position.department }}
+                    </span>
+                    {% endif %}
+                    {% if position.location %}
+                    <span class="vc-pos-meta-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        {{ position.location }}
+                    </span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if position.employment_type or position.work_model %}
+                <div class="vc-pos-tags">
+                    {% if position.employment_type %}<span class="vc-tag">{{ position.get_employment_type_display }}</span>{% endif %}
+                    {% if position.work_model %}<span class="vc-tag">{{ position.get_work_model_display }}</span>{% endif %}
+                </div>
+                {% endif %}
+            </div>
         </header>
 
         <div class="vc-position-layout">
             <div class="vc-position-info">
                 {% if position.employment_type or position.work_model or position.salary_display %}
-                <div class="vc-details">
-                    {% if position.employment_type %}
-                    <div class="vc-detail">
-                        <span class="vc-detail-label">Employment</span>
-                        <span class="vc-detail-val">{{ position.get_employment_type_display }}</span>
-                    </div>
-                    {% endif %}
-                    {% if position.work_model %}
-                    <div class="vc-detail">
-                        <span class="vc-detail-label">Work Model</span>
-                        <span class="vc-detail-val">{{ position.get_work_model_display }}</span>
-                    </div>
-                    {% endif %}
-                    {% if position.salary_display %}
-                    <div class="vc-detail">
-                        <span class="vc-detail-label">Salary Range</span>
-                        <span class="vc-detail-val">{{ position.salary_display }}</span>
-                    </div>
-                    {% endif %}
-                    <div class="vc-detail">
-                        <span class="vc-detail-label">Open Roles</span>
-                        <span class="vc-detail-val">{{ position.open_roles }}</span>
+                <div class="vc-details-card">
+                    <div class="vc-details">
+                        {% if position.employment_type %}
+                        <div class="vc-detail">
+                            <span class="vc-detail-label">Employment</span>
+                            <span class="vc-detail-val">{{ position.get_employment_type_display }}</span>
+                        </div>
+                        {% endif %}
+                        {% if position.work_model %}
+                        <div class="vc-detail">
+                            <span class="vc-detail-label">Work Model</span>
+                            <span class="vc-detail-val">{{ position.get_work_model_display }}</span>
+                        </div>
+                        {% endif %}
+                        {% if position.salary_display %}
+                        <div class="vc-detail">
+                            <span class="vc-detail-label">Salary Range</span>
+                            <span class="vc-detail-val vc-detail-salary">{{ position.salary_display }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="vc-detail">
+                            <span class="vc-detail-label">Open Roles</span>
+                            <span class="vc-detail-val">{{ position.open_roles }}</span>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -73,7 +94,7 @@
                 {% if position.description %}
                 <div class="vc-description">
                     <h2>About this role</h2>
-                    <p>{{ position.description|linebreaksbr }}</p>
+                    <div class="vc-desc-body">{{ position.description|linebreaksbr }}</div>
                 </div>
                 {% endif %}
 
@@ -90,12 +111,15 @@
             </div>
 
             <aside class="vc-apply-panel">
-                <h2>Apply for this position</h2>
+                <div class="vc-apply-panel-head">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                    <h2>Apply for this position</h2>
+                </div>
                 <form method="post" action="{% url 'pages:vacancy_apply' company_slug=client.slug position_uuid=position.uuid %}" enctype="multipart/form-data" class="vc-apply-form">
                     {% csrf_token %}
                     {% for field in form %}
                     <div class="vc-field">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="vc-req">*</span>{% endif %}</label>
                         {{ field }}
                         {% if field.help_text %}<span class="vc-help">{{ field.help_text }}</span>{% endif %}
                         {% for error in field.errors %}
@@ -103,7 +127,10 @@
                         {% endfor %}
                     </div>
                     {% endfor %}
-                    <button type="submit" class="vc-submit">Submit Application</button>
+                    <button type="submit" class="vc-submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        Submit Application
+                    </button>
                 </form>
             </aside>
         </div>

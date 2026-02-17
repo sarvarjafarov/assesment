@@ -21,51 +21,85 @@
 </head>
 <body class="vc-body">
     <div class="vc-shell">
+
         <header class="vc-hero">
-            {% if client.logo_data_url %}
-            <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo">
-            {% endif %}
-            <h1>{{ client.company_name }}</h1>
-            <p class="vc-subtitle">Open positions</p>
+            <div class="vc-hero-inner">
+                {% if client.logo_data_url %}
+                <div class="vc-logo-wrap">
+                    <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo">
+                </div>
+                {% endif %}
+                <h1>{{ client.company_name }}</h1>
+                <p class="vc-subtitle">Explore open positions and join our team</p>
+                {% if positions %}
+                <div class="vc-hero-count">
+                    <span>{{ positions|length }} open position{{ positions|length|pluralize }}</span>
+                </div>
+                {% endif %}
+            </div>
         </header>
 
         {% if positions %}
+        <div class="vc-section-head">
+            <span class="vc-section-label">Open Positions</span>
+            <span class="vc-section-line"></span>
+        </div>
         <div class="vc-grid">
             {% for pos in positions %}
             <a href="{% url 'pages:vacancy_detail' company_slug=client.slug position_uuid=pos.uuid %}" class="vc-card">
-                <div class="vc-card-top">
-                    <h2 class="vc-card-title">{{ pos.title }}</h2>
-                    {% if pos.department or pos.location %}
-                    <span class="vc-card-meta">
-                        {% if pos.department %}{{ pos.department }}{% endif %}
-                        {% if pos.department and pos.location %} &middot; {% endif %}
-                        {% if pos.location %}{{ pos.location }}{% endif %}
-                    </span>
+                <div class="vc-card-body">
+                    <div class="vc-card-top">
+                        <h2 class="vc-card-title">{{ pos.title }}</h2>
+                        {% if pos.department or pos.location %}
+                        <span class="vc-card-meta">
+                            {% if pos.department %}
+                            <span class="vc-meta-item">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                {{ pos.department }}
+                            </span>
+                            {% endif %}
+                            {% if pos.location %}
+                            <span class="vc-meta-item">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                {{ pos.location }}
+                            </span>
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if pos.employment_type or pos.work_model %}
+                    <div class="vc-card-tags">
+                        {% if pos.employment_type %}<span class="vc-tag">{{ pos.get_employment_type_display }}</span>{% endif %}
+                        {% if pos.work_model %}<span class="vc-tag">{{ pos.get_work_model_display }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if pos.salary_display %}
+                    <span class="vc-card-salary">{{ pos.salary_display }}</span>
                     {% endif %}
                 </div>
 
-                {% if pos.employment_type or pos.work_model %}
-                <div class="vc-card-tags">
-                    {% if pos.employment_type %}<span class="vc-tag">{{ pos.get_employment_type_display }}</span>{% endif %}
-                    {% if pos.work_model %}<span class="vc-tag">{{ pos.get_work_model_display }}</span>{% endif %}
-                </div>
-                {% endif %}
-
-                {% if pos.salary_display %}
-                <span class="vc-card-salary">{{ pos.salary_display }}</span>
-                {% endif %}
-
                 <div class="vc-card-foot">
                     <span class="vc-card-roles">{{ pos.open_roles }} open role{{ pos.open_roles|pluralize }}</span>
-                    <span class="vc-card-arrow">&rarr;</span>
+                    <span class="vc-card-cta">
+                        View & Apply
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </span>
                 </div>
             </a>
             {% endfor %}
         </div>
         {% else %}
         <div class="vc-empty">
+            <div class="vc-empty-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+            </div>
             <h2>No open positions right now</h2>
-            <p>Check back later for new opportunities.</p>
+            <p>Check back later for new opportunities at {{ client.company_name }}.</p>
         </div>
         {% endif %}
 

@@ -20,14 +20,45 @@
 <body class="vc-body">
     <div class="vc-shell">
         <div class="vc-success">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
+            <div class="vc-success-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
             <h1>Application submitted!</h1>
             <p>Thanks for applying to <strong>{{ position.title }}</strong> at {{ client.company_name }}.</p>
             <p class="vc-success-sub">We'll review your application and be in touch soon.</p>
-            <a href="{% url 'pages:vacancy_list' company_slug=client.slug %}" class="vc-back-link">View more positions</a>
+
+            <div class="vc-success-steps">
+                <div class="vc-step">
+                    <div class="vc-step-num vc-step-done">1</div>
+                    <div class="vc-step-text">
+                        <strong>Application received</strong>
+                        <span>We have your details</span>
+                    </div>
+                </div>
+                <div class="vc-step-connector"></div>
+                <div class="vc-step">
+                    <div class="vc-step-num">2</div>
+                    <div class="vc-step-text">
+                        <strong>Team review</strong>
+                        <span>Our team will evaluate your profile</span>
+                    </div>
+                </div>
+                <div class="vc-step-connector"></div>
+                <div class="vc-step">
+                    <div class="vc-step-num">3</div>
+                    <div class="vc-step-text">
+                        <strong>Next steps</strong>
+                        <span>We'll reach out with an update</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{% url 'pages:vacancy_list' company_slug=client.slug %}" class="vc-back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                View more positions
+            </a>
         </div>
 
         <footer class="vc-footer">
