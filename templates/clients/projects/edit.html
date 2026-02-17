@@ -1,0 +1,163 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% block title %}Edit {{ project.title }} · Evalon{% endblock %}
+{% block meta_description %}Edit position details and job description.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+
+    {# ── Breadcrumb ── #}
+    <nav class="pe-breadcrumb">
+        <a href="{% url 'clients:project-list' %}">Positions</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <a href="{% url 'clients:project-detail' project.uuid %}">{{ project.title }}</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <span>Edit</span>
+    </nav>
+
+    <header class="pe-header">
+        <h1>Edit Position</h1>
+    </header>
+
+    <form method="post" class="pe-form">
+        {% csrf_token %}
+
+        {# ── Basic Info ── #}
+        <section class="pe-section">
+            <div class="pe-section-head">
+                <h2>Basic Information</h2>
+                <p>Core details about the position</p>
+            </div>
+            <div class="pe-grid pe-grid-2">
+                <div class="pe-field pe-field-wide">
+                    <label for="{{ form.title.id_for_label }}">Position Title <span class="pe-req">*</span></label>
+                    {{ form.title }}
+                    {% for error in form.title.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.campaign.id_for_label }}">Project <span class="pe-req">*</span></label>
+                    {{ form.campaign }}
+                    {% for error in form.campaign.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.department.id_for_label }}">Department</label>
+                    {{ form.department }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.location.id_for_label }}">Location</label>
+                    {{ form.location }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.role_level.id_for_label }}">Role Level</label>
+                    {{ form.role_level }}
+                </div>
+            </div>
+        </section>
+
+        {# ── Employment ── #}
+        <section class="pe-section">
+            <div class="pe-section-head">
+                <h2>Employment Details</h2>
+                <p>Type, work model, and compensation</p>
+            </div>
+            <div class="pe-grid pe-grid-3">
+                <div class="pe-field">
+                    <label for="{{ form.employment_type.id_for_label }}">Employment Type</label>
+                    {{ form.employment_type }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.work_model.id_for_label }}">Work Model</label>
+                    {{ form.work_model }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.salary_currency.id_for_label }}">Currency</label>
+                    {{ form.salary_currency }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.salary_min.id_for_label }}">Salary Min</label>
+                    {{ form.salary_min }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.salary_max.id_for_label }}">Salary Max</label>
+                    {{ form.salary_max }}
+                </div>
+            </div>
+        </section>
+
+        {# ── Job Description ── #}
+        <section class="pe-section">
+            <div class="pe-section-head">
+                <h2>Job Description</h2>
+                <p>Structured sections that appear on the public job posting</p>
+            </div>
+            <div class="pe-grid pe-grid-1">
+                <div class="pe-field">
+                    <label for="{{ form.description.id_for_label }}">About the Role</label>
+                    {{ form.description }}
+                    <span class="pe-help">Describe the role, team context, and what makes this opportunity unique.</span>
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.responsibilities.id_for_label }}">Responsibilities</label>
+                    {{ form.responsibilities }}
+                    <span class="pe-help">One responsibility per line. Each line becomes a bullet point.</span>
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.requirements.id_for_label }}">Requirements</label>
+                    {{ form.requirements }}
+                    <span class="pe-help">One required qualification per line. Each line becomes a bullet point.</span>
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.nice_to_haves.id_for_label }}">Nice to Haves</label>
+                    {{ form.nice_to_haves }}
+                    <span class="pe-help">One preferred qualification per line. Each line becomes a bullet point.</span>
+                </div>
+            </div>
+        </section>
+
+        {# ── Skills & Settings ── #}
+        <section class="pe-section">
+            <div class="pe-section-head">
+                <h2>Skills & Settings</h2>
+                <p>Tags, pipeline settings, and visibility</p>
+            </div>
+            <div class="pe-grid pe-grid-2">
+                <div class="pe-field pe-field-wide">
+                    <label for="{{ form.required_skills.id_for_label }}">Skills</label>
+                    {{ form.required_skills }}
+                    <span class="pe-help">Comma-separated skill tags shown on the job posting.</span>
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.priority.id_for_label }}">Priority</label>
+                    {{ form.priority }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.status.id_for_label }}">Status</label>
+                    {{ form.status }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.open_roles.id_for_label }}">Open Roles</label>
+                    {{ form.open_roles }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.target_start_date.id_for_label }}">Target Start Date</label>
+                    {{ form.target_start_date }}
+                </div>
+                <div class="pe-field">
+                    <label for="{{ form.assessment_type.id_for_label }}">Public Assessment</label>
+                    {{ form.assessment_type }}
+                    <span class="pe-help">Assessment type for the public careers page flow.</span>
+                </div>
+                <div class="pe-field pe-field-check">
+                    {{ form.published }}
+                    <label for="{{ form.published.id_for_label }}">Published on vacancy page</label>
+                </div>
+            </div>
+        </section>
+
+        {# ── Actions ── #}
+        <div class="pe-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'clients:project-detail' project.uuid %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

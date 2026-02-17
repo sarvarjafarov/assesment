@@ -30,9 +30,16 @@
             {% csrf_token %}
             <div class="pj-form-grid">
                 <div class="pj-field">
-                    <label for="{{ form.title.id_for_label }}">Position title</label>
+                    <label for="{{ form.title.id_for_label }}">Position title <span class="pe-req">*</span></label>
                     {{ form.title }}
                     {% for error in form.title.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="pj-field">
+                    <label for="{{ form.campaign.id_for_label }}">Project <span class="pe-req">*</span></label>
+                    {{ form.campaign }}
+                    {% for error in form.campaign.errors %}
                     <span class="field-error">{{ error }}</span>
                     {% endfor %}
                 </div>
@@ -54,10 +61,6 @@
                 <div class="pj-field">
                     <label for="{{ form.work_model.id_for_label }}">Work model</label>
                     {{ form.work_model }}
-                </div>
-                <div class="pj-field">
-                    <label for="{{ form.assessment_type.id_for_label }}">Public assessment</label>
-                    {{ form.assessment_type }}
                 </div>
                 <div class="pj-field pj-field-action">
                     <button type="submit" class="btn btn-primary">Create Position</button>

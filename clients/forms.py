@@ -703,11 +703,25 @@ class ClientProjectForm(forms.ModelForm):
             "open_roles",
             "target_start_date",
             "description",
+            "responsibilities",
+            "requirements",
+            "nice_to_haves",
             "published",
             "assessment_type",
         ]
+        labels = {
+            "description": "About the Role",
+            "responsibilities": "Responsibilities",
+            "requirements": "Requirements",
+            "nice_to_haves": "Nice to Haves",
+            "required_skills": "Skills",
+            "campaign": "Project",
+        }
         widgets = {
-            "description": forms.Textarea(attrs={"rows": 3}),
+            "description": forms.Textarea(attrs={"rows": 4, "placeholder": "Describe the role, team, and what makes this opportunity unique..."}),
+            "responsibilities": forms.Textarea(attrs={"rows": 5, "placeholder": "Enter one responsibility per line, e.g.:\nLead product launches and go-to-market strategy\nDevelop messaging and positioning frameworks\nConduct competitive analysis and market research"}),
+            "requirements": forms.Textarea(attrs={"rows": 5, "placeholder": "Enter one requirement per line, e.g.:\n5+ years of product marketing experience\nStrong analytical and communication skills\nExperience with B2B SaaS products"}),
+            "nice_to_haves": forms.Textarea(attrs={"rows": 4, "placeholder": "Enter one preferred qualification per line, e.g.:\nExperience in AI/ML industry\nMBA or equivalent advanced degree\nPublished thought leadership content"}),
             "target_start_date": forms.DateInput(attrs={"type": "date"}),
             "required_skills": forms.TextInput(attrs={"placeholder": "e.g. Python, SQL, Leadership"}),
             "salary_min": forms.NumberInput(attrs={"placeholder": "Min"}),
@@ -722,7 +736,7 @@ class ClientProjectForm(forms.ModelForm):
         self.fields["status"].required = False
         self.fields["status"].initial = ClientProject.STATUS_ACTIVE
         self.fields["campaign"].queryset = client.campaigns.all()
-        self.fields["campaign"].required = False
+        self.fields["campaign"].required = True
 
     def save(self, commit=True):
         project = super().save(commit=False)

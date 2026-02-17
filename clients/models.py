@@ -630,6 +630,9 @@ class ClientProject(TimeStampedModel):
     open_roles = models.PositiveIntegerField(default=1)
     target_start_date = models.DateField(blank=True, null=True)
     description = models.TextField(blank=True)
+    responsibilities = models.TextField(blank=True, help_text="Key responsibilities, one per line")
+    requirements = models.TextField(blank=True, help_text="Required qualifications, one per line")
+    nice_to_haves = models.TextField(blank=True, help_text="Preferred qualifications, one per line")
     published = models.BooleanField(default=True)
     assessment_type = models.CharField(
         max_length=32,
@@ -682,6 +685,24 @@ class ClientProject(TimeStampedModel):
         if not self.required_skills:
             return []
         return [s.strip() for s in self.required_skills.split(",") if s.strip()]
+
+    @property
+    def responsibilities_list(self):
+        if not self.responsibilities:
+            return []
+        return [line.strip() for line in self.responsibilities.split('\n') if line.strip()]
+
+    @property
+    def requirements_list(self):
+        if not self.requirements:
+            return []
+        return [line.strip() for line in self.requirements.split('\n') if line.strip()]
+
+    @property
+    def nice_to_haves_list(self):
+        if not self.nice_to_haves:
+            return []
+        return [line.strip() for line in self.nice_to_haves.split('\n') if line.strip()]
 
     @property
     def remaining_roles(self):

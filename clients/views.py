@@ -2166,6 +2166,40 @@ class ClientProjectDetailView(ClientProjectAccessMixin, TemplateView):
         return context
 
 
+class ClientProjectEditView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/projects/edit.html"
+
+    def get_project(self):
+        if not hasattr(self, "_project"):
+            self._project = get_object_or_404(
+                self.account.projects, uuid=self.kwargs.get("project_uuid")
+            )
+        return self._project
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.get_project()
+        context["project"] = project
+        context["form"] = getattr(
+            self, "form",
+            ClientProjectForm(instance=project, client=self.account),
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if self.account.role != "manager":
+            messages.error(request, "Only managers can edit positions.")
+            return redirect("clients:project-detail", project_uuid=self.kwargs["project_uuid"])
+        project = self.get_project()
+        form = ClientProjectForm(request.POST, instance=project, client=self.account)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Position updated.")
+            return redirect("clients:project-detail", project_uuid=project.uuid)
+        self.form = form
+        return self.render_to_response(self.get_context_data(), status=400)
+
+
 class ClientProjectCloneView(ClientProjectAccessMixin, FormView):
     template_name = "clients/projects/clone.html"
     form_class = ClientProjectForm

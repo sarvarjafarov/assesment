@@ -5334,19 +5334,44 @@
     flex-shrink: 0;
 }
 
-/* Description */
-.pd-description {
+/* Job Description Sections */
+.pd-jd-sections {
     background: #fff;
     border: 1px solid var(--color-border-medium);
     border-radius: 12px;
-    padding: 1rem 1.5rem;
+    padding: 1.5rem;
     margin-bottom: 1.75rem;
 }
-.pd-description p {
-    margin: 0;
+.pd-jd-section {
+    margin-bottom: 1.5rem;
+}
+.pd-jd-section:last-child {
+    margin-bottom: 0;
+}
+.pd-jd-section h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.6rem;
+}
+.pd-jd-body {
     font-size: 0.9rem;
     line-height: 1.6;
     color: var(--color-text);
+}
+.pd-jd-list {
+    margin: 0;
+    padding: 0 0 0 1.25rem;
+    list-style: disc;
+}
+.pd-jd-list li {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    margin-bottom: 0.3rem;
+}
+.pd-jd-list li:last-child {
+    margin-bottom: 0;
 }
 
 /* Position Details Strip */
@@ -5716,6 +5741,161 @@
     }
     .pd-assess-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+
+/* ========================================================================
+   POSITION EDIT PAGE (projects/edit.html)  —  pe-* prefix
+   ======================================================================== */
+
+.pe-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+}
+.pe-breadcrumb a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+.pe-breadcrumb a:hover {
+    text-decoration: underline;
+}
+.pe-breadcrumb span {
+    color: var(--color-text-muted);
+}
+
+.pe-header {
+    margin-bottom: 1.5rem;
+}
+.pe-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-navy);
+    margin: 0;
+}
+
+.pe-form {
+    max-width: 840px;
+}
+
+.pe-section {
+    background: #fff;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.pe-section-head {
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-border-light);
+    padding-bottom: 0.75rem;
+}
+.pe-section-head h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.15rem;
+}
+.pe-section-head p {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.pe-grid {
+    display: grid;
+    gap: 1rem;
+}
+.pe-grid-1 { grid-template-columns: 1fr; }
+.pe-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.pe-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+.pe-field-wide {
+    grid-column: 1 / -1;
+}
+
+.pe-field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pe-field input,
+.pe-field select,
+.pe-field textarea {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--color-navy);
+    background: #fff;
+    font-family: inherit;
+    transition: border-color 0.15s ease;
+}
+.pe-field input:focus,
+.pe-field select:focus,
+.pe-field textarea:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.pe-field textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+}
+
+.pe-help {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 0.3rem;
+}
+
+.pe-req {
+    color: #ef4444;
+}
+
+.pe-field-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.pe-field-check input[type="checkbox"] {
+    width: auto;
+}
+.pe-field-check label {
+    margin-bottom: 0;
+    text-transform: none;
+    font-size: 0.88rem;
+    color: var(--color-navy);
+}
+
+.pe-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .pe-grid-2,
+    .pe-grid-3 {
+        grid-template-columns: 1fr;
+    }
+    .pe-actions {
+        flex-direction: column;
     }
 }
 
@@ -9751,6 +9931,21 @@
     color: #64748b;
     line-height: 1.8;
     font-size: 0.95rem;
+}
+
+.vc-jd-list {
+    margin: 0;
+    padding: 0 0 0 1.25rem;
+    list-style: disc;
+}
+.vc-jd-list li {
+    font-size: 0.93rem;
+    line-height: 1.7;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+}
+.vc-jd-list li:last-child {
+    margin-bottom: 0;
 }
 
 /* ── Skills ── */

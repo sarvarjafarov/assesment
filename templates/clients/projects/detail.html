@@ -44,6 +44,13 @@
             </a>
             {% endif %}
             {% if request.user.client_account.role == 'manager' %}
+            <a href="{% url 'clients:project-edit' project.uuid %}" class="btn btn-pill">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Edit Position
+            </a>
             <a href="{% url 'clients:project-clone' project.uuid %}" class="btn btn-outline small" title="Duplicate position">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -88,10 +95,45 @@
         </div>
     </div>
 
-    {# ── Description ── #}
-    {% if project.description %}
-    <div class="pd-description">
-        <p>{{ project.description }}</p>
+    {# ── Job Description Sections ── #}
+    {% if project.description or project.responsibilities_list or project.requirements_list or project.nice_to_haves_list %}
+    <div class="pd-jd-sections">
+        {% if project.description %}
+        <div class="pd-jd-section">
+            <h3>About the Role</h3>
+            <div class="pd-jd-body">{{ project.description|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+        {% if project.responsibilities_list %}
+        <div class="pd-jd-section">
+            <h3>Responsibilities</h3>
+            <ul class="pd-jd-list">
+                {% for item in project.responsibilities_list %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% if project.requirements_list %}
+        <div class="pd-jd-section">
+            <h3>Requirements</h3>
+            <ul class="pd-jd-list">
+                {% for item in project.requirements_list %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% if project.nice_to_haves_list %}
+        <div class="pd-jd-section">
+            <h3>Nice to Haves</h3>
+            <ul class="pd-jd-list">
+                {% for item in project.nice_to_haves_list %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 

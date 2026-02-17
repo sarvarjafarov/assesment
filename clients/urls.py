@@ -35,6 +35,7 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
     ),
     path("dashboard/projects/", views.ClientProjectListView.as_view(), name="project-list"),
     path("dashboard/projects/<uuid:project_uuid>/", views.ClientProjectDetailView.as_view(), name="project-detail"),
+    path("dashboard/projects/<uuid:project_uuid>/edit/", views.ClientProjectEditView.as_view(), name="project-edit"),
     path("dashboard/projects/<uuid:project_uuid>/clone/", views.ClientProjectCloneView.as_view(), name="project-clone"),
     path(
         "dashboard/projects/<uuid:project_uuid>/pipeline/<slug:assessment_type>/<uuid:session_uuid>/",

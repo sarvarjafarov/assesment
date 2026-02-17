@@ -106,9 +106,42 @@
                 </div>
                 {% endif %}
 
+                {% if position.responsibilities_list %}
+                <div class="vc-description vc-anim" style="--d:0.18s">
+                    <h2>Responsibilities</h2>
+                    <ul class="vc-jd-list">
+                        {% for item in position.responsibilities_list %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if position.requirements_list %}
+                <div class="vc-description vc-anim" style="--d:0.21s">
+                    <h2>Requirements</h2>
+                    <ul class="vc-jd-list">
+                        {% for item in position.requirements_list %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if position.nice_to_haves_list %}
+                <div class="vc-description vc-anim" style="--d:0.24s">
+                    <h2>Nice to Haves</h2>
+                    <ul class="vc-jd-list">
+                        {% for item in position.nice_to_haves_list %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
                 {% if position.skills_list %}
-                <div class="vc-skills vc-anim" style="--d:0.2s">
-                    <h3>Required Skills</h3>
+                <div class="vc-skills vc-anim" style="--d:0.27s">
+                    <h3>Skills</h3>
                     <div class="vc-skill-pills">
                         {% for skill in position.skills_list %}
                         <span class="vc-skill-pill">{{ skill }}</span>
