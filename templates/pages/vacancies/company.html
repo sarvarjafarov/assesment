@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Careers at {{ client.company_name }}</title>
     <meta name="description" content="Explore open positions at {{ client.company_name }} and apply directly.">
+    <meta property="og:title" content="Careers at {{ client.company_name }}">
+    <meta property="og:description" content="Explore {{ positions|length }} open position{{ positions|length|pluralize }} at {{ client.company_name }}.">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/portal-pages.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,67 +26,66 @@
 
     {# ── Hero ── #}
     <div class="vc-hero">
-        <div class="vc-hero-orb vc-orb-1"></div>
-        <div class="vc-hero-orb vc-orb-2"></div>
-        <div class="vc-hero-orb vc-orb-3"></div>
-        <div class="vc-hero-dot-grid"></div>
+        <div class="vc-hero-grain"></div>
+        <div class="vc-hero-glow vc-glow-1"></div>
+        <div class="vc-hero-glow vc-glow-2"></div>
         <div class="vc-hero-inner">
             {% if client.logo_data_url %}
             <div class="vc-logo-wrap vc-anim" style="--d:0.05s">
                 <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo">
             </div>
             {% endif %}
-            <h1 class="vc-anim" style="--d:0.12s">Join <span class="vc-hero-accent">{{ client.company_name }}</span></h1>
-            <p class="vc-hero-sub vc-anim" style="--d:0.2s">Explore our open roles and find your next opportunity</p>
+            <h1 class="vc-anim" style="--d:0.1s">Join <span class="vc-hero-accent">{{ client.company_name }}</span></h1>
+            <p class="vc-hero-sub vc-anim" style="--d:0.18s">Explore our open roles and find your next opportunity</p>
             {% if positions %}
-            <div class="vc-hero-badge vc-anim" style="--d:0.3s">
+            <div class="vc-hero-badge vc-anim" style="--d:0.26s">
                 <span class="vc-badge-dot"></span>
                 <span>{{ positions|length }} open position{{ positions|length|pluralize }}</span>
             </div>
             {% endif %}
         </div>
-        <div class="vc-hero-wave">
-            <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
-                <path d="M0,60 L0,20 Q360,0 720,20 Q1080,40 1440,20 L1440,60 Z" fill="#f7f8fb"/>
-            </svg>
-        </div>
+        <div class="vc-hero-fade"></div>
     </div>
 
     <div class="vc-shell">
         {% if positions %}
-        {# ── Section Header ── #}
-        <div class="vc-section-head vc-anim" style="--d:0.35s">
-            <span class="vc-section-label">Open Positions</span>
-            <span class="vc-section-count">{{ positions|length }}</span>
-            <span class="vc-section-line"></span>
+
+        {# ── Toolbar: Search + Filter ── #}
+        <div class="vc-toolbar vc-anim" style="--d:0.3s">
+            <div class="vc-search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="vc-search-input" placeholder="Search positions..." autocomplete="off">
+            </div>
+            {% regroup positions by department as dept_groups %}
+            {% if dept_groups|length > 1 %}
+            <div class="vc-filters" id="vc-filters">
+                <button class="vc-filter active" data-dept="all">All</button>
+                {% for group in dept_groups %}
+                <button class="vc-filter" data-dept="{{ group.grouper|default:'General' }}">{{ group.grouper|default:"General" }}</button>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
         {# ── Cards ── #}
-        <div class="vc-grid">
+        <div class="vc-grid" id="vc-grid">
             {% for pos in positions %}
-            <a href="{% url 'pages:vacancy_detail' company_slug=client.slug position_uuid=pos.uuid %}" class="vc-card vc-anim" style="--d:{{ forloop.counter0|add:4 }}0ms">
-                <div class="vc-card-accent"></div>
+            <a href="{% url 'pages:vacancy_detail' company_slug=client.slug position_uuid=pos.uuid %}" class="vc-card vc-anim" style="--d:{{ forloop.counter0 }}50ms" data-title="{{ pos.title|lower }}" data-dept="{{ pos.department|default:'General' }}" data-location="{{ pos.location|default:''|lower }}" data-type="{{ pos.get_employment_type_display|default:''|lower }}">
                 <div class="vc-card-inner">
                     <div class="vc-card-body">
-                        <div class="vc-card-icon-wrap">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                        </div>
                         <div class="vc-card-text">
                             <h2 class="vc-card-title">{{ pos.title }}</h2>
                             {% if pos.department or pos.location %}
                             <div class="vc-card-meta">
                                 {% if pos.department %}
                                 <span class="vc-meta-item">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                                     {{ pos.department }}
                                 </span>
                                 {% endif %}
                                 {% if pos.location %}
                                 <span class="vc-meta-item">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                                     {{ pos.location }}
                                 </span>
                                 {% endif %}
@@ -101,23 +103,30 @@
                         <div class="vc-card-foot-left">
                             {% if pos.salary_display %}
                             <span class="vc-card-salary">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                 {{ pos.salary_display }}
                             </span>
                             {% endif %}
                             <span class="vc-card-roles">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                                 {{ pos.open_roles }} open role{{ pos.open_roles|pluralize }}
                             </span>
                         </div>
                         <span class="vc-card-cta">
                             View & Apply
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                         </span>
                     </div>
                 </div>
             </a>
             {% endfor %}
+        </div>
+
+        {# ── No results (hidden by default) ── #}
+        <div class="vc-no-results" id="vc-no-results" style="display:none">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p>No positions match your search</p>
+            <button type="button" class="vc-clear-search" id="vc-clear-search">Clear search</button>
         </div>
 
         {% else %}
@@ -135,8 +144,71 @@
         {% endif %}
 
         <footer class="vc-footer">
-            <span>Powered by <a href="{% url 'pages:home' %}">Evalon</a></span>
+            <div class="vc-footer-brand">
+                <span>Powered by</span>
+                <a href="{% url 'pages:home' %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Evalon
+                </a>
+            </div>
         </footer>
     </div>
+
+{% if positions %}
+<script>
+(function() {
+    var input = document.getElementById('vc-search-input');
+    var grid = document.getElementById('vc-grid');
+    var noResults = document.getElementById('vc-no-results');
+    var clearBtn = document.getElementById('vc-clear-search');
+    var cards = grid ? Array.prototype.slice.call(grid.querySelectorAll('.vc-card')) : [];
+    var filters = document.getElementById('vc-filters');
+    var activeFilter = 'all';
+
+    function filterCards() {
+        var q = (input.value || '').toLowerCase().trim();
+        var visible = 0;
+        cards.forEach(function(card) {
+            var title = card.getAttribute('data-title') || '';
+            var dept = card.getAttribute('data-dept') || '';
+            var loc = card.getAttribute('data-location') || '';
+            var type = card.getAttribute('data-type') || '';
+            var matchSearch = !q || title.indexOf(q) !== -1 || dept.toLowerCase().indexOf(q) !== -1 || loc.indexOf(q) !== -1 || type.indexOf(q) !== -1;
+            var matchDept = activeFilter === 'all' || dept === activeFilter;
+            if (matchSearch && matchDept) {
+                card.style.display = '';
+                visible++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        noResults.style.display = visible === 0 ? '' : 'none';
+    }
+
+    if (input) input.addEventListener('input', filterCards);
+    if (clearBtn) clearBtn.addEventListener('click', function() {
+        input.value = '';
+        activeFilter = 'all';
+        if (filters) {
+            Array.prototype.slice.call(filters.querySelectorAll('.vc-filter')).forEach(function(b) {
+                b.classList.toggle('active', b.getAttribute('data-dept') === 'all');
+            });
+        }
+        filterCards();
+        input.focus();
+    });
+    if (filters) {
+        filters.addEventListener('click', function(e) {
+            var btn = e.target.closest('.vc-filter');
+            if (!btn) return;
+            activeFilter = btn.getAttribute('data-dept');
+            Array.prototype.slice.call(filters.querySelectorAll('.vc-filter')).forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            filterCards();
+        });
+    }
+})();
+</script>
+{% endif %}
 </body>
 </html>
