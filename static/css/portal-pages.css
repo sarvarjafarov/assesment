@@ -8461,46 +8461,49 @@
 /* ── Position Cards Grid ── */
 .vc-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
 }
+
 /* ── Cards ── */
 .vc-card {
     background: #fff;
     border: 1px solid #e8ecf4;
-    border-radius: 12px;
+    border-radius: 14px;
     text-decoration: none;
     color: inherit;
     display: block;
     position: relative;
     overflow: hidden;
-    transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
+    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
 }
-.vc-card::before {
+/* Warm gradient wash on hover */
+.vc-card::after {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: #ff8a00;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,138,0,0.04) 0%, transparent 60%);
     opacity: 0;
-    transition: opacity 0.22s;
+    transition: opacity 0.25s;
+    pointer-events: none;
+    z-index: 0;
 }
 .vc-card:hover {
-    border-color: #dce1ed;
-    box-shadow: 0 4px 20px rgba(14,20,40,0.07);
-    transform: translateY(-2px);
+    border-color: rgba(255,138,0,0.25);
+    box-shadow: 0 8px 30px rgba(14,20,40,0.08), 0 0 0 1px rgba(255,138,0,0.06);
+    transform: translateY(-3px);
 }
-.vc-card:hover::before {
+.vc-card:hover::after {
     opacity: 1;
 }
 .vc-card-inner {
-    padding: 1.15rem 1.35rem;
+    padding: 1.25rem 1.35rem 1.15rem;
     display: flex;
     flex-direction: column;
     gap: 0;
     min-width: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .vc-card-body {
@@ -8513,10 +8516,10 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.35rem;
 }
 .vc-card-title {
-    font-size: 1.05rem;
+    font-size: 1.08rem;
     font-weight: 700;
     margin: 0;
     color: #0e1428;
@@ -8529,14 +8532,14 @@
 .vc-card-meta {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.65rem;
     flex-wrap: wrap;
 }
 .vc-meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: 0.8rem;
+    gap: 0.25rem;
+    font-size: 0.78rem;
     color: #7c8ba5;
 }
 .vc-meta-item svg {
@@ -8545,22 +8548,22 @@
 }
 .vc-card-tags {
     display: flex;
-    gap: 0.35rem;
+    gap: 0.3rem;
     flex-wrap: wrap;
-    margin-top: 0.25rem;
+    margin-top: 0.3rem;
 }
 .vc-tag {
-    font-size: 0.67rem;
+    font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    padding: 0.2rem 0.55rem;
+    padding: 0.22rem 0.5rem;
     border-radius: 4px;
     background: #f0f3f9;
     color: #5b6882;
 }
 .vc-tag:first-child {
-    background: rgba(255,138,0,0.08);
+    background: rgba(255,138,0,0.09);
     color: #d97706;
 }
 
@@ -8568,58 +8571,61 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 0.75rem;
+    padding-top: 0.7rem;
     margin-top: 0.75rem;
     border-top: 1px solid #f0f3f9;
 }
 .vc-card-foot-left {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 .vc-card-salary {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: 0.84rem;
+    gap: 0.25rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #16a34a;
+    background: rgba(22,163,74,0.06);
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
 }
-.vc-card-salary svg { opacity: 0.7; }
+.vc-card-salary svg { opacity: 0.7; flex-shrink: 0; }
 .vc-card-roles {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    font-size: 0.8rem;
+    gap: 0.3rem;
+    font-size: 0.78rem;
     color: #7c8ba5;
     font-weight: 500;
 }
-.vc-card-roles svg { opacity: 0.45; }
+.vc-card-roles svg { opacity: 0.45; flex-shrink: 0; }
 
-/* CTA arrow */
+/* CTA */
 .vc-card-cta {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    font-size: 0.82rem;
+    gap: 0.3rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #ff8a00;
-    padding: 0.35rem 0.85rem;
-    border-radius: 8px;
-    background: rgba(255,138,0,0.06);
+    padding: 0;
+    border-radius: 0;
+    background: none;
     transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
     white-space: nowrap;
+    flex-shrink: 0;
 }
 .vc-card-cta svg {
     transition: transform 0.2s;
 }
 .vc-card:hover .vc-card-cta {
-    background: #ff8a00;
-    color: #fff;
-    box-shadow: 0 2px 10px rgba(255,138,0,0.25);
+    color: #e07800;
 }
 .vc-card:hover .vc-card-cta svg {
-    transform: translateX(3px);
+    transform: translateX(4px);
 }
 
 /* ── Detail Bar (Position Page) ── */
@@ -9238,10 +9244,13 @@
         white-space: nowrap;
         flex-shrink: 0;
     }
+    .vc-grid {
+        grid-template-columns: 1fr;
+    }
     .vc-card-foot {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.75rem;
+        gap: 0.6rem;
     }
     .vc-card-cta {
         width: 100%;
