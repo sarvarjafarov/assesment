@@ -20,44 +20,55 @@
 <body class="vc-body">
     <div class="vc-shell">
         <div class="vc-success">
-            <div class="vc-success-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+            {# ── Confetti Dots ── #}
+            <div class="vc-confetti" aria-hidden="true">
+                <span style="--x:-60px;--y:-80px;--r:45deg;--c:var(--brand-primary);--d:0s"></span>
+                <span style="--x:70px;--y:-90px;--r:-30deg;--c:#3b82f6;--d:0.1s"></span>
+                <span style="--x:-40px;--y:-60px;--r:15deg;--c:#10b981;--d:0.2s"></span>
+                <span style="--x:50px;--y:-70px;--r:-60deg;--c:#f59e0b;--d:0.05s"></span>
+                <span style="--x:-80px;--y:-50px;--r:75deg;--c:#8b5cf6;--d:0.15s"></span>
+                <span style="--x:30px;--y:-95px;--r:-15deg;--c:#ec4899;--d:0.25s"></span>
+            </div>
+
+            <div class="vc-success-check vc-anim" style="--d:0.1s">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
             </div>
-            <h1>Application submitted!</h1>
-            <p>Thanks for applying to <strong>{{ position.title }}</strong> at {{ client.company_name }}.</p>
-            <p class="vc-success-sub">We'll review your application and be in touch soon.</p>
 
-            <div class="vc-success-steps">
-                <div class="vc-step">
-                    <div class="vc-step-num vc-step-done">1</div>
-                    <div class="vc-step-text">
-                        <strong>Application received</strong>
-                        <span>We have your details</span>
+            <h1 class="vc-anim" style="--d:0.2s">You're in!</h1>
+            <p class="vc-anim" style="--d:0.28s">Your application for <strong>{{ position.title }}</strong> at {{ client.company_name }} has been submitted.</p>
+
+            <div class="vc-success-card vc-anim" style="--d:0.35s">
+                <h3>What happens next</h3>
+                <div class="vc-timeline">
+                    <div class="vc-tl-item vc-tl-done">
+                        <div class="vc-tl-dot"></div>
+                        <div class="vc-tl-content">
+                            <strong>Application received</strong>
+                            <span>We have your details and resume</span>
+                        </div>
                     </div>
-                </div>
-                <div class="vc-step-connector"></div>
-                <div class="vc-step">
-                    <div class="vc-step-num">2</div>
-                    <div class="vc-step-text">
-                        <strong>Team review</strong>
-                        <span>Our team will evaluate your profile</span>
+                    <div class="vc-tl-item">
+                        <div class="vc-tl-dot"></div>
+                        <div class="vc-tl-content">
+                            <strong>Team review</strong>
+                            <span>Our hiring team will evaluate your profile</span>
+                        </div>
                     </div>
-                </div>
-                <div class="vc-step-connector"></div>
-                <div class="vc-step">
-                    <div class="vc-step-num">3</div>
-                    <div class="vc-step-text">
-                        <strong>Next steps</strong>
-                        <span>We'll reach out with an update</span>
+                    <div class="vc-tl-item">
+                        <div class="vc-tl-dot"></div>
+                        <div class="vc-tl-content">
+                            <strong>Next steps</strong>
+                            <span>We'll reach out via email with an update</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <a href="{% url 'pages:vacancy_list' company_slug=client.slug %}" class="vc-back-link">
+            <a href="{% url 'pages:vacancy_list' company_slug=client.slug %}" class="vc-back-btn vc-anim" style="--d:0.45s">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                View more positions
+                Browse more positions
             </a>
         </div>
 
