@@ -3319,12 +3319,15 @@ class ApplicationSendAssessmentView(ClientProjectAccessMixin, View):
             defaults={"status": "draft"},
         )
         session.question_set = question_set
+        session.responses = []  # Clear stale responses when regenerating questions
         session.status = "in_progress"
         session.client = self.account
         session.project = application.project
         session.level = level
         session.duration_minutes = 45
         session.started_at = None
+        session.submitted_at = None
+        session.overall_score = None
         session.save()
 
         application.status = "assessment_sent"

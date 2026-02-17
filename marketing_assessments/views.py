@@ -32,12 +32,19 @@ class StartAssessmentView(ApiKeyRequiredMixin, View):
         candidate_id = payload.get("candidate_id")
         if not candidate_id:
             return JsonResponse({"detail": "candidate_id required"}, status=400)
-        session, _ = DigitalMarketingAssessmentSession.objects.get_or_create(
+        session, created = DigitalMarketingAssessmentSession.objects.get_or_create(
             candidate_id=candidate_id, defaults={"status": "draft"}
         )
         session.question_set = generate_question_set()
+        session.responses = []  # Clear stale responses when regenerating questions
         session.status = "in_progress"
-        session.save(update_fields=["question_set", "status"])
+        session.started_at = None
+        session.submitted_at = None
+        session.overall_score = None
+        session.save(update_fields=[
+            "question_set", "responses", "status",
+            "started_at", "submitted_at", "overall_score",
+        ])
         return JsonResponse({"session_uuid": str(session.uuid)}, status=201)
 
 

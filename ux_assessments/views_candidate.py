@@ -116,7 +116,17 @@ class UXDesignAssessmentView(FormView):
             )
         else:
             self.remaining_minutes = None
-        self.current_index = len(self.session.responses)
+        # Count only responses whose question_id is in the current question_set
+        valid_qids = set(self.session.question_set)
+        valid_responses = [
+            r for r in self.session.responses
+            if r.get("question_id") in valid_qids
+        ]
+        # Prune stale responses from a previous question set
+        if len(valid_responses) != len(self.session.responses):
+            self.session.responses = valid_responses
+            self.session.save(update_fields=["responses"])
+        self.current_index = len(valid_responses)
         if self.current_index >= len(self.session.question_set):
             evaluate_session(self.session)
             return redirect(
