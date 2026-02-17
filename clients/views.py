@@ -2038,7 +2038,6 @@ class ClientProjectAccessMixin(LoginRequiredMixin):
 
 class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
     template_name = "clients/projects/list.html"
-    form_class = ClientProjectForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -2049,8 +2048,18 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
             project.health = project_health.get(project.id, _default_project_health(project))
         context["projects"] = projects
         context["project_health_map"] = project_health
-        context["form"] = getattr(self, "form", self.form_class(client=self.account))
         context["is_manager"] = self.account.role == "manager"
+        return context
+
+
+class ClientProjectCreateView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/projects/edit.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project"] = None
+        context["is_create"] = True
+        context["form"] = getattr(self, "form", ClientProjectForm(client=self.account))
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2064,7 +2073,7 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
         if self.account.role != "manager":
             messages.error(request, "Only managers can create positions.")
             return redirect("clients:project-list")
-        form = self.form_class(request.POST, client=self.account)
+        form = ClientProjectForm(request.POST, client=self.account)
         if form.is_valid():
             project = form.save()
             messages.success(request, "Position created.")

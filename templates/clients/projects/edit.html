@@ -1,7 +1,7 @@
 {% extends 'portal_base.html' %}
 {% load static %}
-{% block title %}Edit {{ project.title }} · Evalon{% endblock %}
-{% block meta_description %}Edit position details and job description.{% endblock %}
+{% block title %}{% if is_create %}New Position{% else %}Edit {{ project.title }}{% endif %} · Evalon{% endblock %}
+{% block meta_description %}{% if is_create %}Create a new position{% else %}Edit position details and job description{% endif %}.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
 
@@ -9,13 +9,17 @@
     <nav class="pe-breadcrumb">
         <a href="{% url 'clients:project-list' %}">Positions</a>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        {% if is_create %}
+        <span>New Position</span>
+        {% else %}
         <a href="{% url 'clients:project-detail' project.uuid %}">{{ project.title }}</a>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"><polyline points="9 18 15 12 9 6"></polyline></svg>
         <span>Edit</span>
+        {% endif %}
     </nav>
 
     <header class="pe-header">
-        <h1>Edit Position</h1>
+        <h1>{% if is_create %}New Position{% else %}Edit Position{% endif %}</h1>
     </header>
 
     <form method="post" class="pe-form">
@@ -155,8 +159,8 @@
 
         {# ── Actions ── #}
         <div class="pe-actions">
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-            <a href="{% url 'clients:project-detail' project.uuid %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">{% if is_create %}Create Position{% else %}Save Changes{% endif %}</button>
+            <a href="{% if is_create %}{% url 'clients:project-list' %}{% else %}{% url 'clients:project-detail' project.uuid %}{% endif %}" class="btn btn-outline">Cancel</a>
         </div>
     </form>
 </div>
