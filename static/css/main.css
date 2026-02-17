@@ -11466,6 +11466,68 @@ main {
     text-decoration: underline;
 }
 
+/* Vacancy Page Bar */
+.db-vacancy-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.05), rgba(255, 138, 0, 0.02));
+    border: 1px solid rgba(255, 138, 0, 0.15);
+    border-radius: var(--radius-xl);
+    margin-bottom: 2rem;
+}
+.db-vacancy-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+.db-vacancy-info > svg {
+    flex-shrink: 0;
+    color: var(--color-orange);
+}
+.db-vacancy-info > div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.db-vacancy-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+}
+.db-vacancy-url {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.db-vacancy-count {
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
+    padding: 0.2rem 0.65rem;
+    border-radius: 10px;
+}
+.db-vacancy-count.db-vacancy-empty {
+    color: var(--color-text-muted);
+    background: rgba(14, 20, 40, 0.04);
+}
+.db-vacancy-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
 /* Key Metrics Row */
 .db-metrics {
     display: grid;
@@ -11785,6 +11847,21 @@ main {
     }
     .db-header-cta {
         align-self: stretch;
+        justify-content: center;
+    }
+    .db-vacancy-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    .db-vacancy-info {
+        flex-wrap: wrap;
+    }
+    .db-vacancy-actions {
+        justify-content: stretch;
+    }
+    .db-vacancy-actions .btn {
+        flex: 1;
         justify-content: center;
     }
     .db-metric-sub {
