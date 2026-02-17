@@ -8,6 +8,7 @@ urlpatterns = [
     path('upgrade/', views.UpgradeView.as_view(), name='upgrade'),
     path('', views.PipelineListView.as_view(), name='pipeline-list'),
     path('create/', views.PipelineCreateView.as_view(), name='pipeline-create'),
+    path('project-data/<int:project_id>/', views.ProjectDataView.as_view(), name='project-data'),
     path(
         '<uuid:pipeline_uuid>/',
         views.PipelineDetailView.as_view(),

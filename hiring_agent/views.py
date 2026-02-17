@@ -77,9 +77,46 @@ class PipelineListView(HiringAgentMixin, TemplateView):
 class PipelineCreateView(HiringAgentMixin, TemplateView):
     template_name = 'hiring_agent/pipeline_create.html'
 
+    def _initial_from_project(self):
+        """Pre-fill form fields from a linked position when ?project=<id> is passed."""
+        project_id = self.request.GET.get('project')
+        if not project_id:
+            return {}
+        from clients.models import ClientProject
+        try:
+            proj = ClientProject.objects.get(id=project_id, client=self.account)
+        except ClientProject.DoesNotExist:
+            return {}
+        desc_parts = [proj.description]
+        if proj.responsibilities:
+            desc_parts.append(f"\nResponsibilities:\n{proj.responsibilities}")
+        if proj.requirements:
+            desc_parts.append(f"\nRequirements:\n{proj.requirements}")
+        initial = {
+            'title': f"{proj.title} Pipeline",
+            'job_description': '\n'.join(p for p in desc_parts if p),
+            'project': proj.pk,
+        }
+        if proj.required_skills:
+            initial['required_skills_text'] = proj.required_skills
+        if proj.nice_to_haves:
+            initial['preferred_skills_text'] = proj.nice_to_haves
+        # Map role_level → seniority_level
+        level_map = {
+            'junior': 'junior', 'mid': 'mid', 'mid-level': 'mid',
+            'senior': 'senior', 'lead': 'lead', 'executive': 'executive',
+        }
+        if proj.role_level:
+            mapped = level_map.get(proj.role_level.lower().strip())
+            if mapped:
+                initial['seniority_level'] = mapped
+        return initial
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['form'] = HiringPipelineForm(client=self.account)
+        ctx['form'] = kwargs.get('form') or HiringPipelineForm(
+            client=self.account, initial=self._initial_from_project(),
+        )
         return ctx
 
     def post(self, request, *args, **kwargs):
@@ -405,4 +442,31 @@ class PipelineStatsView(HiringAgentMixin, View):
             'total': candidates.count(),
             'stages': stage_counts,
             'status': pipeline.status,
+        })
+
+
+class ProjectDataView(HiringAgentMixin, View):
+    """Return position data as JSON for auto-filling the pipeline form."""
+
+    def get(self, request, *args, **kwargs):
+        from clients.models import ClientProject
+        try:
+            proj = ClientProject.objects.get(
+                id=kwargs.get('project_id'), client=self.account,
+            )
+        except ClientProject.DoesNotExist:
+            return JsonResponse({'error': 'Not found'}, status=404)
+
+        desc_parts = [proj.description]
+        if proj.responsibilities:
+            desc_parts.append(f"\nResponsibilities:\n{proj.responsibilities}")
+        if proj.requirements:
+            desc_parts.append(f"\nRequirements:\n{proj.requirements}")
+
+        return JsonResponse({
+            'title': f"{proj.title} Pipeline",
+            'job_description': '\n'.join(p for p in desc_parts if p),
+            'required_skills': proj.required_skills,
+            'preferred_skills': proj.nice_to_haves,
+            'role_level': proj.role_level,
         })

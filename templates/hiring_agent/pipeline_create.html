@@ -172,6 +172,16 @@
                 <div class="ha-non-field-errors">{{ form.non_field_errors }}</div>
                 {% endif %}
 
+                {# ── Linked Position ── #}
+                <div class="ha-section-label">Linked Position</div>
+
+                <div class="ha-field">
+                    <label for="{{ form.project.id_for_label }}">{{ form.project.label }}</label>
+                    {{ form.project }}
+                    <p class="ha-help">Select a position to auto-fill title, description, and skills.</p>
+                    {% if form.project.errors %}<div class="ha-errors">{{ form.project.errors }}</div>{% endif %}
+                </div>
+
                 {# ── Job Details ── #}
                 <div class="ha-section-label">Job Details</div>
 
@@ -263,16 +273,6 @@
                     {% if form.max_candidates.errors %}<div class="ha-errors">{{ form.max_candidates.errors }}</div>{% endif %}
                 </div>
 
-                {# ── Project ── #}
-                <div class="ha-section-label">Project</div>
-
-                <div class="ha-field">
-                    <label for="{{ form.project.id_for_label }}">{{ form.project.label }}</label>
-                    {{ form.project }}
-                    {% if form.project.help_text %}<p class="ha-help">{{ form.project.help_text }}</p>{% endif %}
-                    {% if form.project.errors %}<div class="ha-errors">{{ form.project.errors }}</div>{% endif %}
-                </div>
-
                 <div class="ha-form-actions">
                     <button type="submit" class="btn btn-pill">
                         {% if is_edit %}Save Changes{% else %}Create Pipeline{% endif %}
@@ -346,4 +346,43 @@
     </div>
 
 </div>
+
+{% if not is_edit %}
+<script>
+(function() {
+    var projectSelect = document.getElementById('id_project');
+    if (!projectSelect) return;
+
+    var levelMap = {
+        'junior': 'junior', 'mid': 'mid', 'mid-level': 'mid',
+        'senior': 'senior', 'lead': 'lead', 'executive': 'executive'
+    };
+
+    projectSelect.addEventListener('change', function() {
+        var pid = this.value;
+        if (!pid) return;
+
+        fetch('{% url "hiring_agent:project-data" project_id=0 %}'.replace('/0/', '/' + pid + '/'))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.error) return;
+                var title = document.getElementById('id_title');
+                var desc = document.getElementById('id_job_description');
+                var reqSkills = document.getElementById('id_required_skills_text');
+                var prefSkills = document.getElementById('id_preferred_skills_text');
+                var seniority = document.getElementById('id_seniority_level');
+
+                if (title && !title.value) title.value = data.title || '';
+                if (desc && !desc.value) desc.value = data.job_description || '';
+                if (reqSkills && !reqSkills.value) reqSkills.value = data.required_skills || '';
+                if (prefSkills && !prefSkills.value) prefSkills.value = data.preferred_skills || '';
+                if (seniority && data.role_level) {
+                    var mapped = levelMap[data.role_level.toLowerCase().trim()];
+                    if (mapped) seniority.value = mapped;
+                }
+            });
+    });
+})();
+</script>
+{% endif %}
 {% endblock %}
