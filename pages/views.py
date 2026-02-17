@@ -188,6 +188,7 @@ def home(request):
             "cta_url": reverse("clients:signup"),
             "highlighted": True,
             "features": [
+                "Agentic AI hiring pipelines",
                 "Pipeline kanban & top-candidate spotlights",
                 "Custom branding + shareable reports",
                 "Priority chat + email support",
@@ -207,10 +208,10 @@ def home(request):
             "cta_url": reverse("pages:contact"),
             "highlighted": False,
             "features": [
-                "Agentic AI hiring pipelines",
                 "Dedicated CSM + success playbooks",
                 "Custom assessments & security reviews",
                 "SLA, SSO/SAML, and SOC 2 readiness",
+                "Advanced analytics & audit logs",
             ],
         },
     ]
@@ -439,7 +440,6 @@ def pricing(request):
             "features": [
                 "Everything in Pro, plus:",
                 "Unlimited projects & invites",
-                "Agentic AI hiring pipelines",
                 "Custom assessment design",
                 "Dedicated customer success manager",
                 "SSO / SAML integration",
@@ -461,7 +461,7 @@ def pricing(request):
         {"feature": "Custom branding", "starter": False, "pro": True, "enterprise": True},
         {"feature": "Shareable reports", "starter": False, "pro": True, "enterprise": True},
         {"feature": "Priority support", "starter": False, "pro": True, "enterprise": True},
-        {"feature": "Agentic AI hiring pipelines", "starter": False, "pro": False, "enterprise": True, "highlight": True},
+        {"feature": "Agentic AI hiring pipelines", "starter": False, "pro": True, "enterprise": True, "highlight": True},
         {"feature": "Custom assessments", "starter": False, "pro": False, "enterprise": True},
         {"feature": "SSO / SAML", "starter": False, "pro": False, "enterprise": True},
         {"feature": "Dedicated CSM", "starter": False, "pro": False, "enterprise": True},

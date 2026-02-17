@@ -55,8 +55,8 @@ def portal_navigation(request):
         # Check if user has access to custom assessments (pro/enterprise only)
         context['has_custom_assessments'] = account.plan_slug in ('pro', 'enterprise')
 
-        # Check if user has access to AI hiring pipelines (enterprise only)
-        context['has_ai_hiring'] = account.plan_slug == 'enterprise'
+        # Check if user has access to AI hiring pipelines (pro + enterprise)
+        context['has_ai_hiring'] = account.plan_slug in ('pro', 'enterprise')
 
         # Count assessments requiring review (completed sessions not yet reviewed)
         assessment_count = 0
