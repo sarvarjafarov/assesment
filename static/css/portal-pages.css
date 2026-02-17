@@ -8188,42 +8188,43 @@
 
 /* ── Hero ── */
 .vc-hero {
-    background: #08090f;
+    background: linear-gradient(180deg, #0c0e1a 0%, #080a12 100%);
     padding: 5.5rem 2rem 7rem;
     text-align: center;
     position: relative;
     overflow: hidden;
 }
 
-/* Primary glow — large vivid brand radial at top center */
+/* Primary glow — vivid brand splash from top */
 .vc-hero-glow {
     position: absolute;
-    width: 900px;
-    height: 500px;
-    top: -200px;
+    width: 1000px;
+    height: 600px;
+    top: -250px;
     left: 50%;
     transform: translateX(-50%);
-    background: radial-gradient(ellipse at center, var(--brand-primary), transparent 70%);
-    opacity: 0.25;
+    background: radial-gradient(ellipse at center, var(--brand-primary), transparent 65%);
+    opacity: 0.35;
     pointer-events: none;
     z-index: 0;
 }
+/* Secondary glow — bottom accent */
 .vc-glow-2 {
-    width: 600px;
+    width: 700px;
     height: 400px;
     top: auto;
-    bottom: -150px;
-    opacity: 0.08;
+    bottom: -200px;
+    opacity: 0.12;
 }
 
-/* Thin decorative horizon line */
+/* Decorative horizon line */
 .vc-hero-line {
     position: absolute;
     bottom: 140px;
-    left: 10%;
-    right: 10%;
+    left: 5%;
+    right: 5%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent);
     z-index: 1;
     pointer-events: none;
 }
@@ -8252,9 +8253,9 @@
     background: #fff;
     border-radius: 22px;
     box-shadow:
-        0 0 0 1px rgba(255,255,255,0.1),
+        0 0 0 1px rgba(255,255,255,0.15),
         0 8px 32px rgba(0,0,0,0.5),
-        0 0 80px -20px var(--brand-primary);
+        0 0 60px 0px var(--brand-primary);
     overflow: hidden;
 }
 .vc-logo {
@@ -8274,13 +8275,14 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--brand-primary);
+    text-shadow: 0 0 20px var(--brand-primary);
 }
 .vc-eyebrow-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: var(--brand-primary);
-    box-shadow: 0 0 12px var(--brand-primary);
+    box-shadow: 0 0 12px var(--brand-primary), 0 0 24px var(--brand-primary);
     animation: vc-pulse 2s ease-in-out infinite;
 }
 
@@ -8295,11 +8297,12 @@
 }
 .vc-hero-accent {
     color: var(--brand-primary);
+    text-shadow: 0 0 60px var(--brand-primary), 0 4px 30px rgba(0,0,0,0.3);
 }
 
 /* Subtitle */
 .vc-hero-sub {
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.6);
     font-size: 1.1rem;
     margin: 0;
     line-height: 1.65;
@@ -8311,23 +8314,23 @@
 .vc-hero-stats {
     display: flex;
     align-items: center;
-    gap: 1.75rem;
+    gap: 2rem;
     margin-top: 2.5rem;
-    padding: 1rem 2rem;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
+    padding: 1.1rem 2.25rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 16px;
 }
 .vc-hero-stat {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.15rem;
+    gap: 0.2rem;
 }
 .vc-stat-num {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     font-weight: 800;
-    color: var(--brand-primary);
+    color: #fff;
     letter-spacing: -0.02em;
     line-height: 1;
 }
@@ -8336,12 +8339,12 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.5);
 }
 .vc-stat-divider {
     width: 1px;
     height: 32px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.15);
 }
 
 @keyframes vc-pulse {
