@@ -26,27 +26,37 @@
 
     {# ── Hero ── #}
     <div class="vc-hero">
-        <div class="vc-hero-aurora"></div>
-        <div class="vc-hero-aurora vc-aurora-2"></div>
-        <div class="vc-hero-rays"></div>
+        <div class="vc-hero-glow"></div>
+        <div class="vc-hero-glow vc-glow-2"></div>
+        <div class="vc-hero-line"></div>
         <div class="vc-hero-inner">
             {% if client.logo_data_url %}
-            <div class="vc-logo-wrap vc-anim" style="--d:0.05s">
-                <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo">
+            <div class="vc-logo-row vc-anim" style="--d:0.05s">
+                <div class="vc-logo-wrap">
+                    <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo">
+                </div>
             </div>
             {% endif %}
-            <div class="vc-hero-eyebrow vc-anim" style="--d:0.1s">
+            <p class="vc-hero-eyebrow vc-anim" style="--d:0.1s">
                 <span class="vc-eyebrow-dot"></span>
                 We're hiring
-            </div>
-            <h1 class="vc-anim" style="--d:0.15s">Join the team at<br><span class="vc-hero-accent">{{ client.company_name }}</span></h1>
-            <p class="vc-hero-sub vc-anim" style="--d:0.22s">Discover roles where you'll do the best work of your career</p>
+            </p>
+            <h1 class="vc-anim" style="--d:0.15s">Find your next role at<br><span class="vc-hero-accent">{{ client.company_name }}</span></h1>
+            <p class="vc-hero-sub vc-anim" style="--d:0.22s">Explore open positions and join a team where you'll do meaningful work</p>
             {% if positions %}
-            <div class="vc-hero-badges vc-anim" style="--d:0.3s">
-                <div class="vc-hero-badge">
-                    <span class="vc-badge-dot"></span>
-                    {{ positions|length }} open position{{ positions|length|pluralize }}
+            <div class="vc-hero-stats vc-anim" style="--d:0.3s">
+                <div class="vc-hero-stat">
+                    <span class="vc-stat-num">{{ positions|length }}</span>
+                    <span class="vc-stat-label">Open Roles</span>
                 </div>
+                {% regroup positions by department as dept_groups %}
+                {% if dept_groups|length > 1 %}
+                <div class="vc-stat-divider"></div>
+                <div class="vc-hero-stat">
+                    <span class="vc-stat-num">{{ dept_groups|length }}</span>
+                    <span class="vc-stat-label">Departments</span>
+                </div>
+                {% endif %}
             </div>
             {% endif %}
         </div>
