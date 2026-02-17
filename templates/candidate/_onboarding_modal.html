@@ -1,5 +1,5 @@
 <!-- Assessment Onboarding Modal -->
-<div class="onboarding-overlay" id="onboardingOverlay" style="display: {% if show_onboarding %}flex{% else %}none{% endif %};">
+<div class="onboarding-overlay" id="onboardingOverlay" data-session-uuid="{{ session.uuid }}" style="display: {% if show_onboarding %}flex{% else %}none{% endif %};">
     <div class="onboarding-modal">
         <!-- Step 1: Welcome -->
         <div class="onboarding-step" data-step="1">
@@ -242,16 +242,12 @@
                     <path d="m12 5 7 7-7 7"></path>
                 </svg>
             </button>
-            <form method="post" id="onboardingCompleteForm" style="display: none;">
-                {% csrf_token %}
-                <input type="hidden" name="complete_onboarding" value="1">
-                <button type="submit" class="onboarding-btn-start">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                    Start Assessment
-                </button>
-            </form>
+            <button type="button" class="onboarding-btn-start" id="onboardingStart" style="display: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Start Assessment
+            </button>
         </div>
 
         <button type="button" class="onboarding-skip" id="onboardingSkip">
@@ -264,7 +260,18 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const overlay = document.getElementById('onboardingOverlay');
-    if (!overlay || overlay.style.display === 'none') return;
+    if (!overlay) return;
+
+    // Use localStorage to remember onboarding — no server dependency
+    var storageKey = 'onboarding_seen_' + (overlay.dataset.sessionUuid || '');
+    try {
+        if (localStorage.getItem(storageKey)) {
+            overlay.style.display = 'none';
+            return;
+        }
+    } catch (e) { /* localStorage blocked — fall through to show onboarding */ }
+
+    if (overlay.style.display === 'none') return;
 
     let currentStep = 1;
     const totalSteps = 5;
@@ -274,58 +281,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('onboardingBack');
     const nextBtn = document.getElementById('onboardingNext');
     const skipBtn = document.getElementById('onboardingSkip');
-    const completeForm = document.getElementById('onboardingCompleteForm');
+    const startBtn = document.getElementById('onboardingStart');
+
+    function dismissOnboarding() {
+        overlay.style.display = 'none';
+        try { localStorage.setItem(storageKey, '1'); } catch (e) {}
+    }
 
     function showStep(stepNumber) {
-        steps.forEach(step => step.style.display = 'none');
-        dots.forEach(dot => dot.classList.remove('active'));
+        steps.forEach(function(step) { step.style.display = 'none'; });
+        dots.forEach(function(dot) { dot.classList.remove('active'); });
 
-        const targetStep = document.querySelector(`[data-step="${stepNumber}"]`);
-        const targetDot = document.querySelector(`[data-dot="${stepNumber}"]`);
+        var targetStep = document.querySelector('[data-step="' + stepNumber + '"]');
+        var targetDot = document.querySelector('[data-dot="' + stepNumber + '"]');
 
         if (targetStep) targetStep.style.display = 'block';
         if (targetDot) targetDot.classList.add('active');
 
-        // Update navigation buttons
         backBtn.style.visibility = stepNumber === 1 ? 'hidden' : 'visible';
 
         if (stepNumber === totalSteps) {
             nextBtn.style.display = 'none';
-            completeForm.style.display = 'block';
+            startBtn.style.display = 'inline-flex';
         } else {
             nextBtn.style.display = 'flex';
-            completeForm.style.display = 'none';
+            startBtn.style.display = 'none';
         }
 
         currentStep = stepNumber;
     }
 
     backBtn.addEventListener('click', function() {
-        if (currentStep > 1) {
-            showStep(currentStep - 1);
-        }
+        if (currentStep > 1) showStep(currentStep - 1);
     });
 
     nextBtn.addEventListener('click', function() {
-        if (currentStep < totalSteps) {
-            showStep(currentStep + 1);
-        }
+        if (currentStep < totalSteps) showStep(currentStep + 1);
     });
 
-    dots.forEach(dot => {
+    dots.forEach(function(dot) {
         dot.addEventListener('click', function() {
-            const stepNumber = parseInt(this.dataset.dot);
-            showStep(stepNumber);
+            showStep(parseInt(this.dataset.dot));
         });
     });
 
-    skipBtn.addEventListener('click', function() {
-        overlay.style.display = 'none';
-        // Submit the form to mark onboarding as complete
-        completeForm.querySelector('button').click();
-    });
+    startBtn.addEventListener('click', dismissOnboarding);
+    skipBtn.addEventListener('click', dismissOnboarding);
 
-    // Initialize
     showStep(1);
 });
 </script>
