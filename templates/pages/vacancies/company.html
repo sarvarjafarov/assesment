@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/portal-pages.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --brand-primary: {{ client.brand_primary_color|default:"#ff8a00" }};
@@ -25,6 +25,7 @@
     <div class="vc-hero">
         <div class="vc-hero-orb vc-orb-1"></div>
         <div class="vc-hero-orb vc-orb-2"></div>
+        <div class="vc-hero-orb vc-orb-3"></div>
         <div class="vc-hero-dot-grid"></div>
         <div class="vc-hero-inner">
             {% if client.logo_data_url %}
@@ -32,7 +33,7 @@
                 <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo">
             </div>
             {% endif %}
-            <h1 class="vc-anim" style="--d:0.12s">Join {{ client.company_name }}</h1>
+            <h1 class="vc-anim" style="--d:0.12s">Join <span class="vc-hero-accent">{{ client.company_name }}</span></h1>
             <p class="vc-hero-sub vc-anim" style="--d:0.2s">Explore our open roles and find your next opportunity</p>
             {% if positions %}
             <div class="vc-hero-badge vc-anim" style="--d:0.3s">
@@ -41,6 +42,11 @@
             </div>
             {% endif %}
         </div>
+        <div class="vc-hero-wave">
+            <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+                <path d="M0,60 L0,20 Q360,0 720,20 Q1080,40 1440,20 L1440,60 Z" fill="#f7f8fb"/>
+            </svg>
+        </div>
     </div>
 
     <div class="vc-shell">
@@ -48,59 +54,67 @@
         {# ── Section Header ── #}
         <div class="vc-section-head vc-anim" style="--d:0.35s">
             <span class="vc-section-label">Open Positions</span>
+            <span class="vc-section-count">{{ positions|length }}</span>
             <span class="vc-section-line"></span>
         </div>
 
-        {# ── Cards Grid ── #}
+        {# ── Cards ── #}
         <div class="vc-grid">
             {% for pos in positions %}
             <a href="{% url 'pages:vacancy_detail' company_slug=client.slug position_uuid=pos.uuid %}" class="vc-card vc-anim" style="--d:{{ forloop.counter0|add:4 }}0ms">
-                <div class="vc-card-glow"></div>
-                <div class="vc-card-body">
-                    <div class="vc-card-top">
-                        <h2 class="vc-card-title">{{ pos.title }}</h2>
-                        {% if pos.department or pos.location %}
-                        <div class="vc-card-meta">
-                            {% if pos.department %}
-                            <span class="vc-meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                                {{ pos.department }}
-                            </span>
+                <div class="vc-card-accent"></div>
+                <div class="vc-card-inner">
+                    <div class="vc-card-body">
+                        <div class="vc-card-icon-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <div class="vc-card-text">
+                            <h2 class="vc-card-title">{{ pos.title }}</h2>
+                            {% if pos.department or pos.location %}
+                            <div class="vc-card-meta">
+                                {% if pos.department %}
+                                <span class="vc-meta-item">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                    {{ pos.department }}
+                                </span>
+                                {% endif %}
+                                {% if pos.location %}
+                                <span class="vc-meta-item">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    {{ pos.location }}
+                                </span>
+                                {% endif %}
+                            </div>
                             {% endif %}
-                            {% if pos.location %}
-                            <span class="vc-meta-item">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                {{ pos.location }}
-                            </span>
+                            {% if pos.employment_type or pos.work_model %}
+                            <div class="vc-card-tags">
+                                {% if pos.employment_type %}<span class="vc-tag">{{ pos.get_employment_type_display }}</span>{% endif %}
+                                {% if pos.work_model %}<span class="vc-tag">{{ pos.get_work_model_display }}</span>{% endif %}
+                            </div>
                             {% endif %}
                         </div>
-                        {% endif %}
                     </div>
-
-                    {% if pos.employment_type or pos.work_model %}
-                    <div class="vc-card-tags">
-                        {% if pos.employment_type %}<span class="vc-tag">{{ pos.get_employment_type_display }}</span>{% endif %}
-                        {% if pos.work_model %}<span class="vc-tag">{{ pos.get_work_model_display }}</span>{% endif %}
+                    <div class="vc-card-foot">
+                        <div class="vc-card-foot-left">
+                            {% if pos.salary_display %}
+                            <span class="vc-card-salary">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                {{ pos.salary_display }}
+                            </span>
+                            {% endif %}
+                            <span class="vc-card-roles">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                {{ pos.open_roles }} open role{{ pos.open_roles|pluralize }}
+                            </span>
+                        </div>
+                        <span class="vc-card-cta">
+                            View & Apply
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </span>
                     </div>
-                    {% endif %}
-
-                    {% if pos.salary_display %}
-                    <span class="vc-card-salary">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        {{ pos.salary_display }}
-                    </span>
-                    {% endif %}
-                </div>
-
-                <div class="vc-card-foot">
-                    <span class="vc-card-roles">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        {{ pos.open_roles }} open role{{ pos.open_roles|pluralize }}
-                    </span>
-                    <span class="vc-card-cta">
-                        View & Apply
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </span>
                 </div>
             </a>
             {% endfor %}
