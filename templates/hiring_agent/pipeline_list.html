@@ -108,6 +108,9 @@
         </a>
     </header>
 
+    {# ── Assessment Tabs ── #}
+    {% include 'includes/_assessment_tabs.html' %}
+
     {% if pipelines %}
 
     <div class="ha-count">{{ pipelines|length }} pipeline{{ pipelines|length|pluralize }}</div>

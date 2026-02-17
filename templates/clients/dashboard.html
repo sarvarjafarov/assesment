@@ -1,7 +1,7 @@
 {% extends 'portal_base.html' %}
 {% load static %}
 {% load humanize %}
-{% block title %}Dashboard · Evalon{% endblock %}
+{% block title %}Home · Evalon{% endblock %}
 {% block meta_description %}Your Evalon dashboard - track assessments, projects, and candidate progress.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
@@ -12,14 +12,40 @@
             <h1>Welcome back, {{ account.company_name }}</h1>
             <p class="muted">{{ "now"|date:"l, F j, Y" }} · {{ role_label }}</p>
         </div>
-        <a href="{% url 'clients:project-list' %}" class="db-header-cta btn btn-pill">
+        <a href="{% url 'clients:project-create' %}" class="db-header-cta btn btn-pill">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            New Project
+            New Position
         </a>
     </header>
+
+    {# ── Onboarding Banner (compact, dismissible) ── #}
+    {% if not account.has_completed_onboarding %}
+    <div class="db-onboarding-banner">
+        <div class="db-onboarding-info">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span><strong>{{ onboarding_completed_steps }}/{{ onboarding_total_steps }} setup steps done.</strong> Complete your setup to get the most out of Evalon.</span>
+        </div>
+        <div class="db-onboarding-actions">
+            <a href="{% url 'clients:getting-started' %}" class="btn btn-outline small">Continue Setup</a>
+            <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="dismiss_onboarding">
+                <button type="submit" class="btn-close" title="Dismiss">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 
     {# ── Plan Usage Bar ── #}
     {% if plan_overview %}
@@ -59,106 +85,6 @@
     </div>
     {% endif %}
 
-    {# ── Onboarding Checklist ── #}
-    {% if not account.has_completed_onboarding %}
-    <section class="onboarding-section">
-        <div class="onboarding-card">
-            <div class="onboarding-header">
-                <div class="onboarding-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                </div>
-                <div class="onboarding-title">
-                    <h2>Welcome to Evalon!</h2>
-                    <p>Your account has been approved. Follow these steps to get started with candidate assessments.</p>
-                </div>
-                <form method="post" class="onboarding-dismiss-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="dismiss_onboarding">
-                    <button type="submit" class="btn-close" title="Dismiss onboarding">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </form>
-            </div>
-
-            <div class="onboarding-progress">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ onboarding_progress }}%"></div>
-                </div>
-                <p class="progress-text">{{ onboarding_completed_steps }} of {{ onboarding_total_steps }} steps completed</p>
-            </div>
-
-            <div class="onboarding-steps">
-                <div class="onboarding-step {% if onboarding_step_1_completed %}completed{% endif %}">
-                    <div class="step-number">
-                        {% if onboarding_step_1_completed %}
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        {% else %}<span>1</span>{% endif %}
-                    </div>
-                    <div class="step-content">
-                        <h4>Create Your First Project</h4>
-                        <p>Organize candidates by role or hiring campaign. Projects help you track progress for specific positions.</p>
-                        <a href="{% url 'clients:project-list' %}" class="btn btn-outline btn-small">
-                            <span>{% if onboarding_step_1_completed %}View Projects{% else %}Create Project{% endif %}</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="onboarding-step {% if onboarding_step_2_completed %}completed{% endif %}">
-                    <div class="step-number">
-                        {% if onboarding_step_2_completed %}
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        {% else %}<span>2</span>{% endif %}
-                    </div>
-                    <div class="step-content">
-                        <h4>Send Your First Candidate Invite</h4>
-                        <p>Choose from {{ allowed_assessments|length }} approved assessment{{ allowed_assessments|length|pluralize }}: {% for a in allowed_assessments %}{{ a.label }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
-                        <a href="{% url 'clients:assessments' %}" class="btn btn-outline btn-small">
-                            <span>Browse Assessments</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="onboarding-step {% if onboarding_step_3_completed %}completed{% endif %}">
-                    <div class="step-number">
-                        {% if onboarding_step_3_completed %}
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        {% else %}<span>3</span>{% endif %}
-                    </div>
-                    <div class="step-content">
-                        <h4>Review Your First Assessment Result</h4>
-                        <p>Once a candidate completes their assessment, you'll see auto-scored results with detailed reports and hiring recommendations.</p>
-                        {% if onboarding_step_3_completed %}
-                            <a href="{% url 'clients:analytics' %}" class="btn btn-outline btn-small">
-                                <span>View Analytics</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </a>
-                        {% else %}
-                            <span class="step-pending">Complete steps 1 & 2 first</span>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <div class="onboarding-help">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <p>Need help getting started? <a href="mailto:support@evalon.app">Contact our support team</a></p>
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
     {# ── Key Metrics ── #}
     <section class="db-metrics">
         <article class="db-metric">
@@ -193,7 +119,7 @@
         </article>
     </section>
 
-    {# ── Attention Items (compact collapsible) ── #}
+    {# ── Attention Items ── #}
     {% if attention_items %}
     <details class="db-attention" open>
         <summary class="db-attention-toggle">
@@ -226,138 +152,60 @@
     </details>
     {% endif %}
 
-    {# ── Two-Column Layout: Activity + Sidebar ── #}
-    <div class="db-content-grid">
-
-        {# ── Left: Recent Activity ── #}
-        <section class="db-activity-col">
-            <div class="section-header">
-                <h3>Recent Activity</h3>
-                <a href="#activity" class="link-subtle">View all →</a>
-            </div>
+    {# ── Recent Activity (full width) ── #}
+    <section class="db-activity-full">
+        <div class="section-header">
+            <h3>Recent Activity</h3>
             {% if activity_feed %}
-            <div class="db-activity-card">
-                <ul class="activity-feed">
-                    {% for entry in activity_feed|slice:":8" %}
-                    <li class="activity-item">
-                        <div class="activity-main">
-                            <div class="activity-avatar">
-                                <span>{{ entry.candidate|slice:":1"|upper }}</span>
-                            </div>
-                            <div class="activity-details">
-                                <p class="activity-name">{{ entry.candidate }}</p>
-                                <p class="activity-meta">
-                                    <span>{{ entry.assessment }}</span>
-                                    <span class="db-status-dot {% if entry.status == 'Completed' or entry.status == 'Submitted' %}dot-success{% elif entry.status == 'In Progress' %}dot-active{% else %}dot-pending{% endif %}"></span>
-                                    <span>{{ entry.status }}</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="activity-actions">
-                            <span class="activity-time">{{ entry.timestamp|naturaltime }}</span>
-                            {% if entry.detail_url %}
-                            <a href="{{ entry.detail_url }}" class="btn btn-ghost small">View</a>
-                            {% else %}
-                            <a href="{{ entry.manage_url }}" class="btn btn-ghost small">Manage</a>
-                            {% endif %}
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% else %}
-            <div class="db-empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25; margin-bottom: 1rem;">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="8.5" cy="7" r="4"></circle>
-                    <line x1="20" y1="8" x2="20" y2="14"></line>
-                    <line x1="23" y1="11" x2="17" y2="11"></line>
-                </svg>
-                <p>No recent activity yet.</p>
-                <a href="{% url 'clients:assessments' %}" class="btn btn-outline small">Invite your first candidate</a>
-            </div>
+            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline small">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export CSV
+            </a>
             {% endif %}
-        </section>
-
-        {# ── Right: Sidebar ── #}
-        <aside class="db-sidebar-col">
-            {# Quick Actions #}
-            <div class="db-sidebar-section">
-                <h4 class="db-sidebar-title">Quick Actions</h4>
-                <nav class="db-quick-nav">
-                    <a href="{% url 'clients:assessments' %}" class="db-quick-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                        <span>Assessments <em class="db-quick-count">{{ allowed_assessments|length }}</em></span>
-                    </a>
-                    <a href="{% url 'clients:project-list' %}" class="db-quick-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                        <span>Projects <em class="db-quick-count">{{ project_preview|length|default:0 }}</em></span>
-                    </a>
-                    <a href="{% url 'clients:analytics' %}" class="db-quick-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
-                        <span>Analytics</span>
-                    </a>
-                    <a href="{{ activity_export_url }}" class="db-quick-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        <span>Export CSV</span>
-                    </a>
-                    {% if is_manager %}
-                    <a href="{% url 'clients:billing' %}" class="db-quick-item">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-                        <span>Billing</span>
-                    </a>
-                    {% endif %}
-                </nav>
-            </div>
-
-            {# Active Projects #}
-            {% if project_preview %}
-            <div class="db-sidebar-section">
-                <div class="db-sidebar-header">
-                    <h4 class="db-sidebar-title">Active Projects</h4>
-                    <a href="{% url 'clients:project-list' %}" class="link-subtle">All →</a>
-                </div>
-                <div class="db-project-list">
-                    {% for proj in project_preview %}
-                    <a href="{{ proj.href }}" class="db-project-item">
-                        <div>
-                            <strong>{{ proj.title }}</strong>
-                            <span class="muted">{{ proj.open_roles }} open role{{ proj.open_roles|pluralize }}</span>
+        </div>
+        {% if activity_feed %}
+        <div class="db-activity-card">
+            <ul class="activity-feed">
+                {% for entry in activity_feed|slice:":10" %}
+                <li class="activity-item">
+                    <div class="activity-main">
+                        <div class="activity-avatar">
+                            <span>{{ entry.candidate|slice:":1"|upper }}</span>
                         </div>
-                        <span class="db-project-sessions">{{ proj.sessions }}</span>
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            {# Plan Warning #}
-            {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 or plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
-            <div class="db-sidebar-section db-plan-warn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <div>
-                    {% if plan_overview.invite_remaining is not None and plan_overview.invite_remaining <= 10 %}
-                    <strong>{{ plan_overview.invite_remaining }} invite{{ plan_overview.invite_remaining|pluralize }} left</strong>
-                    <p class="muted">This month's limit is almost reached.</p>
-                    {% elif plan_overview.project_remaining is not None and plan_overview.project_remaining <= 2 %}
-                    <strong>{{ plan_overview.project_remaining }} project slot{{ plan_overview.project_remaining|pluralize }} left</strong>
-                    <p class="muted">You're close to your project limit.</p>
-                    {% endif %}
-                </div>
-                <a href="{{ plan_overview.upgrade_url }}" class="btn btn-outline small">Upgrade</a>
-            </div>
-            {% endif %}
-        </aside>
-    </div>
+                        <div class="activity-details">
+                            <p class="activity-name">{{ entry.candidate }}</p>
+                            <p class="activity-meta">
+                                <span>{{ entry.assessment }}</span>
+                                <span class="db-status-dot {% if entry.status == 'Completed' or entry.status == 'Submitted' %}dot-success{% elif entry.status == 'In Progress' %}dot-active{% else %}dot-pending{% endif %}"></span>
+                                <span>{{ entry.status }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="activity-actions">
+                        <span class="activity-time">{{ entry.timestamp|naturaltime }}</span>
+                        {% if entry.detail_url %}
+                        <a href="{{ entry.detail_url }}" class="btn btn-ghost small">View</a>
+                        {% else %}
+                        <a href="{{ entry.manage_url }}" class="btn btn-ghost small">Manage</a>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <div class="db-empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25; margin-bottom: 1rem;">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            <p>No recent activity yet.</p>
+            <a href="{% url 'clients:assessments' %}" class="btn btn-outline small">Invite your first candidate</a>
+        </div>
+        {% endif %}
+    </section>
 
 </div>
-
-<div id="assessments" style="scroll-margin-top: 2rem;"></div>
-<div id="analytics" style="scroll-margin-top: 2rem;"></div>
-<div id="activity" style="scroll-margin-top: 2rem;"></div>
-
 {% endblock %}

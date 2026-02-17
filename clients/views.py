@@ -2041,6 +2041,10 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        tab = self.request.GET.get("tab", "positions")
+        context["active_tab"] = tab
+
+        # Positions data (always needed for count badge)
         dataset_map = build_dataset_map(self.account)
         project_health = build_project_health_map(self.account, dataset_map)
         projects = list(self.account.projects.order_by("-created_at"))
@@ -2048,8 +2052,29 @@ class ClientProjectListView(ClientProjectAccessMixin, TemplateView):
             project.health = project_health.get(project.id, _default_project_health(project))
         context["projects"] = projects
         context["project_health_map"] = project_health
+
+        # Campaigns data
+        campaigns = self.account.campaigns.all()
+        for campaign in campaigns:
+            campaign.pos_count = campaign.position_count
+            campaign.active_count = campaign.active_position_count
+        context["campaigns"] = campaigns
+        context["campaign_form"] = getattr(self, "campaign_form", HiringProjectForm(client=self.account))
+
         context["is_manager"] = self.account.role == "manager"
         return context
+
+    def post(self, request, *args, **kwargs):
+        if self.account.role != "manager":
+            messages.error(request, "Only managers can create projects.")
+            return redirect("clients:project-list")
+        form = HiringProjectForm(request.POST, client=self.account)
+        if form.is_valid():
+            campaign = form.save()
+            messages.success(request, f'Project "{campaign.name}" created.')
+            return redirect("clients:campaign-detail", campaign_uuid=campaign.uuid)
+        self.campaign_form = form
+        return self.render_to_response(self.get_context_data(), status=400)
 
 
 class ClientProjectCreateView(ClientProjectAccessMixin, TemplateView):

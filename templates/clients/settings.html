@@ -11,6 +11,12 @@
         <p class="muted">Manage your account and preferences</p>
     </header>
 
+    {# ── Settings/Billing Tabs ── #}
+    <nav class="portal-tabs">
+        <a href="{% url 'clients:settings' %}" class="portal-tab {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">General</a>
+        <a href="{% url 'clients:billing' %}" class="portal-tab {% if request.resolver_match.url_name == 'billing' %}active{% endif %}">Billing</a>
+    </nav>
+
     {# ── Account Information ── #}
     <section class="st-section">
         <div class="st-section-head">

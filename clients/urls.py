@@ -1,6 +1,16 @@
 from django.urls import path
+from django.views import View
+from django.shortcuts import redirect as _redirect
 
 from . import views
+
+
+class _CampaignListRedirect(View):
+    def get(self, request, *args, **kwargs):
+        return _redirect("clients:project-list")
+
+    def post(self, request, *args, **kwargs):
+        return _redirect("clients:project-list")
 
 app_name = "clients"
 
@@ -43,7 +53,7 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
         views.ClientProjectPipelineStageView.as_view(),
         name="project-pipeline-update",
     ),
-    path("dashboard/campaigns/", views.CampaignListView.as_view(), name="campaign-list"),
+    path("dashboard/campaigns/", _CampaignListRedirect.as_view(), name="campaign-list"),
     path("dashboard/campaigns/<uuid:campaign_uuid>/", views.CampaignDetailView.as_view(), name="campaign-detail"),
     path("dashboard/campaigns/<uuid:campaign_uuid>/edit/", views.CampaignEditView.as_view(), name="campaign-edit"),
     path("dashboard/applications/", views.ApplicationListView.as_view(), name="application-list"),

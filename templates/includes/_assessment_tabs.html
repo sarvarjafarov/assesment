@@ -1,0 +1,13 @@
+<nav class="portal-tabs">
+    <a href="{% url 'clients:assessments' %}" class="portal-tab {% if request.resolver_match.url_name == 'assessments' or request.resolver_match.url_name == 'assessment-manage' or request.resolver_match.url_name == 'assessment-detail' %}active{% endif %}">
+        Library
+    </a>
+    {% if has_custom_assessments %}
+    <a href="{% url 'custom_assessments:list' %}" class="portal-tab {% if 'custom_assessments' in request.resolver_match.app_name %}active{% endif %}">
+        Custom
+    </a>
+    {% endif %}
+    <a href="{% if has_ai_hiring %}{% url 'hiring_agent:pipeline-list' %}{% else %}{% url 'hiring_agent:upgrade' %}{% endif %}" class="portal-tab {% if 'hiring_agent' in request.resolver_match.app_name %}active{% endif %}">
+        AI Hiring
+    </a>
+</nav>
