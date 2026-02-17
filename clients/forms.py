@@ -684,6 +684,29 @@ class ClientSessionNoteForm(forms.ModelForm):
 
 
 class ClientProjectForm(forms.ModelForm):
+    # AI Screening fields (non-model, only for Pro/Enterprise plans)
+    ai_screening_enabled = forms.BooleanField(
+        required=False,
+        label="Enable AI Screening",
+    )
+    ai_assessment_types = forms.MultipleChoiceField(
+        required=False,
+        choices=[],
+        widget=forms.CheckboxSelectMultiple,
+        label="AI Assessments",
+        help_text="Assessments to send to shortlisted candidates.",
+    )
+    ai_automation_mode = forms.ChoiceField(
+        required=False,
+        choices=[
+            ('semi_auto', 'Semi-Auto (auto-screen, human decides)'),
+            ('recommend', 'Recommend (human approves all)'),
+            ('full_auto', 'Full Auto (AI handles all)'),
+        ],
+        initial='semi_auto',
+        label="Automation Level",
+    )
+
     class Meta:
         model = ClientProject
         fields = [
@@ -740,6 +763,26 @@ class ClientProjectForm(forms.ModelForm):
         self.fields["campaign"].queryset = client.campaigns.all()
         self.fields["campaign"].required = True
 
+        # AI Screening fields — only for eligible plans
+        if client.can_use_ai_hiring:
+            self.fields['ai_assessment_types'].choices = [
+                (code, meta['label'])
+                for code, meta in ClientAccount.ASSESSMENT_DETAILS.items()
+            ]
+            # Pre-fill from existing pipeline on edit
+            if self.instance and self.instance.pk:
+                pipeline = self.instance.hiring_pipelines.filter(
+                    status__in=('active', 'draft'),
+                ).first()
+                if pipeline:
+                    self.fields['ai_screening_enabled'].initial = True
+                    self.fields['ai_assessment_types'].initial = pipeline.assessment_types
+                    self.fields['ai_automation_mode'].initial = pipeline.automation_mode
+        else:
+            self.fields['ai_screening_enabled'].widget = forms.HiddenInput()
+            self.fields['ai_assessment_types'].widget = forms.HiddenInput()
+            self.fields['ai_automation_mode'].widget = forms.HiddenInput()
+
     def save(self, commit=True):
         project = super().save(commit=False)
         project.client = self.client
@@ -747,7 +790,63 @@ class ClientProjectForm(forms.ModelForm):
             project.status = ClientProject.STATUS_ACTIVE
         if commit:
             project.save()
+            if self.client.can_use_ai_hiring:
+                _sync_pipeline_from_project(
+                    project=project,
+                    enabled=self.cleaned_data.get('ai_screening_enabled', False),
+                    assessment_types=self.cleaned_data.get('ai_assessment_types', []),
+                    automation_mode=self.cleaned_data.get('ai_automation_mode', 'semi_auto'),
+                )
         return project
+
+
+def _sync_pipeline_from_project(project, enabled, assessment_types, automation_mode):
+    """Create, update, or pause a HiringPipeline to match position AI settings."""
+    from hiring_agent.models import HiringPipeline
+
+    existing = HiringPipeline.objects.filter(project=project).first()
+
+    if not enabled:
+        if existing and existing.status == 'active':
+            existing.status = 'paused'
+            existing.save(update_fields=['status', 'updated_at'])
+        return
+
+    # Build job_description from project fields
+    desc_parts = [project.description]
+    if project.responsibilities:
+        desc_parts.append(f"Responsibilities:\n{project.responsibilities}")
+    if project.requirements:
+        desc_parts.append(f"Requirements:\n{project.requirements}")
+    job_description = '\n\n'.join(p for p in desc_parts if p)
+
+    required_skills = [s.strip() for s in (project.required_skills or '').split(',') if s.strip()]
+    preferred_skills = [s.strip() for s in (project.nice_to_haves or '').split('\n') if s.strip()]
+
+    level_map = {
+        'junior': 'junior', 'mid': 'mid', 'mid-level': 'mid',
+        'senior': 'senior', 'lead': 'lead', 'executive': 'executive',
+    }
+    seniority = level_map.get((project.role_level or '').lower().strip(), 'mid')
+
+    defaults = {
+        'title': project.title,
+        'job_description': job_description,
+        'required_skills': required_skills,
+        'preferred_skills': preferred_skills,
+        'seniority_level': seniority,
+        'assessment_types': assessment_types or [],
+        'automation_mode': automation_mode,
+        'status': 'active',
+        'client': project.client,
+    }
+
+    if existing:
+        for key, val in defaults.items():
+            setattr(existing, key, val)
+        existing.save()
+    else:
+        HiringPipeline.objects.create(project=project, **defaults)
 
 
 class HiringProjectForm(forms.ModelForm):

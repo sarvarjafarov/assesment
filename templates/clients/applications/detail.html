@@ -159,8 +159,8 @@
                 </div>
                 {% if pipeline_candidate.pipeline %}
                 <div class="apd-ai-pipeline-link">
-                    <a href="{% url 'hiring_agent:candidate-detail' pipeline_uuid=pipeline_candidate.pipeline.uuid pk=pipeline_candidate.pk %}">
-                        View full pipeline details
+                    <a href="{% url 'hiring_agent:candidate-detail' pipeline_uuid=pipeline_candidate.pipeline.uuid pk=pipeline_candidate.pk %}" style="opacity:.6;font-size:.82rem">
+                        Advanced pipeline view
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                     </a>
                 </div>
@@ -216,6 +216,74 @@
                 {% if pipeline_candidate.ai_final_summary %}
                 <p class="apd-ai-summary">{{ pipeline_candidate.ai_final_summary }}</p>
                 {% endif %}
+            </section>
+            {% endif %}
+
+            {# ── Human Review ── #}
+            {% if pipeline_candidate and review_form %}
+            <section class="apd-card">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -3px; margin-right: 6px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+                    Human Review
+                </h2>
+                {% if pipeline_candidate.human_decision %}
+                <div class="apd-review-current">
+                    <span class="apd-review-badge ap-status ap-status-{% if pipeline_candidate.human_decision == 'advance' %}reviewed{% elif pipeline_candidate.human_decision == 'reject' %}rejected{% else %}pending{% endif %}">{{ pipeline_candidate.get_human_decision_display }}</span>
+                    {% if pipeline_candidate.human_notes %}
+                    <p class="apd-review-notes">{{ pipeline_candidate.human_notes }}</p>
+                    {% endif %}
+                    <details class="apd-review-change">
+                        <summary>Change decision</summary>
+                {% endif %}
+                        <form method="post" action="{% url 'clients:application-review' application_uuid=application.uuid %}" class="apd-review-form">
+                            {% csrf_token %}
+                            <div class="apd-review-radios">
+                                {% for radio in review_form.decision %}
+                                {{ radio }}
+                                {% endfor %}
+                            </div>
+                            <div class="apd-review-notes-field">
+                                <label for="{{ review_form.notes.id_for_label }}">Notes</label>
+                                {{ review_form.notes }}
+                            </div>
+                            <button type="submit" class="btn btn-primary small">Save Review</button>
+                        </form>
+                {% if pipeline_candidate.human_decision %}
+                    </details>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
+            {# ── AI Processing Log ── #}
+            {% if action_logs %}
+            <section class="apd-card">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -3px; margin-right: 6px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    AI Processing Log
+                </h2>
+                <div class="apd-log-table-wrap">
+                    <table class="apd-log-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Status</th>
+                                <th>Tokens</th>
+                                <th>When</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in action_logs %}
+                            <tr>
+                                <td>{{ log.get_action_display }}</td>
+                                <td><span class="apd-log-status apd-log-status--{{ log.status }}">{{ log.status }}</span></td>
+                                <td class="ap-cell-muted">{{ log.tokens_used|default:"—" }}</td>
+                                <td class="ap-cell-muted">{{ log.created_at|naturaltime }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </section>
             {% endif %}
 

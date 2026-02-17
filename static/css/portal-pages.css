@@ -4615,6 +4615,43 @@
     color: var(--color-navy);
 }
 
+/* AI Screening section */
+.pe-section-ai {
+    border: 1.5px solid #e0e7ff;
+    background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+}
+.pe-ai-toggle {
+    padding: 0.75rem 0 0.25rem;
+}
+.pe-ai-toggle label {
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+.pe-ai-options {
+    margin-top: 1rem;
+    padding: 1rem 0 0;
+    border-top: 1px solid #e0e7ff;
+}
+.pe-checkbox-group ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.pe-checkbox-group li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.pe-checkbox-group li label {
+    margin-bottom: 0;
+    text-transform: none;
+    font-size: 0.88rem;
+    color: var(--color-navy);
+}
+
 .pe-actions {
     display: flex;
     gap: 0.75rem;
@@ -9822,6 +9859,24 @@
     color: #991b1b;
 }
 
+/* AI Score badge */
+.ap-ai-score {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+.ap-ai-score-pass {
+    background: #d1fae5;
+    color: #065f46;
+}
+.ap-ai-score-fail {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 /* Breadcrumb (shared) */
 .ap-breadcrumb {
     display: flex;
@@ -10287,6 +10342,98 @@
 }
 .apd-assess-score--pass { color: #059669; }
 .apd-assess-score--fail { color: #dc2626; }
+
+/* Human Review */
+.apd-review-current {
+    margin-bottom: 0.5rem;
+}
+.apd-review-badge {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+.apd-review-notes {
+    font-size: 0.88rem;
+    color: #555;
+    margin: 0.25rem 0 0.5rem;
+}
+.apd-review-change summary {
+    font-size: 0.82rem;
+    color: var(--color-orange, #ff8a00);
+    cursor: pointer;
+    margin-top: 0.25rem;
+}
+.apd-review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+.apd-review-radios {
+    display: flex;
+    gap: 1rem;
+}
+.apd-review-radios label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+.apd-review-notes-field label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #888;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+.apd-review-notes-field textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.88rem;
+    resize: vertical;
+}
+
+/* AI Processing Log */
+.apd-log-table-wrap {
+    overflow-x: auto;
+}
+.apd-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+.apd-log-table th {
+    text-align: left;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #888;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid #eee;
+}
+.apd-log-table td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid #f5f5f5;
+}
+.apd-log-status {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+.apd-log-status--success {
+    background: #d1fae5;
+    color: #065f46;
+}
+.apd-log-status--error {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
 /* Responsive */
 @media (max-width: 900px) {

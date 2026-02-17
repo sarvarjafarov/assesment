@@ -27,6 +27,14 @@
                 <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
+            {% if can_use_ai_hiring %}
+            <select name="ai" class="ap-filter-select">
+                <option value="">AI: All</option>
+                <option value="screened" {% if selected_ai == "screened" %}selected{% endif %}>AI Screened</option>
+                <option value="passed" {% if selected_ai == "passed" %}selected{% endif %}>AI Passed</option>
+                <option value="failed" {% if selected_ai == "failed" %}selected{% endif %}>AI Failed</option>
+            </select>
+            {% endif %}
             <button type="submit" class="btn btn-outline small">Filter</button>
         </form>
     </div>
@@ -39,6 +47,7 @@
                     <th>Candidate</th>
                     <th>Position</th>
                     <th>Status</th>
+                    {% if can_use_ai_hiring %}<th>AI Score</th>{% endif %}
                     <th>Applied</th>
                     <th></th>
                 </tr>
@@ -52,6 +61,15 @@
                     </td>
                     <td>{{ app.project.title }}</td>
                     <td><span class="ap-status ap-status-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                    {% if can_use_ai_hiring %}
+                    <td>
+                        {% if app.pipeline_candidate and app.pipeline_candidate.ai_screen_score is not None %}
+                        <span class="ap-ai-score {% if app.pipeline_candidate.ai_screen_score >= 60 %}ap-ai-score-pass{% else %}ap-ai-score-fail{% endif %}">{{ app.pipeline_candidate.ai_screen_score|floatformat:0 }}</span>
+                        {% else %}
+                        <span class="ap-cell-muted">&mdash;</span>
+                        {% endif %}
+                    </td>
+                    {% endif %}
                     <td class="ap-cell-muted">{{ app.created_at|naturaltime }}</td>
                     <td class="ap-cell-action">
                         <a href="{% url 'clients:application-detail' application_uuid=app.uuid %}" class="ap-view-link">View &rarr;</a>

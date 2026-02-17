@@ -2088,6 +2088,7 @@ class ClientProjectCreateView(ClientProjectAccessMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["project"] = None
         context["is_create"] = True
+        context["account"] = self.account
         context["form"] = getattr(self, "form", ClientProjectForm(client=self.account))
         return context
 
@@ -2218,6 +2219,7 @@ class ClientProjectEditView(ClientProjectAccessMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         project = self.get_project()
         context["project"] = project
+        context["account"] = self.account
         context["form"] = getattr(
             self, "form",
             ClientProjectForm(instance=project, client=self.account),
@@ -3225,7 +3227,7 @@ class ApplicationListView(ClientProjectAccessMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         applications = PositionApplication.objects.filter(
             client=self.account,
-        ).select_related("project")
+        ).select_related("project", "pipeline_candidate")
 
         project_uuid = self.request.GET.get("position")
         if project_uuid:
@@ -3235,11 +3237,26 @@ class ApplicationListView(ClientProjectAccessMixin, TemplateView):
         if status_filter and status_filter in dict(PositionApplication.STATUS_CHOICES):
             applications = applications.filter(status=status_filter)
 
+        ai_filter = self.request.GET.get("ai")
+        if ai_filter == "screened":
+            applications = applications.filter(pipeline_candidate__isnull=False)
+        elif ai_filter == "passed":
+            applications = applications.filter(
+                pipeline_candidate__ai_screen_score__gte=60,
+            )
+        elif ai_filter == "failed":
+            applications = applications.filter(
+                pipeline_candidate__ai_screen_score__lt=60,
+                pipeline_candidate__ai_screen_score__isnull=False,
+            )
+
         context["applications"] = applications
         context["projects"] = self.account.projects.order_by("-created_at")
         context["status_choices"] = PositionApplication.STATUS_CHOICES
         context["selected_position"] = project_uuid or ""
         context["selected_status"] = status_filter or ""
+        context["selected_ai"] = ai_filter or ""
+        context["can_use_ai_hiring"] = self.account.can_use_ai_hiring
         return context
 
 
@@ -3260,10 +3277,22 @@ class ApplicationDetailView(ClientProjectAccessMixin, TemplateView):
         application = self.get_application()
         context["application"] = application
         context["position"] = application.project
-        context["pipeline_candidate"] = application.pipeline_candidate
+        pc = application.pipeline_candidate
+        context["pipeline_candidate"] = pc
 
         from .forms import SendAssessmentFromApplicationForm
         context["send_assessment_form"] = SendAssessmentFromApplicationForm(client=self.account)
+
+        # Human review form + action logs for AI-screened candidates
+        if pc:
+            from hiring_agent.forms import CandidateReviewForm
+            from hiring_agent.models import AgentActionLog
+            context["review_form"] = CandidateReviewForm(
+                initial={"decision": pc.human_decision} if pc.human_decision else None,
+            )
+            context["action_logs"] = AgentActionLog.objects.filter(
+                candidate=pc,
+            ).order_by("-created_at")[:20]
         return context
 
     def post(self, request, *args, **kwargs):
@@ -3281,6 +3310,36 @@ class ApplicationDetailView(ClientProjectAccessMixin, TemplateView):
             messages.success(request, f"Application status updated to {application.get_status_display()}.")
         else:
             messages.error(request, "Invalid status transition.")
+        return redirect("clients:application-detail", application_uuid=application.uuid)
+
+
+class ApplicationReviewView(ClientProjectAccessMixin, View):
+    """POST-only: save human review decision on a pipeline candidate."""
+
+    def post(self, request, *args, **kwargs):
+        application = get_object_or_404(
+            PositionApplication,
+            client=self.account,
+            uuid=kwargs.get("application_uuid"),
+        )
+        pc = application.pipeline_candidate
+        if not pc:
+            messages.error(request, "No AI pipeline candidate linked.")
+            return redirect("clients:application-detail", application_uuid=application.uuid)
+
+        from hiring_agent.forms import CandidateReviewForm
+        form = CandidateReviewForm(request.POST)
+        if form.is_valid():
+            pc.human_decision = form.cleaned_data["decision"]
+            pc.human_notes = form.cleaned_data.get("notes", "")
+            pc.save(update_fields=["human_decision", "human_notes", "updated_at"])
+
+            from hiring_agent.services import process_pipeline
+            process_pipeline(pc.pipeline)
+
+            messages.success(request, f"Review saved: {pc.get_human_decision_display()}")
+        else:
+            messages.error(request, "Invalid review form.")
         return redirect("clients:application-detail", application_uuid=application.uuid)
 
 
