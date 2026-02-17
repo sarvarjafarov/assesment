@@ -5779,7 +5779,32 @@
 }
 
 .pe-form {
-    max-width: 840px;
+    max-width: 100%;
+}
+
+/* Two-column row layout */
+.pe-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 0;
+}
+.pe-row-full {
+    grid-template-columns: 1fr;
+}
+
+/* Job description 2×2 textarea grid */
+.pe-jd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Horizontal divider between sub-sections */
+.pe-divider {
+    border: none;
+    border-top: 1px solid var(--color-border-light);
+    margin: 1.25rem 0;
 }
 
 .pe-section {
@@ -5889,6 +5914,14 @@
     padding-bottom: 2rem;
 }
 
+@media (max-width: 900px) {
+    .pe-row {
+        grid-template-columns: 1fr;
+    }
+    .pe-jd-grid {
+        grid-template-columns: 1fr;
+    }
+}
 @media (max-width: 768px) {
     .pe-grid-2,
     .pe-grid-3 {
