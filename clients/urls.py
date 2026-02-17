@@ -66,4 +66,5 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
     path("support/request/", views.SupportRequestCreateView.as_view(), name="support-request"),
     path("api/notifications/", views.NotificationsAPIView.as_view(), name="api-notifications"),
     path("api/notifications/mark-read/", views.NotificationsMarkReadView.as_view(), name="api-notifications-mark-read"),
+    path("api/campaigns/quick-create/", views.CampaignQuickCreateView.as_view(), name="api-campaign-quick-create"),
 ]

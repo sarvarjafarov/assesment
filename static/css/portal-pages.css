@@ -4542,6 +4542,64 @@
     color: #ef4444;
 }
 
+.pe-field-with-action {
+    display: flex;
+    gap: 0.4rem;
+    align-items: stretch;
+}
+.pe-field-with-action select {
+    flex: 1;
+}
+.pe-inline-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    flex-shrink: 0;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.pe-inline-add:hover {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+    background: rgba(255, 138, 0, 0.04);
+}
+.pe-inline-create {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+    align-items: center;
+}
+.pe-inline-input {
+    flex: 1;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--color-orange);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--color-navy);
+    background: rgba(255, 138, 0, 0.03);
+    font-family: inherit;
+    outline: none;
+}
+.pe-inline-input:focus {
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.1);
+}
+.pe-inline-cancel {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.4rem 0.5rem;
+}
+.pe-inline-cancel:hover {
+    color: var(--color-navy);
+}
+
 .pe-field-check {
     display: flex;
     align-items: center;

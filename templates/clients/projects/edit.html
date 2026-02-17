@@ -40,7 +40,17 @@
                     </div>
                     <div class="pe-field">
                         <label for="{{ form.campaign.id_for_label }}">Project <span class="pe-req">*</span></label>
-                        {{ form.campaign }}
+                        <div class="pe-field-with-action">
+                            {{ form.campaign }}
+                            <button type="button" class="pe-inline-add" id="pe-toggle-campaign" title="Create new project">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            </button>
+                        </div>
+                        <div class="pe-inline-create" id="pe-campaign-create" style="display:none">
+                            <input type="text" id="pe-campaign-name" placeholder="Project name" class="pe-inline-input">
+                            <button type="button" id="pe-campaign-save" class="btn btn-primary btn-sm">Create</button>
+                            <button type="button" id="pe-campaign-cancel" class="pe-inline-cancel">Cancel</button>
+                        </div>
                         {% for error in form.campaign.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                     </div>
                     <div class="pe-field">
@@ -165,4 +175,59 @@
         </div>
     </form>
 </div>
+
+<script>
+(function() {
+    const toggle = document.getElementById('pe-toggle-campaign');
+    const panel = document.getElementById('pe-campaign-create');
+    const nameInput = document.getElementById('pe-campaign-name');
+    const saveBtn = document.getElementById('pe-campaign-save');
+    const cancelBtn = document.getElementById('pe-campaign-cancel');
+    const select = document.getElementById('{{ form.campaign.id_for_label }}');
+
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener('click', function() {
+        panel.style.display = 'flex';
+        toggle.style.display = 'none';
+        nameInput.focus();
+    });
+
+    cancelBtn.addEventListener('click', function() {
+        panel.style.display = 'none';
+        toggle.style.display = '';
+        nameInput.value = '';
+    });
+
+    nameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
+        if (e.key === 'Escape') { cancelBtn.click(); }
+    });
+
+    saveBtn.addEventListener('click', function() {
+        const name = nameInput.value.trim();
+        if (!name) { nameInput.focus(); return; }
+        saveBtn.disabled = true;
+        saveBtn.textContent = '...';
+
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const fd = new FormData();
+        fd.append('name', name);
+        fd.append('csrfmiddlewaretoken', csrf);
+
+        fetch('{% url "clients:api-campaign-quick-create" %}', { method: 'POST', body: fd })
+            .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
+            .then(({ ok, data }) => {
+                if (!ok) { alert(data.error || 'Error'); return; }
+                const opt = new Option(data.name, data.id, true, true);
+                select.appendChild(opt);
+                panel.style.display = 'none';
+                toggle.style.display = '';
+                nameInput.value = '';
+            })
+            .catch(() => alert('Network error'))
+            .finally(() => { saveBtn.disabled = false; saveBtn.textContent = 'Create'; });
+    });
+})();
+</script>
 {% endblock %}

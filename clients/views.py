@@ -3100,6 +3100,21 @@ class NotificationsMarkReadView(LoginRequiredMixin, View):
         return JsonResponse({"success": True, "unread_count": unread_count})
 
 
+class CampaignQuickCreateView(ClientProjectAccessMixin, View):
+    """AJAX endpoint: create a campaign and return its id + name."""
+
+    def post(self, request, *args, **kwargs):
+        if self.account.role != "manager":
+            return JsonResponse({"error": "Permission denied."}, status=403)
+        name = request.POST.get("name", "").strip()
+        if not name:
+            return JsonResponse({"error": "Project name is required."}, status=400)
+        campaign = HiringProject.objects.create(
+            client=self.account, name=name, status="active",
+        )
+        return JsonResponse({"id": campaign.id, "name": campaign.name})
+
+
 # ── Campaign (Hiring Project) Views ───────────────────────────────────
 
 class CampaignListView(ClientProjectAccessMixin, TemplateView):
