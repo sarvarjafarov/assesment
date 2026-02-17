@@ -550,6 +550,34 @@ class ClientSessionNote(TimeStampedModel):
         return f"{status} for {self.candidate_id}"
 
 
+class HiringProject(TimeStampedModel):
+    STATUS_CHOICES = [
+        ("active", "Active"),
+        ("paused", "Paused"),
+        ("completed", "Completed"),
+        ("archived", "Archived"),
+    ]
+    client = models.ForeignKey(ClientAccount, related_name="campaigns", on_delete=models.CASCADE)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="active")
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.name} ({self.client.company_name})"
+
+    @property
+    def position_count(self):
+        return self.positions.count()
+
+    @property
+    def active_position_count(self):
+        return self.positions.filter(status=ClientProject.STATUS_ACTIVE).count()
+
+
 class ClientProject(TimeStampedModel):
     STATUS_ACTIVE = "active"
     STATUS_ON_HOLD = "on_hold"
@@ -581,6 +609,11 @@ class ClientProject(TimeStampedModel):
     ]
 
     client = models.ForeignKey(ClientAccount, related_name="projects", on_delete=models.CASCADE)
+    campaign = models.ForeignKey(
+        HiringProject, related_name="positions", on_delete=models.SET_NULL,
+        null=True, blank=True,
+        help_text="Hiring project this position belongs to",
+    )
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     title = models.CharField(max_length=200)
     role_level = models.CharField(max_length=120, blank=True)

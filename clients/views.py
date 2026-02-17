@@ -48,9 +48,10 @@ from .forms import (
     ClientSignupForm,
     ClientSessionNoteForm,
     EmailPreferencesForm,
+    HiringProjectForm,
     SocialProfileCompleteForm,
 )
-from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote, PositionApplication, SupportRequest
+from .models import ClientAccount, ClientNotification, ClientProject, ClientSessionNote, HiringProject, PositionApplication, SupportRequest
 from .services import send_verification_email, send_approval_notification, send_welcome_email, is_ssrf_target
 
 logger = logging.getLogger(__name__)
@@ -3029,6 +3030,103 @@ class NotificationsMarkReadView(LoginRequiredMixin, View):
 
         unread_count = account.notifications.filter(is_read=False).count()
         return JsonResponse({"success": True, "unread_count": unread_count})
+
+
+# ── Campaign (Hiring Project) Views ───────────────────────────────────
+
+class CampaignListView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/campaigns/list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaigns = self.account.campaigns.all()
+        for campaign in campaigns:
+            campaign.pos_count = campaign.position_count
+            campaign.active_count = campaign.active_position_count
+        context["campaigns"] = campaigns
+        context["form"] = getattr(self, "form", HiringProjectForm(client=self.account))
+        context["is_manager"] = self.account.role == "manager"
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if self.account.role != "manager":
+            messages.error(request, "Only managers can create projects.")
+            return redirect("clients:campaign-list")
+        form = HiringProjectForm(request.POST, client=self.account)
+        if form.is_valid():
+            campaign = form.save()
+            messages.success(request, f'Project "{campaign.name}" created.')
+            return redirect("clients:campaign-detail", campaign_uuid=campaign.uuid)
+        self.form = form
+        return self.render_to_response(self.get_context_data(), status=400)
+
+
+class CampaignDetailView(ClientProjectAccessMixin, TemplateView):
+    template_name = "clients/campaigns/detail.html"
+
+    def get_campaign(self):
+        if not hasattr(self, "_campaign"):
+            self._campaign = get_object_or_404(
+                self.account.campaigns, uuid=self.kwargs.get("campaign_uuid")
+            )
+        return self._campaign
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaign = self.get_campaign()
+        positions = campaign.positions.order_by("-created_at")
+        for pos in positions:
+            pos.app_count = pos.applications.count()
+        context["campaign"] = campaign
+        context["positions"] = positions
+        context["unassigned_positions"] = self.account.projects.filter(campaign__isnull=True).order_by("-created_at")
+        context["form"] = HiringProjectForm(instance=campaign, client=self.account)
+        context["is_manager"] = self.account.role == "manager"
+        total_apps = sum(p.app_count for p in positions)
+        context["stats"] = {
+            "total_positions": positions.count(),
+            "active_positions": positions.filter(status=ClientProject.STATUS_ACTIVE).count(),
+            "total_applications": total_apps,
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        campaign = self.get_campaign()
+        action = request.POST.get("action")
+
+        if action == "assign_position":
+            pos_uuid = request.POST.get("position_uuid")
+            if pos_uuid:
+                pos = get_object_or_404(self.account.projects, uuid=pos_uuid)
+                pos.campaign = campaign
+                pos.save(update_fields=["campaign"])
+                messages.success(request, f'"{pos.title}" added to this project.')
+            return redirect("clients:campaign-detail", campaign_uuid=campaign.uuid)
+
+        if action == "remove_position":
+            pos_uuid = request.POST.get("position_uuid")
+            if pos_uuid:
+                pos = get_object_or_404(campaign.positions.all(), uuid=pos_uuid)
+                pos.campaign = None
+                pos.save(update_fields=["campaign"])
+                messages.success(request, f'"{pos.title}" removed from this project.')
+            return redirect("clients:campaign-detail", campaign_uuid=campaign.uuid)
+
+        return redirect("clients:campaign-detail", campaign_uuid=campaign.uuid)
+
+
+class CampaignEditView(ClientProjectAccessMixin, View):
+    def post(self, request, *args, **kwargs):
+        campaign = get_object_or_404(
+            self.account.campaigns, uuid=self.kwargs.get("campaign_uuid")
+        )
+        form = HiringProjectForm(request.POST, instance=campaign, client=self.account)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Project updated.")
+        else:
+            messages.error(request, "Please fix the errors below.")
+        return redirect("clients:campaign-detail", campaign_uuid=campaign.uuid)
 
 
 # ── Application Management Views ──────────────────────────────────────

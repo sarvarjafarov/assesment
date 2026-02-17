@@ -1,0 +1,164 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}{{ campaign.name }} · Evalon{% endblock %}
+{% block meta_description %}Manage positions in the {{ campaign.name }} hiring project.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+
+    {# ── Breadcrumb ── #}
+    <nav class="cp-breadcrumb">
+        <a href="{% url 'clients:campaign-list' %}">Projects</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <span>{{ campaign.name }}</span>
+    </nav>
+
+    {# ── Campaign Header ── #}
+    <header class="cp-detail-header">
+        <div class="cp-detail-info">
+            <div class="cp-detail-title-row">
+                <h1>{{ campaign.name }}</h1>
+                <span class="cp-status cp-status-{{ campaign.status }}">{{ campaign.get_status_display }}</span>
+            </div>
+            {% if campaign.description %}
+            <p class="cp-detail-desc">{{ campaign.description }}</p>
+            {% endif %}
+            <span class="cp-detail-date">Created {{ campaign.created_at|naturaltime }}</span>
+        </div>
+        {% if is_manager %}
+        <button type="button" class="btn btn-outline small" id="cp-toggle-edit">Edit Project</button>
+        {% endif %}
+    </header>
+
+    {# ── Edit Form (collapsible) ── #}
+    {% if is_manager %}
+    <div class="cp-edit-panel" id="cp-edit-panel">
+        <form method="post" action="{% url 'clients:campaign-edit' campaign_uuid=campaign.uuid %}" class="cp-form">
+            {% csrf_token %}
+            <div class="cp-form-grid">
+                <div class="cp-field">
+                    <label for="{{ form.name.id_for_label }}">Project name</label>
+                    {{ form.name }}
+                </div>
+                <div class="cp-field">
+                    <label for="{{ form.status.id_for_label }}">Status</label>
+                    {{ form.status }}
+                </div>
+                <div class="cp-field cp-field-wide">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="cp-field cp-field-action">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {# ── Stats ── #}
+    <div class="cp-stats-bar">
+        <div class="cp-stat-card">
+            <span class="cp-stat-card-val">{{ stats.total_positions }}</span>
+            <span class="cp-stat-card-lbl">Total Positions</span>
+        </div>
+        <div class="cp-stat-card">
+            <span class="cp-stat-card-val">{{ stats.active_positions }}</span>
+            <span class="cp-stat-card-lbl">Actively Hiring</span>
+        </div>
+        <div class="cp-stat-card">
+            <span class="cp-stat-card-val">{{ stats.total_applications }}</span>
+            <span class="cp-stat-card-lbl">Applications</span>
+        </div>
+    </div>
+
+    {# ── Positions Table ── #}
+    <div class="cp-section">
+        <div class="cp-section-head">
+            <h2>Positions</h2>
+            <a href="{% url 'clients:project-list' %}" class="btn btn-outline small">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                New Position
+            </a>
+        </div>
+
+        {% if positions %}
+        <div class="cp-pos-table-wrap">
+            <table class="cp-pos-table">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Status</th>
+                        <th>Open Roles</th>
+                        <th>Applications</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pos in positions %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'clients:project-detail' pos.uuid %}" class="cp-pos-link">
+                                {{ pos.title }}
+                                {% if pos.department %}<span class="cp-pos-dept">{{ pos.department }}</span>{% endif %}
+                            </a>
+                        </td>
+                        <td><span class="pj-status pj-status-{{ pos.status }}">{{ pos.get_status_display }}</span></td>
+                        <td>{{ pos.open_roles }}</td>
+                        <td>{{ pos.app_count }}</td>
+                        <td>
+                            <form method="post" style="display:inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="remove_position">
+                                <input type="hidden" name="position_uuid" value="{{ pos.uuid }}">
+                                <button type="submit" class="btn btn-ghost small cp-remove-btn" title="Remove from project">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="cp-empty-mini">
+            <p>No positions assigned to this project yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── Assign Existing Position ── #}
+    {% if unassigned_positions %}
+    <div class="cp-section">
+        <div class="cp-section-head">
+            <h2>Add Existing Position</h2>
+        </div>
+        <form method="post" class="cp-assign-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="assign_position">
+            <select name="position_uuid" class="cp-assign-select">
+                <option value="">Select a position...</option>
+                {% for pos in unassigned_positions %}
+                <option value="{{ pos.uuid }}">{{ pos.title }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary small">Add to Project</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+(function() {
+    const btn = document.getElementById('cp-toggle-edit');
+    const panel = document.getElementById('cp-edit-panel');
+    if (btn && panel) {
+        btn.addEventListener('click', function() {
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        });
+    }
+})();
+</script>
+{% endblock %}

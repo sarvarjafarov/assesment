@@ -1,0 +1,120 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Projects · Evalon{% endblock %}
+{% block meta_description %}Organize your hiring campaigns and group positions.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+
+    {# ── Page Header ── #}
+    <header class="cp-header">
+        <div>
+            <h1>Projects</h1>
+            <p class="muted">Group related positions under hiring campaigns</p>
+        </div>
+        {% if is_manager %}
+        <button type="button" class="btn btn-pill cp-create-btn" id="cp-toggle-create">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Project
+        </button>
+        {% endif %}
+    </header>
+
+    {# ── Collapsible Create Form ── #}
+    {% if is_manager %}
+    <div class="cp-create-panel" id="cp-create-panel" {% if form.errors %}style="display:block"{% endif %}>
+        <form method="post" class="cp-form">
+            {% csrf_token %}
+            <div class="cp-form-grid">
+                <div class="cp-field">
+                    <label for="{{ form.name.id_for_label }}">Project name</label>
+                    {{ form.name }}
+                    {% for error in form.name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="cp-field cp-field-wide">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="cp-field cp-field-action">
+                    <button type="submit" class="btn btn-primary">Create Project</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {# ── Count Bar ── #}
+    {% if campaigns %}
+    <div class="cp-toolbar">
+        <span class="cp-count">{{ campaigns|length }} project{{ campaigns|length|pluralize }}</span>
+    </div>
+    {% endif %}
+
+    {# ── Campaign Grid ── #}
+    {% if campaigns %}
+    <div class="cp-grid">
+        {% for campaign in campaigns %}
+        <a href="{% url 'clients:campaign-detail' campaign.uuid %}" class="cp-card">
+            <div class="cp-card-top">
+                <div class="cp-card-title">
+                    <h3>{{ campaign.name }}</h3>
+                    {% if campaign.description %}
+                    <span class="cp-meta">{{ campaign.description|truncatewords:12 }}</span>
+                    {% endif %}
+                </div>
+                <span class="cp-status cp-status-{{ campaign.status }}">{{ campaign.get_status_display }}</span>
+            </div>
+
+            <div class="cp-stats-row">
+                <div class="cp-stat">
+                    <span class="cp-stat-val">{{ campaign.pos_count }}</span>
+                    <span class="cp-stat-lbl">Position{{ campaign.pos_count|pluralize }}</span>
+                </div>
+                <div class="cp-stat">
+                    <span class="cp-stat-val">{{ campaign.active_count }}</span>
+                    <span class="cp-stat-lbl">Active</span>
+                </div>
+            </div>
+
+            <div class="cp-card-foot">
+                <span class="cp-card-date">Created {{ campaign.created_at|naturaltime }}</span>
+                <span class="cp-card-arrow">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    {# ── Empty State ── #}
+    <div class="cp-empty">
+        <div class="cp-empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </div>
+        <h2>No projects yet</h2>
+        <p>Create a project to group related positions under a hiring campaign.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+(function() {
+    const btn = document.getElementById('cp-toggle-create');
+    const panel = document.getElementById('cp-create-panel');
+    if (btn && panel) {
+        btn.addEventListener('click', function() {
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        });
+    }
+})();
+</script>
+{% endblock %}

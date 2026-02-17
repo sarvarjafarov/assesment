@@ -19,7 +19,7 @@ from hr_assessments.services import generate_question_set as generate_hr_questio
 from finance_assessments.models import FinanceAssessmentSession
 from finance_assessments.services import generate_question_set as generate_finance_question_set
 
-from .models import ClientAccount, ClientSessionNote, ClientProject
+from .models import ClientAccount, ClientSessionNote, ClientProject, HiringProject
 
 PUBLIC_EMAIL_DOMAINS = {
     "gmail.com",
@@ -237,7 +237,8 @@ class BaseClientInviteForm(forms.Form):
     project = forms.ModelChoiceField(
         label="Position",
         queryset=ClientProject.objects.none(),
-        help_text="Each invite must be tied to a position.",
+        required=False,
+        help_text="Optionally tie this invite to a position.",
     )
     deadline_type = forms.ChoiceField(
         required=False,
@@ -276,13 +277,8 @@ class BaseClientInviteForm(forms.Form):
         super().__init__(*args, **kwargs)
         project_qs = client.projects.order_by("-created_at")
         self.fields["project"].queryset = project_qs
-        if not project_qs.exists():
-            self.fields["project"].help_text = "Create a position first."
-
     def clean(self):
         cleaned = super().clean()
-        if not self.client.projects.exists():
-            raise forms.ValidationError("Create a position before inviting candidates.")
         generator = self.generate_question_set
         if not generator:
             raise forms.ValidationError("Assessment configuration missing.")
@@ -692,6 +688,7 @@ class ClientProjectForm(forms.ModelForm):
         model = ClientProject
         fields = [
             "title",
+            "campaign",
             "role_level",
             "department",
             "location",
@@ -724,12 +721,37 @@ class ClientProjectForm(forms.ModelForm):
         # the form validates and falls back to the model default.
         self.fields["status"].required = False
         self.fields["status"].initial = ClientProject.STATUS_ACTIVE
+        self.fields["campaign"].queryset = client.campaigns.all()
+        self.fields["campaign"].required = False
 
     def save(self, commit=True):
         project = super().save(commit=False)
         project.client = self.client
         if not project.status:
             project.status = ClientProject.STATUS_ACTIVE
+        if commit:
+            project.save()
+        return project
+
+
+class HiringProjectForm(forms.ModelForm):
+    class Meta:
+        model = HiringProject
+        fields = ["name", "description", "status"]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def __init__(self, *args, client: ClientAccount, **kwargs):
+        self.client = client
+        super().__init__(*args, **kwargs)
+        self.fields["status"].required = False
+
+    def save(self, commit=True):
+        project = super().save(commit=False)
+        project.client = self.client
+        if not project.status:
+            project.status = "active"
         if commit:
             project.save()
         return project
