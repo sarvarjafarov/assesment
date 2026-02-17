@@ -1640,6 +1640,70 @@ def vacancy_detail(request, company_slug, position_uuid):
     })
 
 
+def _maybe_enqueue_pipeline(application, resume_data, resume_filename):
+    """
+    If the position has an active AI hiring pipeline, create a PipelineCandidate
+    from the application and trigger pipeline processing.
+    """
+    import logging
+    from hiring_agent.models import HiringPipeline, PipelineCandidate
+    from hiring_agent.services import parse_resume_bytes, process_pipeline
+    from assessments.models import CandidateProfile
+
+    logger = logging.getLogger(__name__)
+
+    position = application.project
+    # Find an active pipeline linked to this position
+    pipeline = (
+        HiringPipeline.objects
+        .filter(project=position, status='active')
+        .first()
+    )
+    if not pipeline:
+        return
+
+    # Parse resume text from binary data
+    resume_text = ''
+    if resume_data:
+        try:
+            resume_text = parse_resume_bytes(bytes(resume_data), resume_filename)
+        except Exception:
+            logger.warning('Failed to parse resume for pipeline candidate %s', application.email)
+
+    # Split full_name into first/last
+    parts = application.full_name.strip().split(None, 1)
+    first_name = parts[0] if parts else application.full_name
+    last_name = parts[1] if len(parts) > 1 else ''
+
+    # Get or create CandidateProfile
+    candidate, _ = CandidateProfile.objects.get_or_create(
+        email=application.email,
+        defaults={'first_name': first_name, 'last_name': last_name},
+    )
+
+    # Create PipelineCandidate (skip if already exists for this pipeline)
+    pc, created = PipelineCandidate.objects.get_or_create(
+        pipeline=pipeline,
+        candidate=candidate,
+        defaults={
+            'resume_text': resume_text,
+            'stage': 'uploaded',
+        },
+    )
+    if not created:
+        return  # Already in pipeline
+
+    # Link application ↔ pipeline candidate
+    application.pipeline_candidate = pc
+    application.save(update_fields=['pipeline_candidate'])
+
+    # Trigger AI screening
+    try:
+        process_pipeline(pipeline)
+    except Exception:
+        logger.exception('Failed to auto-process pipeline %s after vacancy application', pipeline.id)
+
+
 @require_POST
 def vacancy_apply(request, company_slug, position_uuid):
     """Handle vacancy application — just creates record, no assessment."""
@@ -1692,7 +1756,7 @@ def vacancy_apply(request, company_slug, position_uuid):
         resume_filename = getattr(resume_file, "name", "")
 
     try:
-        PositionApplication.objects.create(
+        application = PositionApplication.objects.create(
             project=position,
             client=client,
             full_name=full_name,
@@ -1711,6 +1775,9 @@ def vacancy_apply(request, company_slug, position_uuid):
             "position": position,
             "form": form,
         })
+
+    # Auto-feed into AI hiring pipeline if one is linked to this position
+    _maybe_enqueue_pipeline(application, resume_data, resume_filename)
 
     return redirect("pages:vacancy_applied", company_slug=company_slug, position_uuid=position_uuid)
 

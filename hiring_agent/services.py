@@ -78,6 +78,25 @@ def _parse_docx(content: bytes) -> str:
     return '\n'.join(paragraphs).strip()
 
 
+def parse_resume_bytes(content: bytes, filename: str = '') -> str:
+    """Extract text from raw resume bytes using the filename to detect format."""
+    if not content:
+        return ''
+    fname = filename.lower()
+    if fname.endswith('.pdf'):
+        return _parse_pdf(content)
+    elif fname.endswith('.docx'):
+        return _parse_docx(content)
+    # Unknown extension — try PDF then DOCX then raw text
+    try:
+        return _parse_pdf(content)
+    except Exception:
+        try:
+            return _parse_docx(content)
+        except Exception:
+            return content.decode('utf-8', errors='ignore')
+
+
 # ---------------------------------------------------------------------------
 # Anthropic client helper
 # ---------------------------------------------------------------------------

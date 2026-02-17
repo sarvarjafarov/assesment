@@ -742,6 +742,13 @@ class PositionApplication(TimeStampedModel):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     assessment_session_uuid = models.UUIDField(null=True, blank=True)
     assessment_type = models.CharField(max_length=32, blank=True)
+    pipeline_candidate = models.OneToOneField(
+        'hiring_agent.PipelineCandidate',
+        related_name='application',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:

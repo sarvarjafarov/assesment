@@ -2,6 +2,8 @@
 Auto-advance hiring pipelines when assessment sessions are submitted.
 Listens for post_save on all assessment session models and triggers
 pipeline processing for the relevant candidate.
+
+Also syncs PipelineCandidate stage changes back to linked PositionApplication.
 """
 import logging
 
@@ -16,6 +18,18 @@ from hr_assessments.models import HRAssessmentSession
 from finance_assessments.models import FinanceAssessmentSession
 
 logger = logging.getLogger(__name__)
+
+# Map pipeline stages → application statuses
+_STAGE_TO_APP_STATUS = {
+    'shortlisted': 'reviewed',
+    'assessment_pending': 'assessment_sent',
+    'assessment_sent': 'assessment_sent',
+    'assessment_completed': 'assessment_sent',
+    'decision_made': 'reviewed',
+    'hired': 'hired',
+    'rejected': 'rejected',
+    'rejected_at_screen': 'rejected',
+}
 
 SESSION_MODELS = [
     DigitalMarketingAssessmentSession,
@@ -67,3 +81,28 @@ def on_assessment_submitted(sender, instance, **kwargs):
                 'Failed to auto-process pipeline %s after assessment submission',
                 pipeline.id,
             )
+
+
+# ---------------------------------------------------------------------------
+# Sync PipelineCandidate stage → PositionApplication status
+# ---------------------------------------------------------------------------
+
+from .models import PipelineCandidate  # noqa: E402
+
+
+@receiver(post_save, sender=PipelineCandidate)
+def sync_application_status(sender, instance, **kwargs):
+    """When a PipelineCandidate stage changes, update the linked PositionApplication."""
+    new_status = _STAGE_TO_APP_STATUS.get(instance.stage)
+    if not new_status:
+        return
+
+    # Check if this PipelineCandidate has a linked application (reverse OneToOne)
+    try:
+        app = instance.application
+    except PipelineCandidate.application.RelatedObjectDoesNotExist:
+        return
+
+    if app.status != new_status:
+        app.status = new_status
+        app.save(update_fields=['status'])
