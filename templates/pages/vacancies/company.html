@@ -26,26 +26,26 @@
 
     {# ── Hero ── #}
     <div class="vc-hero">
-        <div class="vc-hero-grain"></div>
-        <div class="vc-hero-mesh"></div>
-        <div class="vc-hero-grid"></div>
-        <div class="vc-hero-orb vc-orb-1"></div>
-        <div class="vc-hero-orb vc-orb-2"></div>
-        <div class="vc-hero-orb vc-orb-3"></div>
+        <div class="vc-hero-aurora"></div>
+        <div class="vc-hero-aurora vc-aurora-2"></div>
+        <div class="vc-hero-rays"></div>
         <div class="vc-hero-inner">
             {% if client.logo_data_url %}
             <div class="vc-logo-wrap vc-anim" style="--d:0.05s">
                 <img src="{{ client.logo_data_url }}" alt="{{ client.company_name }}" class="vc-logo">
             </div>
             {% endif %}
-            <div class="vc-hero-eyebrow vc-anim" style="--d:0.08s">We're hiring</div>
-            <h1 class="vc-anim" style="--d:0.12s">Join the team at<br><span class="vc-hero-accent">{{ client.company_name }}</span></h1>
-            <p class="vc-hero-sub vc-anim" style="--d:0.2s">Discover roles where you'll do the best work of your career</p>
+            <div class="vc-hero-eyebrow vc-anim" style="--d:0.1s">
+                <span class="vc-eyebrow-dot"></span>
+                We're hiring
+            </div>
+            <h1 class="vc-anim" style="--d:0.15s">Join the team at<br><span class="vc-hero-accent">{{ client.company_name }}</span></h1>
+            <p class="vc-hero-sub vc-anim" style="--d:0.22s">Discover roles where you'll do the best work of your career</p>
             {% if positions %}
-            <div class="vc-hero-badges vc-anim" style="--d:0.28s">
+            <div class="vc-hero-badges vc-anim" style="--d:0.3s">
                 <div class="vc-hero-badge">
                     <span class="vc-badge-dot"></span>
-                    <span>{{ positions|length }} open position{{ positions|length|pluralize }}</span>
+                    {{ positions|length }} open position{{ positions|length|pluralize }}
                 </div>
             </div>
             {% endif %}
