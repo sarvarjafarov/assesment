@@ -120,6 +120,11 @@
                         {{ form.target_start_date }}
                     </div>
                     <div class="pe-field">
+                        <label for="{{ form.deadline.id_for_label }}">Application Deadline</label>
+                        {{ form.deadline }}
+                        <span class="pe-help">Position auto-archives after this date.</span>
+                    </div>
+                    <div class="pe-field">
                         <label for="{{ form.assessment_type.id_for_label }}">Public Assessment</label>
                         {{ form.assessment_type }}
                     </div>

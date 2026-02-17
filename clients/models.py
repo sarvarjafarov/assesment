@@ -629,6 +629,10 @@ class ClientProject(TimeStampedModel):
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
     open_roles = models.PositiveIntegerField(default=1)
     target_start_date = models.DateField(blank=True, null=True)
+    deadline = models.DateField(
+        blank=True, null=True,
+        help_text="Position auto-archives and hides from vacancy page after this date",
+    )
     description = models.TextField(blank=True)
     responsibilities = models.TextField(blank=True, help_text="Key responsibilities, one per line")
     requirements = models.TextField(blank=True, help_text="Required qualifications, one per line")
@@ -646,6 +650,13 @@ class ClientProject(TimeStampedModel):
 
     def __str__(self):
         return f"{self.title} ({self.client.company_name})"
+
+    @property
+    def is_past_deadline(self):
+        if not self.deadline:
+            return False
+        from datetime import date
+        return date.today() > self.deadline
 
     def total_sessions(self):
         total = 0

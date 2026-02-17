@@ -187,6 +187,12 @@
                 {% if project.assessment_type %}
                 <span class="pj-tag pj-tag-assess">{{ project.get_assessment_type_display }}</span>
                 {% endif %}
+                {% if project.deadline %}
+                <span class="pj-deadline {% if project.is_past_deadline %}pj-deadline-expired{% endif %}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {{ project.deadline|date:"M j, Y" }}
+                </span>
+                {% endif %}
                 <span class="pj-date">{{ project.created_at|naturaltime }}</span>
             </div>
         </a>

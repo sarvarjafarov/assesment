@@ -1589,14 +1589,24 @@ def position_applied(request, company_slug, position_uuid):
 
 def vacancy_list(request, company_slug):
     """Public vacancy page listing open positions for a company."""
+    from datetime import date
+    from django.db.models import Q
     from clients.models import ClientAccount, ClientProject
 
     client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
+
+    # Auto-archive positions past their deadline
+    ClientProject.objects.filter(
+        client=client,
+        status=ClientProject.STATUS_ACTIVE,
+        deadline__lt=date.today(),
+    ).update(status=ClientProject.STATUS_ARCHIVED)
+
     positions = ClientProject.objects.filter(
         client=client,
         status=ClientProject.STATUS_ACTIVE,
         published=True,
-    )
+    ).filter(Q(deadline__isnull=True) | Q(deadline__gte=date.today()))
 
     return render(request, "pages/vacancies/company.html", {
         "client": client,
@@ -1606,6 +1616,7 @@ def vacancy_list(request, company_slug):
 
 def vacancy_detail(request, company_slug, position_uuid):
     """Public position detail with vacancy apply form."""
+    from datetime import date
     from clients.models import ClientAccount, ClientProject
 
     client = get_object_or_404(ClientAccount, slug=company_slug, status="approved")
@@ -1616,6 +1627,10 @@ def vacancy_detail(request, company_slug, position_uuid):
         status=ClientProject.STATUS_ACTIVE,
         published=True,
     )
+
+    # Block access to positions past their deadline
+    if position.deadline and position.deadline < date.today():
+        raise Http404
     form = VacancyApplyForm()
 
     return render(request, "pages/vacancies/position.html", {
@@ -1628,6 +1643,7 @@ def vacancy_detail(request, company_slug, position_uuid):
 @require_POST
 def vacancy_apply(request, company_slug, position_uuid):
     """Handle vacancy application — just creates record, no assessment."""
+    from datetime import date
     from django.db import IntegrityError
     from clients.models import ClientAccount, ClientProject, PositionApplication
 
@@ -1639,6 +1655,10 @@ def vacancy_apply(request, company_slug, position_uuid):
         status=ClientProject.STATUS_ACTIVE,
         published=True,
     )
+
+    # Block applications to positions past their deadline
+    if position.deadline and position.deadline < date.today():
+        raise Http404
 
     form = VacancyApplyForm(request.POST, request.FILES)
     if not form.is_valid():
