@@ -8189,98 +8189,195 @@
 /* ── Hero ── */
 .vc-hero {
     background: var(--brand-secondary, #0e1428);
-    padding: 4.5rem 2rem 5rem;
+    padding: 6rem 2rem 7rem;
     text-align: center;
     position: relative;
     overflow: hidden;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Subtle grain texture */
+/* Grain overlay */
 .vc-hero-grain {
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     background-size: 256px;
     pointer-events: none;
+    z-index: 1;
 }
 
-/* Soft brand-colored glows */
-.vc-hero-glow {
+/* Animated gradient mesh behind everything */
+.vc-hero-mesh {
+    position: absolute;
+    inset: -50%;
+    background:
+        radial-gradient(ellipse 600px 400px at 20% 50%, var(--brand-primary), transparent 70%),
+        radial-gradient(ellipse 500px 500px at 80% 20%, var(--brand-primary), transparent 70%),
+        radial-gradient(ellipse 400px 600px at 60% 90%, color-mix(in srgb, var(--brand-primary) 60%, #6366f1), transparent 70%);
+    opacity: 0.15;
+    animation: vc-mesh-drift 20s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+@keyframes vc-mesh-drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(30px, -20px) scale(1.05); }
+    66%  { transform: translate(-20px, 15px) scale(0.98); }
+    100% { transform: translate(10px, -10px) scale(1.02); }
+}
+
+/* Subtle dot grid pattern */
+.vc-hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 1;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
+}
+
+/* Floating glass orbs */
+.vc-hero-orb {
     position: absolute;
     border-radius: 50%;
     pointer-events: none;
-    filter: blur(80px);
-    opacity: 0.35;
+    z-index: 1;
 }
-.vc-glow-1 {
-    width: 500px; height: 500px;
-    top: -200px; left: -100px;
-    background: var(--brand-primary);
-}
-.vc-glow-2 {
-    width: 400px; height: 400px;
-    bottom: -150px; right: -80px;
-    background: var(--brand-primary);
+.vc-orb-1 {
+    width: 320px; height: 320px;
+    top: -80px; right: -60px;
+    background: radial-gradient(circle at 30% 30%, var(--brand-primary), transparent 70%);
     opacity: 0.2;
+    filter: blur(60px);
+    animation: vc-float-1 16s ease-in-out infinite;
+}
+.vc-orb-2 {
+    width: 240px; height: 240px;
+    bottom: -40px; left: -40px;
+    background: radial-gradient(circle at 70% 70%, var(--brand-primary), transparent 70%);
+    opacity: 0.15;
+    filter: blur(50px);
+    animation: vc-float-2 12s ease-in-out infinite;
+}
+.vc-orb-3 {
+    width: 160px; height: 160px;
+    top: 30%; left: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+    opacity: 0.3;
+    filter: blur(40px);
+    animation: vc-float-3 14s ease-in-out infinite;
+}
+@keyframes vc-float-1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-30px, 20px); }
+}
+@keyframes vc-float-2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(25px, -15px); }
+}
+@keyframes vc-float-3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-15px, -20px) scale(1.2); }
 }
 
 .vc-hero-inner {
     position: relative;
-    z-index: 2;
-    max-width: 600px;
+    z-index: 3;
+    max-width: 680px;
     margin: 0 auto;
 }
+
+/* Logo */
 .vc-logo-wrap {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 72px;
-    height: 72px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    margin-bottom: 1.5rem;
+    width: 76px;
+    height: 76px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
+    margin-bottom: 1.75rem;
     overflow: hidden;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 .vc-logo {
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
     object-fit: contain;
 }
+
+/* Eyebrow tag */
+.vc-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 1rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-primary);
+    margin-bottom: 1.25rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Heading */
 .vc-hero h1 {
-    font-size: 2.6rem;
+    font-size: 3.2rem;
     font-weight: 800;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.75rem;
     color: #fff;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
     line-height: 1.15;
 }
 .vc-hero-accent {
     color: var(--brand-primary);
-}
-.vc-hero-sub {
-    color: rgba(255,255,255,0.5);
-    font-size: 1.05rem;
-    margin: 0;
-    line-height: 1.6;
-    font-weight: 400;
+    position: relative;
 }
 
-/* Badge with pulse dot */
+/* Subtitle */
+.vc-hero-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 1.15rem;
+    margin: 0;
+    line-height: 1.65;
+    font-weight: 400;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Badges row */
+.vc-hero-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
 .vc-hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 1.75rem;
-    padding: 0.45rem 1.1rem 0.45rem 0.85rem;
-    background: rgba(255,255,255,0.07);
+    padding: 0.5rem 1.2rem 0.5rem 0.9rem;
+    background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 999px;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     font-weight: 600;
     color: rgba(255,255,255,0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 .vc-badge-dot {
     width: 8px;
@@ -8295,15 +8392,15 @@
     50% { opacity: 0.5; transform: scale(0.8); }
 }
 
-/* Hero fade transition (replaces wave) */
+/* Hero fade to page bg */
 .vc-hero-fade {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    height: 120px;
     background: linear-gradient(to bottom, transparent, #f8f9fc);
-    z-index: 1;
+    z-index: 2;
 }
 
 /* ── Toolbar (Search + Filters) ── */
@@ -9120,13 +9217,20 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
     .vc-hero {
-        padding: 3.5rem 1.5rem 4rem;
+        padding: 4rem 1.5rem 5rem;
+        min-height: 340px;
     }
     .vc-hero h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     .vc-hero-sub {
-        font-size: 0.92rem;
+        font-size: 0.95rem;
+    }
+    .vc-hero-eyebrow {
+        font-size: 0.7rem;
+    }
+    .vc-hero-grid {
+        background-size: 24px 24px;
     }
     .vc-shell {
         padding: 0 1rem 3rem;
@@ -9201,19 +9305,27 @@
 }
 @media (max-width: 480px) {
     .vc-hero {
-        padding: 2.5rem 1rem 3rem;
+        padding: 3rem 1rem 4rem;
+        min-height: auto;
     }
     .vc-hero h1 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
+    }
+    .vc-hero h1 br {
+        display: none;
     }
     .vc-logo-wrap {
         width: 56px;
         height: 56px;
+        border-radius: 14px;
+        margin-bottom: 1.25rem;
     }
     .vc-logo {
         width: 40px;
         height: 40px;
     }
+    .vc-hero-orb { display: none; }
+    .vc-hero-mesh { opacity: 0.1; }
     .vc-apply-head {
         padding: 1.25rem 1.25rem 0.85rem;
     }
