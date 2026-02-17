@@ -18043,6 +18043,251 @@ main {
     min-width: 160px;
 }
 
+/* ── Signup Flow: Identity Bar + Stepper ── */
+
+.sf-flash {
+    margin-bottom: 1.25rem;
+}
+.sf-flash-msg {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.9rem;
+    font-weight: 500;
+    animation: sf-flash-in 0.3s ease;
+}
+.sf-flash-success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+.sf-flash-success svg { color: #10b981; flex-shrink: 0; }
+.sf-flash-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+@keyframes sf-flash-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sf-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+}
+.sf-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid var(--color-border-light);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.sf-identity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+}
+.sf-identity-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-navy);
+}
+.sf-identity-email {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sf-identity-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 100px;
+    background: rgba(99, 102, 241, 0.08);
+    color: #6366f1;
+    white-space: nowrap;
+}
+
+/* Stepper */
+.sf-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+.sf-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+.sf-step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--color-border-light);
+    color: var(--color-text-muted);
+    transition: all 0.2s;
+}
+.sf-step-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+.sf-step-done .sf-step-dot {
+    background: #10b981;
+    color: #fff;
+}
+.sf-step-done .sf-step-label {
+    color: #065f46;
+}
+.sf-step-active .sf-step-dot {
+    background: var(--color-orange);
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 138, 0, 0.15);
+}
+.sf-step-active .sf-step-label {
+    color: var(--color-orange);
+    font-weight: 700;
+}
+.sf-step-line {
+    width: 48px;
+    height: 2px;
+    background: var(--color-border-light);
+    margin: 0 0.5rem;
+    margin-bottom: 1.4rem;
+    flex-shrink: 0;
+}
+.sf-step-line-done {
+    background: #10b981;
+}
+
+/* Pending approval content */
+.sf-pending-content {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.sf-pending-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff3e0;
+    border-radius: 50%;
+    color: #ef6c00;
+}
+.sf-pending-content h1 {
+    font-size: 1.5rem;
+    margin: 0 0 0.75rem;
+    color: var(--color-navy);
+}
+.sf-pending-content .lede {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 440px;
+    margin: 0 auto;
+}
+.sf-pending-content .lede strong {
+    color: var(--color-navy);
+}
+.sf-pending-details {
+    background: #f8f9fa;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.sf-pending-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+.sf-pending-row:last-child { border-bottom: none; }
+.sf-pending-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+.sf-pending-value {
+    color: var(--color-navy);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+.sf-pending-status {
+    display: inline-flex;
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: #fff3e0;
+    color: #ef6c00;
+}
+.sf-pending-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.sf-pending-actions .btn {
+    min-width: 150px;
+}
+
+@media (max-width: 600px) {
+    .sf-identity {
+        flex-wrap: wrap;
+    }
+    .sf-stepper {
+        padding: 0;
+    }
+    .sf-step-line {
+        width: 24px;
+    }
+    .sf-step-label {
+        font-size: 0.68rem;
+    }
+    .sf-pending-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    .sf-pending-actions {
+        flex-direction: column;
+    }
+    .sf-pending-actions .btn {
+        width: 100%;
+    }
+}
+
 /* Auth Animation Stagger */
 .form-section:nth-child(1) { animation-delay: 0.05s; }
 .form-section:nth-child(2) { animation-delay: 0.1s; }

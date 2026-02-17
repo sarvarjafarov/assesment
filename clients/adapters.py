@@ -4,6 +4,7 @@ Integrates social authentication with the ClientAccount model.
 """
 import logging
 
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -198,6 +199,11 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
             client = user.client_account
             # Check if profile needs completion (missing company info)
             if not client.company_name:
+                provider_label = 'Google' if client.auth_provider == 'google' else 'LinkedIn'
+                messages.success(
+                    request,
+                    f"Signed in with {provider_label} as {client.email}. Just a few details to finish your setup.",
+                )
                 return reverse('clients:complete_profile')
             # Check if account is approved
             if client.status != 'approved':
