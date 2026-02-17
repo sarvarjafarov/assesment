@@ -5,112 +5,235 @@
 {% block portal_content %}
 <div class="portal-shell">
 
-    <header class="ap-detail-header">
-        <nav class="ap-breadcrumb">
-            <a href="{% url 'clients:application-list' %}">Applications</a>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            <span>{{ application.full_name }}</span>
-        </nav>
-        <div class="ap-detail-title-row">
-            <h1>{{ application.full_name }}</h1>
+    {# ── Breadcrumb ── #}
+    <nav class="ap-breadcrumb">
+        <a href="{% url 'clients:application-list' %}">Applications</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <span>{{ application.full_name }}</span>
+    </nav>
+
+    {# ── Header ── #}
+    <header class="apd-header">
+        <div class="apd-header-left">
+            <div class="apd-avatar">{{ application.full_name|make_list|first }}</div>
+            <div>
+                <h1>{{ application.full_name }}</h1>
+                <div class="apd-header-meta">
+                    <span>{{ application.email }}</span>
+                    {% if application.phone_number %}
+                    <span class="apd-meta-dot"></span>
+                    <span>{{ application.phone_number }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="apd-header-right">
             <span class="ap-status ap-status-{{ application.status }}">{{ application.get_status_display }}</span>
+            {% if application.status == "pending" %}
+            <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="new_status" value="reviewed">
+                <button type="submit" class="btn btn-outline small">Mark as Reviewed</button>
+            </form>
+            {% endif %}
         </div>
     </header>
 
-    <div class="ap-detail-grid">
-        {# ── Left: Applicant Info ── #}
-        <div class="ap-info-card">
-            <h2>Applicant Details</h2>
-            <div class="ap-info-row">
-                <span class="ap-label">Email</span>
-                <span>{{ application.email }}</span>
-            </div>
-            {% if application.phone_number %}
-            <div class="ap-info-row">
-                <span class="ap-label">Phone</span>
-                <span>{{ application.phone_number }}</span>
-            </div>
-            {% endif %}
-            <div class="ap-info-row">
-                <span class="ap-label">Position</span>
-                <span><a href="{% url 'clients:project-detail' position.uuid %}">{{ position.title }}</a></span>
-            </div>
-            <div class="ap-info-row">
-                <span class="ap-label">Applied</span>
-                <span>{{ application.created_at|date:"M j, Y g:i A" }}</span>
-            </div>
+    <div class="apd-grid">
+        {# ── Left Column ── #}
+        <div class="apd-main">
+
+            {# ── Application Info ── #}
+            <section class="apd-card">
+                <h2>Application Details</h2>
+                <div class="apd-details-grid">
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Position</span>
+                        <a href="{% url 'clients:project-detail' position.uuid %}" class="apd-detail-link">{{ position.title }}</a>
+                    </div>
+                    {% if position.department %}
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Department</span>
+                        <span class="apd-detail-value">{{ position.department }}</span>
+                    </div>
+                    {% endif %}
+                    {% if position.location %}
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Location</span>
+                        <span class="apd-detail-value">{{ position.location }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Applied</span>
+                        <span class="apd-detail-value">{{ application.created_at|date:"M j, Y" }} at {{ application.created_at|date:"g:i A" }}</span>
+                    </div>
+                    {% if position.employment_type %}
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Employment Type</span>
+                        <span class="apd-detail-value">{{ position.get_employment_type_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if position.work_model %}
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Work Model</span>
+                        <span class="apd-detail-value">{{ position.get_work_model_display }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            {# ── Resume ── #}
             {% if application.resume_data %}
-            <a href="{% url 'clients:application-resume' application_uuid=application.uuid %}" class="btn btn-outline small ap-download-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Download Resume
-            </a>
+            <section class="apd-card">
+                <h2>Resume</h2>
+                <div class="apd-resume-box">
+                    <div class="apd-resume-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="apd-resume-info">
+                        <span class="apd-resume-name">{{ application.resume_filename|default:"Resume" }}</span>
+                        <span class="apd-resume-meta">Uploaded {{ application.created_at|naturaltime }}</span>
+                    </div>
+                    <a href="{% url 'clients:application-resume' application_uuid=application.uuid %}" class="btn btn-outline small">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download
+                    </a>
+                </div>
+            </section>
+            {% endif %}
+
+            {# ── Assessment Status ── #}
+            {% if application.assessment_type %}
+            <section class="apd-card">
+                <h2>Assessment</h2>
+                <div class="apd-details-grid">
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Type</span>
+                        <span class="apd-detail-value">{{ application.get_assessment_type_display }}</span>
+                    </div>
+                    <div class="apd-detail">
+                        <span class="apd-detail-label">Status</span>
+                        <span class="ap-status ap-status-{{ application.status }}">{{ application.get_status_display }}</span>
+                    </div>
+                </div>
+            </section>
             {% endif %}
         </div>
 
-        {# ── Right: Actions ── #}
-        <div class="ap-actions-card">
-            <h2>Actions</h2>
-
-            {# Mark as Reviewed #}
-            {% if application.status == "pending" %}
-            <form method="post" class="ap-action-form">
-                {% csrf_token %}
-                <input type="hidden" name="new_status" value="reviewed">
-                <button type="submit" class="btn btn-pill ap-action-btn">Mark as Reviewed</button>
-            </form>
-            {% endif %}
+        {# ── Right Column: Actions ── #}
+        <div class="apd-sidebar">
 
             {# Send Assessment #}
             {% if application.status == "pending" or application.status == "reviewed" %}
-            <div class="ap-send-assessment">
-                <h3>Send Assessment</h3>
-                <p class="muted">Select an assessment type to send to this candidate.</p>
-                <form method="post" action="{% url 'clients:application-send-assessment' application_uuid=application.uuid %}" class="ap-assessment-form">
+            <section class="apd-card">
+                <h2>Send Assessment</h2>
+                <p class="apd-card-desc">Select an assessment type to send to this candidate.</p>
+                <form method="post" action="{% url 'clients:application-send-assessment' application_uuid=application.uuid %}" class="apd-assess-form">
                     {% csrf_token %}
-                    <div class="ap-form-row">
+                    <div class="apd-assess-select">
                         {{ send_assessment_form.assessment_type }}
-                        <button type="submit" class="btn btn-pill btn-primary">Send Invitation</button>
                     </div>
+                    <button type="submit" class="btn btn-primary apd-assess-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Send Invitation
+                    </button>
                 </form>
-            </div>
+            </section>
             {% endif %}
 
-            {# Assessment Status (if sent) #}
-            {% if application.assessment_type %}
-            <div class="ap-session-info">
-                <h3>Assessment</h3>
-                <div class="ap-info-row">
-                    <span class="ap-label">Type</span>
-                    <span>{{ application.get_assessment_type_display }}</span>
-                </div>
-                <div class="ap-info-row">
-                    <span class="ap-label">Status</span>
-                    <span class="ap-status ap-status-{{ application.status }}">{{ application.get_status_display }}</span>
-                </div>
-            </div>
-            {% endif %}
-
-            {# Hire / Reject #}
+            {# Decision #}
             {% if application.status != "rejected" and application.status != "hired" %}
-            <div class="ap-final-actions">
-                <form method="post" style="display:inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="new_status" value="hired">
-                    <button type="submit" class="btn btn-outline small ap-btn-hire">Hire</button>
-                </form>
-                <form method="post" style="display:inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="new_status" value="rejected">
-                    <button type="submit" class="btn btn-outline small ap-btn-reject">Reject</button>
-                </form>
-            </div>
+            <section class="apd-card">
+                <h2>Decision</h2>
+                <p class="apd-card-desc">Take a final action on this application.</p>
+                <div class="apd-decision-actions">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="new_status" value="hired">
+                        <button type="submit" class="btn apd-btn-hire">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Hire
+                        </button>
+                    </form>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="new_status" value="rejected">
+                        <button type="submit" class="btn apd-btn-reject">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Reject
+                        </button>
+                    </form>
+                </div>
+            </section>
             {% endif %}
+
+            {# Timeline #}
+            <section class="apd-card">
+                <h2>Timeline</h2>
+                <div class="apd-timeline">
+                    <div class="apd-timeline-item apd-timeline-done">
+                        <div class="apd-timeline-dot"></div>
+                        <div class="apd-timeline-content">
+                            <span class="apd-timeline-label">Applied</span>
+                            <span class="apd-timeline-date">{{ application.created_at|date:"M j, Y g:i A" }}</span>
+                        </div>
+                    </div>
+                    <div class="apd-timeline-item {% if application.status != 'pending' %}apd-timeline-done{% endif %}">
+                        <div class="apd-timeline-dot"></div>
+                        <div class="apd-timeline-content">
+                            <span class="apd-timeline-label">Reviewed</span>
+                            {% if application.status != 'pending' %}
+                            <span class="apd-timeline-date">Completed</span>
+                            {% else %}
+                            <span class="apd-timeline-date apd-timeline-pending">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="apd-timeline-item {% if application.assessment_type %}apd-timeline-done{% endif %}">
+                        <div class="apd-timeline-dot"></div>
+                        <div class="apd-timeline-content">
+                            <span class="apd-timeline-label">Assessment</span>
+                            {% if application.assessment_type %}
+                            <span class="apd-timeline-date">{{ application.get_assessment_type_display }}</span>
+                            {% else %}
+                            <span class="apd-timeline-date apd-timeline-pending">Not sent</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="apd-timeline-item {% if application.status == 'hired' or application.status == 'rejected' %}apd-timeline-done{% endif %}">
+                        <div class="apd-timeline-dot"></div>
+                        <div class="apd-timeline-content">
+                            <span class="apd-timeline-label">Decision</span>
+                            {% if application.status == 'hired' %}
+                            <span class="apd-timeline-date" style="color: #065f46;">Hired</span>
+                            {% elif application.status == 'rejected' %}
+                            <span class="apd-timeline-date" style="color: #991b1b;">Rejected</span>
+                            {% else %}
+                            <span class="apd-timeline-date apd-timeline-pending">Awaiting</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
-
 </div>
 {% endblock %}
