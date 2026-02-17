@@ -699,7 +699,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                     for project in account.projects.order_by("-created_at")[:3]
                 ],
                 "project_count": account.projects.count(),
-                "vacancy_page_url": reverse("vacancy_list", args=[account.slug]) if account.slug else None,
+                "vacancy_page_url": reverse("pages:vacancy_list", args=[account.slug]) if account.slug else None,
                 "published_position_count": account.projects.filter(
                     status=ClientProject.STATUS_ACTIVE, published=True,
                 ).count(),
