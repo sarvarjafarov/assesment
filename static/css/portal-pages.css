@@ -7542,39 +7542,48 @@
 .gd-toc {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
     background: #fff;
     border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 10px;
+    border-radius: 12px;
     margin-bottom: 2rem;
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .gd-toc-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.7rem;
-    border-radius: 6px;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--color-text-muted, #6b7280);
     text-decoration: none;
-    transition: background 0.15s, color 0.15s;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);
+    transition: all 0.2s ease;
 }
 .gd-toc-item:hover {
-    background: var(--color-surface, #f3f4f6);
-    color: var(--color-navy, #0a1628);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+    color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 15%, transparent);
 }
-.gd-toc-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--dot);
+.gd-toc-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
     flex-shrink: 0;
+    opacity: 0.8;
+}
+.gd-toc-item:hover .gd-toc-icon {
+    opacity: 1;
 }
 
 /* Section Head (icon badge + title) */
@@ -8158,7 +8167,8 @@
 }
 @media (max-width: 480px) {
     .gd-actions { grid-template-columns: 1fr; }
-    .gd-toc-item { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    .gd-toc-item { font-size: 0.75rem; padding: 0.3rem 0.55rem; }
+    .gd-toc-icon svg { width: 12px; height: 12px; }
     .gd-pipeline-flow { flex-direction: column; align-items: flex-start; }
     .gd-pipeline-arrow { transform: rotate(90deg); }
 }
