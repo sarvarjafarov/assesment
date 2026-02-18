@@ -7870,6 +7870,259 @@
     color: var(--color-text-muted, #6b7280);
 }
 
+/* Plan chip (header) */
+.gd-plan-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+.gd-plan-chip--starter {
+    background: color-mix(in srgb, #10b981 12%, transparent);
+    color: #059669;
+}
+.gd-plan-chip--pro {
+    background: linear-gradient(135deg, rgba(236,72,153,0.12), rgba(139,92,246,0.12));
+    color: #9333ea;
+}
+.gd-plan-chip--enterprise {
+    background: color-mix(in srgb, #3b82f6 12%, transparent);
+    color: #2563eb;
+}
+
+/* Sub-heading within cards */
+.gd-sub-heading {
+    margin: 0.75rem 0 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-navy, #0a1628);
+}
+
+/* Detail/muted text */
+.gd-detail-text {
+    font-size: 0.82rem;
+    color: var(--color-text-muted, #6b7280);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* "All Plans" label next to card-label */
+.gd-all-plans {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: color-mix(in srgb, #10b981 12%, transparent);
+    color: #059669;
+    margin-left: 0.35rem;
+    vertical-align: middle;
+}
+
+/* Plans comparison grid */
+.gd-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+.gd-plan-card {
+    background: #fff;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.25rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s;
+}
+.gd-plan-card--featured {
+    border-color: #ec4899;
+    box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.15), 0 4px 16px rgba(236, 72, 153, 0.08);
+}
+.gd-plan-card--current {
+    border-color: var(--color-orange, #ff8a00);
+    box-shadow: 0 0 0 1px rgba(255, 138, 0, 0.15);
+}
+.gd-plan-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+.gd-plan-card-head h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-navy, #0a1628);
+}
+.gd-plan-price {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-navy, #0a1628);
+}
+.gd-plan-price small {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #6b7280);
+}
+.gd-plan-desc {
+    font-size: 0.82rem !important;
+    color: var(--color-text-muted, #6b7280) !important;
+    margin-bottom: 0.75rem !important;
+    line-height: 1.5 !important;
+}
+.gd-plan-limits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.6rem 0;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    margin-bottom: 0.75rem;
+    font-size: 0.82rem;
+    color: var(--color-text, #374151);
+}
+.gd-plan-limits strong {
+    color: var(--color-navy, #0a1628);
+}
+.gd-plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+}
+.gd-plan-features li {
+    font-size: 0.8rem;
+    color: var(--color-text, #374151);
+    padding-left: 1.1rem;
+    position: relative;
+    line-height: 1.45;
+}
+.gd-plan-features li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.42rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-orange, #ff8a00);
+}
+.gd-plan-features li:first-child::before {
+    display: none;
+}
+.gd-plan-features li:first-child {
+    padding-left: 0;
+    font-weight: 600;
+    color: var(--color-navy, #0a1628);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.15rem;
+}
+.gd-plan-current-label {
+    display: block;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-orange, #ff8a00);
+    text-align: center;
+}
+
+/* Assessment type grid */
+.gd-assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+.gd-assessment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--color-surface, #f8f9fa);
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+.gd-assessment-item:hover {
+    background: #f0f1f3;
+}
+.gd-assessment-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--assess) 12%, transparent);
+    color: var(--assess);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.gd-assessment-item strong {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-navy, #0a1628);
+    margin-bottom: 0.1rem;
+}
+.gd-assessment-item p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #6b7280);
+    line-height: 1.4;
+}
+
+/* Pipeline flow (AI Screening) */
+.gd-pipeline-flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+}
+.gd-pipeline-stage {
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: color-mix(in srgb, #ec4899 8%, transparent);
+    color: #be185d;
+    white-space: nowrap;
+}
+.gd-pipeline-stage--final {
+    background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(139,92,246,0.15));
+    color: #7c3aed;
+}
+.gd-pipeline-arrow {
+    color: var(--color-text-muted, #6b7280);
+    font-size: 0.8rem;
+}
+
+/* Upsell variant for cards and tips */
+.gd-card--upsell {
+    border-color: color-mix(in srgb, #ec4899 25%, transparent);
+    background: color-mix(in srgb, #ec4899 3%, #fff);
+}
+.gd-tip--upgrade {
+    background: color-mix(in srgb, #ec4899 6%, transparent);
+    border-color: color-mix(in srgb, #ec4899 18%, transparent);
+    border-left-color: #ec4899;
+}
+.gd-tip--upgrade svg {
+    color: #ec4899;
+}
+
 /* Help footer */
 .gd-help-footer {
     display: flex;
@@ -7888,19 +8141,26 @@
 
 /* gd-* Responsive */
 @media (max-width: 768px) {
+    .gd-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
     .gd-header-icon { width: 44px; height: 44px; }
     .gd-header-icon svg { width: 22px; height: 22px; }
     .gd-header h1 { font-size: 1.3rem; }
     .gd-toc { position: static; overflow-x: auto; flex-wrap: nowrap; }
     .gd-two-col { grid-template-columns: 1fr; }
     .gd-feature-grid { grid-template-columns: 1fr; }
+    .gd-plans-grid { grid-template-columns: 1fr; }
+    .gd-assessment-grid { grid-template-columns: 1fr; }
     .gd-actions { grid-template-columns: 1fr 1fr; }
     .gd-card { padding: 1rem; }
     .gd-step-card { padding: 1rem; }
+    .gd-pipeline-flow { gap: 0.2rem; }
+    .gd-pipeline-stage { padding: 0.25rem 0.5rem; font-size: 0.7rem; }
 }
 @media (max-width: 480px) {
     .gd-actions { grid-template-columns: 1fr; }
     .gd-toc-item { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    .gd-pipeline-flow { flex-direction: column; align-items: flex-start; }
+    .gd-pipeline-arrow { transform: rotate(90deg); }
 }
 
 
