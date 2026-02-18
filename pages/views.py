@@ -88,8 +88,8 @@ def home(request):
     features = [
         {
             "slug": "create",
-            "title": "Create project",
-            "description": "Pick an assessment, set deadlines, and customize instructions in minutes.",
+            "title": "Create a position",
+            "description": "Define the role, attach an assessment, and publish to your vacancy page in minutes.",
         },
         {
             "slug": "invite",
@@ -189,8 +189,10 @@ def home(request):
             "highlighted": True,
             "features": [
                 "Agentic AI hiring pipelines",
+                "Custom assessments (build your own)",
                 "Pipeline kanban & top-candidate spotlights",
                 "Custom branding + shareable reports",
+                "Webhook & API integrations",
                 "Priority chat + email support",
             ],
         },
@@ -200,7 +202,7 @@ def home(request):
             "name": "Enterprise",
             "price": "Custom",
             "frequency": "contact us",
-            "description": "Unlimited projects and invites, tailor-made assessments, SSO, and hands-on rollout.",
+            "description": "Unlimited projects and invites, dedicated support, and hands-on rollout.",
             "projects": "Unlimited projects",
             "invites": "Unlimited invites",
             "overage": None,
@@ -209,9 +211,9 @@ def home(request):
             "highlighted": False,
             "features": [
                 "Dedicated CSM + success playbooks",
-                "Custom assessments & security reviews",
-                "SLA, SSO/SAML, and SOC 2 readiness",
+                "SLA guarantee",
                 "Advanced analytics & audit logs",
+                "On-site training & rollout support",
             ],
         },
     ]
@@ -421,8 +423,11 @@ def pricing(request):
                 "Everything in Starter, plus:",
                 "Up to 10 active projects",
                 "250 candidate invites per month",
+                "Agentic AI hiring pipelines",
+                "Custom assessments (build your own)",
                 "Pipeline kanban & top-candidate spotlights",
                 "Custom branding & shareable reports",
+                "Webhook & API integrations",
                 "Overage at $0.40 per extra invite",
                 "Priority chat & email support",
             ],
@@ -432,7 +437,7 @@ def pricing(request):
             "name": "Enterprise",
             "price": "Custom",
             "frequency": "contact us",
-            "desc": "Unlimited everything, tailor-made assessments, SSO, and hands-on rollout.",
+            "desc": "Unlimited projects and invites, dedicated support, and hands-on rollout.",
             "limits": "Unlimited projects & invites",
             "cta_label": "Request a quote",
             "cta_url": reverse("pages:contact"),
@@ -440,10 +445,8 @@ def pricing(request):
             "features": [
                 "Everything in Pro, plus:",
                 "Unlimited projects & invites",
-                "Custom assessment design",
                 "Dedicated customer success manager",
-                "SSO / SAML integration",
-                "SLA guarantee & SOC 2 readiness",
+                "SLA guarantee",
                 "Full API access",
                 "On-site training & rollout support",
             ],
@@ -462,11 +465,10 @@ def pricing(request):
         {"feature": "Shareable reports", "starter": False, "pro": True, "enterprise": True},
         {"feature": "Priority support", "starter": False, "pro": True, "enterprise": True},
         {"feature": "Agentic AI hiring pipelines", "starter": False, "pro": True, "enterprise": True, "highlight": True},
-        {"feature": "Custom assessments", "starter": False, "pro": False, "enterprise": True},
-        {"feature": "SSO / SAML", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "Custom assessments", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Webhook & API access", "starter": False, "pro": True, "enterprise": True},
         {"feature": "Dedicated CSM", "starter": False, "pro": False, "enterprise": True},
         {"feature": "SLA guarantee", "starter": False, "pro": False, "enterprise": True},
-        {"feature": "API access", "starter": False, "pro": False, "enterprise": True},
         {"feature": "On-site training", "starter": False, "pro": False, "enterprise": True},
     ]
 
@@ -533,7 +535,7 @@ def contact(request):
         "sections": [
             {
                 "badge": "Sales & demos",
-                "title": "hello@evalon.so",
+                "title": "hello@evalon.app",
                 "body": "Replies within 1 business day.",
                 "list": [
                     "Live product walkthroughs",
@@ -543,7 +545,7 @@ def contact(request):
             },
             {
                 "badge": "Support",
-                "title": "support@evalon.so",
+                "title": "support@evalon.app",
                 "body": "Replies within 4 business hours.",
                 "list": [
                     "Assessment troubleshooting",
@@ -553,7 +555,7 @@ def contact(request):
             },
             {
                 "badge": "Partnerships",
-                "title": "partners@evalon.so",
+                "title": "partners@evalon.app",
                 "body": "Replies within 2 business days.",
                 "list": [
                     "ATS & HRIS integrations",
@@ -628,9 +630,9 @@ def security(request):
                 "badge": "Trust & compliance",
                 "title": "Audited controls",
                 "list": [
-                    "SOC 2 Type II controls, audited annually",
+                    "SOC 2 Type II controls",
                     "GDPR-ready data processing agreements",
-                    "SSO via Okta, Azure AD, and Google Workspace",
+                    "Social sign-in via Google and LinkedIn",
                 ],
             },
             {
@@ -653,8 +655,8 @@ def security(request):
             },
             {
                 "badge": "Need to report something?",
-                "title": "security@evalon.so",
-                "body": "Visit https://status.evalon.so for live uptime. Email us for questionnaires or penetration test reports.",
+                "title": "security@evalon.app",
+                "body": "Visit https://status.evalon.app for live uptime. Email us for questionnaires or penetration test reports.",
             },
         ],
     }
@@ -695,7 +697,7 @@ def privacy(request):
                 "badge": "Your rights",
                 "title": "Control your data",
                 "list": [
-                    "Customers can export, modify, or delete data via the admin console or by contacting privacy@evalon.so.",
+                    "Customers can export, modify, or delete data via the admin console or by contacting privacy@evalon.app.",
                     "We enter DPAs and SCCs upon request.",
                     "Data residency options are available for enterprise plans.",
                 ],
