@@ -2626,7 +2626,7 @@ class PlatformGuideView(LoginRequiredMixin, TemplateView):
         account = self.request.user.client_account
         context["account"] = account
         context["plan_slug"] = account.plan_slug
-        context["plan_label"] = account.plan_config.get("label", "Starter")
+        context["plan_label"] = account.plan_details.get("label", "Starter")
         context["can_use_ai_hiring"] = account.can_use_ai_hiring
         context["can_use_white_labeling"] = account.can_use_white_labeling
         context["has_custom_assessments"] = account.plan_slug in ("pro", "enterprise")
