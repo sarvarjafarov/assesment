@@ -738,8 +738,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
             total_steps = len(step_data)
             completed_steps = sum(1 for v in step_data.values() if v)
 
-            if completed_steps == total_steps:
-                account.mark_onboarding_complete()
+            # Don't auto-complete onboarding from the dashboard —
+            # only the Getting Started page should mark it complete,
+            # so the banner and tour have a chance to show.
 
             context.update({
                 'onboarding_total_steps': total_steps,
