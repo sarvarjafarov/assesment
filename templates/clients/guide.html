@@ -1,0 +1,355 @@
+{% extends 'portal_base.html' %}
+{% load static %}
+{% block title %}Platform Guide · Evalon{% endblock %}
+{% block meta_description %}Learn how Evalon works — positions, candidates, assessments, AI screening, and more.{% endblock %}
+{% block portal_content %}
+<div class="portal-shell">
+
+    {# ── Header ── #}
+    <header class="gd-header">
+        <div class="gd-header-left">
+            <div class="gd-header-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+            </div>
+            <div>
+                <h1>Platform Guide</h1>
+                <p class="muted">Everything you need to know about using Evalon</p>
+            </div>
+        </div>
+    </header>
+
+    {# ── How It Works ── #}
+    <section class="gd-section" id="how-it-works">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            How Evalon Works
+        </h2>
+        <p class="gd-section-intro">Evalon streamlines your hiring in four simple steps.</p>
+        <div class="gs-workflow">
+            <div class="gs-workflow-steps">
+                <div class="gs-wf-step">
+                    <div class="gs-wf-num">1</div>
+                    <h4>Create a position</h4>
+                    <p>Define the role, title, requirements, and job description. Choose which assessments to use.</p>
+                </div>
+                <div class="gs-wf-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+                <div class="gs-wf-step">
+                    <div class="gs-wf-num">2</div>
+                    <h4>Candidates apply</h4>
+                    <p>Share your vacancy page link or send assessment invites directly via email.</p>
+                </div>
+                <div class="gs-wf-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+                <div class="gs-wf-step">
+                    <div class="gs-wf-num">3</div>
+                    {% if can_use_ai_hiring %}
+                    <h4>AI screens & scores</h4>
+                    <p>Resumes are auto-scored and candidates receive assessments automatically.</p>
+                    {% else %}
+                    <h4>Candidates assessed</h4>
+                    <p>Candidates complete role-specific assessments, scored automatically by AI.</p>
+                    {% endif %}
+                </div>
+                <div class="gs-wf-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+                <div class="gs-wf-step">
+                    <div class="gs-wf-num">4</div>
+                    <h4>Review & decide</h4>
+                    <p>See scores, AI summaries, and make confident hiring decisions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ── Dashboard ── #}
+    <section class="gd-section" id="dashboard">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Home (Dashboard)
+        </h2>
+        <div class="gd-card">
+            <p>Your dashboard is the command center. At a glance you see:</p>
+            <ul class="gd-list">
+                <li><strong>Onboarding banner</strong> — tracks your setup progress and links to the Getting Started checklist</li>
+                <li><strong>Plan usage</strong> — how many invites and projects you've used this month vs your plan limits</li>
+                <li><strong>Vacancy page link</strong> — your public careers page URL, with a copy button for easy sharing</li>
+                <li><strong>Key metrics</strong> — completion rate, average duration, and average score across all assessments</li>
+                <li><strong>Attention items</strong> — overdue invites, stale sessions, or benchmarking alerts</li>
+                <li><strong>Recent activity</strong> — live feed of candidate submissions, completions, and status changes</li>
+            </ul>
+        </div>
+    </section>
+
+    {# ── Jobs & Positions ── #}
+    <section class="gd-section" id="jobs">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path>
+            </svg>
+            Jobs (Positions & Campaigns)
+        </h2>
+        <div class="gd-card">
+            <h3>Positions</h3>
+            <p>Each position represents a role you're hiring for. When creating a position you can set:</p>
+            <ul class="gd-list">
+                <li><strong>Title & description</strong> — the role name and detailed job description</li>
+                <li><strong>Department & location</strong> — for organizing and filtering</li>
+                <li><strong>Employment type & work model</strong> — full-time/part-time, remote/hybrid/on-site</li>
+                <li><strong>Assessment type</strong> — which assessment candidates should complete</li>
+                <li><strong>Published status</strong> — toggle whether this position appears on your public vacancy page</li>
+                {% if can_use_ai_hiring %}
+                <li><strong>AI Screening</strong> <span class="gs-pro-badge">Pro</span> — enable automatic resume scoring, set automation level, and choose assessment types for AI-screened candidates</li>
+                {% endif %}
+            </ul>
+
+            <h3>Campaigns</h3>
+            <p>Campaigns let you group related positions into a project (e.g., "Q1 Engineering Hiring"). This is useful for tracking related roles together.</p>
+        </div>
+    </section>
+
+    {# ── Candidates ── #}
+    <section class="gd-section" id="candidates">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Candidates
+        </h2>
+        <div class="gd-card">
+            <p>Every application — whether from your vacancy page or a direct invite — appears here. You can:</p>
+            <ul class="gd-list">
+                <li><strong>Filter by position</strong> — see candidates for a specific role</li>
+                <li><strong>Filter by status</strong> — pending, reviewed, hired, rejected</li>
+                {% if can_use_ai_hiring %}
+                <li><strong>Filter by AI score</strong> <span class="gs-pro-badge">Pro</span> — screened, passed (60+), or failed</li>
+                {% endif %}
+                <li><strong>View details</strong> — click any candidate to see their full profile, resume, assessment results, and timeline</li>
+            </ul>
+
+            <h3>Candidate Detail Page</h3>
+            <p>On each candidate's page you'll find:</p>
+            <ul class="gd-list">
+                <li><strong>Status management</strong> — move candidates through your pipeline (pending → reviewed → hired/rejected)</li>
+                <li><strong>Assessment results</strong> — scores and AI-generated summaries</li>
+                <li><strong>Send assessment</strong> — invite the candidate to complete an additional assessment</li>
+                {% if can_use_ai_hiring %}
+                <li><strong>AI Screening results</strong> <span class="gs-pro-badge">Pro</span> — AI score, human review decision, and the full AI processing log</li>
+                {% endif %}
+            </ul>
+        </div>
+    </section>
+
+    {# ── Assessments ── #}
+    <section class="gd-section" id="assessments">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            Assessments
+        </h2>
+        <div class="gd-card">
+            <p>Evalon provides a library of AI-scored assessments designed for different roles and skills:</p>
+            <ul class="gd-list">
+                <li><strong>Browse the library</strong> — see all available assessment types with descriptions and estimated completion time</li>
+                <li><strong>Manage sessions</strong> — for each assessment type, view all invited candidates, their progress, and scores</li>
+                <li><strong>Invite candidates</strong> — send assessment links via email directly from any assessment page</li>
+                <li><strong>View results</strong> — see detailed scores, AI-generated feedback, and session recordings</li>
+                <li><strong>Export data</strong> — download assessment results as CSV for your records</li>
+            </ul>
+            <p class="gd-tip">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <strong>Tip:</strong> When you attach an assessment to a position, candidates who apply through your vacancy page will automatically receive it.
+            </p>
+        </div>
+    </section>
+
+    {% if can_use_ai_hiring %}
+    {# ── AI Screening ── #}
+    <section class="gd-section" id="ai-screening">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93"></path>
+                <path d="M8.56 2.75a4 4 0 0 0-1.81 6.69"></path>
+                <path d="M12 18v4"></path>
+                <path d="M8 22h8"></path>
+                <path d="M7 12h10"></path>
+                <path d="M5 16h14"></path>
+            </svg>
+            AI Screening
+            <span class="gs-pro-badge">Pro</span>
+        </h2>
+        <div class="gd-card">
+            <p>AI Screening automates the first stage of your hiring pipeline. Here's how it works:</p>
+
+            <h3>1. Enable on a Position</h3>
+            <p>When editing a position, toggle "Enable AI Screening" in the AI Screening section. Choose your automation level:</p>
+            <ul class="gd-list">
+                <li><strong>Screen only</strong> — AI scores resumes but takes no further action</li>
+                <li><strong>Screen + auto-send assessments</strong> — candidates who pass the AI screen automatically receive assessments</li>
+                <li><strong>Full automation</strong> — AI screens, sends assessments, and can auto-reject low-scoring candidates</li>
+            </ul>
+
+            <h3>2. Candidates Get Scored</h3>
+            <p>When candidates apply to an AI-enabled position, their resume is analyzed and scored 0-100. Candidates scoring 60+ are marked as "passed".</p>
+
+            <h3>3. Review on the Candidates Page</h3>
+            <p>The Candidates list shows an "AI Score" column. Use the AI filter to quickly find passed or failed candidates. On each candidate's detail page you can:</p>
+            <ul class="gd-list">
+                <li>See the full AI screening score and reasoning</li>
+                <li>Submit a human review decision (approve, reject, or request more info)</li>
+                <li>View the complete AI Processing Log showing every action taken</li>
+            </ul>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Vacancy Page ── #}
+    <section class="gd-section" id="vacancy-page">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            Vacancy Page
+        </h2>
+        <div class="gd-card">
+            <p>Your vacancy page is a public careers page that shows all your published positions. Candidates can browse open roles and apply directly.</p>
+            {% if vacancy_page_url %}
+            <p class="gd-highlight">
+                Your vacancy page: <a href="{{ vacancy_page_url }}" target="_blank"><strong>{{ request.get_host }}{{ vacancy_page_url }}</strong></a>
+            </p>
+            {% endif %}
+            <ul class="gd-list">
+                <li><strong>Auto-published</strong> — positions marked as "published" appear automatically</li>
+                <li><strong>Branded</strong> — shows your company name and logo</li>
+                <li><strong>Application form</strong> — candidates fill out name, email, resume, and any position-specific fields</li>
+                <li><strong>Automatic pipeline</strong> — applications land in your Candidates page instantly{% if can_use_ai_hiring %}, and AI Screening triggers if enabled{% endif %}</li>
+            </ul>
+            <p class="gd-tip">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <strong>Tip:</strong> Share your vacancy page link on LinkedIn, job boards, or your company website to attract applicants.
+            </p>
+        </div>
+    </section>
+
+    {# ── Reports ── #}
+    <section class="gd-section" id="reports">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="20" x2="12" y2="10"></line>
+                <line x1="18" y1="20" x2="18" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+            Reports & Analytics
+        </h2>
+        <div class="gd-card">
+            <p>The Reports page provides high-level analytics across your hiring activity:</p>
+            <ul class="gd-list">
+                <li><strong>Completion rates</strong> — how many invited candidates finish their assessments</li>
+                <li><strong>Score distributions</strong> — see how candidates perform across different assessment types</li>
+                <li><strong>Time-to-complete</strong> — average duration from invite to submission</li>
+                <li><strong>Position-level breakdowns</strong> — compare performance across different roles</li>
+            </ul>
+        </div>
+    </section>
+
+    {# ── Settings ── #}
+    <section class="gd-section" id="settings">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Settings
+        </h2>
+        <div class="gd-card">
+            <ul class="gd-list">
+                <li><strong>Company profile</strong> — update your company name, logo, and description</li>
+                <li><strong>Team members</strong> — invite colleagues with manager or viewer roles</li>
+                <li><strong>Notifications</strong> — configure email alerts for new applications and completed assessments</li>
+                <li><strong>Billing</strong> — view your current plan, usage, and upgrade options</li>
+                <li><strong>Vacancy page slug</strong> — customize your vacancy page URL</li>
+            </ul>
+        </div>
+    </section>
+
+    {# ── Quick Links ── #}
+    <section class="gd-section" id="quick-actions">
+        <h2 class="gd-section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+            </svg>
+            Quick Actions
+        </h2>
+        <div class="gd-actions">
+            <a href="{% url 'clients:project-create' %}" class="gd-action-card">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <h4>Create Position</h4>
+                <p>Start hiring for a new role</p>
+            </a>
+            <a href="{% url 'clients:application-list' %}" class="gd-action-card">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                </svg>
+                <h4>View Candidates</h4>
+                <p>Review applications and scores</p>
+            </a>
+            <a href="{% url 'clients:assessments' %}" class="gd-action-card">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <h4>Browse Assessments</h4>
+                <p>Explore the assessment library</p>
+            </a>
+            {% if not account.has_completed_onboarding %}
+            <a href="{% url 'clients:getting-started' %}" class="gd-action-card">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <h4>Setup Checklist</h4>
+                <p>Complete your onboarding steps</p>
+            </a>
+            {% endif %}
+        </div>
+    </section>
+
+    {# ── Help Footer ── #}
+    <div class="gs-help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <p>Need help? <a href="mailto:support@evalon.app">Contact our support team</a></p>
+    </div>
+
+</div>
+{% endblock %}

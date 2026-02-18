@@ -2611,8 +2611,30 @@ class ClientAssessmentExportView(ClientAssessmentMixin, View):
         return response
 
 
+class PlatformGuideView(LoginRequiredMixin, TemplateView):
+    """Permanent platform guide explaining all features and workflows."""
+    template_name = "clients/guide.html"
+    login_url = reverse_lazy("clients:login")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, "client_account"):
+            return redirect("clients:login")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        account = self.request.user.client_account
+        context["account"] = account
+        context["can_use_ai_hiring"] = account.can_use_ai_hiring
+        context["vacancy_page_url"] = (
+            reverse("pages:vacancy_list", args=[account.slug])
+            if account.slug else None
+        )
+        return context
+
+
 class GettingStartedView(LoginRequiredMixin, TemplateView):
-    """Getting Started checklist with 8 actionable onboarding tasks."""
+    """Getting Started checklist with actionable onboarding tasks."""
     template_name = "clients/getting_started.html"
     login_url = reverse_lazy("clients:login")
 

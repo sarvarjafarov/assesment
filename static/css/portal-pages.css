@@ -7502,6 +7502,192 @@
 
 
 /* ========================================================================
+   PLATFORM GUIDE PAGE  —  gd-* prefix
+   ======================================================================== */
+
+.gd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+.gd-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.gd-header-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--color-orange, #ff8a00), #ff6b00);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.gd-header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    line-height: 1.2;
+}
+.gd-header .muted {
+    margin: 0.15rem 0 0;
+}
+
+.gd-section {
+    margin-bottom: 2rem;
+}
+.gd-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-navy, #0a1628);
+    margin: 0 0 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-border, #e5e7eb);
+}
+.gd-section-title svg {
+    color: var(--color-orange, #ff8a00);
+    flex-shrink: 0;
+}
+.gd-section-intro {
+    color: var(--color-text-muted, #6b7280);
+    margin: 0 0 1rem;
+}
+
+.gd-card {
+    background: #fff;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+}
+.gd-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.25rem 0 0.5rem;
+    color: var(--color-navy, #0a1628);
+}
+.gd-card h3:first-child {
+    margin-top: 0;
+}
+.gd-card p {
+    margin: 0 0 0.75rem;
+    color: var(--color-text, #374151);
+    line-height: 1.6;
+}
+
+.gd-list {
+    margin: 0 0 0.75rem;
+    padding-left: 1.25rem;
+    line-height: 1.7;
+}
+.gd-list li {
+    margin-bottom: 0.35rem;
+    color: var(--color-text, #374151);
+}
+
+.gd-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    background: var(--color-surface, #f8f9fa);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-left: 3px solid var(--color-orange, #ff8a00);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0 0;
+    font-size: 0.88rem;
+}
+.gd-tip svg {
+    flex-shrink: 0;
+    color: var(--color-orange, #ff8a00);
+    margin-top: 0.1rem;
+}
+
+.gd-highlight {
+    background: var(--color-surface, #f8f9fa);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+}
+.gd-highlight a {
+    color: var(--color-orange, #ff8a00);
+    text-decoration: none;
+}
+.gd-highlight a:hover {
+    text-decoration: underline;
+}
+
+/* Quick action cards */
+.gd-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+.gd-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 1rem;
+    background: #fff;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--color-text, #374151);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.gd-action-card:hover {
+    border-color: var(--color-orange, #ff8a00);
+    box-shadow: 0 2px 8px rgba(255, 138, 0, 0.12);
+}
+.gd-action-card svg {
+    color: var(--color-orange, #ff8a00);
+    margin-bottom: 0.6rem;
+}
+.gd-action-card h4 {
+    margin: 0 0 0.2rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-navy, #0a1628);
+}
+.gd-action-card p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #6b7280);
+}
+
+/* gd-* Responsive */
+@media (max-width: 768px) {
+    .gd-header-icon {
+        width: 44px;
+        height: 44px;
+    }
+    .gd-header-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+    .gd-header h1 { font-size: 1.3rem; }
+    .gd-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+    .gd-card {
+        padding: 1rem;
+    }
+}
+@media (max-width: 480px) {
+    .gd-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ========================================================================
    RESPONSIVE MEDIA QUERIES (consolidated from all pages)
    ======================================================================== */
 
