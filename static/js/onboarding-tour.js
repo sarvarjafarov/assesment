@@ -275,12 +275,12 @@ class OnboardingTour {
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
                 <h2>Tour Complete!</h2>
-                <p>You're all set to start hiring. Remember, you can:</p>
+                <p>You're all set to start hiring. Here's what you can do:</p>
                 <ul>
-                    <li>Send assessment invites</li>
-                    <li>Organize candidates with projects</li>
-                    <li>Review results and make decisions</li>
-                    <li>Track analytics and insights</li>
+                    <li>Create positions and publish your vacancy page</li>
+                    <li>Review candidates and AI screening results</li>
+                    <li>Send assessments and track progress</li>
+                    <li>Make hiring decisions with full context</li>
                 </ul>
                 <button class="btn btn-primary" onclick="this.parentElement.parentElement.remove()">Get Started</button>
             </div>

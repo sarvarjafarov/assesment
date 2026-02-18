@@ -206,7 +206,10 @@
         </svg>
         <h3>No positions yet</h3>
         {% if is_manager %}
-        <p class="muted">Create your first position to start organizing candidates.</p>
+        <p class="muted">Create your first position to start receiving candidates and running assessments.</p>
+        <div class="ap-empty-actions">
+            <a href="{% url 'clients:project-create' %}" class="btn btn-primary small">Create Position</a>
+        </div>
         {% else %}
         <p class="muted">Positions will appear here once your manager creates them.</p>
         {% endif %}

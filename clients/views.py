@@ -708,35 +708,43 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
 
         # Onboarding progress calculation
         if not account.has_completed_onboarding:
-            # Check which steps have been completed
-            step_1_completed = account.projects.exists()  # Has at least one project
-            step_2_completed = stats["total_candidates"] > 0  # Has sent at least one invite
-            step_3_completed = stats["completed_count"] > 0  # Has at least one completed assessment
+            has_profile = bool(account.company_name and account.has_logo)
+            has_position = account.projects.exists()
+            has_published = account.projects.filter(published=True).exists()
+            has_invite = stats["total_candidates"] > 0
+            has_completed = stats["completed_count"] > 0
 
-            # Auto-update onboarding step data
-            account.onboarding_step_data = {
-                'step_1': step_1_completed,
-                'step_2': step_2_completed,
-                'step_3': step_3_completed,
+            step_data = {
+                'complete_profile': has_profile,
+                'create_position': has_position,
+                'publish_vacancy': has_published,
+                'send_assessment': has_invite,
+                'review_results': has_completed,
             }
+
+            # AI steps for Pro/Enterprise
+            if account.can_use_ai_hiring:
+                from hiring_agent.models import HiringPipeline
+                step_data['enable_ai_screening'] = HiringPipeline.objects.filter(
+                    client=account, status='active',
+                ).exists()
+                step_data['review_ai_candidates'] = PositionApplication.objects.filter(
+                    client=account, pipeline_candidate__isnull=False,
+                ).exists()
+
+            account.onboarding_step_data = step_data
             account.save(update_fields=['onboarding_step_data'])
 
-            # Auto-complete onboarding if all steps are done
-            if step_1_completed and step_2_completed and step_3_completed:
+            total_steps = len(step_data)
+            completed_steps = sum(1 for v in step_data.values() if v)
+
+            if completed_steps == total_steps:
                 account.mark_onboarding_complete()
 
-            # Calculate progress
-            total_steps = 3
-            completed_steps = sum([step_1_completed, step_2_completed, step_3_completed])
-            progress_percent = round((completed_steps / total_steps) * 100)
-
             context.update({
-                'onboarding_step_1_completed': step_1_completed,
-                'onboarding_step_2_completed': step_2_completed,
-                'onboarding_step_3_completed': step_3_completed,
                 'onboarding_total_steps': total_steps,
                 'onboarding_completed_steps': completed_steps,
-                'onboarding_progress': progress_percent,
+                'onboarding_progress': round((completed_steps / total_steps) * 100),
             })
 
         plan_details = account.plan_details()
@@ -2621,7 +2629,6 @@ class GettingStartedView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         account = self.request.user.client_account
-        step_data = account.onboarding_step_data or {}
 
         # Count sessions for invite/review detection
         dataset_map = build_dataset_map(account)
@@ -2638,96 +2645,96 @@ class GettingStartedView(LoginRequiredMixin, TemplateView):
             else reverse("clients:assessments")
         )
 
+        # Most recent position for edit link
+        latest_project = account.projects.order_by("-created_at").first()
+        edit_position_url = (
+            reverse("clients:project-edit", args=[latest_project.uuid])
+            if latest_project
+            else reverse("clients:project-create")
+        )
+
         steps = [
             {
                 "key": "complete_profile",
                 "number": 1,
                 "title": "Complete your profile",
-                "description": "Ensure your company name and contact details are set up.",
-                "icon": "user",
+                "description": "Add your company name and logo so candidates see a professional experience.",
                 "action_label": "Go to Settings",
                 "action_url": reverse("clients:settings"),
-                "completed": bool(account.company_name),
+                "completed": bool(account.company_name and account.has_logo),
                 "auto": True,
             },
             {
-                "key": "upload_logo",
+                "key": "create_position",
                 "number": 2,
-                "title": "Upload company logo",
-                "description": "Add your brand identity to candidate-facing assessment pages.",
-                "icon": "image",
-                "action_label": "Upload Logo",
-                "action_url": reverse("clients:settings") + "#branding",
-                "completed": account.has_logo,
-                "auto": True,
-            },
-            {
-                "key": "create_project",
-                "number": 3,
-                "title": "Create your first project",
-                "description": "Organize your hiring pipeline by role or campaign.",
-                "icon": "folder",
-                "action_label": "Create Project",
-                "action_url": reverse("clients:project-list"),
+                "title": "Create your first position",
+                "description": "Define a role with title, description, and requirements. This is the foundation of your hiring pipeline.",
+                "action_label": "Create Position",
+                "action_url": reverse("clients:project-create"),
                 "completed": account.projects.exists(),
                 "auto": True,
             },
             {
-                "key": "browse_assessments",
-                "number": 4,
-                "title": "Browse assessment banks",
-                "description": "Explore your approved assessment types and question banks.",
-                "icon": "file-text",
-                "action_label": "Browse Assessments",
-                "action_url": reverse("clients:assessments"),
-                "completed": step_data.get("browse_assessments", False),
-                "auto": False,
+                "key": "publish_vacancy",
+                "number": 3,
+                "title": "Publish your vacancy page",
+                "description": "Make at least one position visible on your public careers page so candidates can apply directly.",
+                "action_label": "Manage Positions",
+                "action_url": reverse("clients:project-list"),
+                "completed": account.projects.filter(published=True).exists(),
+                "auto": True,
             },
             {
-                "key": "invite_candidate",
-                "number": 5,
-                "title": "Invite your first candidate",
-                "description": "Send an assessment invitation to a candidate via email.",
-                "icon": "send",
+                "key": "send_assessment",
+                "number": 4,
+                "title": "Send your first assessment",
+                "description": "Invite a candidate to take a role-specific assessment. They'll receive an email with a link to start.",
                 "action_label": "Send Invite",
                 "action_url": assessment_url,
                 "completed": total_sessions > 0,
                 "auto": True,
             },
             {
-                "key": "review_assessment",
-                "number": 6,
+                "key": "review_results",
+                "number": 5,
                 "title": "Review a completed assessment",
-                "description": "Check a candidate's auto-scored results and recommendations.",
-                "icon": "bar-chart",
+                "description": "Check auto-scored results, AI recommendations, and detailed response breakdowns.",
                 "action_label": "View Results",
                 "action_url": assessment_url,
                 "completed": completed_sessions > 0,
                 "auto": True,
             },
-            {
-                "key": "setup_notifications",
-                "number": 7,
-                "title": "Set up notifications",
-                "description": "Configure email alerts for assessment completions and activity.",
-                "icon": "bell",
-                "action_label": "Notification Settings",
-                "action_url": reverse("clients:settings") + "#notifications",
-                "completed": step_data.get("setup_notifications", False),
-                "auto": False,
-            },
-            {
-                "key": "explore_analytics",
-                "number": 8,
-                "title": "Explore analytics",
-                "description": "View hiring insights, score distributions, and performance reports.",
-                "icon": "trending-up",
-                "action_label": "View Analytics",
-                "action_url": reverse("clients:analytics"),
-                "completed": step_data.get("explore_analytics", False),
-                "auto": False,
-            },
         ]
+
+        # AI steps for Pro/Enterprise
+        if account.can_use_ai_hiring:
+            from hiring_agent.models import HiringPipeline
+            steps.append({
+                "key": "enable_ai_screening",
+                "number": len(steps) + 1,
+                "title": "Enable AI Screening",
+                "description": "Turn on AI-powered resume screening for a position. AI will automatically score applicants and send assessments.",
+                "action_label": "Enable AI",
+                "action_url": edit_position_url,
+                "completed": HiringPipeline.objects.filter(
+                    client=account, status='active',
+                ).exists(),
+                "auto": True,
+                "pro": True,
+            })
+            steps.append({
+                "key": "review_ai_candidates",
+                "number": len(steps) + 1,
+                "title": "Review AI-screened candidates",
+                "description": "Check the AI Score column on your Candidates page to see how AI rated each applicant.",
+                "action_label": "View Candidates",
+                "action_url": reverse("clients:application-list"),
+                "completed": PositionApplication.objects.filter(
+                    client=account, pipeline_candidate__isnull=False,
+                ).exists(),
+                "auto": True,
+                "pro": True,
+            })
 
         completed_count = sum(1 for s in steps if s["completed"])
         total_count = len(steps)
@@ -2744,6 +2751,7 @@ class GettingStartedView(LoginRequiredMixin, TemplateView):
             "total_count": total_count,
             "progress_percent": progress_percent,
             "all_complete": all_complete,
+            "can_use_ai_hiring": account.can_use_ai_hiring,
         })
         return context
 
@@ -2762,8 +2770,9 @@ class OnboardingCompleteView(LoginRequiredMixin, View):
 
         elif action == 'complete_step':
             VALID_STEPS = {
-                'step_1', 'step_2', 'step_3', 'step_4', 'step_5',
-                'browse_assessments', 'setup_notifications', 'explore_analytics',
+                'complete_profile', 'create_position', 'publish_vacancy',
+                'send_assessment', 'review_results',
+                'enable_ai_screening', 'review_ai_candidates',
             }
             step_id = request.POST.get('step_id', '')
             if step_id and step_id in VALID_STEPS:
@@ -3257,6 +3266,11 @@ class ApplicationListView(ClientProjectAccessMixin, TemplateView):
         context["selected_status"] = status_filter or ""
         context["selected_ai"] = ai_filter or ""
         context["can_use_ai_hiring"] = self.account.can_use_ai_hiring
+        # Vacancy page URL for empty state CTA
+        if self.account.slug:
+            context["vacancy_page_url"] = reverse(
+                "pages:vacancy_list", args=[self.account.slug]
+            )
         return context
 
 

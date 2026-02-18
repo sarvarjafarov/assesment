@@ -226,14 +226,15 @@
         </div>
         {% else %}
         <div class="db-empty-state">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25; margin-bottom: 1rem;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25; margin-bottom: 1rem; color: var(--color-navy);">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="8.5" cy="7" r="4"></circle>
                 <line x1="20" y1="8" x2="20" y2="14"></line>
                 <line x1="23" y1="11" x2="17" y2="11"></line>
             </svg>
-            <p>No recent activity yet.</p>
-            <a href="{% url 'clients:assessments' %}" class="btn btn-outline small">Invite your first candidate</a>
+            <p><strong>Ready to start hiring?</strong></p>
+            <p class="muted">Create a position, publish it on your vacancy page, and candidates will start flowing in.</p>
+            <a href="{% url 'clients:project-create' %}" class="btn btn-primary small">Create Your First Position</a>
         </div>
         {% endif %}
     </section>

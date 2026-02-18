@@ -85,8 +85,14 @@
             <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
             <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
         </svg>
-        <h3>No applications yet</h3>
-        <p class="muted">Applications will appear here when candidates apply through your vacancy page.</p>
+        <h3>No candidates yet</h3>
+        <p class="muted">Candidates will appear here when they apply through your vacancy page or when you send assessment invites directly.</p>
+        <div class="ap-empty-actions">
+            {% if vacancy_page_url %}
+            <a href="{{ vacancy_page_url }}" target="_blank" class="btn btn-outline small">View Vacancy Page</a>
+            {% endif %}
+            <a href="{% url 'clients:project-create' %}" class="btn btn-primary small">Create Position</a>
+        </div>
     </div>
     {% endif %}
 

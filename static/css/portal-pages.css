@@ -7398,6 +7398,108 @@
     .gs-complete-banner { flex-direction: column; text-align: center; }
 }
 
+/* Getting Started – Workflow Diagram */
+.gs-workflow {
+    background: var(--color-surface, #f8f9fa);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+.gs-workflow-steps {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+.gs-wf-step {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+}
+.gs-wf-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-orange, #ff8a00);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+.gs-wf-step h4 {
+    margin: 0 0 0.25rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-navy, #0a1628);
+}
+.gs-wf-step p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #6b7280);
+    line-height: 1.3;
+}
+.gs-wf-arrow {
+    color: var(--color-text-muted, #ccc);
+    padding-top: 0.6rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+}
+@media (max-width: 768px) {
+    .gs-workflow-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+    .gs-wf-arrow {
+        transform: rotate(90deg);
+        padding-top: 0;
+    }
+    .gs-wf-step {
+        padding: 0.5rem 0;
+    }
+}
+
+/* Getting Started – Pro Badge */
+.gs-pro-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff8a00, #ff6b00);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Empty State – Action Buttons */
+.ap-empty-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    justify-content: center;
+}
+
+/* Dashboard Empty State */
+.db-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+.db-empty-state p {
+    margin: 0 0 0.25rem;
+}
+.db-empty-state .muted {
+    margin-bottom: 1rem;
+}
+.db-empty-state .btn {
+    margin-top: 0.5rem;
+}
+
 
 /* ========================================================================
    RESPONSIVE MEDIA QUERIES (consolidated from all pages)

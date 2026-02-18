@@ -207,8 +207,9 @@
         // Small delay to ensure page is fully rendered
         setTimeout(() => {
             const userRole = '{{ account.role }}';
-            const steps = typeof getRoleSteps === 'function'
-                ? getRoleSteps(userRole)
+            const canUseAI = {{ account.can_use_ai_hiring|yesno:"true,false" }};
+            const steps = typeof buildTourSteps === 'function'
+                ? buildTourSteps(userRole, canUseAI)
                 : onboardingSteps;
 
             const tour = new OnboardingTour(steps, {

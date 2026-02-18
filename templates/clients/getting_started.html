@@ -23,6 +23,46 @@
         </div>
     </header>
 
+    {# ── How It Works ── #}
+    <section class="gs-workflow">
+        <div class="gs-workflow-steps">
+            <div class="gs-wf-step">
+                <div class="gs-wf-num">1</div>
+                <h4>Create a position</h4>
+                <p>Define the role, requirements, and job description</p>
+            </div>
+            <div class="gs-wf-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+            <div class="gs-wf-step">
+                <div class="gs-wf-num">2</div>
+                <h4>Candidates apply</h4>
+                <p>Share your vacancy page or send assessment invites directly</p>
+            </div>
+            <div class="gs-wf-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+            <div class="gs-wf-step">
+                <div class="gs-wf-num">3</div>
+                {% if can_use_ai_hiring %}
+                <h4>AI screens & scores</h4>
+                <p>Resumes are auto-scored and candidates receive assessments</p>
+                {% else %}
+                <h4>Candidates take assessments</h4>
+                <p>Invited candidates complete role-specific assessments scored by AI</p>
+                {% endif %}
+            </div>
+            <div class="gs-wf-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+            <div class="gs-wf-step">
+                <div class="gs-wf-num">4</div>
+                <h4>Review & decide</h4>
+                <p>See scores, AI summaries, and make hiring decisions</p>
+            </div>
+        </div>
+    </section>
+
     {# ── Progress ── #}
     <div class="gs-progress">
         <div class="gs-progress-top">
@@ -45,7 +85,7 @@
         </div>
         <div>
             <h3>All set! You're ready to go.</h3>
-            <p>You've completed all the setup steps. Head to your <a href="{% url 'clients:dashboard' %}">dashboard</a> to manage your pipeline.</p>
+            <p>You've completed all the setup steps. Head to your <a href="{% url 'clients:dashboard' %}">dashboard</a> to manage your hiring pipeline.</p>
         </div>
     </div>
     {% endif %}
@@ -65,7 +105,10 @@
             </div>
 
             <div class="gs-step-body">
-                <h3 class="gs-step-title">{{ step.title }}</h3>
+                <h3 class="gs-step-title">
+                    {{ step.title }}
+                    {% if step.pro %}<span class="gs-pro-badge">Pro</span>{% endif %}
+                </h3>
                 <p class="gs-step-desc">{{ step.description }}</p>
             </div>
 
