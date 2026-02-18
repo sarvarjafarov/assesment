@@ -7588,14 +7588,22 @@
 
 /* Section Head (icon badge + title) */
 .gd-section {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     scroll-margin-top: 4rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+.gd-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 .gd-section-head {
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid color-mix(in srgb, var(--accent, #ff8a00) 20%, transparent);
 }
 .gd-section-head h2 {
     margin: 0;
@@ -7631,9 +7639,14 @@
 .gd-card {
     background: #fff;
     border: 1px solid var(--color-border, #e5e7eb);
+    border-left: 3px solid color-mix(in srgb, var(--accent, #e5e7eb) 35%, transparent);
     border-radius: 10px;
     padding: 1.25rem 1.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    transition: border-left-color 0.2s;
+}
+.gd-card:hover {
+    border-left-color: color-mix(in srgb, var(--accent, #e5e7eb) 60%, transparent);
 }
 .gd-card p {
     margin: 0 0 0.75rem;
@@ -7646,7 +7659,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--accent, var(--color-text-muted, #6b7280));
     margin-bottom: 0.6rem;
 }
 
@@ -7675,7 +7688,7 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--color-orange, #ff8a00);
+    background: var(--accent, var(--color-orange, #ff8a00));
     flex-shrink: 0;
     margin-top: 0.45rem;
 }
@@ -7687,27 +7700,30 @@
 .gd-feature-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 0.6rem;
+    gap: 0.65rem;
 }
 .gd-feature {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    padding: 0.9rem 1rem;
-    background: #fff;
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 8px;
-    transition: border-color 0.15s;
+    padding: 1rem 1.1rem;
+    background: color-mix(in srgb, var(--fa, #ff8a00) 3%, #fff);
+    border: 1px solid color-mix(in srgb, var(--fa, #e5e7eb) 12%, transparent);
+    border-radius: 10px;
+    transition: all 0.2s ease;
 }
 .gd-feature:hover {
-    border-color: #c7c9ce;
+    background: color-mix(in srgb, var(--fa, #ff8a00) 6%, #fff);
+    border-color: color-mix(in srgb, var(--fa, #e5e7eb) 25%, transparent);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--fa, #000) 8%, transparent);
 }
 .gd-feature-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    background: color-mix(in srgb, var(--color-orange, #ff8a00) 10%, transparent);
-    color: var(--color-orange, #ff8a00);
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--fa, var(--color-orange, #ff8a00)) 12%, transparent);
+    color: var(--fa, var(--color-orange, #ff8a00));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7717,13 +7733,13 @@
     display: block;
     font-size: 0.85rem;
     color: var(--color-navy, #0a1628);
-    margin-bottom: 0.1rem;
+    margin-bottom: 0.15rem;
 }
 .gd-feature p {
     margin: 0;
     font-size: 0.78rem;
     color: var(--color-text-muted, #6b7280);
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 /* Numbered step cards (AI Screening) */
@@ -7738,8 +7754,13 @@
     padding: 1.25rem 1.5rem;
     background: #fff;
     border: 1px solid var(--color-border, #e5e7eb);
+    border-left: 3px solid color-mix(in srgb, var(--accent, #ec4899) 30%, transparent);
     border-bottom: none;
     position: relative;
+    transition: background 0.15s;
+}
+.gd-step-card:hover {
+    background: color-mix(in srgb, var(--accent, #ec4899) 2%, #fff);
 }
 .gd-step-card:first-child {
     border-radius: 10px 10px 0 0;
@@ -7793,19 +7814,19 @@
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
-    background: color-mix(in srgb, var(--color-orange, #ff8a00) 6%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-orange, #ff8a00) 18%, transparent);
-    border-left: 3px solid var(--color-orange, #ff8a00);
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-    margin: 0.85rem 0 0;
+    background: color-mix(in srgb, var(--accent, var(--color-orange, #ff8a00)) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent, var(--color-orange, #ff8a00)) 18%, transparent);
+    border-left: 3px solid var(--accent, var(--color-orange, #ff8a00));
+    border-radius: 8px;
+    padding: 0.85rem 1.1rem;
+    margin: 1rem 0 0;
     font-size: 0.85rem;
     line-height: 1.5;
     color: var(--color-text, #374151);
 }
 .gd-tip svg {
     flex-shrink: 0;
-    color: var(--color-orange, #ff8a00);
+    color: var(--accent, var(--color-orange, #ff8a00));
     margin-top: 0.1rem;
 }
 
@@ -7814,19 +7835,19 @@
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    padding: 0.6rem 1rem;
-    background: var(--color-surface, #f8f9fa);
-    border: 1px solid var(--color-border, #e5e7eb);
+    padding: 0.65rem 1rem;
+    background: color-mix(in srgb, var(--accent, #14b8a6) 4%, #f8f9fa);
+    border: 1px solid color-mix(in srgb, var(--accent, #14b8a6) 15%, transparent);
     border-radius: 8px;
     margin-bottom: 1rem;
     font-size: 0.88rem;
 }
 .gd-url-bar svg {
-    color: var(--color-text-muted, #6b7280);
+    color: var(--accent, var(--color-text-muted, #6b7280));
     flex-shrink: 0;
 }
 .gd-url-bar a {
-    color: var(--color-orange, #ff8a00);
+    color: var(--accent, var(--color-orange, #ff8a00));
     font-weight: 600;
     text-decoration: none;
 }
@@ -7849,11 +7870,12 @@
     border-radius: 12px;
     text-decoration: none;
     color: var(--color-text, #374151);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    transition: all 0.2s ease;
 }
 .gd-action-card:hover {
-    border-color: var(--color-border, #d1d5db);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border-color: color-mix(in srgb, var(--ac) 30%, transparent);
+    background: color-mix(in srgb, var(--ac) 3%, #fff);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--ac) 12%, transparent);
     transform: translateY(-2px);
 }
 .gd-action-icon {
@@ -8024,7 +8046,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--color-orange, #ff8a00);
+    background: var(--accent, var(--color-orange, #ff8a00));
 }
 .gd-plan-features li:first-child::before {
     display: none;
@@ -8045,7 +8067,7 @@
     border-top: 1px solid var(--color-border, #e5e7eb);
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--color-orange, #ff8a00);
+    color: var(--accent, var(--color-orange, #ff8a00));
     text-align: center;
 }
 
@@ -8060,13 +8082,17 @@
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    padding: 0.85rem 1rem;
-    background: var(--color-surface, #f8f9fa);
-    border-radius: 8px;
-    transition: background 0.15s;
+    padding: 0.9rem 1rem;
+    background: color-mix(in srgb, var(--assess) 4%, #f8f9fa);
+    border: 1px solid color-mix(in srgb, var(--assess) 8%, transparent);
+    border-radius: 10px;
+    transition: all 0.2s ease;
 }
 .gd-assessment-item:hover {
-    background: #f0f1f3;
+    background: color-mix(in srgb, var(--assess) 8%, #f8f9fa);
+    border-color: color-mix(in srgb, var(--assess) 20%, transparent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--assess) 10%, transparent);
 }
 .gd-assessment-icon {
     width: 34px;
@@ -8136,16 +8162,16 @@
 .gd-help-footer {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 1rem 1.25rem;
-    background: var(--color-surface, #f8f9fa);
+    gap: 0.75rem;
+    padding: 1.1rem 1.5rem;
+    background: linear-gradient(135deg, color-mix(in srgb, #6366f1 4%, #f8f9fa), color-mix(in srgb, #ec4899 4%, #f8f9fa));
     border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 10px;
-    margin-top: 0.5rem;
+    border-radius: 12px;
+    margin-top: 1rem;
 }
-.gd-help-footer svg { flex-shrink: 0; color: var(--color-text-muted, #6b7280); }
+.gd-help-footer svg { flex-shrink: 0; color: #6366f1; }
 .gd-help-footer p { margin: 0; font-size: 0.88rem; }
-.gd-help-footer a { color: var(--color-orange, #ff8a00); font-weight: 600; text-decoration: none; }
+.gd-help-footer a { color: #6366f1; font-weight: 600; text-decoration: none; }
 .gd-help-footer a:hover { text-decoration: underline; }
 
 /* gd-* Responsive */
