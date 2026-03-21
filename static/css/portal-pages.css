@@ -818,17 +818,39 @@
     color: var(--color-orange, #ff8a00);
 }
 
-/* AI Hiring tab — purple identity */
+/* AI Hiring tab — premium purple identity */
 .portal-tab--ai {
-    color: #a78bfa;
+    color: #7c3aed;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1.1rem;
+    margin: 0 0.25rem;
+    border-radius: 20px 20px 0 0;
+    border-bottom: 2px solid transparent;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(236, 72, 153, 0.04));
+    transition: all 0.25s ease;
+}
+.portal-tab--ai svg {
+    color: #8b5cf6;
+    transition: transform 0.25s ease;
 }
 .portal-tab--ai:hover {
-    color: #8b5cf6;
+    color: #6d28d9;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.06));
+}
+.portal-tab--ai:hover svg {
+    transform: scale(1.15);
 }
 .portal-tab--ai.active {
-    color: #7c3aed;
-    border-bottom-color: #8b5cf6;
-    background: linear-gradient(to top, rgba(139, 92, 246, 0.06), transparent);
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    border-bottom-color: #7c3aed;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+}
+.portal-tab--ai.active svg {
+    color: #fff;
 }
 @media (max-width: 640px) {
     .portal-tabs {
