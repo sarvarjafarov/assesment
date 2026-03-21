@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0e1428; line-height: 1.6; margin: 0; padding: 0; background-color: #f5f3ff;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1); overflow: hidden;">
+
+        <!-- Header -->
+        <div style="text-align: center; padding: 40px 32px 32px; background: linear-gradient(135deg, #0f0c29 0%, #1a1145 40%, #302b63 100%);">
+            <p style="margin: 0 0 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5);">ATS Resume Checker</p>
+            <h1 style="color: #ffffff; font-size: 28px; margin: 0 0 4px; font-weight: 800;">Your ATS Score</h1>
+
+            <!-- Score Circle -->
+            <div style="margin: 24px auto 16px; width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; border: 4px solid {% if score >= 80 %}#10b981{% elif score >= 60 %}#f59e0b{% else %}#ef4444{% endif %};">
+                <span style="font-size: 42px; font-weight: 800; color: #ffffff;">{{ score }}</span>
+            </div>
+
+            <!-- Verdict -->
+            <span style="display: inline-block; padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; letter-spacing: 0.03em; {% if score >= 80 %}background: rgba(16,185,129,0.2); color: #6ee7b7;{% elif score >= 60 %}background: rgba(245,158,11,0.2); color: #fcd34d;{% else %}background: rgba(239,68,68,0.2); color: #fca5a5;{% endif %}">
+                {{ verdict }}
+            </span>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 32px;">
+
+            <p style="font-size: 16px; margin: 0 0 16px;">Hi {{ lead.full_name|default:"there" }},</p>
+            <p style="margin: 0 0 24px; color: #5b647b;">Here's your detailed ATS compatibility analysis. We've checked your resume against the job description you provided.</p>
+
+            <!-- Summary -->
+            <div style="padding: 16px 20px; background: #f8f9fa; border-radius: 10px; margin-bottom: 24px; border-left: 4px solid #8b5cf6;">
+                <p style="margin: 0; font-size: 14px; color: #374151;">{{ result.summary }}</p>
+            </div>
+
+            <!-- Hard Skills -->
+            {% if result.hard_skills_analysis %}
+            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Skills Analysis</h2>
+
+            {% if result.hard_skills_analysis.matched %}
+            <p style="font-size: 13px; font-weight: 700; color: #059669; margin: 0 0 8px;">Matched Skills</p>
+            <p style="margin: 0 0 16px; font-size: 14px; color: #374151;">
+                {% for s in result.hard_skills_analysis.matched %}
+                <span style="display: inline-block; padding: 3px 10px; margin: 2px 4px 2px 0; background: rgba(16,185,129,0.1); border-radius: 4px; font-size: 13px; color: #059669;">{{ s }}</span>
+                {% endfor %}
+            </p>
+            {% endif %}
+
+            {% if result.hard_skills_analysis.missing_critical %}
+            <p style="font-size: 13px; font-weight: 700; color: #dc2626; margin: 0 0 8px;">Missing Critical Skills</p>
+            <p style="margin: 0 0 16px; font-size: 14px; color: #374151;">
+                {% for s in result.hard_skills_analysis.missing_critical %}
+                <span style="display: inline-block; padding: 3px 10px; margin: 2px 4px 2px 0; background: rgba(239,68,68,0.1); border-radius: 4px; font-size: 13px; color: #dc2626;">{{ s }}</span>
+                {% endfor %}
+            </p>
+            {% endif %}
+            {% endif %}
+
+            <!-- Experience Alignment -->
+            {% if result.experience_alignment %}
+            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Experience Alignment</h2>
+            <div style="padding: 16px 20px; background: #f8f9fa; border-radius: 10px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 13px; color: #5b647b;">Alignment Score</span>
+                    <span style="font-size: 15px; font-weight: 800; color: #0e1428;">{{ result.experience_alignment.score }}/100</span>
+                </div>
+                <p style="margin: 0; font-size: 14px; color: #374151;">{{ result.experience_alignment.assessment }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Strengths -->
+            {% if result.strengths %}
+            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #059669;">Strengths</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                {% for s in result.strengths %}
+                <tr>
+                    <td style="padding: 6px 0 6px 0; vertical-align: top; width: 20px; color: #10b981; font-size: 14px;">+</td>
+                    <td style="padding: 6px 0; font-size: 14px; color: #374151;">{{ s }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+
+            <!-- Top Improvements -->
+            {% if result.improvements %}
+            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #d97706;">Top Improvements</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                {% for imp in result.improvements|slice:":5" %}
+                <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f3f4f6; vertical-align: top;">
+                        {% if imp.issue %}
+                        <p style="margin: 0 0 4px; font-size: 14px; font-weight: 600; color: #0e1428;">{{ imp.issue }}</p>
+                        <p style="margin: 0; font-size: 13px; color: #5b647b;">{{ imp.fix }}</p>
+                        {% else %}
+                        <p style="margin: 0; font-size: 14px; color: #374151;">{{ imp }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+
+            <!-- Quantification -->
+            {% if result.quantification_check %}
+            {% if result.quantification_check.suggestions %}
+            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Add Numbers & Metrics</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                {% for sug in result.quantification_check.suggestions %}
+                <tr>
+                    <td style="padding: 6px 0; font-size: 14px; color: #374151;">
+                        <span style="color: #8b5cf6; margin-right: 6px;">#</span> {{ sug }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            {% endif %}
+
+            <!-- Pro Tip -->
+            {% if result.tip %}
+            <div style="margin: 28px 0 24px; padding: 20px; background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(236,72,153,0.05)); border-radius: 10px; border: 1px solid rgba(139,92,246,0.15);">
+                <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: #7c3aed;">Pro Tip</p>
+                <p style="margin: 0; font-size: 14px; color: #374151;">{{ result.tip }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Overall Recommendations -->
+            {% if result.overall_recommendations %}
+            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Top 3 Actions</h2>
+            {% for rec in result.overall_recommendations|slice:":3" %}
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; font-weight: 800; font-size: 13px; text-align: center; line-height: 28px; flex-shrink: 0;">{{ forloop.counter }}</div>
+                <p style="margin: 0; font-size: 14px; color: #374151; padding-top: 4px;">{{ rec }}</p>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- CTA -->
+            <div style="text-align: center; margin: 36px 0 16px; padding: 28px; background: linear-gradient(135deg, #0f0c29, #1a1145); border-radius: 12px;">
+                <p style="margin: 0 0 4px; font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">Hiring for your team?</p>
+                <p style="margin: 0 0 20px; font-size: 16px; color: #fff; font-weight: 700;">Screen candidates with AI-powered assessments</p>
+                <a href="https://www.evalon.tech/?utm_source=resume_checker&utm_medium=email" style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #ff8a00, #ff6b00); color: #fff; text-decoration: none; border-radius: 999px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 16px rgba(255,138,0,0.3);">
+                    Try Evalon Free
+                </a>
+            </div>
+
+            <p style="margin: 24px 0 0; font-size: 13px; color: #94a3b8; text-align: center;">
+                Check another resume at <a href="https://www.evalon.tech/resume-checker/" style="color: #8b5cf6;">evalon.tech/resume-checker</a>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 20px 32px; background: #f8f9fa; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                Evalon &middot; AI-Powered Hiring Assessments<br>
+                <a href="https://www.evalon.tech" style="color: #8b5cf6; text-decoration: none;">evalon.tech</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

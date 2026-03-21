@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber, PublicAssessment, Role, InterviewQuestion
+from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber, PublicAssessment, ResumeCheckerLead, Role, InterviewQuestion
 
 
 @admin.register(DemoRequest)
@@ -82,6 +82,15 @@ class APIAccessRequestAdmin(admin.ModelAdmin):
         updated = queryset.update(status='credentials_sent', api_key_issued_at=timezone.now())
         self.message_user(request, f'{updated} request(s) marked as Credentials Sent.')
     mark_as_credentials_sent.short_description = "Mark selected as Credentials Sent"
+
+
+@admin.register(ResumeCheckerLead)
+class ResumeCheckerLeadAdmin(admin.ModelAdmin):
+    list_display = ['email', 'full_name', 'ats_score', 'verdict', 'created_at']
+    list_filter = ['verdict', 'created_at']
+    search_fields = ['email', 'full_name']
+    readonly_fields = ['created_at', 'result_json']
+    ordering = ['-created_at']
 
 
 @admin.register(NewsletterSubscriber)

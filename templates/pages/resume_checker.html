@@ -28,6 +28,30 @@
                 <form method="post" enctype="multipart/form-data" class="rc-form" id="rc-form">
                     {% csrf_token %}
 
+                    <div class="rc-row">
+                        <div class="rc-field">
+                            <label for="id_full_name" class="rc-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                Full name
+                            </label>
+                            <input type="text" name="full_name" id="id_full_name" class="rc-input" placeholder="Jane Smith" required value="{{ form.full_name.value|default:"" }}">
+                            {% if form.full_name.errors %}
+                            <div class="rc-field-error">{{ form.full_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="rc-field">
+                            <label for="id_email" class="rc-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                Email address
+                            </label>
+                            <input type="email" name="email" id="id_email" class="rc-input" placeholder="you@example.com" required value="{{ form.email.value|default:"" }}">
+                            {% if form.email.errors %}
+                            <div class="rc-field-error">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                            <span class="rc-field-hint">We'll send your detailed report to this email</span>
+                        </div>
+                    </div>
+
                     <div class="rc-field">
                         <label for="id_resume" class="rc-label">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -143,6 +167,58 @@
             </section>
             {% endif %}
 
+            {# ── Hard Skills Analysis ── #}
+            {% if result.hard_skills_analysis %}
+            <section class="rc-section">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Skills Analysis
+                </h2>
+                {% if result.hard_skills_analysis.matched %}
+                <p class="rc-skill-heading rc-skill-heading--green">Matched Skills</p>
+                <div class="rc-skill-tags">
+                    {% for s in result.hard_skills_analysis.matched %}
+                    <span class="rc-skill-tag rc-skill-tag--green">{{ s }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if result.hard_skills_analysis.missing_critical %}
+                <p class="rc-skill-heading rc-skill-heading--red">Missing Critical Skills</p>
+                <div class="rc-skill-tags">
+                    {% for s in result.hard_skills_analysis.missing_critical %}
+                    <span class="rc-skill-tag rc-skill-tag--red">{{ s }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if result.hard_skills_analysis.missing_nice_to_have %}
+                <p class="rc-skill-heading rc-skill-heading--amber">Nice-to-Have (Missing)</p>
+                <div class="rc-skill-tags">
+                    {% for s in result.hard_skills_analysis.missing_nice_to_have %}
+                    <span class="rc-skill-tag rc-skill-tag--amber">{{ s }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
+            {# ── Experience Alignment ── #}
+            {% if result.experience_alignment %}
+            <section class="rc-section">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
+                    Experience Alignment
+                    <span class="rc-inline-score">{{ result.experience_alignment.score }}/100</span>
+                </h2>
+                <p class="rc-muted">{{ result.experience_alignment.assessment }}</p>
+                {% if result.experience_alignment.years_detected != "unclear" %}
+                <div class="rc-meta-row">
+                    <span>Detected: <strong>{{ result.experience_alignment.years_detected }}</strong></span>
+                    <span>Required: <strong>{{ result.experience_alignment.years_required }}</strong></span>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
             {# ── Strengths & Improvements ── #}
             <div class="rc-two-col">
                 {% if result.strengths %}
@@ -167,9 +243,57 @@
                     </h2>
                     <ul class="rc-list rc-list--amber">
                         {% for imp in result.improvements %}
-                        <li>{{ imp }}</li>
+                        <li>{% if imp.issue %}<strong>{{ imp.issue }}:</strong> {{ imp.fix }}{% else %}{{ imp }}{% endif %}</li>
                         {% endfor %}
                     </ul>
+                </section>
+                {% endif %}
+            </div>
+
+            {# ── Quantification & Action Verbs ── #}
+            <div class="rc-two-col">
+                {% if result.quantification_check %}
+                <section class="rc-section">
+                    <h2>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                        Metrics & Numbers
+                    </h2>
+                    {% if result.quantification_check.examples_found %}
+                    <p class="rc-small-label">Found in your resume:</p>
+                    <ul class="rc-list rc-list--green">
+                        {% for ex in result.quantification_check.examples_found %}
+                        <li>{{ ex }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% if result.quantification_check.suggestions %}
+                    <p class="rc-small-label" style="margin-top: 0.75rem;">Add metrics here:</p>
+                    <ul class="rc-list rc-list--amber">
+                        {% for sug in result.quantification_check.suggestions %}
+                        <li>{{ sug }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </section>
+                {% endif %}
+
+                {% if result.action_verbs_check %}
+                <section class="rc-section">
+                    <h2>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>
+                        Action Verbs
+                    </h2>
+                    {% if result.action_verbs_check.weak_phrases %}
+                    <div class="rc-verb-fixes">
+                        {% for wp in result.action_verbs_check.weak_phrases %}
+                        <div class="rc-verb-fix">
+                            <span class="rc-verb-old">{{ wp.original }}</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <span class="rc-verb-new">{{ wp.improved }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </section>
                 {% endif %}
             </div>
@@ -204,6 +328,24 @@
                 </section>
                 {% endif %}
             </div>
+            {% endif %}
+
+            {# ── Overall Recommendations ── #}
+            {% if result.overall_recommendations %}
+            <section class="rc-section rc-section--purple">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>
+                    Top Priority Actions
+                </h2>
+                <div class="rc-priorities">
+                    {% for rec in result.overall_recommendations|slice:":3" %}
+                    <div class="rc-priority">
+                        <span class="rc-priority-num">{{ forloop.counter }}</span>
+                        <span>{{ rec }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
             {% endif %}
 
             {# ── Pro Tip ── #}
@@ -369,6 +511,34 @@
     color: #dc2626;
     font-weight: 500;
 }
+.rc-field-hint {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 0.2rem;
+}
+.rc-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.rc-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    border: 1px solid rgba(14, 20, 40, 0.12);
+    border-radius: 12px;
+    background: rgba(14, 20, 40, 0.02);
+    color: var(--color-navy, #0e1428);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+.rc-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+.rc-input::placeholder { color: #94a3b8; }
 
 /* Submit */
 .rc-submit {
@@ -521,6 +691,38 @@
 .rc-section--green { border-left: 3px solid #10b981; }
 .rc-section--amber { border-left: 3px solid #f59e0b; }
 .rc-section--red { border-left: 3px solid #ef4444; }
+.rc-section--purple { border-left: 3px solid #8b5cf6; }
+
+/* Skills tags */
+.rc-skill-heading { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin: 0.75rem 0 0.4rem; }
+.rc-skill-heading:first-of-type { margin-top: 0; }
+.rc-skill-heading--green { color: #059669; }
+.rc-skill-heading--red { color: #dc2626; }
+.rc-skill-heading--amber { color: #d97706; }
+.rc-skill-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
+.rc-skill-tag { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; }
+.rc-skill-tag--green { background: rgba(16,185,129,0.1); color: #059669; }
+.rc-skill-tag--red { background: rgba(239,68,68,0.1); color: #dc2626; }
+.rc-skill-tag--amber { background: rgba(245,158,11,0.1); color: #d97706; }
+
+/* Inline score */
+.rc-inline-score { margin-left: auto; font-size: 0.85rem; font-weight: 800; color: #8b5cf6; }
+
+/* Meta row */
+.rc-meta-row { display: flex; gap: 2rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--color-text-muted); }
+.rc-muted { margin: 0; font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.5; }
+.rc-small-label { font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 0.4rem; }
+
+/* Action verb fixes */
+.rc-verb-fixes { display: flex; flex-direction: column; gap: 0.5rem; }
+.rc-verb-fix { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.5rem 0.75rem; background: rgba(14,20,40,0.02); border-radius: 8px; }
+.rc-verb-old { color: #94a3b8; text-decoration: line-through; }
+.rc-verb-new { color: #059669; font-weight: 600; }
+
+/* Priority actions */
+.rc-priorities { display: flex; flex-direction: column; gap: 0.75rem; }
+.rc-priority { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.88rem; color: #374151; line-height: 1.5; }
+.rc-priority-num { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; font-weight: 800; font-size: 0.75rem; flex-shrink: 0; }
 
 .rc-two-col {
     display: grid;
@@ -632,6 +834,7 @@
     .rc-steps { grid-template-columns: 1fr; }
     .rc-score-card { flex-direction: column; text-align: center; padding: 1.5rem; }
     .rc-two-col { grid-template-columns: 1fr; }
+    .rc-row { grid-template-columns: 1fr; }
 }
 </style>
 

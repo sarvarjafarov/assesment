@@ -108,6 +108,25 @@ class NewsletterSubscriber(models.Model):
         self.save(update_fields=['status', 'unsubscribed_at'])
 
 
+class ResumeCheckerLead(models.Model):
+    """Leads captured from the free ATS Resume Checker tool."""
+
+    email = models.EmailField(db_index=True)
+    full_name = models.CharField(max_length=200, blank=True, default="")
+    ats_score = models.PositiveSmallIntegerField(null=True, blank=True)
+    verdict = models.CharField(max_length=50, blank=True, default="")
+    result_json = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Resume Checker Lead"
+        verbose_name_plural = "Resume Checker Leads"
+
+    def __str__(self):
+        return f"{self.email} — score {self.ats_score or '?'} ({self.created_at:%b %d})"
+
+
 class PublicAssessment(models.Model):
     """Public-facing assessment pages for marketing."""
 

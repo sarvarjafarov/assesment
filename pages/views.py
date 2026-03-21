@@ -1806,6 +1806,8 @@ logger = logging.getLogger(__name__)
 
 def resume_checker(request):
     """Free public tool — check resume ATS compatibility against a job description."""
+    from .models import ResumeCheckerLead
+
     form = ResumeCheckerForm()
     result = None
     error = None
@@ -1818,6 +1820,22 @@ def resume_checker(request):
                     form.cleaned_data["resume"],
                     form.cleaned_data["job_description"],
                 )
+                # Save lead
+                lead = ResumeCheckerLead.objects.create(
+                    email=form.cleaned_data["email"],
+                    full_name=form.cleaned_data["full_name"],
+                    ats_score=result.get("ats_score"),
+                    verdict=result.get("verdict", ""),
+                    result_json=result,
+                )
+                # Also add to newsletter subscribers
+                from .models import NewsletterSubscriber
+                NewsletterSubscriber.objects.get_or_create(
+                    email=form.cleaned_data["email"],
+                    defaults={"source": "resume_checker"},
+                )
+                # Send results email
+                _send_resume_checker_email(lead, result)
             except Exception as exc:
                 logger.exception("Resume checker error: %s", exc)
                 error = "Something went wrong analyzing your resume. Please try again."
@@ -1837,31 +1855,99 @@ def _analyze_resume(resume_file, job_description: str) -> dict:
     if not resume_text or len(resume_text.strip()) < 50:
         raise ValueError("Could not extract enough text from the resume.")
 
-    prompt = f"""You are an expert ATS (Applicant Tracking System) analyst. Analyze this resume against the provided job description and return a JSON object with the following structure:
+    prompt = f"""You are an expert ATS (Applicant Tracking System) analyst and career coach with 15+ years of experience in technical recruiting. Perform a deep analysis of this resume against the provided job description.
+
+Return a JSON object with this structure:
 
 {{
     "ats_score": <integer 0-100>,
     "verdict": "<one of: Excellent Match|Strong Match|Good Match|Needs Improvement|Poor Match>",
-    "summary": "<2-3 sentence overall assessment>",
+    "summary": "<3-4 sentence executive assessment covering overall fit, key gaps, and top priority action>",
     "keyword_matches": [
-        {{"keyword": "<keyword from JD>", "found": <true/false>, "context": "<where found in resume or suggestion>"}}
+        {{"keyword": "<important keyword/skill from JD>", "found": <true/false>, "context": "<exact quote from resume where found, or specific suggestion for adding it>", "importance": "<high|medium|low>"}}
     ],
-    "strengths": ["<strength 1>", "<strength 2>", ...],
-    "improvements": ["<actionable improvement 1>", "<actionable improvement 2>", ...],
-    "missing_sections": ["<missing section if any>"],
-    "formatting_issues": ["<issue if any>"],
-    "tip": "<one pro tip to significantly boost ATS score>"
+    "hard_skills_analysis": {{
+        "matched": ["<skill found in both resume and JD>"],
+        "missing_critical": ["<required skill in JD not found in resume>"],
+        "missing_nice_to_have": ["<preferred/optional skill not found>"],
+        "extra": ["<skills in resume not in JD that still add value>"]
+    }},
+    "experience_alignment": {{
+        "score": <integer 0-100>,
+        "assessment": "<2 sentence analysis of experience level vs requirements>",
+        "years_detected": "<years of experience detected or 'unclear'>",
+        "years_required": "<years required per JD or 'not specified'>"
+    }},
+    "strengths": ["<specific strength with example from resume>"],
+    "improvements": [
+        {{"issue": "<what's wrong>", "fix": "<exactly how to fix it with example wording>", "impact": "<high|medium|low>"}}
+    ],
+    "missing_sections": ["<standard resume section that's missing>"],
+    "formatting_issues": ["<ATS parsing concern — fonts, tables, columns, headers, file format>"],
+    "quantification_check": {{
+        "has_metrics": <true/false>,
+        "examples_found": ["<metric found in resume>"],
+        "suggestions": ["<where to add numbers/metrics with example>"]
+    }},
+    "action_verbs_check": {{
+        "strong_verbs_found": ["<strong action verb used>"],
+        "weak_phrases": [{{"original": "<weak phrase>", "improved": "<stronger alternative>"}}]
+    }},
+    "overall_recommendations": [
+        "<top 3 highest-impact changes, ordered by importance>"
+    ],
+    "tip": "<one insider pro tip that most candidates don't know about ATS systems>"
 }}
 
-Be specific and actionable. Focus on real ATS parsing concerns: keyword density, section headers, formatting, measurable achievements, skills match.
+IMPORTANT GUIDELINES:
+- Extract at least 10-15 keywords from the JD for matching
+- Be brutally honest but constructive
+- Every improvement must include specific example wording the candidate can copy-paste
+- Flag any formatting that would break ATS parsing (tables, images, columns, fancy fonts, headers/footers)
+- Check for measurable achievements and quantified results
+- Assess action verb strength and suggest replacements for weak verbs
+- Consider both exact keyword matches and semantic equivalents
 
 RESUME:
-{resume_text[:6000]}
+{resume_text[:8000]}
 
 JOB DESCRIPTION:
-{job_description[:4000]}
+{job_description[:5000]}
 
-Return ONLY valid JSON, no markdown fences."""
+Return ONLY valid JSON, no markdown fences or commentary."""
 
-    response = _call_claude(prompt, max_tokens=2048)
+    response = _call_claude(prompt, max_tokens=4096)
     return response["data"]
+
+
+def _send_resume_checker_email(lead, result: dict):
+    """Send a branded HTML email with the resume analysis results."""
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+    from django.utils.html import strip_tags
+    from django.conf import settings
+
+    context = {
+        "lead": lead,
+        "result": result,
+        "score": result.get("ats_score", 0),
+        "verdict": result.get("verdict", ""),
+    }
+
+    html_content = render_to_string("emails/resume_checker_results.html", context)
+    text_content = strip_tags(html_content)
+
+    subject = f"Your ATS Score: {result.get('ats_score', '?')}/100 — {result.get('verdict', 'Resume Analysis')}"
+
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=text_content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[lead.email],
+    )
+    msg.attach_alternative(html_content, "text/html")
+
+    try:
+        msg.send(fail_silently=False)
+    except Exception as exc:
+        logger.warning("Failed to send resume checker email to %s: %s", lead.email, exc)

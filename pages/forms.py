@@ -59,6 +59,15 @@ class VacancyApplyForm(forms.Form):
 
 class ResumeCheckerForm(forms.Form):
     """Free ATS resume checker — lead magnet."""
+    full_name = forms.CharField(
+        label="Full name",
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": "Jane Smith"}),
+    )
+    email = forms.EmailField(
+        label="Email address",
+        widget=forms.EmailInput(attrs={"placeholder": "you@example.com"}),
+    )
     resume = forms.FileField(
         label="Upload your resume",
         help_text="PDF or DOCX, max 5 MB",
@@ -67,7 +76,7 @@ class ResumeCheckerForm(forms.Form):
         label="Job description",
         widget=forms.Textarea(attrs={
             "rows": 6,
-            "placeholder": "Paste the job description here...",
+            "placeholder": "Paste the job description here — include requirements, responsibilities, and qualifications...",
         }),
         max_length=10000,
     )
@@ -83,6 +92,9 @@ class ResumeCheckerForm(forms.Form):
         if not (header.startswith(b"%PDF") or header.startswith(b"PK")):
             raise forms.ValidationError("Upload a PDF or DOCX file.")
         return f
+
+    def clean_email(self):
+        return self.cleaned_data["email"].lower().strip()
 
 
 class DemoRequestForm(forms.ModelForm):
