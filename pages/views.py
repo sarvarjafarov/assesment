@@ -1855,66 +1855,17 @@ def _analyze_resume(resume_file, job_description: str) -> dict:
     if not resume_text or len(resume_text.strip()) < 50:
         raise ValueError("Could not extract enough text from the resume.")
 
-    prompt = f"""You are an expert ATS (Applicant Tracking System) analyst and career coach with 15+ years of experience in technical recruiting. Perform a deep analysis of this resume against the provided job description.
+    prompt = f"""Analyze this resume vs job description for ATS compatibility. Return ONLY valid JSON (no markdown):
 
-Return a JSON object with this structure:
+{{"ats_score":<0-100>,"verdict":"<Excellent Match|Strong Match|Good Match|Needs Improvement|Poor Match>","summary":"<2 sentence assessment>","keyword_matches":[{{"keyword":"<skill>","found":<bool>,"context":"<brief note>","importance":"<high|medium|low>"}}],"hard_skills_analysis":{{"matched":["<skill>"],"missing_critical":["<skill>"],"missing_nice_to_have":["<skill>"]}},"experience_alignment":{{"score":<0-100>,"assessment":"<1 sentence>","years_detected":"<X years>","years_required":"<X years>"}},"strengths":["<strength>"],"improvements":[{{"issue":"<problem>","fix":"<solution>"}}],"missing_sections":["<section>"],"formatting_issues":["<issue>"],"quantification_check":{{"has_metrics":<bool>,"examples_found":["<metric>"],"suggestions":["<suggestion>"]}},"action_verbs_check":{{"weak_phrases":[{{"original":"<weak>","improved":"<strong>"}}]}},"overall_recommendations":["<action1>","<action2>","<action3>"],"tip":"<pro tip>"}}
 
-{{
-    "ats_score": <integer 0-100>,
-    "verdict": "<one of: Excellent Match|Strong Match|Good Match|Needs Improvement|Poor Match>",
-    "summary": "<3-4 sentence executive assessment covering overall fit, key gaps, and top priority action>",
-    "keyword_matches": [
-        {{"keyword": "<important keyword/skill from JD>", "found": <true/false>, "context": "<exact quote from resume where found, or specific suggestion for adding it>", "importance": "<high|medium|low>"}}
-    ],
-    "hard_skills_analysis": {{
-        "matched": ["<skill found in both resume and JD>"],
-        "missing_critical": ["<required skill in JD not found in resume>"],
-        "missing_nice_to_have": ["<preferred/optional skill not found>"],
-        "extra": ["<skills in resume not in JD that still add value>"]
-    }},
-    "experience_alignment": {{
-        "score": <integer 0-100>,
-        "assessment": "<2 sentence analysis of experience level vs requirements>",
-        "years_detected": "<years of experience detected or 'unclear'>",
-        "years_required": "<years required per JD or 'not specified'>"
-    }},
-    "strengths": ["<specific strength with example from resume>"],
-    "improvements": [
-        {{"issue": "<what's wrong>", "fix": "<exactly how to fix it with example wording>", "impact": "<high|medium|low>"}}
-    ],
-    "missing_sections": ["<standard resume section that's missing>"],
-    "formatting_issues": ["<ATS parsing concern — fonts, tables, columns, headers, file format>"],
-    "quantification_check": {{
-        "has_metrics": <true/false>,
-        "examples_found": ["<metric found in resume>"],
-        "suggestions": ["<where to add numbers/metrics with example>"]
-    }},
-    "action_verbs_check": {{
-        "strong_verbs_found": ["<strong action verb used>"],
-        "weak_phrases": [{{"original": "<weak phrase>", "improved": "<stronger alternative>"}}]
-    }},
-    "overall_recommendations": [
-        "<top 3 highest-impact changes, ordered by importance>"
-    ],
-    "tip": "<one insider pro tip that most candidates don't know about ATS systems>"
-}}
-
-IMPORTANT GUIDELINES:
-- Extract at least 10-15 keywords from the JD for matching
-- Be brutally honest but constructive
-- Every improvement must include specific example wording the candidate can copy-paste
-- Flag any formatting that would break ATS parsing (tables, images, columns, fancy fonts, headers/footers)
-- Check for measurable achievements and quantified results
-- Assess action verb strength and suggest replacements for weak verbs
-- Consider both exact keyword matches and semantic equivalents
+Keep arrays short (max 8 keywords, 4 strengths, 4 improvements, 3 weak phrases). Be concise.
 
 RESUME:
-{resume_text[:5000]}
+{resume_text[:3000]}
 
 JOB DESCRIPTION:
-{job_description[:3000]}
-
-Return ONLY valid JSON, no markdown fences or commentary."""
+{job_description[:2000]}"""
 
     import anthropic
     import json as _json
@@ -1928,7 +1879,7 @@ Return ONLY valid JSON, no markdown fences or commentary."""
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=4096,
+        max_tokens=2500,
         messages=[{"role": "user", "content": prompt}],
     )
 
