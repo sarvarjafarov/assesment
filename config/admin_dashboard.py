@@ -183,14 +183,16 @@ def _get_dashboard_context():
     all_session_rows = []
 
     # Core assessment sessions
-    for session in AssessmentSession.objects.select_related("candidate_profile").order_by("-created_at"):
+    for session in AssessmentSession.objects.select_related("candidate", "company").order_by("-created_at"):
+        candidate_name = str(session.candidate) if session.candidate else getattr(session, "candidate_email", "—") or "—"
+        client_name = str(session.company) if hasattr(session, "company") and session.company else "—"
         all_session_rows.append({
             "id": session.id,
-            "candidate": str(session.candidate_profile) if session.candidate_profile else session.candidate_email or "—",
+            "candidate": candidate_name,
             "assessment": "Core Assessment",
             "status": session.get_status_display() if hasattr(session, "get_status_display") else session.status,
             "score": getattr(session, "overall_score", None),
-            "client": str(session.client) if hasattr(session, "client") and session.client else "—",
+            "client": client_name,
             "created_at": session.created_at.strftime("%b %d, %Y %I:%M %p") if session.created_at else "",
             "submitted_at": session.submitted_at.strftime("%b %d, %Y %I:%M %p") if session.submitted_at else "—",
             "admin_url": f"/admin/assessments/assessmentsession/{session.id}/change/",
