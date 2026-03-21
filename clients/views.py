@@ -84,7 +84,7 @@ def _record_failed_login(request):
 
 ACTIVITY_STATUS_CHOICES = {"all", "draft", "in_progress", "submitted"}
 ACTIVITY_ASSESSMENT_CHOICES = {"all"} | {choice[0] for choice in ClientAccount.ASSESSMENT_CHOICES}
-ACTIVITY_WINDOWS = {"7": 7, "30": 30, "90": 90}
+ACTIVITY_WINDOWS = {"7": 7, "30": 30, "90": 90, "all": 0}
 ACTIVITY_PRESETS = {
     "needs_review": {"status": "in_progress", "assessment": "all"},
     "completed_last_7": {"status": "submitted", "window": "7"},
@@ -94,14 +94,14 @@ ACTIVITY_PRESETS = {
 def parse_activity_filters(params):
     assessment = params.get("assessment", "all")
     status = params.get("status", "all")
-    window = params.get("window", "30")
+    window = params.get("window", "all")
     preset = params.get("preset", "")
     if assessment not in ACTIVITY_ASSESSMENT_CHOICES:
         assessment = "all"
     if status not in ACTIVITY_STATUS_CHOICES:
         status = "all"
     if window not in ACTIVITY_WINDOWS:
-        window = "30"
+        window = "all"
     result = {"assessment": assessment, "status": status, "window": window, "preset": ""}
     if preset in ACTIVITY_PRESETS:
         result.update(ACTIVITY_PRESETS[preset])
@@ -380,14 +380,16 @@ ROLE_BRANDING_ACCESS = ALL_ROLE_CODES
 
 def build_activity_feed(account: ClientAccount, dataset_map: dict, filters: dict, activity_limit: int | None = 6):
     entries: list[dict] = []
-    cutoff = timezone.now() - timedelta(days=ACTIVITY_WINDOWS.get(filters.get("window", "30"), 30))
+    window_days = ACTIVITY_WINDOWS.get(filters.get("window", "all"), 0)
     for code, queryset in dataset_map.items():
         if filters.get("assessment") not in ("all", code):
             continue
         qs = queryset
         if filters.get("status") not in ("all", None):
             qs = qs.filter(status=filters["status"])
-        qs = qs.filter(models.Q(updated_at__gte=cutoff) | models.Q(created_at__gte=cutoff))
+        if window_days > 0:
+            cutoff = timezone.now() - timedelta(days=window_days)
+            qs = qs.filter(models.Q(updated_at__gte=cutoff) | models.Q(created_at__gte=cutoff))
         label = ClientAccount.ASSESSMENT_DETAILS.get(code, {}).get("label", code.title())
         for session in qs.order_by("-updated_at")[:200]:
             timestamp = session.updated_at or session.created_at
@@ -623,7 +625,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         catalog = ClientAccount.ASSESSMENT_DETAILS
         dataset_map = build_dataset_map(account)
         activity_filters = parse_activity_filters(self.request.GET)
-        stats = self._calculate_stats(account, dataset_map, activity_filters, activity_limit=50)
+        stats = self._calculate_stats(account, dataset_map, activity_filters, activity_limit=None)
         assessment_stats_map = {item["code"]: item for item in stats.get("assessment_breakdown", [])}
         benchmarks = self._benchmark_snapshot()
         if benchmarks and stats.get("completion_rate") is not None:
@@ -688,7 +690,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "activity_filter_options": {
                     "assessments": [("all", "All assessments")] + list(ClientAccount.ASSESSMENT_CHOICES),
                     "statuses": [("all", "All statuses"), ("draft", "Draft"), ("in_progress", "In progress"), ("submitted", "Completed")],
-                    "windows": [("7", "Last 7 days"), ("30", "Last 30 days"), ("90", "Last 90 days")],
+                    "windows": [("all", "All time"), ("7", "Last 7 days"), ("30", "Last 30 days"), ("90", "Last 90 days")],
                     "presets": [("", "Choose preset"), ("needs_review", "Needs review"), ("completed_last_7", "Completed last 7 days")],
                 },
                 "activity_querystring": self.request.GET.urlencode(),
