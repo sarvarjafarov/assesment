@@ -73,7 +73,7 @@ class PipelineListView(HiringAgentMixin, TemplateView):
         ).select_related('project')
         ctx['pipelines'] = pipelines
         ctx['active_count'] = pipelines.filter(status='active').count()
-        ctx['total_candidates'] = sum(p.candidate_count for p in pipelines)
+        ctx['total_candidates'] = sum(p.candidate_count() for p in pipelines)
         ctx['hired_count'] = sum(
             p.candidates.filter(stage='hired').count()
             for p in pipelines
