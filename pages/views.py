@@ -1909,15 +1909,38 @@ IMPORTANT GUIDELINES:
 - Consider both exact keyword matches and semantic equivalents
 
 RESUME:
-{resume_text[:8000]}
+{resume_text[:5000]}
 
 JOB DESCRIPTION:
-{job_description[:5000]}
+{job_description[:3000]}
 
 Return ONLY valid JSON, no markdown fences or commentary."""
 
-    response = _call_claude(prompt, max_tokens=4096)
-    return response["data"]
+    from hiring_agent.services import _get_anthropic_client
+    import json as _json
+    import time as _time
+
+    client = _get_anthropic_client()
+    start = _time.time()
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=3000,
+        messages=[{"role": "user", "content": prompt}],
+        timeout=25.0,
+    )
+
+    if not response.content:
+        raise ValueError("Empty response from Claude API")
+    text = response.content[0].text.strip()
+    # Strip markdown code fences if present
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    text = text.strip()
+
+    return _json.loads(text)
 
 
 def _send_resume_checker_email(lead, result: dict):
