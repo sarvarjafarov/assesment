@@ -5,22 +5,147 @@
 {% block meta_description %}Manage your AI-powered hiring pipelines and candidate screening.{% endblock %}
 {% block portal_content %}
 <style>
-    /* ── Pipeline List ── */
-    .ha-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-    .ha-header h1 { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--color-text, #0e1428); }
-    .ha-header .ha-subtitle { margin: 0.25rem 0 0; color: var(--color-text-muted, #5b647b); font-size: 0.9rem; }
+    /* ── AI Hiring — Premium identity ── */
+    .ha-hero {
+        position: relative;
+        padding: 2.5rem 2.25rem 2rem;
+        border-radius: var(--radius-2xl, 24px);
+        margin-bottom: 1.75rem;
+        background: linear-gradient(135deg, #0f0c29 0%, #1a1145 40%, #302b63 100%);
+        overflow: hidden;
+        color: #fff;
+    }
+    .ha-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 600px 400px at 80% 20%, rgba(139, 92, 246, 0.25), transparent),
+            radial-gradient(ellipse 400px 300px at 20% 80%, rgba(236, 72, 153, 0.15), transparent);
+        pointer-events: none;
+    }
+    .ha-hero::after {
+        content: '';
+        position: absolute; top: -60px; right: -40px;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.3), transparent 70%);
+        filter: blur(40px);
+        pointer-events: none;
+    }
+    .ha-hero-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+    }
+    .ha-hero-text { flex: 1; min-width: 240px; }
+    .ha-hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 0.5rem;
+    }
+    .ha-hero-label svg { opacity: 0.7; }
+    .ha-hero h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.3;
+    }
+    .ha-hero .ha-subtitle {
+        margin: 0.4rem 0 0;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.55);
+        font-weight: 400;
+    }
+    .ha-hero .btn-pill {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+        font-weight: 700;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .ha-hero .btn-pill:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 28px rgba(139, 92, 246, 0.55);
+    }
 
-    .ha-count { margin-bottom: 1rem; font-size: 0.85rem; color: var(--color-text-muted, #5b647b); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+    /* ── Pipeline Stats Strip ── */
+    .ha-stats {
+        display: flex;
+        gap: 1px;
+        background: rgba(139, 92, 246, 0.15);
+        border-radius: var(--radius-xl, 16px);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .ha-stat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 0.75rem;
+        background: #fff;
+        min-width: 0;
+    }
+    .ha-stat-val {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1a1145;
+        line-height: 1.2;
+    }
+    .ha-stat-val--purple { color: #8b5cf6; }
+    .ha-stat-val--green { color: #10b981; }
+    .ha-stat-val--amber { color: #f59e0b; }
+    .ha-stat-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-text-muted, #5b647b);
+        margin-top: 0.2rem;
+        white-space: nowrap;
+    }
 
-    .ha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 1.25rem; }
+    /* ── Count label ── */
+    .ha-count {
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: var(--color-text-muted, #5b647b);
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+    }
+
+    /* ── Pipeline Grid ── */
+    .ha-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+        gap: 1.25rem;
+    }
 
     .ha-pipeline-card {
-        display: block; text-decoration: none; color: inherit;
-        border: 1px solid rgba(14, 20, 40, 0.08);
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        border: 1px solid rgba(139, 92, 246, 0.12);
         border-radius: var(--radius-2xl, 24px);
         padding: 1.75rem;
         background: #fff;
-        transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+        transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
         position: relative;
         overflow: hidden;
     }
@@ -28,90 +153,208 @@
         content: '';
         position: absolute; top: 0; left: 0; right: 0;
         height: 3px;
-        background: var(--color-orange, #ff8a00);
+        background: linear-gradient(90deg, #8b5cf6, #ec4899);
         opacity: 0;
-        transition: opacity 0.25s ease;
+        transition: opacity 0.3s ease;
+    }
+    .ha-pipeline-card::after {
+        content: '';
+        position: absolute; top: -40px; right: -40px;
+        width: 100px; height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.06), transparent 70%);
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        opacity: 0;
     }
     .ha-pipeline-card:hover {
-        box-shadow: 0 20px 45px rgba(14, 20, 40, 0.08);
-        transform: translateY(-2px);
-        border-color: rgba(14, 20, 40, 0.12);
+        box-shadow: 0 20px 50px rgba(139, 92, 246, 0.12), 0 4px 12px rgba(14, 20, 40, 0.04);
+        transform: translateY(-3px);
+        border-color: rgba(139, 92, 246, 0.25);
     }
     .ha-pipeline-card:hover::before { opacity: 1; }
+    .ha-pipeline-card:hover::after { opacity: 1; }
 
-    .ha-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
-    .ha-card-title { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--color-text, #0e1428); line-height: 1.4; }
+    .ha-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .ha-card-title-group { flex: 1; min-width: 0; }
+    .ha-card-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-text, #0e1428);
+        line-height: 1.4;
+    }
+    .ha-card-ai-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: #8b5cf6;
+        margin-top: 0.25rem;
+    }
+    .ha-card-ai-label svg { flex-shrink: 0; }
 
     .ha-badge {
-        display: inline-flex; align-items: center;
-        padding: 0.2rem 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
         border-radius: var(--radius-full, 999px);
-        font-size: 0.7rem; font-weight: 700;
+        font-size: 0.7rem;
+        font-weight: 700;
         white-space: nowrap;
         text-transform: uppercase;
         letter-spacing: 0.04em;
+        flex-shrink: 0;
     }
     .ha-badge--active { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    .ha-badge--active::before {
+        content: '';
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #10b981;
+        animation: ha-pulse 2s ease-in-out infinite;
+    }
     .ha-badge--draft { background: rgba(14, 20, 40, 0.06); color: var(--color-text-muted, #5b647b); }
     .ha-badge--paused { background: rgba(245, 158, 11, 0.12); color: #d97706; }
     .ha-badge--completed { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
     .ha-badge--archived { background: rgba(14, 20, 40, 0.04); color: #94a3b8; }
 
-    .ha-card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
-    .ha-tag {
-        display: inline-flex; align-items: center; gap: 0.3rem;
-        font-size: 0.75rem; color: var(--color-text-muted, #5b647b);
-        background: var(--color-bg-muted, #f7f8fb);
-        padding: 0.25rem 0.6rem;
-        border-radius: var(--radius-sm, 6px);
-        border: 1px solid rgba(14, 20, 40, 0.06);
+    @keyframes ha-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
     }
-    .ha-tag svg { opacity: 0.5; }
+
+    .ha-card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1.25rem;
+    }
+    .ha-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.75rem;
+        color: var(--color-text-muted, #5b647b);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.04), rgba(236, 72, 153, 0.04));
+        padding: 0.3rem 0.65rem;
+        border-radius: var(--radius-sm, 6px);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+    }
+    .ha-tag svg { opacity: 0.5; color: #8b5cf6; }
 
     .ha-card-footer {
-        display: flex; align-items: flex-end; gap: 1.5rem;
+        display: flex;
+        align-items: flex-end;
+        gap: 1.5rem;
         padding-top: 1.25rem;
-        border-top: 1px solid rgba(14, 20, 40, 0.06);
+        border-top: 1px solid rgba(139, 92, 246, 0.08);
     }
     .ha-card-stat { display: flex; flex-direction: column; }
-    .ha-card-stat-val { font-size: 1.25rem; font-weight: 800; color: var(--color-text, #0e1428); line-height: 1; }
-    .ha-card-stat-label { font-size: 0.72rem; color: var(--color-text-muted, #5b647b); font-weight: 600; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.03em; }
-    .ha-card-time { margin-left: auto; text-align: right; font-size: 0.78rem; color: #94a3b8; }
+    .ha-card-stat-val {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1a1145;
+        line-height: 1;
+    }
+    .ha-card-stat-label {
+        font-size: 0.72rem;
+        color: var(--color-text-muted, #5b647b);
+        font-weight: 600;
+        margin-top: 0.2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .ha-card-time {
+        margin-left: auto;
+        text-align: right;
+        font-size: 0.78rem;
+        color: #94a3b8;
+    }
 
     /* ── Empty State ── */
     .ha-empty {
         text-align: center;
         padding: 5rem 2rem;
-        background: #fff;
-        border: 1px solid rgba(14, 20, 40, 0.08);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.03), rgba(236, 72, 153, 0.03));
+        border: 1px dashed rgba(139, 92, 246, 0.2);
         border-radius: var(--radius-2xl, 24px);
     }
-    .ha-empty-icon { margin-bottom: 1.5rem; color: var(--color-orange, #ff8a00); opacity: 0.15; }
+    .ha-empty-icon { margin-bottom: 1.5rem; color: #8b5cf6; opacity: 0.2; }
     .ha-empty h3 { margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 700; color: var(--color-text, #0e1428); }
     .ha-empty p { margin: 0 0 2rem; color: var(--color-text-muted, #5b647b); max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .ha-empty .btn-pill {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        color: #fff;
+        border: none;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+        .ha-hero { padding: 1.75rem 1.25rem 1.5rem; }
+        .ha-hero h1 { font-size: 1.35rem; }
+        .ha-stats { flex-wrap: wrap; }
+        .ha-stat { flex: 1 1 30%; min-width: 80px; padding: 0.75rem 0.5rem; }
+        .ha-stat-val { font-size: 1.2rem; }
+        .ha-grid { grid-template-columns: 1fr; }
+    }
 </style>
 
 <div class="portal-shell">
 
-    {# ── Page Header ── #}
-    <header class="ha-header">
-        <div>
-            <h1>AI Hiring Pipelines</h1>
-            <p class="ha-subtitle">Automate candidate screening and evaluation with AI</p>
+    {# ── AI Hero Header ── #}
+    <div class="ha-hero">
+        <div class="ha-hero-content">
+            <div class="ha-hero-text">
+                <div class="ha-hero-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>
+                    Agentic AI Powered
+                </div>
+                <h1>AI Hiring Pipelines</h1>
+                <p class="ha-subtitle">Automate candidate screening, evaluation, and ranking with intelligent AI agents</p>
+            </div>
+            <a href="{% url 'hiring_agent:pipeline-create' %}" class="btn btn-pill">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Create Pipeline
+            </a>
         </div>
-        <a href="{% url 'hiring_agent:pipeline-create' %}" class="btn btn-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Create Pipeline
-        </a>
-    </header>
+    </div>
 
     {# ── Assessment Tabs ── #}
     {% include 'includes/_assessment_tabs.html' %}
 
     {% if pipelines %}
+
+    {# ── Stats Strip ── #}
+    <div class="ha-stats">
+        <div class="ha-stat">
+            <span class="ha-stat-val ha-stat-val--purple">{{ pipelines|length }}</span>
+            <span class="ha-stat-label">Pipeline{{ pipelines|length|pluralize }}</span>
+        </div>
+        <div class="ha-stat">
+            <span class="ha-stat-val ha-stat-val--green">{{ active_count|default:"0" }}</span>
+            <span class="ha-stat-label">Active</span>
+        </div>
+        <div class="ha-stat">
+            <span class="ha-stat-val">{{ total_candidates|default:"0" }}</span>
+            <span class="ha-stat-label">Candidates</span>
+        </div>
+        <div class="ha-stat">
+            <span class="ha-stat-val ha-stat-val--amber">{{ hired_count|default:"0" }}</span>
+            <span class="ha-stat-label">Hired</span>
+        </div>
+    </div>
 
     <div class="ha-count">{{ pipelines|length }} pipeline{{ pipelines|length|pluralize }}</div>
 
@@ -119,7 +362,13 @@
         {% for pipeline in pipelines %}
         <a href="{% url 'hiring_agent:pipeline-detail' pipeline_uuid=pipeline.uuid %}" class="ha-pipeline-card">
             <div class="ha-card-top">
-                <h3 class="ha-card-title">{{ pipeline.title }}</h3>
+                <div class="ha-card-title-group">
+                    <h3 class="ha-card-title">{{ pipeline.title }}</h3>
+                    <div class="ha-card-ai-label">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>
+                        AI-managed pipeline
+                    </div>
+                </div>
                 <span class="ha-badge ha-badge--{{ pipeline.status }}">{{ pipeline.get_status_display }}</span>
             </div>
 

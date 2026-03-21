@@ -68,9 +68,16 @@ class PipelineListView(HiringAgentMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['pipelines'] = HiringPipeline.objects.filter(
+        pipelines = HiringPipeline.objects.filter(
             client=self.account
         ).select_related('project')
+        ctx['pipelines'] = pipelines
+        ctx['active_count'] = pipelines.filter(status='active').count()
+        ctx['total_candidates'] = sum(p.candidate_count for p in pipelines)
+        ctx['hired_count'] = sum(
+            p.candidates.filter(stage='hired').count()
+            for p in pipelines
+        )
         return ctx
 
 
