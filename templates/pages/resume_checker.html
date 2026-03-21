@@ -207,7 +207,7 @@
                 <h2>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
                     Experience Alignment
-                    <span class="rc-inline-score">{{ result.experience_alignment.score }}/100</span>
+                    <span class="rc-inline-score">{{ result.experience_alignment.score }} / 100</span>
                 </h2>
                 <p class="rc-muted">{{ result.experience_alignment.assessment }}</p>
                 {% if result.experience_alignment.years_detected != "unclear" %}
@@ -661,9 +661,9 @@
     letter-spacing: 0.04em;
     margin-bottom: 0.5rem;
 }
-.rc-verdict--good { background: rgba(16, 185, 129, 0.12); color: #059669; }
-.rc-verdict--ok { background: rgba(245, 158, 11, 0.12); color: #d97706; }
-.rc-verdict--low { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+.rc-verdict--good { background: #10b981; color: #fff; }
+.rc-verdict--ok { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; }
+.rc-verdict--low { background: #ef4444; color: #fff; }
 .rc-summary {
     margin: 0;
     font-size: 0.95rem;
@@ -706,7 +706,7 @@
 .rc-skill-tag--amber { background: rgba(245,158,11,0.1); color: #d97706; }
 
 /* Inline score */
-.rc-inline-score { margin-left: auto; font-size: 0.85rem; font-weight: 800; color: #8b5cf6; }
+.rc-inline-score { margin-left: auto; font-size: 0.85rem; font-weight: 800; color: #8b5cf6; white-space: nowrap; padding-left: 0.75rem; }
 
 /* Meta row */
 .rc-meta-row { display: flex; gap: 2rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--color-text-muted); }
@@ -721,8 +721,8 @@
 
 /* Priority actions */
 .rc-priorities { display: flex; flex-direction: column; gap: 0.75rem; }
-.rc-priority { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.88rem; color: #374151; line-height: 1.5; }
-.rc-priority-num { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; font-weight: 800; font-size: 0.75rem; flex-shrink: 0; }
+.rc-priority { display: flex; align-items: flex-start; gap: 1rem; font-size: 0.88rem; color: #374151; line-height: 1.5; }
+.rc-priority-num { min-width: 28px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; font-weight: 800; font-size: 0.75rem; flex-shrink: 0; margin-top: 1px; }
 
 .rc-two-col {
     display: grid;
