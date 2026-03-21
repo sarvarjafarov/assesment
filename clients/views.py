@@ -623,7 +623,7 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         catalog = ClientAccount.ASSESSMENT_DETAILS
         dataset_map = build_dataset_map(account)
         activity_filters = parse_activity_filters(self.request.GET)
-        stats = self._calculate_stats(account, dataset_map, activity_filters)
+        stats = self._calculate_stats(account, dataset_map, activity_filters, activity_limit=50)
         assessment_stats_map = {item["code"]: item for item in stats.get("assessment_breakdown", [])}
         benchmarks = self._benchmark_snapshot()
         if benchmarks and stats.get("completion_rate") is not None:
@@ -671,8 +671,18 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
                 "quick_actions": self._quick_actions(account),
                 "attention_items": stats.get("attention_items", []),
                 "activity_feed": stats.get("recent_activity", []),
+                "activity_total_count": len(stats.get("recent_activity", [])),
                 "activity_filters": activity_filters,
                 "activity_export_url": self._activity_export_url(),
+                "activity_summary": {
+                    "total": stats.get("total_candidates", 0),
+                    "completed": stats.get("completed_count", 0),
+                    "in_progress": stats.get("in_progress_count", 0),
+                    "draft": stats.get("draft_count", 0),
+                    "completion_rate": stats.get("completion_rate", 0),
+                    "avg_score": stats.get("average_score"),
+                    "avg_duration": stats.get("average_duration"),
+                },
                 "benchmark": benchmarks,
                 "weekly_summary_enabled": account.receive_weekly_summary,
                 "activity_filter_options": {

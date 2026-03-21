@@ -183,46 +183,141 @@
     </details>
     {% endif %}
 
-    {# ── Recent Activity (full width) ── #}
+    {# ── Activity Report (full width) ── #}
     <section class="db-activity-full">
         <div class="section-header">
-            <h3>Recent Activity</h3>
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Activity Report
+            </h3>
             {% if activity_feed %}
-            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline small">
+            <a href="{% url 'clients:activity-export' %}{% if activity_querystring %}?{{ activity_querystring }}{% endif %}" class="btn btn-outline small">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Export CSV
             </a>
             {% endif %}
         </div>
+
+        {# ── Summary Stats Bar ── #}
+        <div class="db-report-summary">
+            <div class="db-report-stat">
+                <span class="db-report-stat-value">{{ activity_summary.total }}</span>
+                <span class="db-report-stat-label">Total Candidates</span>
+            </div>
+            <div class="db-report-stat db-report-stat--success">
+                <span class="db-report-stat-value">{{ activity_summary.completed }}</span>
+                <span class="db-report-stat-label">Completed</span>
+            </div>
+            <div class="db-report-stat db-report-stat--active">
+                <span class="db-report-stat-value">{{ activity_summary.in_progress }}</span>
+                <span class="db-report-stat-label">In Progress</span>
+            </div>
+            <div class="db-report-stat db-report-stat--pending">
+                <span class="db-report-stat-value">{{ activity_summary.draft }}</span>
+                <span class="db-report-stat-label">Draft</span>
+            </div>
+            <div class="db-report-stat">
+                <span class="db-report-stat-value">{{ activity_summary.completion_rate|floatformat:0 }}%</span>
+                <span class="db-report-stat-label">Completion Rate</span>
+            </div>
+            {% if activity_summary.avg_score %}
+            <div class="db-report-stat">
+                <span class="db-report-stat-value">{{ activity_summary.avg_score|floatformat:1 }}</span>
+                <span class="db-report-stat-label">Avg Score</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {# ── Filter Bar ── #}
+        <form method="get" class="db-report-filters" id="activity-filter-form">
+            <div class="db-filter-group">
+                <label class="db-filter-label">Assessment</label>
+                <select name="assessment" class="db-filter-select" onchange="this.form.submit()">
+                    {% for value, label in activity_filter_options.assessments %}
+                    <option value="{{ value }}" {% if activity_filters.assessment == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="db-filter-group">
+                <label class="db-filter-label">Status</label>
+                <select name="status" class="db-filter-select" onchange="this.form.submit()">
+                    {% for value, label in activity_filter_options.statuses %}
+                    <option value="{{ value }}" {% if activity_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="db-filter-group">
+                <label class="db-filter-label">Time Window</label>
+                <select name="window" class="db-filter-select" onchange="this.form.submit()">
+                    {% for value, label in activity_filter_options.windows %}
+                    <option value="{{ value }}" {% if activity_filters.window == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if activity_filters.assessment != "all" or activity_filters.status != "all" or activity_filters.window != "30" %}
+            <a href="{% url 'clients:dashboard' %}" class="db-filter-reset btn btn-ghost small">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                Reset
+            </a>
+            {% endif %}
+        </form>
+
+        {# ── Activity Table ── #}
         {% if activity_feed %}
+        <div class="db-report-count">
+            <span>Showing {{ activity_total_count }} activit{{ activity_total_count|pluralize:"y,ies" }}</span>
+        </div>
         <div class="db-activity-card">
-            <ul class="activity-feed">
-                {% for entry in activity_feed|slice:":10" %}
-                <li class="activity-item">
-                    <div class="activity-main">
-                        <div class="activity-avatar">
-                            <span>{{ entry.candidate|slice:":1"|upper }}</span>
-                        </div>
-                        <div class="activity-details">
-                            <p class="activity-name">{{ entry.candidate }}</p>
-                            <p class="activity-meta">
-                                <span>{{ entry.assessment }}</span>
-                                <span class="db-status-dot {% if entry.status == 'Completed' or entry.status == 'Submitted' %}dot-success{% elif entry.status == 'In Progress' %}dot-active{% else %}dot-pending{% endif %}"></span>
-                                <span>{{ entry.status }}</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="activity-actions">
-                        <span class="activity-time">{{ entry.timestamp|naturaltime }}</span>
-                        {% if entry.detail_url %}
-                        <a href="{{ entry.detail_url }}" class="btn btn-ghost small">View</a>
-                        {% else %}
-                        <a href="{{ entry.manage_url }}" class="btn btn-ghost small">Manage</a>
-                        {% endif %}
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+            <div class="db-report-table-wrap">
+                <table class="db-report-table">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Assessment</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in activity_feed %}
+                        <tr class="db-report-row">
+                            <td class="db-report-candidate">
+                                <div class="activity-avatar">
+                                    <span>{{ entry.candidate|slice:":1"|upper }}</span>
+                                </div>
+                                <span class="db-report-candidate-name">{{ entry.candidate }}</span>
+                            </td>
+                            <td class="db-report-assessment">
+                                <span class="db-report-assessment-badge">{{ entry.assessment }}</span>
+                            </td>
+                            <td class="db-report-status">
+                                <span class="db-report-status-pill {% if entry.status == 'Completed' or entry.status == 'Submitted' %}pill-success{% elif entry.status == 'In Progress' %}pill-active{% else %}pill-pending{% endif %}">
+                                    <span class="db-status-dot {% if entry.status == 'Completed' or entry.status == 'Submitted' %}dot-success{% elif entry.status == 'In Progress' %}dot-active{% else %}dot-pending{% endif %}"></span>
+                                    {{ entry.status }}
+                                </span>
+                            </td>
+                            <td class="db-report-time">
+                                <span title="{{ entry.timestamp|date:'N j, Y g:i A' }}">{{ entry.timestamp|naturaltime }}</span>
+                            </td>
+                            <td class="db-report-action">
+                                {% if entry.detail_url %}
+                                <a href="{{ entry.detail_url }}" class="btn btn-ghost small">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    View
+                                </a>
+                                {% else %}
+                                <a href="{{ entry.manage_url }}" class="btn btn-ghost small">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    Manage
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% else %}
         <div class="db-empty-state">
@@ -232,9 +327,15 @@
                 <line x1="20" y1="8" x2="20" y2="14"></line>
                 <line x1="23" y1="11" x2="17" y2="11"></line>
             </svg>
+            {% if activity_filters.assessment != "all" or activity_filters.status != "all" %}
+            <p><strong>No activities match your filters</strong></p>
+            <p class="muted">Try adjusting the filters above or reset to see all activity.</p>
+            <a href="{% url 'clients:dashboard' %}" class="btn btn-outline small">Reset Filters</a>
+            {% else %}
             <p><strong>Ready to start hiring?</strong></p>
             <p class="muted">Create a position, publish it on your vacancy page, and candidates will start flowing in.</p>
             <a href="{% url 'clients:project-create' %}" class="btn btn-primary small">Create Your First Position</a>
+            {% endif %}
         </div>
         {% endif %}
     </section>
