@@ -19,6 +19,7 @@ urlpatterns = [
     path('vacancies/<slug:company_slug>/<uuid:position_uuid>/', views.vacancy_detail, name='vacancy_detail'),
     path('vacancies/<slug:company_slug>/<uuid:position_uuid>/apply/', views.vacancy_apply, name='vacancy_apply'),
     path('vacancies/<slug:company_slug>/<uuid:position_uuid>/applied/', views.vacancy_applied, name='vacancy_applied'),
+    path('resume-checker/', views.resume_checker, name='resume-checker'),
     path('security/', views.security, name='security'),
     path('privacy/', views.privacy, name='privacy'),
     path('terms/', views.terms, name='terms'),

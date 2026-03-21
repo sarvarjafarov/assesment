@@ -1,0 +1,678 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Free ATS Resume Checker · Evalon{% endblock %}
+{% block meta_description %}Check if your resume can pass ATS screening. Upload your resume, paste a job description, and get instant AI-powered feedback — completely free.{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' %}
+    <main>
+        <div class="page-container slim">
+
+            {# ── Hero ── #}
+            <section class="rc-hero">
+                <div class="rc-hero-badge">Free Tool</div>
+                <h1>ATS Resume Checker</h1>
+                <p class="rc-hero-sub">Upload your resume and paste a job description to instantly see how well your resume matches — powered by AI.</p>
+            </section>
+
+            {% if error %}
+            <div class="rc-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            {% if not result %}
+            {# ── Upload Form ── #}
+            <section class="rc-form-card">
+                <form method="post" enctype="multipart/form-data" class="rc-form" id="rc-form">
+                    {% csrf_token %}
+
+                    <div class="rc-field">
+                        <label for="id_resume" class="rc-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            Upload your resume
+                        </label>
+                        <div class="rc-dropzone" id="rc-dropzone">
+                            <input type="file" name="resume" id="id_resume" accept=".pdf,.docx" required>
+                            <div class="rc-dropzone-content">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <span class="rc-dropzone-text">Drag & drop or <strong>browse</strong></span>
+                                <span class="rc-dropzone-hint">PDF or DOCX, max 5 MB</span>
+                            </div>
+                            <div class="rc-dropzone-file" id="rc-file-name" style="display:none;"></div>
+                        </div>
+                        {% if form.resume.errors %}
+                        <div class="rc-field-error">{{ form.resume.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="rc-field">
+                        <label for="id_job_description" class="rc-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
+                            Job description
+                        </label>
+                        <textarea name="job_description" id="id_job_description" rows="8" class="rc-textarea" placeholder="Paste the full job description here — include requirements, responsibilities, and qualifications for the best analysis..." required maxlength="10000">{{ form.job_description.value|default:"" }}</textarea>
+                        {% if form.job_description.errors %}
+                        <div class="rc-field-error">{{ form.job_description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="rc-submit" id="rc-submit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>
+                        Analyze My Resume
+                    </button>
+                </form>
+            </section>
+
+            {# ── How It Works ── #}
+            <section class="rc-how">
+                <h2>How it works</h2>
+                <div class="rc-steps">
+                    <div class="rc-step">
+                        <div class="rc-step-num">1</div>
+                        <h3>Upload</h3>
+                        <p>Drop your resume (PDF or DOCX)</p>
+                    </div>
+                    <div class="rc-step">
+                        <div class="rc-step-num">2</div>
+                        <h3>Paste JD</h3>
+                        <p>Add the job description you're targeting</p>
+                    </div>
+                    <div class="rc-step">
+                        <div class="rc-step-num">3</div>
+                        <h3>Get Score</h3>
+                        <p>Receive instant ATS compatibility feedback</p>
+                    </div>
+                </div>
+            </section>
+
+            {% else %}
+            {# ══════════════════════════════════════════════ #}
+            {# ── RESULTS                                  ── #}
+            {# ══════════════════════════════════════════════ #}
+
+            {# ── Score Ring ── #}
+            <section class="rc-score-card">
+                <div class="rc-score-ring-wrap">
+                    <svg class="rc-score-ring" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(14,20,40,0.06)" stroke-width="10"/>
+                        <circle cx="60" cy="60" r="52" fill="none"
+                            stroke="{% if result.ats_score >= 80 %}#10b981{% elif result.ats_score >= 60 %}#f59e0b{% else %}#ef4444{% endif %}"
+                            stroke-width="10" stroke-linecap="round"
+                            stroke-dasharray="{{ result.ats_score|floatformat:0 }} {{ 100|add:0 }}"
+                            stroke-dashoffset="0"
+                            transform="rotate(-90 60 60)"
+                            style="--score: {{ result.ats_score }};"
+                        />
+                    </svg>
+                    <div class="rc-score-value">{{ result.ats_score }}</div>
+                </div>
+                <div class="rc-score-info">
+                    <div class="rc-verdict rc-verdict--{% if result.ats_score >= 80 %}good{% elif result.ats_score >= 60 %}ok{% else %}low{% endif %}">
+                        {{ result.verdict }}
+                    </div>
+                    <p class="rc-summary">{{ result.summary }}</p>
+                </div>
+            </section>
+
+            {# ── Keyword Matches ── #}
+            {% if result.keyword_matches %}
+            <section class="rc-section">
+                <h2>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    Keyword Analysis
+                </h2>
+                <div class="rc-keywords">
+                    {% for kw in result.keyword_matches %}
+                    <div class="rc-keyword {% if kw.found %}rc-keyword--found{% else %}rc-keyword--missing{% endif %}">
+                        <div class="rc-keyword-status">
+                            {% if kw.found %}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            {% else %}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <strong>{{ kw.keyword }}</strong>
+                            <p>{{ kw.context }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {# ── Strengths & Improvements ── #}
+            <div class="rc-two-col">
+                {% if result.strengths %}
+                <section class="rc-section rc-section--green">
+                    <h2>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Strengths
+                    </h2>
+                    <ul class="rc-list rc-list--green">
+                        {% for s in result.strengths %}
+                        <li>{{ s }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+
+                {% if result.improvements %}
+                <section class="rc-section rc-section--amber">
+                    <h2>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        Improvements
+                    </h2>
+                    <ul class="rc-list rc-list--amber">
+                        {% for imp in result.improvements %}
+                        <li>{{ imp }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+            </div>
+
+            {# ── Missing Sections & Formatting ── #}
+            {% if result.missing_sections or result.formatting_issues %}
+            <div class="rc-two-col">
+                {% if result.missing_sections %}
+                <section class="rc-section rc-section--red">
+                    <h2>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+                        Missing Sections
+                    </h2>
+                    <ul class="rc-list rc-list--red">
+                        {% for ms in result.missing_sections %}
+                        <li>{{ ms }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+                {% if result.formatting_issues %}
+                <section class="rc-section">
+                    <h2>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        Formatting Notes
+                    </h2>
+                    <ul class="rc-list">
+                        {% for fi in result.formatting_issues %}
+                        <li>{{ fi }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {# ── Pro Tip ── #}
+            {% if result.tip %}
+            <section class="rc-tip">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <div>
+                    <strong>Pro Tip</strong>
+                    <p>{{ result.tip }}</p>
+                </div>
+            </section>
+            {% endif %}
+
+            {# ── Try Again + CTA ── #}
+            <div class="rc-actions">
+                <a href="{% url 'pages:resume-checker' %}" class="rc-btn-again">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                    Check Another Resume
+                </a>
+                <a href="{% url 'pages:home' %}#pricing" class="rc-btn-cta">
+                    Want to screen candidates at scale? Try Evalon free
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+
+            {% endif %}
+
+        </div>
+    </main>
+</div>
+
+<style>
+/* ── Resume Checker Page ── */
+.rc-hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+}
+.rc-hero-badge {
+    display: inline-block;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 999px;
+    margin-bottom: 1rem;
+}
+.rc-hero h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--color-navy, #0e1428);
+    margin: 0 0 0.75rem;
+}
+.rc-hero-sub {
+    font-size: 1.05rem;
+    color: var(--color-text-muted, #5b647b);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ── Error ── */
+.rc-error {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.875rem 1.25rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    border-radius: 12px;
+    color: #dc2626;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+/* ── Form Card ── */
+.rc-form-card {
+    background: #fff;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(14, 20, 40, 0.06);
+    margin-bottom: 3rem;
+}
+.rc-form { display: flex; flex-direction: column; gap: 1.5rem; }
+.rc-field { display: flex; flex-direction: column; gap: 0.4rem; }
+.rc-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-navy, #0e1428);
+}
+.rc-label svg { color: var(--color-text-muted); }
+
+/* Dropzone */
+.rc-dropzone {
+    position: relative;
+    border: 2px dashed rgba(14, 20, 40, 0.12);
+    border-radius: 14px;
+    padding: 2rem;
+    text-align: center;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+}
+.rc-dropzone:hover, .rc-dropzone.dragover {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.03);
+}
+.rc-dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.rc-dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-text-muted, #5b647b);
+    pointer-events: none;
+}
+.rc-dropzone-content svg { color: #8b5cf6; opacity: 0.5; }
+.rc-dropzone-text { font-size: 0.9rem; }
+.rc-dropzone-hint { font-size: 0.75rem; opacity: 0.6; }
+.rc-dropzone-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #7c3aed;
+}
+
+/* Textarea */
+.rc-textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    border: 1px solid rgba(14, 20, 40, 0.12);
+    border-radius: 12px;
+    background: rgba(14, 20, 40, 0.02);
+    color: var(--color-navy, #0e1428);
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rc-textarea:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+.rc-textarea::placeholder { color: #94a3b8; }
+
+.rc-field-error {
+    font-size: 0.8rem;
+    color: #dc2626;
+    font-weight: 500;
+}
+
+/* Submit */
+.rc-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+    align-self: center;
+}
+.rc-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
+}
+.rc-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading state */
+.rc-submit.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+.rc-submit.loading svg {
+    animation: rc-spin 1s linear infinite;
+}
+@keyframes rc-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── How It Works ── */
+.rc-how {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.rc-how h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin-bottom: 1.25rem;
+}
+.rc-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+.rc-step {
+    padding: 1.5rem 1rem;
+    background: #fff;
+    border: 1px solid rgba(14, 20, 40, 0.06);
+    border-radius: 16px;
+}
+.rc-step-num {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    margin: 0 auto 0.75rem;
+}
+.rc-step h3 { margin: 0 0 0.25rem; font-size: 0.95rem; font-weight: 700; }
+.rc-step p { margin: 0; font-size: 0.82rem; color: var(--color-text-muted); }
+
+/* ═══════════════════════ RESULTS ═══════════════════════ */
+
+/* Score Card */
+.rc-score-card {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 2.5rem;
+    background: #fff;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(14, 20, 40, 0.06);
+    margin-bottom: 1.5rem;
+}
+.rc-score-ring-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+}
+.rc-score-ring { width: 100%; height: 100%; }
+.rc-score-ring circle:last-child {
+    stroke-dasharray: calc(var(--score) * 3.27) 327;
+    transition: stroke-dasharray 1s ease;
+}
+.rc-score-value {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-navy, #0e1428);
+}
+.rc-score-info { flex: 1; }
+.rc-verdict {
+    display: inline-block;
+    padding: 0.25rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+}
+.rc-verdict--good { background: rgba(16, 185, 129, 0.12); color: #059669; }
+.rc-verdict--ok { background: rgba(245, 158, 11, 0.12); color: #d97706; }
+.rc-verdict--low { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+.rc-summary {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-text-muted, #5b647b);
+    line-height: 1.6;
+}
+
+/* Sections */
+.rc-section {
+    background: #fff;
+    border: 1px solid rgba(14, 20, 40, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+.rc-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-navy, #0e1428);
+    margin: 0 0 1rem;
+}
+.rc-section--green { border-left: 3px solid #10b981; }
+.rc-section--amber { border-left: 3px solid #f59e0b; }
+.rc-section--red { border-left: 3px solid #ef4444; }
+
+.rc-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Keywords */
+.rc-keywords { display: flex; flex-direction: column; gap: 0.5rem; }
+.rc-keyword {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: rgba(14, 20, 40, 0.02);
+}
+.rc-keyword--found { background: rgba(16, 185, 129, 0.04); }
+.rc-keyword--missing { background: rgba(239, 68, 68, 0.04); }
+.rc-keyword-status { flex-shrink: 0; margin-top: 2px; }
+.rc-keyword strong { font-size: 0.88rem; color: var(--color-navy); }
+.rc-keyword p { margin: 0.15rem 0 0; font-size: 0.8rem; color: var(--color-text-muted); }
+
+/* Lists */
+.rc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.rc-list li {
+    position: relative;
+    padding-left: 1.25rem;
+    font-size: 0.88rem;
+    color: #374151;
+    line-height: 1.5;
+}
+.rc-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #94a3b8;
+}
+.rc-list--green li::before { background: #10b981; }
+.rc-list--amber li::before { background: #f59e0b; }
+.rc-list--red li::before { background: #ef4444; }
+
+/* Pro Tip */
+.rc-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(236, 72, 153, 0.04));
+    border: 1px solid rgba(139, 92, 246, 0.12);
+    border-radius: 14px;
+    margin: 1rem 0 1.5rem;
+}
+.rc-tip svg { color: #8b5cf6; flex-shrink: 0; margin-top: 2px; }
+.rc-tip strong { font-size: 0.85rem; color: #7c3aed; }
+.rc-tip p { margin: 0.2rem 0 0; font-size: 0.88rem; color: #374151; line-height: 1.5; }
+
+/* Actions */
+.rc-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+.rc-btn-again {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #7c3aed;
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+.rc-btn-again:hover { background: rgba(139, 92, 246, 0.14); }
+
+.rc-btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--color-orange, #ff8a00);
+    text-decoration: none;
+    font-weight: 600;
+    transition: gap 0.2s ease;
+}
+.rc-btn-cta:hover { gap: 0.6rem; }
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+    .rc-hero h1 { font-size: 1.6rem; }
+    .rc-form-card { padding: 1.25rem; }
+    .rc-steps { grid-template-columns: 1fr; }
+    .rc-score-card { flex-direction: column; text-align: center; padding: 1.5rem; }
+    .rc-two-col { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+(function() {
+    // Dropzone file name display
+    var input = document.getElementById('id_resume');
+    var dropzone = document.getElementById('rc-dropzone');
+    var fileName = document.getElementById('rc-file-name');
+    var content = dropzone ? dropzone.querySelector('.rc-dropzone-content') : null;
+
+    if (input && dropzone) {
+        input.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                fileName.textContent = this.files[0].name;
+                fileName.style.display = 'flex';
+                if (content) content.style.display = 'none';
+            }
+        });
+        dropzone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', function() {
+            this.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', function() {
+            this.classList.remove('dragover');
+        });
+    }
+
+    // Loading state on submit
+    var form = document.getElementById('rc-form');
+    var btn = document.getElementById('rc-submit');
+    if (form && btn) {
+        form.addEventListener('submit', function() {
+            btn.classList.add('loading');
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Analyzing...';
+            btn.disabled = true;
+        });
+    }
+})();
+</script>
+{% endblock %}

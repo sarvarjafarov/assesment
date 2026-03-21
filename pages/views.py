@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
-from .forms import DemoRequestForm, PositionApplyForm, VacancyApplyForm
+from .forms import DemoRequestForm, PositionApplyForm, ResumeCheckerForm, VacancyApplyForm
 from django.db.models import Count, Prefetch
 from .models import NewsletterSubscriber, PublicAssessment, Role, InterviewQuestion
 
@@ -1795,3 +1795,73 @@ def vacancy_applied(request, company_slug, position_uuid):
         "client": client,
         "position": position,
     })
+
+
+# ── Free ATS Resume Checker (lead magnet) ──────────────────────────
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def resume_checker(request):
+    """Free public tool — check resume ATS compatibility against a job description."""
+    form = ResumeCheckerForm()
+    result = None
+    error = None
+
+    if request.method == "POST":
+        form = ResumeCheckerForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                result = _analyze_resume(
+                    form.cleaned_data["resume"],
+                    form.cleaned_data["job_description"],
+                )
+            except Exception as exc:
+                logger.exception("Resume checker error: %s", exc)
+                error = "Something went wrong analyzing your resume. Please try again."
+
+    return render(request, "pages/resume_checker.html", {
+        "form": form,
+        "result": result,
+        "error": error,
+    })
+
+
+def _analyze_resume(resume_file, job_description: str) -> dict:
+    """Parse resume, call Claude for ATS analysis, return structured result."""
+    from hiring_agent.services import parse_resume, _call_claude
+
+    resume_text = parse_resume(resume_file)
+    if not resume_text or len(resume_text.strip()) < 50:
+        raise ValueError("Could not extract enough text from the resume.")
+
+    prompt = f"""You are an expert ATS (Applicant Tracking System) analyst. Analyze this resume against the provided job description and return a JSON object with the following structure:
+
+{{
+    "ats_score": <integer 0-100>,
+    "verdict": "<one of: Excellent Match|Strong Match|Good Match|Needs Improvement|Poor Match>",
+    "summary": "<2-3 sentence overall assessment>",
+    "keyword_matches": [
+        {{"keyword": "<keyword from JD>", "found": <true/false>, "context": "<where found in resume or suggestion>"}}
+    ],
+    "strengths": ["<strength 1>", "<strength 2>", ...],
+    "improvements": ["<actionable improvement 1>", "<actionable improvement 2>", ...],
+    "missing_sections": ["<missing section if any>"],
+    "formatting_issues": ["<issue if any>"],
+    "tip": "<one pro tip to significantly boost ATS score>"
+}}
+
+Be specific and actionable. Focus on real ATS parsing concerns: keyword density, section headers, formatting, measurable achievements, skills match.
+
+RESUME:
+{resume_text[:6000]}
+
+JOB DESCRIPTION:
+{job_description[:4000]}
+
+Return ONLY valid JSON, no markdown fences."""
+
+    response = _call_claude(prompt, max_tokens=2048)
+    return response["data"]

@@ -57,6 +57,34 @@ class VacancyApplyForm(forms.Form):
         return self.cleaned_data["email"].lower().strip()
 
 
+class ResumeCheckerForm(forms.Form):
+    """Free ATS resume checker — lead magnet."""
+    resume = forms.FileField(
+        label="Upload your resume",
+        help_text="PDF or DOCX, max 5 MB",
+    )
+    job_description = forms.CharField(
+        label="Job description",
+        widget=forms.Textarea(attrs={
+            "rows": 6,
+            "placeholder": "Paste the job description here...",
+        }),
+        max_length=10000,
+    )
+
+    def clean_resume(self):
+        f = self.cleaned_data.get("resume")
+        if not f:
+            return f
+        if f.size > 5 * 1024 * 1024:
+            raise forms.ValidationError("Resume must be smaller than 5 MB.")
+        header = f.read(8)
+        f.seek(0)
+        if not (header.startswith(b"%PDF") or header.startswith(b"PK")):
+            raise forms.ValidationError("Upload a PDF or DOCX file.")
+        return f
+
+
 class DemoRequestForm(forms.ModelForm):
     """Form for capturing demo requests from the homepage."""
 
