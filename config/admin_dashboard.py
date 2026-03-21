@@ -179,6 +179,43 @@ def _get_dashboard_context():
     for t in recent_tickets:
         t["created_at"] = t["created_at"].strftime("%b %d, %Y") if t["created_at"] else ""
 
+    # --- All sessions (combined from all assessment types) ---
+    all_session_rows = []
+
+    # Core assessment sessions
+    for session in AssessmentSession.objects.select_related("candidate_profile").order_by("-created_at"):
+        all_session_rows.append({
+            "id": session.id,
+            "candidate": str(session.candidate_profile) if session.candidate_profile else session.candidate_email or "—",
+            "assessment": "Core Assessment",
+            "status": session.get_status_display() if hasattr(session, "get_status_display") else session.status,
+            "score": getattr(session, "overall_score", None),
+            "client": str(session.client) if hasattr(session, "client") and session.client else "—",
+            "created_at": session.created_at.strftime("%b %d, %Y %I:%M %p") if session.created_at else "",
+            "submitted_at": session.submitted_at.strftime("%b %d, %Y %I:%M %p") if session.submitted_at else "—",
+            "admin_url": f"/admin/assessments/assessmentsession/{session.id}/change/",
+        })
+
+    # Specialized sessions
+    for label, Model, date_field in SESSION_MODELS:
+        for session in Model.objects.select_related("client").order_by("-created_at"):
+            score = getattr(session, "overall_score", None) or getattr(session, "eligibility_score", None)
+            submitted = getattr(session, date_field, None)
+            all_session_rows.append({
+                "id": str(session.uuid) if hasattr(session, "uuid") else session.id,
+                "candidate": session.candidate_id or "—",
+                "assessment": label,
+                "status": session.get_status_display() if hasattr(session, "get_status_display") else session.status,
+                "score": float(score) if score is not None else None,
+                "client": session.client.company_name if session.client else "—",
+                "created_at": session.created_at.strftime("%b %d, %Y %I:%M %p") if session.created_at else "",
+                "submitted_at": submitted.strftime("%b %d, %Y %I:%M %p") if submitted else "—",
+                "admin_url": "",
+            })
+
+    # Sort by created_at descending (most recent first)
+    all_session_rows.sort(key=lambda x: x["created_at"], reverse=True)
+
     return {
         # KPIs
         "total_clients": total_clients,
@@ -213,6 +250,9 @@ def _get_dashboard_context():
         "recent_clients": recent_clients,
         "recent_demos": recent_demos,
         "recent_tickets": recent_tickets,
+        # All sessions
+        "all_session_rows": all_session_rows,
+        "all_session_count": len(all_session_rows),
     }
 
 

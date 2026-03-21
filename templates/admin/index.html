@@ -377,6 +377,93 @@
 </div>
 {% endif %}
 
+<!-- ===== ALL SESSIONS REPORT ===== -->
+<div class="ev-section-title"><i class="fas fa-list-alt"></i> All Sessions Report ({{ all_session_count }} total)</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card ev-table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-database"></i> Complete Session Log</span>
+                <div>
+                    <input type="text" id="ev-session-search" class="form-control form-control-sm" placeholder="Search candidate, assessment, client..." style="width: 280px; display: inline-block; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: #fff;">
+                    <select id="ev-session-filter-status" class="form-control form-control-sm" style="width: 140px; display: inline-block; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: #fff; margin-left: 0.5rem;">
+                        <option value="all">All statuses</option>
+                        <option value="Invited">Invited</option>
+                        <option value="Draft">Draft</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <select id="ev-session-filter-type" class="form-control form-control-sm" style="width: 140px; display: inline-block; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: #fff; margin-left: 0.5rem;">
+                        <option value="all">All types</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Product">Product</option>
+                        <option value="Behavioral">Behavioral</option>
+                        <option value="Custom">Custom</option>
+                        <option value="UX Design">UX Design</option>
+                        <option value="HR">HR</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Core Assessment">Core Assessment</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="ev-session-table">
+                        <thead style="position: sticky; top: 0; z-index: 1; background: #343a40;">
+                            <tr>
+                                <th>#</th>
+                                <th>Candidate</th>
+                                <th>Assessment</th>
+                                <th>Client</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>Invited</th>
+                                <th>Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in all_session_rows %}
+                            <tr class="ev-session-row" data-status="{{ s.status }}" data-type="{{ s.assessment }}">
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    {% if s.admin_url %}
+                                    <a href="{{ s.admin_url }}">{{ s.candidate }}</a>
+                                    {% else %}
+                                    {{ s.candidate }}
+                                    {% endif %}
+                                </td>
+                                <td><span class="ev-badge ev-badge-info">{{ s.assessment }}</span></td>
+                                <td>{{ s.client }}</td>
+                                <td>
+                                    {% if s.status == "Submitted" or s.status == "Completed" %}
+                                        <span class="ev-badge ev-badge-success">{{ s.status }}</span>
+                                    {% elif s.status == "In Progress" or s.status == "In progress" %}
+                                        <span class="ev-badge ev-badge-warning">{{ s.status }}</span>
+                                    {% elif s.status == "Invited" or s.status == "Draft" %}
+                                        <span class="ev-badge ev-badge-secondary">{{ s.status }}</span>
+                                    {% else %}
+                                        <span class="ev-badge ev-badge-secondary">{{ s.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if s.score != None %}{{ s.score|floatformat:1 }}{% else %}—{% endif %}</td>
+                                <td>{{ s.created_at }}</td>
+                                <td>{{ s.submitted_at }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="8" class="text-center text-muted">No sessions found</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer text-muted" style="font-size: 0.8rem;">
+                <span id="ev-session-visible-count">{{ all_session_count }}</span> of {{ all_session_count }} sessions shown
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ===== ORIGINAL JAZZMIN MODEL LIST ===== -->
 <div class="ev-section-title"><i class="fas fa-database"></i> Models</div>
 {% get_side_menu using="app_list" as dashboard_list %}
@@ -558,6 +645,45 @@
             }
         }
     });
+})();
+
+// Session table filtering
+(function() {
+    const searchInput = document.getElementById('ev-session-search');
+    const statusFilter = document.getElementById('ev-session-filter-status');
+    const typeFilter = document.getElementById('ev-session-filter-type');
+    const rows = document.querySelectorAll('.ev-session-row');
+    const countEl = document.getElementById('ev-session-visible-count');
+
+    function filterTable() {
+        const query = (searchInput.value || '').toLowerCase();
+        const status = statusFilter.value;
+        const type = typeFilter.value;
+        let visible = 0;
+
+        rows.forEach(function(row) {
+            const text = row.textContent.toLowerCase();
+            const rowStatus = row.dataset.status || '';
+            const rowType = row.dataset.type || '';
+
+            const matchSearch = !query || text.indexOf(query) !== -1;
+            const matchStatus = status === 'all' || rowStatus === status;
+            const matchType = type === 'all' || rowType === type;
+
+            if (matchSearch && matchStatus && matchType) {
+                row.style.display = '';
+                visible++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (countEl) countEl.textContent = visible;
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterTable);
+    if (statusFilter) statusFilter.addEventListener('change', filterTable);
+    if (typeFilter) typeFilter.addEventListener('change', filterTable);
 })();
 </script>
 {% endblock %}
