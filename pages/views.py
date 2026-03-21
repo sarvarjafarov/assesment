@@ -1923,12 +1923,12 @@ Return ONLY valid JSON, no markdown fences or commentary."""
     client = anthropic.Anthropic(
         api_key=settings.ANTHROPIC_API_KEY,
         max_retries=0,
-        timeout=20.0,
+        timeout=25.0,
     )
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=2000,
+        max_tokens=4096,
         messages=[{"role": "user", "content": prompt}],
     )
 
@@ -1942,7 +1942,25 @@ Return ONLY valid JSON, no markdown fences or commentary."""
         text = text[:-3]
     text = text.strip()
 
-    return _json.loads(text)
+    # If JSON is truncated, attempt to repair by closing open structures
+    try:
+        return _json.loads(text)
+    except _json.JSONDecodeError:
+        # Try to salvage truncated JSON by closing brackets
+        repaired = text
+        open_braces = repaired.count("{") - repaired.count("}")
+        open_brackets = repaired.count("[") - repaired.count("]")
+        # Trim trailing partial value (incomplete string or number)
+        if repaired and repaired[-1] not in "]}\"0123456789truefalsn":
+            last_comma = repaired.rfind(",")
+            if last_comma > 0:
+                repaired = repaired[:last_comma]
+        # If stuck mid-string, close it
+        in_string = repaired.count('"') % 2 == 1
+        if in_string:
+            repaired += '"'
+        repaired += "]" * open_brackets + "}" * open_braces
+        return _json.loads(repaired)
 
 
 def _send_resume_checker_email(lead, result: dict):
