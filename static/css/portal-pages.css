@@ -831,10 +831,35 @@
     border-bottom: 2px solid transparent;
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(236, 72, 153, 0.04));
     transition: all 0.25s ease;
+    overflow: hidden;
+}
+.portal-tab--ai::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: none;
+}
+.portal-tab--ai.active::after {
+    animation: ai-tab-shimmer 2.5s ease-in-out infinite;
+}
+@keyframes ai-tab-shimmer {
+    0% { left: -100%; }
+    100% { left: 200%; }
 }
 .portal-tab--ai svg {
     color: #8b5cf6;
     transition: transform 0.25s ease;
+}
+.portal-tab--ai.active svg {
+    color: #fff;
+    animation: ai-bolt-pulse 2s ease-in-out infinite;
+}
+@keyframes ai-bolt-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
 }
 .portal-tab--ai:hover {
     color: #6d28d9;
@@ -848,9 +873,6 @@
     background: linear-gradient(135deg, #7c3aed, #8b5cf6);
     border-bottom-color: #7c3aed;
     box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
-}
-.portal-tab--ai.active svg {
-    color: #fff;
 }
 @media (max-width: 640px) {
     .portal-tabs {
