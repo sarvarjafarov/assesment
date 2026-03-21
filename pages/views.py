@@ -1916,18 +1916,20 @@ JOB DESCRIPTION:
 
 Return ONLY valid JSON, no markdown fences or commentary."""
 
-    from hiring_agent.services import _get_anthropic_client
+    import anthropic
     import json as _json
-    import time as _time
+    from django.conf import settings
 
-    client = _get_anthropic_client()
-    start = _time.time()
+    client = anthropic.Anthropic(
+        api_key=settings.ANTHROPIC_API_KEY,
+        max_retries=0,
+        timeout=20.0,
+    )
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=3000,
+        max_tokens=2000,
         messages=[{"role": "user", "content": prompt}],
-        timeout=25.0,
     )
 
     if not response.content:
