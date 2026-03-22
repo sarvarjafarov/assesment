@@ -2,7 +2,7 @@
 {% load url_extras %}
 {% load seo_tags %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang|default:'en' }}">
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D0V5NWPH3W"></script>
@@ -48,6 +48,8 @@
     <meta name="theme-color" content="#ff8a00">
     {% block extra_meta %}{% endblock %}
     {% block canonical %}<link rel="canonical" href="{{ seo_metadata.canonical_url|default:request.build_absolute_uri }}">{% endblock %}
+    {% for alt in hreflang %}<link rel="alternate" hreflang="{{ alt.lang }}" href="{{ alt.url }}" />
+    {% endfor %}{% if hreflang %}<link rel="alternate" hreflang="x-default" href="{{ hreflang.0.url }}" />{% endif %}
     {% render_seo_jsonld seo_metadata %}
     <link rel="alternate" type="application/rss+xml" title="Evalon Insights" href="{% url 'blog:feed' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Xidmət Şərtləri · Evalon{% endblock %}
+{% block meta_description %}Evalon xidmət şərtləri. Platformamızdan istifadə qaydaları.{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header_az.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">Hüquqi</p>
+                    <h1>Xidmət Şərtləri</h1>
+                    <p class="lede">Son yenilənmə: 22 mart 2026</p>
+                </div>
+            </section>
+            <section class="panel">
+                <div class="prose">
+                    <h2>Şərtlərin qəbulu</h2>
+                    <p>Evalon platformasından istifadə etməklə siz bu xidmət şərtlərini qəbul etmiş olursunuz.</p>
+
+                    <h2>Xidmət təsviri</h2>
+                    <p>Evalon işə qəbul qiymətləndirmə platformasıdır. Biz şirkətlərə namizədlərin bacarıqlarını strukturlaşdırılmış qiymətləndirmələrlə ölçməyə kömək edirik.</p>
+
+                    <h2>Hesab məsuliyyəti</h2>
+                    <ul>
+                        <li>Hesab məlumatlarınızın təhlükəsizliyinə görə siz məsuliyyət daşıyırsınız</li>
+                        <li>Hesabınız altında baş verən bütün fəaliyyətlərə görə cavabdehsiniz</li>
+                        <li>İcazəsiz girişdən şübhələndikdə dərhal bizə məlumat verin</li>
+                    </ul>
+
+                    <h2>Ödəniş şərtləri</h2>
+                    <p>Ödənişli planlar aylıq və ya illik əsasda faktura edilir. Ləğv etmə cari dövr bitdikdən sonra qüvvəyə minir.</p>
+
+                    <h2>Əlaqə</h2>
+                    <p>Suallarınız üçün: <a href="mailto:support@evalon.app">support@evalon.app</a></p>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}
+{% endblock %}

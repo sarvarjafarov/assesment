@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Əlaqə · Evalon{% endblock %}
+{% block meta_description %}Demolar, dəstək və ya təhlükəsizlik yoxlamaları üçün Evalon ilə əlaqə saxlayın. Biz tez cavab veririk və sizi doğru komanda üzvünə yönləndiririk.{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header_az.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">Əlaqə</p>
+                    <h1>Bizimlə əlaqə saxlayın</h1>
+                    <p class="lede">Evalon-u qiymətləndirməyiniz, komandanızı qoşmağınız və ya təhlükəsizlik yoxlaması tələb etməyiniz fərq etməz — sizi doğru mütəxəssisə yönləndirəcəyik.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="info-grid">
+                    {% for channel in channels %}
+                    <article class="info-card">
+                        <p class="label">{{ channel.label }}</p>
+                        <h3>{{ channel.email }}</h3>
+                        <p class="sla">{{ channel.sla }}</p>
+                        <ul>
+                            {% for detail in channel.details %}
+                            <li>{{ detail }}</li>
+                            {% endfor %}
+                        </ul>
+                        <a class="btn btn-pill"
+                           href="mailto:{{ channel.email }}"
+                           data-gtag-click="contact_email_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ channel.label|lower }}"
+                           data-gtag-params='{"channel":"{{ channel.label|escapejs }}"}'>E-poçt göndər</a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}
+{% block site_footer %}
+    {% include 'includes/site_footer_az.html' %}
+{% endblock %}

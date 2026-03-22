@@ -49,6 +49,7 @@ urlpatterns = [
     path('password-reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password-reset/complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
+    path('az/', include('pages.urls_az')),
     path('', include('pages.urls')),
     path('blog/', include('blog.urls')),
     path('console/', include('console.urls')),

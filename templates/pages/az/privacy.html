@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Məxfilik Siyasəti · Evalon{% endblock %}
+{% block meta_description %}Evalon məxfilik siyasəti. Şəxsi məlumatlarınızın necə toplandığı, istifadə edildiyi və qorunduğu haqqında.{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header_az.html' %}
+    <main>
+        <div class="page-container slim">
+            <section class="hero-card stacked">
+                <div>
+                    <p class="eyebrow">Hüquqi</p>
+                    <h1>Məxfilik Siyasəti</h1>
+                    <p class="lede">Son yenilənmə: 22 mart 2026</p>
+                </div>
+            </section>
+            <section class="panel">
+                <div class="prose">
+                    <h2>Ümumi məlumat</h2>
+                    <p>Evalon ("biz", "bizim") sizin məxfiliyinizə hörmət edir. Bu siyasət bizim şəxsi məlumatlarınızı necə topladığımızı, istifadə etdiyimizi və qoruduğumuzu izah edir.</p>
+
+                    <h2>Topladığımız məlumatlar</h2>
+                    <p>Biz aşağıdakı məlumatları toplaya bilərik:</p>
+                    <ul>
+                        <li>Ad və email ünvanı (hesab yaratdıqda)</li>
+                        <li>Şirkət məlumatları (müştəri hesabları üçün)</li>
+                        <li>Qiymətləndirmə cavabları və nəticələri</li>
+                        <li>CV faylları (CV yoxlayıcı və CV yaradıcı alətləri üçün)</li>
+                        <li>İstifadə məlumatları və analitika</li>
+                    </ul>
+
+                    <h2>Məlumatların istifadəsi</h2>
+                    <p>Topladığımız məlumatları aşağıdakı məqsədlər üçün istifadə edirik:</p>
+                    <ul>
+                        <li>Xidmətlərimizi təmin etmək və təkmilləşdirmək</li>
+                        <li>Qiymətləndirmə nəticələrini emal etmək</li>
+                        <li>Müştəri dəstəyi göstərmək</li>
+                        <li>Xidmət yenilikləri barədə məlumat vermək</li>
+                    </ul>
+
+                    <h2>Məlumatların qorunması</h2>
+                    <p>Biz məlumatlarınızı qorumaq üçün sənaye standartlarına uyğun təhlükəsizlik tədbirləri tətbiq edirik, o cümlədən şifrələmə, giriş nəzarəti və müntəzəm audit.</p>
+
+                    <h2>Əlaqə</h2>
+                    <p>Məxfilik suallarınız üçün bizimlə əlaqə saxlayın: <a href="mailto:privacy@evalon.app">privacy@evalon.app</a></p>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}
+{% endblock %}
