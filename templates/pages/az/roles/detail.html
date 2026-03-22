@@ -17,7 +17,7 @@
                     "@type": "ListItem",
                     "position": 1,
                     "name": "Qiymətləndirmələr",
-                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages_az:assessment_detail' %}"
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages_az:assessment_list' %}"
                 },
                 {
                     "@type": "ListItem",
@@ -49,7 +49,7 @@
             <header class="rp-detail-hero">
                 <div class="rp-detail-hero-inner">
                     <div class="rp-breadcrumb">
-                        <a href="{% url 'pages_az:assessment_detail' %}">Qiymətləndirmələr</a>
+                        <a href="{% url 'pages_az:assessment_list' %}">Qiymətləndirmələr</a>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         <a href="{% url 'pages_az:role_assessment_list' %}">Vəzifələr</a>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
