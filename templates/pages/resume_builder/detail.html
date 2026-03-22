@@ -3,7 +3,7 @@
 {% block title %}{{ template.seo_title|default:"Build Your "|add:role.title|add:" Resume" }} · Evalon{% endblock %}
 {% block meta_description %}{{ template.seo_description|default:"Build a professional "|add:role.title|add:" resume with our free builder. Includes example content, key skills, and expert tips." }}{% endblock %}
 
-{% block extra_css %}
+{% block content %}
 <style>
 /* ── Resume Builder Detail (rb-*) ────────────────────────────────── */
 
@@ -1115,9 +1115,6 @@
     }
 }
 </style>
-{% endblock %}
-
-{% block content %}
 <div class="page-shell">
     {% include 'includes/site_header.html' with active='assessments' %}
     <main>
