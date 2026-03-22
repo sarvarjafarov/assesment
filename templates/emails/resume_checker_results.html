@@ -3,160 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--[if mso]>
+    <style>
+        table { border-collapse: collapse; }
+        .score-circle { border: 4px solid {% if score >= 80 %}#10b981{% elif score >= 60 %}#f59e0b{% else %}#ef4444{% endif %}; }
+    </style>
+    <![endif]-->
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0e1428; line-height: 1.6; margin: 0; padding: 0; background-color: #f5f3ff;">
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1); overflow: hidden;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #0e1428; line-height: 1.6; margin: 0; padding: 0; background-color: #f5f3ff; -webkit-text-size-adjust: 100%;">
+    <!-- Wrapper -->
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f3ff;">
+        <tr>
+            <td align="center" style="padding: 40px 16px;">
+                <!-- Main Container -->
+                <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);">
 
-        <!-- Header -->
-        <div style="text-align: center; padding: 40px 32px 32px; background: linear-gradient(135deg, #0f0c29 0%, #1a1145 40%, #302b63 100%);">
-            <p style="margin: 0 0 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5);">ATS Resume Checker</p>
-            <h1 style="color: #ffffff; font-size: 28px; margin: 0 0 4px; font-weight: 800;">Your ATS Score</h1>
+                    <!-- ====== HEADER ====== -->
+                    <tr>
+                        <td style="text-align: center; padding: 40px 32px 32px; background-color: #1a1145;">
+                            <p style="margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #9ca3af;">ATS RESUME CHECKER</p>
+                            <h1 style="color: #ffffff; font-size: 26px; margin: 0 0 24px; font-weight: 800;">Your ATS Score</h1>
 
-            <!-- Score Circle -->
-            <div style="margin: 24px auto 16px; width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; border: 4px solid {% if score >= 80 %}#10b981{% elif score >= 60 %}#f59e0b{% else %}#ef4444{% endif %};">
-                <span style="font-size: 42px; font-weight: 800; color: #ffffff;">{{ score }}</span>
-            </div>
+                            <!-- Score Circle (table-based) -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+                                <tr>
+                                    <td align="center" style="width: 110px; height: 110px; border-radius: 55px; border: 4px solid {% if score >= 80 %}#10b981{% elif score >= 60 %}#f59e0b{% else %}#ef4444{% endif %}; background-color: rgba(255,255,255,0.08);">
+                                        <span style="font-size: 44px; font-weight: 800; color: #ffffff; line-height: 110px;">{{ score }}</span>
+                                    </td>
+                                </tr>
+                            </table>
 
-            <!-- Verdict -->
-            <span style="display: inline-block; padding: 8px 20px; border-radius: 999px; font-size: 14px; font-weight: 700; letter-spacing: 0.03em; {% if score >= 80 %}background: #10b981; color: #ffffff;{% elif score >= 60 %}background: #f59e0b; color: #ffffff;{% else %}background: #ef4444; color: #ffffff;{% endif %}">
-                {{ verdict }}
-            </span>
-        </div>
+                            <!-- Verdict Badge -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin-top: 20px;">
+                                <tr>
+                                    <td style="padding: 8px 24px; border-radius: 20px; font-size: 14px; font-weight: 700; letter-spacing: 0.03em; color: #ffffff; {% if score >= 80 %}background-color: #10b981;{% elif score >= 60 %}background-color: #f59e0b;{% else %}background-color: #ef4444;{% endif %}">
+                                        {{ verdict }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-        <!-- Content -->
-        <div style="padding: 32px;">
+                    <!-- ====== CONTENT ====== -->
+                    <tr>
+                        <td style="padding: 32px 32px 0;">
+                            <p style="font-size: 16px; margin: 0 0 12px;">Hi {{ lead.full_name|default:"there" }},</p>
+                            <p style="margin: 0 0 24px; font-size: 14px; color: #5b647b;">Here's your detailed ATS compatibility analysis. We've checked your resume against the job description you provided.</p>
+                        </td>
+                    </tr>
 
-            <p style="font-size: 16px; margin: 0 0 16px;">Hi {{ lead.full_name|default:"there" }},</p>
-            <p style="margin: 0 0 24px; color: #5b647b;">Here's your detailed ATS compatibility analysis. We've checked your resume against the job description you provided.</p>
+                    <!-- Summary -->
+                    <tr>
+                        <td style="padding: 0 32px 24px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td style="border-left: 4px solid #8b5cf6; padding: 16px 20px; background-color: #f8f9fa; border-radius: 0 8px 8px 0;">
+                                        <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6;">{{ result.summary }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-            <!-- Summary -->
-            <div style="padding: 16px 20px; background: #f8f9fa; border-radius: 10px; margin-bottom: 24px; border-left: 4px solid #8b5cf6;">
-                <p style="margin: 0; font-size: 14px; color: #374151;">{{ result.summary }}</p>
-            </div>
+                    <!-- ====== SKILLS ANALYSIS ====== -->
+                    {% if result.hard_skills_analysis %}
+                    <tr>
+                        <td style="padding: 0 32px 20px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: #0e1428; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">Skills Analysis</h2>
 
-            <!-- Hard Skills -->
-            {% if result.hard_skills_analysis %}
-            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Skills Analysis</h2>
+                            {% if result.hard_skills_analysis.matched %}
+                            <p style="font-size: 12px; font-weight: 700; color: #059669; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.05em;">Matched</p>
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+                                <tr>
+                                    {% for s in result.hard_skills_analysis.matched %}
+                                    <td style="padding: 4px 10px; margin: 0 4px 4px 0; background-color: #ecfdf5; border-radius: 4px; font-size: 13px; color: #059669; font-weight: 600; border: 1px solid #d1fae5;">{{ s }}&nbsp;&nbsp;</td>
+                                    {% endfor %}
+                                </tr>
+                            </table>
+                            {% endif %}
 
-            {% if result.hard_skills_analysis.matched %}
-            <p style="font-size: 13px; font-weight: 700; color: #059669; margin: 0 0 8px;">Matched Skills</p>
-            <p style="margin: 0 0 16px; font-size: 14px; color: #374151;">
-                {% for s in result.hard_skills_analysis.matched %}
-                <span style="display: inline-block; padding: 3px 10px; margin: 2px 4px 2px 0; background: rgba(16,185,129,0.1); border-radius: 4px; font-size: 13px; color: #059669;">{{ s }}</span>
-                {% endfor %}
-            </p>
-            {% endif %}
+                            {% if result.hard_skills_analysis.missing_critical %}
+                            <p style="font-size: 12px; font-weight: 700; color: #dc2626; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.05em;">Missing Critical</p>
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom: 12px;">
+                                <tr>
+                                    {% for s in result.hard_skills_analysis.missing_critical %}
+                                    <td style="padding: 4px 10px; margin: 0 4px 4px 0; background-color: #fef2f2; border-radius: 4px; font-size: 13px; color: #dc2626; font-weight: 600; border: 1px solid #fecaca;">{{ s }}&nbsp;&nbsp;</td>
+                                    {% endfor %}
+                                </tr>
+                            </table>
+                            {% endif %}
 
-            {% if result.hard_skills_analysis.missing_critical %}
-            <p style="font-size: 13px; font-weight: 700; color: #dc2626; margin: 0 0 8px;">Missing Critical Skills</p>
-            <p style="margin: 0 0 16px; font-size: 14px; color: #374151;">
-                {% for s in result.hard_skills_analysis.missing_critical %}
-                <span style="display: inline-block; padding: 3px 10px; margin: 2px 4px 2px 0; background: rgba(239,68,68,0.1); border-radius: 4px; font-size: 13px; color: #dc2626;">{{ s }}</span>
-                {% endfor %}
-            </p>
-            {% endif %}
-            {% endif %}
+                            {% if result.hard_skills_analysis.missing_nice_to_have %}
+                            <p style="font-size: 12px; font-weight: 700; color: #d97706; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.05em;">Nice to Have</p>
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom: 8px;">
+                                <tr>
+                                    {% for s in result.hard_skills_analysis.missing_nice_to_have %}
+                                    <td style="padding: 4px 10px; margin: 0 4px 4px 0; background-color: #fffbeb; border-radius: 4px; font-size: 13px; color: #d97706; font-weight: 600; border: 1px solid #fde68a;">{{ s }}&nbsp;&nbsp;</td>
+                                    {% endfor %}
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <!-- Experience Alignment -->
-            {% if result.experience_alignment %}
-            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Experience Alignment</h2>
-            <div style="padding: 16px 20px; background: #f8f9fa; border-radius: 10px; margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="font-size: 13px; color: #5b647b;">Alignment Score</span>
-                    <span style="font-size: 15px; font-weight: 800; color: #0e1428;">{{ result.experience_alignment.score }} / 100</span>
-                </div>
-                <p style="margin: 0; font-size: 14px; color: #374151;">{{ result.experience_alignment.assessment }}</p>
-            </div>
-            {% endif %}
+                    <!-- ====== EXPERIENCE ALIGNMENT ====== -->
+                    {% if result.experience_alignment %}
+                    <tr>
+                        <td style="padding: 0 32px 20px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: #0e1428; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">Experience Alignment</h2>
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fa; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="font-size: 13px; color: #5b647b;">Alignment Score</td>
+                                                <td align="right" style="font-size: 18px; font-weight: 800; color: #8b5cf6;">{{ result.experience_alignment.score }} / 100</td>
+                                            </tr>
+                                        </table>
+                                        <p style="margin: 10px 0 0; font-size: 14px; color: #374151; line-height: 1.5;">{{ result.experience_alignment.assessment }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <!-- Strengths -->
-            {% if result.strengths %}
-            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #059669;">Strengths</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-                {% for s in result.strengths %}
-                <tr>
-                    <td style="padding: 6px 0 6px 0; vertical-align: top; width: 20px; color: #10b981; font-size: 14px;">+</td>
-                    <td style="padding: 6px 0; font-size: 14px; color: #374151;">{{ s }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% endif %}
+                    <!-- ====== STRENGTHS ====== -->
+                    {% if result.strengths %}
+                    <tr>
+                        <td style="padding: 0 32px 20px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: #059669; border-bottom: 2px solid #d1fae5; padding-bottom: 8px;">Strengths</h2>
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                {% for s in result.strengths %}
+                                <tr>
+                                    <td width="24" valign="top" style="padding: 6px 0; color: #10b981; font-size: 16px; font-weight: 700;">+</td>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #374151; line-height: 1.5;">{{ s }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <!-- Top Improvements -->
-            {% if result.improvements %}
-            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #d97706;">Top Improvements</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-                {% for imp in result.improvements|slice:":5" %}
-                <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #f3f4f6; vertical-align: top;">
-                        {% if imp.issue %}
-                        <p style="margin: 0 0 4px; font-size: 14px; font-weight: 600; color: #0e1428;">{{ imp.issue }}</p>
-                        <p style="margin: 0; font-size: 13px; color: #5b647b;">{{ imp.fix }}</p>
-                        {% else %}
-                        <p style="margin: 0; font-size: 14px; color: #374151;">{{ imp }}</p>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% endif %}
+                    <!-- ====== IMPROVEMENTS ====== -->
+                    {% if result.improvements %}
+                    <tr>
+                        <td style="padding: 0 32px 20px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: #d97706; border-bottom: 2px solid #fde68a; padding-bottom: 8px;">Improvements</h2>
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                {% for imp in result.improvements|slice:":5" %}
+                                <tr>
+                                    <td style="padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
+                                        {% if imp.issue %}
+                                        <p style="margin: 0 0 4px; font-size: 14px; font-weight: 600; color: #0e1428;">{{ imp.issue }}</p>
+                                        <p style="margin: 0; font-size: 13px; color: #5b647b; line-height: 1.5;">{{ imp.fix }}</p>
+                                        {% else %}
+                                        <p style="margin: 0; font-size: 14px; color: #374151;">{{ imp }}</p>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <!-- Quantification -->
-            {% if result.quantification_check %}
-            {% if result.quantification_check.suggestions %}
-            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Add Numbers & Metrics</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-                {% for sug in result.quantification_check.suggestions %}
-                <tr>
-                    <td style="padding: 6px 0; font-size: 14px; color: #374151;">
-                        <span style="color: #8b5cf6; margin-right: 6px;">#</span> {{ sug }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% endif %}
-            {% endif %}
+                    <!-- ====== METRICS ====== -->
+                    {% if result.quantification_check.suggestions %}
+                    <tr>
+                        <td style="padding: 0 32px 20px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: #0e1428; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">Add Numbers &amp; Metrics</h2>
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                {% for sug in result.quantification_check.suggestions %}
+                                <tr>
+                                    <td width="20" valign="top" style="padding: 6px 0; color: #8b5cf6; font-weight: 700;">#</td>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #374151;">{{ sug }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <!-- Pro Tip -->
-            {% if result.tip %}
-            <div style="margin: 28px 0 24px; padding: 20px; background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(236,72,153,0.05)); border-radius: 10px; border: 1px solid rgba(139,92,246,0.15);">
-                <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: #7c3aed;">Pro Tip</p>
-                <p style="margin: 0; font-size: 14px; color: #374151;">{{ result.tip }}</p>
-            </div>
-            {% endif %}
+                    <!-- ====== ACTION VERBS ====== -->
+                    {% if result.action_verbs_check.weak_phrases %}
+                    <tr>
+                        <td style="padding: 0 32px 20px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: #0e1428; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">Strengthen Your Language</h2>
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                {% for wp in result.action_verbs_check.weak_phrases %}
+                                <tr>
+                                    <td style="padding: 8px 12px; background-color: #fef2f2; font-size: 13px; color: #94a3b8; text-decoration: line-through;">{{ wp.original }}</td>
+                                    <td width="30" align="center" style="padding: 8px 4px; font-size: 14px; color: #8b5cf6;">&rarr;</td>
+                                    <td style="padding: 8px 12px; background-color: #ecfdf5; font-size: 13px; color: #059669; font-weight: 600;">{{ wp.improved }}</td>
+                                </tr>
+                                {% if not forloop.last %}
+                                <tr><td colspan="3" style="height: 4px;"></td></tr>
+                                {% endif %}
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <!-- Overall Recommendations -->
-            {% if result.overall_recommendations %}
-            <h2 style="font-size: 16px; font-weight: 700; margin: 28px 0 12px; color: #0e1428;">Top 3 Actions</h2>
-            {% for rec in result.overall_recommendations|slice:":3" %}
-            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; font-weight: 800; font-size: 13px; text-align: center; line-height: 28px; flex-shrink: 0;">{{ forloop.counter }}</div>
-                <p style="margin: 0; font-size: 14px; color: #374151; padding-top: 4px;">{{ rec }}</p>
-            </div>
-            {% endfor %}
-            {% endif %}
+                    <!-- ====== PRO TIP ====== -->
+                    {% if result.tip %}
+                    <tr>
+                        <td style="padding: 0 32px 24px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e9d5ff; border-radius: 10px; background-color: #faf5ff;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.06em;">Pro Tip</p>
+                                        <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6;">{{ result.tip }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <!-- CTA -->
-            <div style="text-align: center; margin: 36px 0 16px; padding: 28px; background: linear-gradient(135deg, #0f0c29, #1a1145); border-radius: 12px;">
-                <p style="margin: 0 0 4px; font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">Hiring for your team?</p>
-                <p style="margin: 0 0 20px; font-size: 16px; color: #fff; font-weight: 700;">Screen candidates with AI-powered assessments</p>
-                <a href="https://www.evalon.tech/?utm_source=resume_checker&utm_medium=email" style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #ff8a00, #ff6b00); color: #fff; text-decoration: none; border-radius: 999px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 16px rgba(255,138,0,0.3);">
-                    Try Evalon Free
-                </a>
-            </div>
+                    <!-- ====== TOP 3 ACTIONS ====== -->
+                    {% if result.overall_recommendations %}
+                    <tr>
+                        <td style="padding: 0 32px 24px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: #0e1428; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">Top 3 Actions</h2>
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                {% for rec in result.overall_recommendations|slice:":3" %}
+                                <tr>
+                                    <td width="36" valign="top" style="padding: 8px 0;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="28" height="28" align="center" style="border-radius: 14px; background-color: #8b5cf6; color: #ffffff; font-weight: 800; font-size: 13px; line-height: 28px;">{{ forloop.counter }}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td style="padding: 8px 0 8px 8px; font-size: 14px; color: #374151; line-height: 1.5;">{{ rec }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
 
-            <p style="margin: 24px 0 0; font-size: 13px; color: #94a3b8; text-align: center;">
-                Check another resume at <a href="https://www.evalon.tech/resume-checker/" style="color: #8b5cf6;">evalon.tech/resume-checker</a>
-            </p>
-        </div>
+                    <!-- ====== CTA ====== -->
+                    <tr>
+                        <td style="padding: 0 32px 24px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #1a1145; border-radius: 12px;">
+                                <tr>
+                                    <td align="center" style="padding: 32px 24px;">
+                                        <p style="margin: 0 0 4px; font-size: 12px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;">Hiring for your team?</p>
+                                        <p style="margin: 0 0 20px; font-size: 17px; color: #ffffff; font-weight: 700;">Screen candidates with AI-powered assessments</p>
+                                        <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+                                            <tr>
+                                                <td style="padding: 14px 36px; background-color: #ff8a00; border-radius: 999px;">
+                                                    <a href="https://www.evalon.tech/?utm_source=resume_checker&utm_medium=email" style="color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; display: block;">Try Evalon Free</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-        <!-- Footer -->
-        <div style="padding: 20px 32px; background: #f8f9fa; text-align: center; border-top: 1px solid #e5e7eb;">
-            <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                Evalon &middot; AI-Powered Hiring Assessments<br>
-                <a href="https://www.evalon.tech" style="color: #8b5cf6; text-decoration: none;">evalon.tech</a>
-            </p>
-        </div>
-    </div>
+                    <!-- Check another -->
+                    <tr>
+                        <td align="center" style="padding: 0 32px 28px;">
+                            <p style="margin: 0; font-size: 13px; color: #94a3b8;">
+                                Check another resume at <a href="https://www.evalon.tech/resume-checker/" style="color: #8b5cf6; text-decoration: none;">evalon.tech/resume-checker</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- ====== FOOTER ====== -->
+                    <tr>
+                        <td style="padding: 20px 32px; background-color: #f8f9fa; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                                Evalon &middot; AI-Powered Hiring Assessments<br>
+                                <a href="https://www.evalon.tech" style="color: #8b5cf6; text-decoration: none;">evalon.tech</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
