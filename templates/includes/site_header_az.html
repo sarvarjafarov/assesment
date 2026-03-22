@@ -16,10 +16,10 @@
         <div class="nav-menu" id="siteNavMenu" data-nav-menu>
             <ul class="nav-links">
                 <li><a href="{% url 'pages_az:home' %}#necə-işləyir">Necə işləyir</a></li>
-                <li><a class="{% if active == 'assessments' %}is-active{% endif %}" href="{% url 'pages_az:resume_builder_list' %}">CV Yaradıcı</a></li>
-                <li><a class="{% if active == 'resume_checker' %}is-active{% endif %}" href="{% url 'pages_az:resume_checker' %}">CV Yoxla</a></li>
+                <li><a class="{% if active == 'assessments' %}is-active{% endif %}" href="{% url 'pages:assessment_list' %}">Qiymətləndirmələr</a></li>
+                <li><a class="nav-ai-link {% if active == 'ai_hiring' %}is-active{% endif %}" href="{% url 'pages:ai_hiring' %}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI İşəgötürmə</a></li>
                 <li><a class="{% if active == 'pricing' %}is-active{% endif %}" href="{% url 'pages_az:pricing' %}">Qiymət</a></li>
-                <li><a href="{% url 'pages:home' %}" class="nav-lang-switch" title="English">EN</a></li>
+                <li><a class="{% if active == 'blog' %}is-active{% endif %}" href="{% url 'blog:list' %}">Bloq</a></li>
             </ul>
             <div class="nav-actions">
                 {% if user.is_authenticated %}
