@@ -34,65 +34,65 @@ def _hreflang(en_path, az_path):
 
 def home(request):
     hero_content = {
-        "badge": "İşə Qəbul Qiymətləndirmə Platforması",
-        "title": "Daha yaxşı namizədləri",
-        "title_accent": "strukturlaşdırılmış qiymətləndirmələrlə işə götürün",
-        "subtitle": "Hər bir vəzifə üçün hazır bacarıq testləri — avtomatik qiymətləndirmə, irəliləyiş izləmə və komandanızın etibar edə biləcəyi hesabatlarla.",
-        "primary_label": "Pulsuz Başlayın",
+        "badge": "İşə qəbul platforması",
+        "title": "Ən yaxşı namizədləri",
+        "title_accent": "testlərlə seçin",
+        "subtitle": "Hər vəzifə üçün hazır bacarıq testləri — avtomatik nəticələr, prosesin izlənməsi və etibarlı hesabatlar.",
+        "primary_label": "Pulsuz başlayın",
         "primary_url": reverse("clients:signup"),
         "secondary_link_label": "Necə işləyir →",
         "secondary_link_url": "#necə-işləyir",
     }
 
     assessment_suite = [
-        {"slug": "marketing", "label": "Marketinq IQ", "title": "Rəqəmsal Marketinq", "summary": "Ödənişli reklam, SEO, analitika və kontent yaradılması.", "duration": "32 dəq"},
-        {"slug": "product", "label": "Məhsul Hissi", "title": "Məhsul İdarəetməsi", "summary": "Məntiqi düşüncə, prioritetləşdirmə və UX analizi.", "duration": "30 dəq"},
-        {"slug": "behavioral", "label": "Davranış DNT", "title": "Liderlik və Mədəniyyət", "summary": "Komanda işi, risk tolerantlığı və kouçinq.", "duration": "15 dəq"},
-        {"slug": "ux_design", "label": "Dizayn Gözü", "title": "UX/UI Dizayn", "summary": "İstifadəçi araşdırması, interaksiya dizaynı və əlçatanlıq.", "duration": "35 dəq"},
-        {"slug": "hr", "label": "İnsan Resursları", "title": "HR və İnsan Strategiyası", "summary": "İşə qəbul, uyğunluq və insan strategiyası.", "duration": "35 dəq"},
-        {"slug": "finance", "label": "Maliyyə IQ", "title": "Maliyyə İdarəetməsi", "summary": "Büdcələşdirmə, risk idarəetməsi və strateji maliyyə.", "duration": "35 dəq"},
+        {"slug": "marketing", "label": "Marketinq", "title": "Rəqəmsal marketinq", "summary": "Reklam, SEO, analitika və kontent bilikləri yoxlanılır.", "duration": "32 dəq"},
+        {"slug": "product", "label": "Məhsul", "title": "Məhsul idarəetməsi", "summary": "Analitik düşüncə, prioritetlərin müəyyənləşdirilməsi və UX.", "duration": "30 dəq"},
+        {"slug": "behavioral", "label": "Davranış", "title": "Liderlik və mədəniyyət", "summary": "Komanda işi, riskə münasibət və mentorluq bacarıqları.", "duration": "15 dəq"},
+        {"slug": "ux_design", "label": "Dizayn", "title": "UX/UI dizayn", "summary": "İstifadəçi araşdırması, interfeys dizaynı və əlçatanlıq.", "duration": "35 dəq"},
+        {"slug": "hr", "label": "HR", "title": "İnsan resursları", "summary": "İşə qəbul, əmək qanunvericiliyi və HR strategiyası.", "duration": "35 dəq"},
+        {"slug": "finance", "label": "Maliyyə", "title": "Maliyyə idarəetməsi", "summary": "Büdcə planlaması, risk analizi və strateji maliyyə.", "duration": "35 dəq"},
     ]
 
     features = [
-        {"slug": "create", "title": "Vəzifə yaradın", "description": "Rolu müəyyənləşdirin, qiymətləndirmə əlavə edin və bir neçə dəqiqə ərzində vakansiya səhifənizdə yayınlayın."},
-        {"slug": "invite", "title": "Namizədləri dəvət edin", "description": "Namizədlər öz tempiylə başlamaq üçün link olan aydın bir email alırlar."},
-        {"slug": "review", "title": "Avtomatik qiymətləndirmə", "description": "Strukturlaşdırılmış rubriklər hər cavabı qiymətləndirir ki, siz yan-yana müqayisə edə biləsiniz."},
-        {"slug": "decide", "title": "Qərar verin", "description": "Təmiz hesabatları yükləyin və bütün işə qəbul qərarlarını bir yerdə izləyin."},
+        {"slug": "create", "title": "Vakansiya yaradın", "description": "Vəzifəni təyin edin, test əlavə edin və vakansiya səhifənizdə dərc edin."},
+        {"slug": "invite", "title": "Namizədləri dəvət edin", "description": "Namizədlər öz vaxtlarında testi keçmək üçün link olan e-poçt alırlar."},
+        {"slug": "review", "title": "Avtomatik nəticələr", "description": "Hər cavab avtomatik qiymətləndirilir — namizədləri asanlıqla müqayisə edin."},
+        {"slug": "decide", "title": "Qərar qəbul edin", "description": "Hesabatları yükləyin və bütün işə qəbul prosesini bir yerdən idarə edin."},
     ]
 
     case_studies = [
-        {"slug": "atlas", "company": "Atlas CRM", "headline": "Məhsul işə götürmələri üçün 37% daha sürətli.", "result": "Müsahibəçilər üçün avtomatik qiymətləndirmə ilə PM testlərini mərkəzləşdirdilər.", "metric_label": "İşə götürmə sürəti", "metric_value": "-37%"},
-        {"slug": "northwind", "company": "Northwind Commerce", "headline": "Marketinq tapşırıqlarından 2x daha çox siqnal.", "result": "Ssenari tapşırıqları uzaqdan namizədlərə ədalətli şans verdi.", "metric_label": "Siqnal dərinliyi", "metric_value": "2x"},
-        {"slug": "aster", "company": "Aster Care", "headline": "Namizəd NPS 4.9 / 5-ə yüksəldi.", "result": "Davranış refleksiyaları və yönləndirilmiş portal klinik liderləri cəlb etdi.", "metric_label": "Namizəd CSAT", "metric_value": "4.9"},
+        {"slug": "atlas", "company": "Atlas CRM", "headline": "Məhsul mütəxəssislərinin işə qəbulu 37% sürətləndi.", "result": "Testlərin avtomatik qiymətləndirilməsi müsahibəçilərin vaxtına qənaət etdi.", "metric_label": "İşə qəbul sürəti", "metric_value": "-37%"},
+        {"slug": "northwind", "company": "Northwind Commerce", "headline": "Marketinq testlərindən 2 dəfə çox faydalı nəticə.", "result": "Real ssenari tapşırıqları distant namizədlərə bərabər imkan yaratdı.", "metric_label": "Nəticə keyfiyyəti", "metric_value": "2x"},
+        {"slug": "aster", "company": "Aster Care", "headline": "Namizəd məmnuniyyəti 4.9/5-ə çatdı.", "result": "Rahat interfeys və aydın təlimatlar namizədlərin iştirakını artırdı.", "metric_label": "Namizəd reytinqi", "metric_value": "4.9"},
     ]
 
     pricing_tiers = [
         {
             "slug": "starter", "badge": "Pulsuz", "name": "Başlanğıc",
             "price": "$0", "frequency": "Həmişəlik",
-            "description": "İki aktiv vəzifə və kiçik namizəd hovuzu ilə Evalon-u sınayın.",
-            "projects": "2 aktiv layihə", "invites": "Ayda 20 dəvət",
-            "cta_label": "Pulsuz hesab yaradın", "cta_url": reverse("clients:signup"),
+            "description": "2 aktiv vakansiya ilə Evalon-u sınayın.",
+            "projects": "2 aktiv vakansiya", "invites": "Ayda 20 dəvət",
+            "cta_label": "Pulsuz qeydiyyat", "cta_url": reverse("clients:signup"),
             "highlighted": False,
-            "features": ["Bütün 6 qiymətləndirmə bankı daxildir", "Əsas hesabatlar və CSV ixracı", "Email dəstəyi"],
+            "features": ["6 test bankının hamısı daxildir", "Sadə hesabatlar və CSV", "E-poçt dəstəyi"],
         },
         {
-            "slug": "pro", "badge": "Ən populyar", "name": "Pro",
+            "slug": "pro", "badge": "Ən çox seçilən", "name": "Pro",
             "price": "$59", "frequency": "aylıq",
-            "description": "Daha zəngin hesabatlar və sadə brendinqlə birdən çox axtarış aparın.",
-            "projects": "10 aktiv layihə", "invites": "Ayda 250 dəvət",
-            "cta_label": "Pro sınağına başlayın", "cta_url": reverse("clients:signup"),
+            "description": "Ətraflı hesabatlar və şirkət brendinqi ilə bir neçə vakansiya idarə edin.",
+            "projects": "10 aktiv vakansiya", "invites": "Ayda 250 dəvət",
+            "cta_label": "Pro-nu sınayın", "cta_url": reverse("clients:signup"),
             "highlighted": True,
-            "features": ["AI işə götürmə boru xətləri", "Xüsusi qiymətləndirmələr", "Kanban və top namizəd vurğuları", "Xüsusi brendinq + paylaşıla bilən hesabatlar", "Webhook və API inteqrasiyalar", "Prioritet dəstək"],
+            "features": ["AI ilə avtomatik işə qəbul", "Öz testlərinizi yaradın", "Namizəd paneli və ən yaxşı namizədlər", "Şirkət brendinqi + paylaşılan hesabatlar", "Webhook və API inteqrasiya", "Prioritet dəstək"],
         },
         {
-            "slug": "enterprise", "badge": "Xüsusi", "name": "Müəssisə",
-            "price": "Xüsusi", "frequency": "bizimlə əlaqə saxlayın",
-            "description": "Limitsiz layihələr və dəvətlər, xüsusi dəstək.",
-            "projects": "Limitsiz layihələr", "invites": "Limitsiz dəvətlər",
-            "cta_label": "Qiymət soruşun", "cta_url": reverse("pages_az:contact"),
+            "slug": "enterprise", "badge": "Fərdi", "name": "Korporativ",
+            "price": "Fərdi", "frequency": "bizimlə əlaqə saxlayın",
+            "description": "Limitsiz vakansiya, dəvət və fərdi dəstək.",
+            "projects": "Limitsiz vakansiya", "invites": "Limitsiz dəvət",
+            "cta_label": "Qiymət öyrənin", "cta_url": reverse("pages_az:contact"),
             "highlighted": False,
-            "features": ["Xüsusi müştəri meneceri", "SLA zəmanəti", "Təkmil analitika", "Yerində təlim və dəstək"],
+            "features": ["Fərdi müştəri meneceri", "SLA zəmanəti", "Təkmil analitika", "Yerində təlim və dəstək"],
         },
     ]
 
@@ -116,37 +116,37 @@ def pricing(request):
         {
             "slug": "starter", "badge": "Pulsuz", "name": "Başlanğıc",
             "price": "$0", "frequency": "Həmişəlik",
-            "description": "Evalon-u iki aktiv vəzifə ilə sınayın.",
-            "cta_label": "Pulsuz hesab yaradın", "cta_url": reverse("clients:signup"),
+            "description": "2 aktiv vakansiya ilə Evalon-u sınayın.",
+            "cta_label": "Pulsuz qeydiyyat", "cta_url": reverse("clients:signup"),
             "highlighted": False,
-            "features": ["Bütün 6 qiymətləndirmə", "Əsas hesabatlar", "Email dəstəyi", "Ayda 20 dəvət", "2 aktiv layihə"],
+            "features": ["6 test bankının hamısı", "Sadə hesabatlar", "E-poçt dəstəyi", "Ayda 20 dəvət", "2 aktiv vakansiya"],
         },
         {
-            "slug": "pro", "badge": "Ən populyar", "name": "Pro",
+            "slug": "pro", "badge": "Ən çox seçilən", "name": "Pro",
             "price": "$59", "frequency": "aylıq",
-            "description": "Zəngin hesabatlar və brendinqlə birdən çox axtarış.",
-            "cta_label": "Pro sınağına başlayın", "cta_url": reverse("clients:signup"),
+            "description": "Ətraflı hesabatlar və brendinq ilə bir neçə vakansiya idarə edin.",
+            "cta_label": "Pro-nu sınayın", "cta_url": reverse("clients:signup"),
             "highlighted": True,
-            "features": ["AI işə götürmə boru xətləri", "Xüsusi qiymətləndirmələr yaradın", "Kanban və top namizəd", "Xüsusi brendinq + hesabatlar", "Webhook və API", "Prioritet dəstək", "Ayda 250 dəvət", "10 aktiv layihə"],
+            "features": ["AI ilə avtomatik işə qəbul", "Öz testlərinizi yaradın", "Namizəd paneli", "Şirkət brendinqi + hesabatlar", "Webhook və API", "Prioritet dəstək", "Ayda 250 dəvət", "10 aktiv vakansiya"],
         },
         {
-            "slug": "enterprise", "badge": "Xüsusi", "name": "Müəssisə",
-            "price": "Xüsusi", "frequency": "bizimlə əlaqə saxlayın",
-            "description": "Limitsiz hər şey, xüsusi dəstək.",
-            "cta_label": "Qiymət soruşun", "cta_url": reverse("pages_az:contact"),
+            "slug": "enterprise", "badge": "Fərdi", "name": "Korporativ",
+            "price": "Fərdi", "frequency": "bizimlə əlaqə saxlayın",
+            "description": "Limitsiz vakansiya, dəvət və fərdi dəstək.",
+            "cta_label": "Qiymət öyrənin", "cta_url": reverse("pages_az:contact"),
             "highlighted": False,
-            "features": ["Xüsusi müştəri meneceri", "SLA zəmanəti", "Təkmil analitika və audit", "Yerində təlim", "Limitsiz layihə və dəvət"],
+            "features": ["Fərdi müştəri meneceri", "SLA zəmanəti", "Təkmil analitika və audit", "Yerində təlim", "Limitsiz vakansiya və dəvət"],
         },
     ]
 
     comparison = [
-        {"feature": "Qiymətləndirmə bankları", "starter": "Bütün 6", "pro": "Bütün 6 + xüsusi", "enterprise": "Bütün 6 + xüsusi"},
-        {"feature": "Aktiv layihələr", "starter": "2", "pro": "10", "enterprise": "Limitsiz"},
-        {"feature": "Aylıq dəvətlər", "starter": "20", "pro": "250", "enterprise": "Limitsiz"},
-        {"feature": "AI işə götürmə", "starter": "—", "pro": "✓", "enterprise": "✓"},
-        {"feature": "Xüsusi brendinq", "starter": "—", "pro": "✓", "enterprise": "✓"},
-        {"feature": "API girişi", "starter": "—", "pro": "✓", "enterprise": "✓"},
-        {"feature": "Xüsusi dəstək", "starter": "Email", "pro": "Prioritet", "enterprise": "Xüsusi menecer"},
+        {"feature": "Test bankları", "starter": "6-sı da", "pro": "6 + öz testləriniz", "enterprise": "6 + öz testləriniz"},
+        {"feature": "Aktiv vakansiyalar", "starter": "2", "pro": "10", "enterprise": "Limitsiz"},
+        {"feature": "Aylıq dəvət", "starter": "20", "pro": "250", "enterprise": "Limitsiz"},
+        {"feature": "AI işə qəbul", "starter": "—", "pro": "✓", "enterprise": "✓"},
+        {"feature": "Şirkət brendinqi", "starter": "—", "pro": "✓", "enterprise": "✓"},
+        {"feature": "API", "starter": "—", "pro": "✓", "enterprise": "✓"},
+        {"feature": "Dəstək", "starter": "E-poçt", "pro": "Prioritet", "enterprise": "Fərdi menecer"},
     ]
 
     return render(request, "pages/az/pricing.html", {
@@ -161,9 +161,9 @@ def pricing(request):
 
 def contact(request):
     channels = [
-        {"label": "Ümumi sorğular", "email": "hello@evalon.app", "sla": "24 saat ərzində cavab", "details": ["Məhsul sualları", "Qiymətləndirmə", "Tərəfdaşlıq"]},
-        {"label": "Texniki dəstək", "email": "support@evalon.app", "sla": "12 saat ərzində cavab", "details": ["Hesab problemləri", "İnteqrasiya dəstəyi", "Xəta bildirişləri"]},
-        {"label": "Tərəfdaşlıq", "email": "partners@evalon.app", "sla": "48 saat ərzində cavab", "details": ["Reseller proqramı", "API tərəfdaşlıq", "Birgə marketinq"]},
+        {"label": "Ümumi suallar", "email": "hello@evalon.app", "sla": "24 saat ərzində cavab", "details": ["Məhsul haqqında suallar", "Qiymət təklifləri", "Əməkdaşlıq"]},
+        {"label": "Texniki dəstək", "email": "support@evalon.app", "sla": "12 saat ərzində cavab", "details": ["Hesab problemləri", "İnteqrasiya köməyi", "Xəta bildirişi"]},
+        {"label": "Əməkdaşlıq", "email": "partners@evalon.app", "sla": "48 saat ərzində cavab", "details": ["Distribütor proqramı", "API əməkdaşlıq", "Birgə marketinq"]},
     ]
 
     return render(request, "pages/az/contact.html", {
@@ -220,7 +220,7 @@ def resume_checker(request):
                 _send_resume_checker_email(lead, result)
             except Exception as exc:
                 logger.exception("Resume checker AZ error: %s", exc)
-                error = "CV-nizin analizində xəta baş verdi. Zəhmət olmasa yenidən cəhd edin."
+                error = "CV analizi zamanı xəta baş verdi. Zəhmət olmasa yenidən yoxlayın."
 
     return render(request, "pages/az/resume_checker.html", {
         "form": form,
