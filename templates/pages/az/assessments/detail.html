@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ assessment.seo_title }}{% endblock %}
+{% block meta_description %}{{ assessment.seo_description }}{% endblock %}
+{% block extra_meta %}
+    {% if assessment.meta_keywords %}<meta name="keywords" content="{{ assessment.meta_keywords }}">{% endif %}
+    {% if assessment.meta_image %}<meta property="og:image" content="{{ assessment.meta_image }}">{% endif %}
+    <meta property="og:type" content="product">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "{{ assessment.title|escapejs }}",
+        "description": "{{ assessment.seo_description|escapejs }}",
+        {% if assessment.meta_image or assessment.featured_image %}"image": "{{ assessment.meta_image|default:assessment.featured_image }}",{% endif %}
+        "brand": {
+            "@type": "Organization",
+            "name": "Evalon"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": "{{ request.build_absolute_uri }}",
+            "priceCurrency": "USD",
+            "price": "0",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
+{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header_az.html' with active='assessments' %}
+    <main>
+        <div class="ad-shell" style="--ad-accent: {{ theme_color }}; --ad-accent-rgb: {{ theme_rgb }}">
+            {# Hero #}
+            <header class="ad-hero">
+                <div class="ad-hero-inner">
+                    <div class="ad-breadcrumb">
+                        <a href="{% url 'pages_az:assessment_list' %}">Qiymətləndirmələr</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span>{{ assessment.label }}</span>
+                    </div>
+                    {% if preview_mode %}
+                    <div class="ad-preview-banner">Önizləmə rejimi — yalnız etibarlı önizləmə linki ilə görünür.</div>
+                    {% endif %}
+                    <span class="ad-label">{{ assessment.label }}</span>
+                    <h1 class="ad-title">{{ assessment.title }}</h1>
+                    {% if assessment.subtitle %}
+                    <p class="ad-subtitle">{{ assessment.subtitle }}</p>
+                    {% endif %}
+                    <p class="ad-summary">{{ assessment.summary }}</p>
+                    <div class="ad-meta-row">
+                        <div class="ad-meta-item">
+                            <span class="ad-meta-val">{{ assessment.duration_minutes }} dəq</span>
+                            <span class="ad-meta-lbl">Müddət</span>
+                        </div>
+                        <div class="ad-meta-item">
+                            <span class="ad-meta-val">{{ assessment.question_count }}</span>
+                            <span class="ad-meta-lbl">Sual</span>
+                        </div>
+                        <div class="ad-meta-item">
+                            <span class="ad-meta-val ad-difficulty ad-difficulty--{{ assessment.difficulty_level }}">{{ assessment.get_difficulty_level_display }}</span>
+                            <span class="ad-meta-lbl">Çətinlik</span>
+                        </div>
+                    </div>
+                    <div class="ad-hero-actions">
+                        <a class="ad-btn-primary"
+                           href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
+                           data-gtag-click="assessment_detail_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ assessment.slug }}">{{ assessment.cta_label }}</a>
+                        <a class="ad-btn-secondary"
+                           href="{% url 'pages:contact' %}"
+                           data-gtag-click="contact_sales_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="assessment_contact_sales">Satış ilə əlaqə</a>
+                    </div>
+                </div>
+            </header>
+
+            {# Trust Stats #}
+            <div class="ad-trust-stats">
+                <span class="ad-trust-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <strong>500+</strong> şirkətlər
+                </span>
+                <span class="ad-trust-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    AI ilə qiymətləndirmə
+                </span>
+                <span class="ad-trust-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    GDPR uyğun
+                </span>
+            </div>
+
+            {# Sticky TOC #}
+            <nav class="ad-toc" id="ad-toc" aria-label="Səhifə bölmələri">
+                <span class="ad-toc-label">Bu səhifədə</span>
+                {% if assessment.description or assessment.overview_content %}<a class="ad-toc-link" href="#overview">İcmal</a>{% endif %}
+                {% if assessment.focus_areas %}<a class="ad-toc-link" href="#focus">Diqqət sahələri</a>{% endif %}
+                {% if assessment.skills_tested %}<a class="ad-toc-link" href="#skills">Bacarıqlar</a>{% endif %}
+                {% if assessment.sample_questions %}<a class="ad-toc-link" href="#samples">Nümunələr</a>{% endif %}
+                {% if assessment.scoring_rubric %}<a class="ad-toc-link" href="#scoring">Qiymətləndirmə</a>{% endif %}
+                {% if assessment.stats %}<a class="ad-toc-link" href="#stats">Statistika</a>{% endif %}
+                {% if assessment.use_cases %}<a class="ad-toc-link" href="#use-cases">İstifadə halları</a>{% endif %}
+                {% if assessment.faqs %}<a class="ad-toc-link" href="#faqs">TVS</a>{% endif %}
+            </nav>
+
+            {# Overview #}
+            {% if assessment.description or assessment.overview_content %}
+            <section class="ad-section" id="overview">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">İcmal</h2>
+                    {% if assessment.overview_content %}
+                    <div class="ad-prose">{{ assessment.overview_content|safe }}</div>
+                    {% else %}
+                    <div class="ad-prose"><p>{{ assessment.description }}</p></div>
+                    {% endif %}
+                </div>
+            </section>
+            {% endif %}
+
+            {# Focus Areas #}
+            {% if assessment.focus_areas %}
+            <section class="ad-section ad-section--alt" id="focus">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Diqqət sahələri</h2>
+                    <p class="ad-section-desc">Bu qiymətləndirmədə qiymətləndirilən əsas sahələr.</p>
+                    <div class="ad-tags">
+                        {% for area in assessment.focus_areas %}
+                        <span class="ad-tag">{{ area }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Skills Tested #}
+            {% if assessment.skills_tested %}
+            <section class="ad-section" id="skills">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Yoxlanılan bacarıqlar</h2>
+                    <p class="ad-section-desc">Hər namizəd üçün qiymətləndirilən əsas bacarıqlar.</p>
+                    <div class="ad-skills">
+                        {% for skill in assessment.skills_tested %}
+                        <div class="ad-skill">
+                            <h3>{{ skill.name }}</h3>
+                            <p>{{ skill.description }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Sample Questions #}
+            {% if assessment.sample_questions %}
+            <section class="ad-section ad-section--alt" id="samples">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Nümunə suallar</h2>
+                    <p class="ad-section-desc">Namizədlərin qarşılaşacağı sual növlərinə baxın.</p>
+                    <div class="ad-samples">
+                        {% for sample in assessment.sample_questions %}
+                        <div class="ad-sample">
+                            <span class="ad-sample-num">{{ forloop.counter }}</span>
+                            <div class="ad-sample-body">
+                                <span class="ad-sample-type">{{ sample.type|default:"Ssenari" }}</span>
+                                <p>{{ sample.question }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Mid-page CTA #}
+            <div class="ad-mid-cta">
+                <p>Bəyəndiniz? Bu gün namizədləri qiymətləndirməyə başlayın.</p>
+                <a class="ad-btn-primary"
+                   href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
+                   data-gtag-click="assessment_mid_cta_click"
+                   data-gtag-category="engagement"
+                   data-gtag-label="{{ assessment.slug }}_mid">{{ assessment.cta_label }}</a>
+            </div>
+
+            {# Scoring Rubric #}
+            {% if assessment.scoring_rubric %}
+            <section class="ad-section" id="scoring">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Qiymətləndirmə metodologiyası</h2>
+                    <div class="ad-scoring-bars" id="scoring-bars">
+                        {# JS will parse rubric text and render bars; fallback to prose #}
+                    </div>
+                    <div class="ad-prose ad-scoring-fallback" id="scoring-fallback">{{ assessment.scoring_rubric|linebreaks }}</div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Stats #}
+            {% if assessment.stats %}
+            <section class="ad-section ad-section--alt" id="stats">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Bir baxışda</h2>
+                    <div class="ad-stats-row">
+                        {% for stat in assessment.stats %}
+                        <div class="ad-stat">
+                            <span class="ad-stat-val">{{ stat.value }}</span>
+                            <span class="ad-stat-lbl">{{ stat.label }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Use Cases #}
+            {% if assessment.use_cases %}
+            <section class="ad-section" id="use-cases">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Bu qiymətləndirməni nə vaxt istifadə etməli</h2>
+                    <div class="ad-usecases">
+                        {% for case in assessment.use_cases %}
+                        <div class="ad-usecase">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div>
+                                <h3>{{ case.title }}</h3>
+                                <p>{{ case.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# FAQs #}
+            {% if assessment.faqs %}
+            <section class="ad-section ad-section--alt" id="faqs">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Tez-tez verilən suallar</h2>
+                    <div class="ad-faqs">
+                        {% for faq in assessment.faqs %}
+                        <details class="ad-faq">
+                            <summary>{{ faq.question }}</summary>
+                            <div class="ad-faq-answer">{{ faq.answer }}</div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# CTA #}
+            <section class="ad-cta">
+                <div class="ad-cta-inner">
+                    <h2>{{ assessment.label }} namizədlərini qiymətləndirməyə hazırsınız?</h2>
+                    <p>Pulsuz başlayın və dəqiqələr ərzində qiymətləndirmə göndərin.</p>
+                    <div class="ad-cta-actions">
+                        <a class="ad-btn-primary"
+                           href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
+                           data-gtag-click="assessment_detail_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ assessment.slug }}">{{ assessment.cta_label }}</a>
+                        <a class="ad-btn-secondary"
+                           href="{% url 'pages:contact' %}"
+                           data-gtag-click="contact_sales_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="assessment_contact_sales_footer">Satış ilə danışın</a>
+                    </div>
+                </div>
+            </section>
+
+            {# Roles that use this assessment — capped at 6 #}
+            {% if assessment.roles.exists %}
+            <section class="ad-section" id="roles">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Bu qiymətləndirmədən istifadə edən rollar</h2>
+                    <p class="ad-section-desc">Bu qiymətləndirmənin xüsusi vəzifələr üçün işə götürməyə necə uyğun olduğunu görün.</p>
+                    <div class="ad-related">
+                        {% for role in assessment.roles.all|slice:":6" %}
+                        <a class="ad-related-card" href="{{ role.get_absolute_url }}">
+                            <span class="ad-related-label">{{ role.department }}</span>
+                            <h3>{{ role.title }}</h3>
+                            <p>{{ role.description|truncatewords:18 }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% if assessment.roles.count > 6 %}
+                    <div class="ad-roles-more">
+                        <a href="{% url 'pages:role_assessment_list' %}">Bütün {{ assessment.roles.count }} rola baxın
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+            {% endif %}
+
+            {# Related #}
+            {% if related_assessments %}
+            <section class="ad-section" id="related">
+                <div class="ad-section-inner">
+                    <h2 class="ad-section-title">Əlaqəli qiymətləndirmələr</h2>
+                    <div class="ad-related">
+                        {% for related in related_assessments %}
+                        <a class="ad-related-card" href="{{ related.get_absolute_url }}"
+                           style="--al-accent: {{ related.theme_color }}; --al-accent-rgb: {{ related.theme_rgb }}"
+                           data-gtag-click="related_assessment_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ related.slug }}">
+                            <span class="ad-related-label">{{ related.label }}</span>
+                            <h3>{{ related.title }}</h3>
+                            <p>{{ related.summary|truncatewords:18 }}</p>
+                            <div class="ad-related-meta">
+                                <span>{{ related.duration_minutes }} dəq</span>
+                                <span class="al-meta-dot"></span>
+                                <span>{{ related.question_count }} sual</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+{# Scoring bars visualization + TOC scrollspy #}
+<script>
+(function() {
+    // Scoring bars: parse rubric text and render visual bars
+    var rubric = document.getElementById('scoring-fallback');
+    var barsEl = document.getElementById('scoring-bars');
+    if (rubric && barsEl) {
+        var text = rubric.textContent || '';
+        var regex = /([A-Za-z\s\/&]+?)\s*[:–—-]\s*(\d+)\s*%/g;
+        var items = [], m;
+        while ((m = regex.exec(text)) !== null) {
+            items.push({ label: m[1].trim(), pct: parseInt(m[2], 10) });
+        }
+        if (items.length >= 2) {
+            rubric.style.display = 'none';
+            barsEl.innerHTML = items.map(function(it) {
+                return '<div class="ad-scoring-bar">' +
+                    '<div class="ad-scoring-bar-header">' +
+                    '<span class="ad-scoring-bar-label">' + it.label + '</span>' +
+                    '<span class="ad-scoring-bar-pct">' + it.pct + '%</span>' +
+                    '</div>' +
+                    '<div class="ad-scoring-bar-track"><div class="ad-scoring-bar-fill" style="width:' + it.pct + '%"></div></div>' +
+                    '</div>';
+            }).join('');
+        }
+    }
+
+    // TOC scrollspy
+    var toc = document.getElementById('ad-toc');
+    if (!toc) return;
+    var links = toc.querySelectorAll('.ad-toc-link');
+    if (!links.length) return;
+    var sections = [];
+    links.forEach(function(link) {
+        var id = link.getAttribute('href').slice(1);
+        var sec = document.getElementById(id);
+        if (sec) sections.push({ el: sec, link: link });
+    });
+    if (!sections.length) return;
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            var match = sections.find(function(s) { return s.el === entry.target; });
+            if (match) {
+                if (entry.isIntersecting) {
+                    links.forEach(function(l) { l.classList.remove('ad-toc-link--active'); });
+                    match.link.classList.add('ad-toc-link--active');
+                }
+            }
+        });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+    sections.forEach(function(s) { observer.observe(s.el); });
+})();
+</script>
+{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}
+{% endblock %}

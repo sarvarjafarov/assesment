@@ -341,3 +341,172 @@ def resume_download_pdf(request, slug):
     """PDF download — reuses English download logic."""
     from .views import resume_download_pdf as en_download
     return en_download(request, slug)
+
+
+# ── Assessments ───────────────────────────────────────────────────────
+
+from .models import PublicAssessment
+
+
+def assessment_list(request):
+    """AZ version of assessment library list."""
+    from .views import _get_assessment_theme, ASSESSMENT_THEMES
+
+    assessments = PublicAssessment.objects.filter(is_active=True)
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        assessments = assessments.filter(
+            Q(title__icontains=query) | Q(label__icontains=query) |
+            Q(summary__icontains=query) | Q(description__icontains=query)
+        ).distinct()
+
+    paginator = Paginator(assessments, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    for a in page_obj:
+        theme = _get_assessment_theme(a.slug)
+        a.theme_color = theme['color']
+        a.theme_rgb = theme['rgb']
+
+    return render(request, 'pages/az/assessments/list.html', {
+        'assessments': page_obj,
+        'page_obj': page_obj,
+        'query': query,
+        'is_paginated': page_obj.has_other_pages(),
+        'themes': ASSESSMENT_THEMES,
+        'lang': 'az',
+        'hreflang': _hreflang('/assessments/', '/az/qiymetlendirmeler/'),
+    })
+
+
+def assessment_detail(request, slug):
+    """AZ version of assessment detail page."""
+    from .views import _get_assessment_theme
+
+    assessment = get_object_or_404(PublicAssessment, slug=slug, is_active=True)
+    theme = _get_assessment_theme(assessment.slug)
+
+    related = PublicAssessment.objects.filter(
+        is_active=True
+    ).exclude(pk=assessment.pk).order_by('order')[:4]
+    for r in related:
+        t = _get_assessment_theme(r.slug)
+        r.theme_color = t['color']
+        r.theme_rgb = t['rgb']
+
+    return render(request, 'pages/az/assessments/detail.html', {
+        'assessment': assessment,
+        'related_assessments': related,
+        'theme_color': theme['color'],
+        'theme_rgb': theme['rgb'],
+        'lang': 'az',
+        'hreflang': _hreflang(f'/assessments/{slug}/', f'/az/qiymetlendirmeler/{slug}/'),
+    })
+
+
+# ── AI Hiring ─────────────────────────────────────────────────────────
+
+def ai_hiring(request):
+    """AZ version of AI hiring marketing page."""
+    import os
+    from django.conf import settings
+    az_tpl = "pages/az/ai_hiring.html"
+    en_tpl = "pages/ai_hiring.html"
+    tpl = az_tpl if os.path.exists(os.path.join(settings.BASE_DIR, 'templates', az_tpl)) else en_tpl
+    return render(request, tpl, {
+        "active": "ai_hiring",
+        "lang": "az",
+        "hreflang": _hreflang("/ai-hiring/", "/az/ai-isegotürme/"),
+    })
+
+
+# ── Role Assessments (SEO) ───────────────────────────────────────────
+
+def role_assessment_list(request):
+    """AZ version of role assessment list."""
+    from .views import role_assessment_list as en_view
+    # Reuse English logic, just swap template
+    from django.db.models import Count, Prefetch
+
+    roles = Role.objects.filter(
+        is_active=True, assessment_types__is_active=True,
+    ).annotate(
+        assessment_count=Count('assessment_types', filter=Q(assessment_types__is_active=True))
+    ).filter(assessment_count__gt=0).distinct().prefetch_related(
+        Prefetch('assessment_types', queryset=PublicAssessment.objects.filter(is_active=True).order_by('order')[:3], to_attr='preview_assessments')
+    )
+
+    department = request.GET.get('department', '').strip()
+    if department:
+        roles = roles.filter(department__iexact=department)
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        roles = roles.filter(Q(title__icontains=query) | Q(department__icontains=query))
+
+    departments = Role.objects.filter(is_active=True).values_list('department', flat=True).distinct().order_by('department')
+
+    paginator = Paginator(roles, 24)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'pages/az/roles/list.html', {
+        'roles': page_obj,
+        'page_obj': page_obj,
+        'query': query,
+        'department': department,
+        'departments': departments,
+        'total_roles': roles.count(),
+        'total_assessments': PublicAssessment.objects.filter(is_active=True).count(),
+        'total_departments': departments.count(),
+        'lang': 'az',
+        'hreflang': _hreflang('/assessments/roles/', '/az/qiymetlendirmeler/vezifeler/'),
+    })
+
+
+def role_assessment_department(request, dept_slug):
+    """AZ version of role assessment department page."""
+    from .views import DEPARTMENT_META, role_assessment_department as en_view
+    from django.http import Http404
+
+    dept_info = DEPARTMENT_META.get(dept_slug)
+    if not dept_info:
+        raise Http404
+
+    roles = Role.objects.filter(
+        is_active=True, department__iexact=dept_info['name'],
+        assessment_types__is_active=True,
+    ).distinct().prefetch_related('assessment_types')
+
+    return render(request, 'pages/az/roles/department.html', {
+        'dept_slug': dept_slug,
+        'dept_info': dept_info,
+        'roles': roles,
+        'lang': 'az',
+    })
+
+
+def role_assessment_detail(request, slug):
+    """AZ version of role assessment detail page."""
+    from .views import _get_assessment_theme
+
+    role = get_object_or_404(Role, slug=slug, is_active=True)
+
+    recommended = role.assessment_types.filter(is_active=True).order_by('order')
+    for a in recommended:
+        theme = _get_assessment_theme(a.slug)
+        a.theme_color = theme['color']
+        a.theme_rgb = theme['rgb']
+
+    related = Role.objects.filter(
+        is_active=True, department=role.department,
+        assessment_types__is_active=True,
+    ).exclude(pk=role.pk).distinct()[:4]
+
+    return render(request, 'pages/az/roles/detail.html', {
+        'role': role,
+        'recommended_assessments': recommended,
+        'related_roles': related,
+        'lang': 'az',
+        'hreflang': _hreflang(f'/assessments/for/{slug}/', f'/az/qiymetlendirmeler/ucun/{slug}/'),
+    })

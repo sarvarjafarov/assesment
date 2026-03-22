@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ role.role_seo_title }}{% endblock %}
+{% block meta_description %}{{ role.role_seo_description }}{% endblock %}
+{% block extra_meta %}
+    {% if role.meta_keywords %}<meta name="keywords" content="{{ role.meta_keywords }}">{% endif %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "{{ role.title }} Qiymətləndirmə Batareyası",
+        "description": "{{ role.role_seo_description|escapejs }}",
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Qiymətləndirmələr",
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages_az:assessment_detail' %}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Vəzifələr",
+                    "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages_az:role_assessment_list' %}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ role.title }}"
+                }
+            ]
+        },
+        "provider": {
+            "@type": "Organization",
+            "name": "Evalon",
+            "url": "{{ request.scheme }}://{{ request.get_host }}"
+        }
+    }
+    </script>
+{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header_az.html' with active='assessments' %}
+    <main>
+        <div class="rp-detail-shell">
+            {# Hero #}
+            <header class="rp-detail-hero">
+                <div class="rp-detail-hero-inner">
+                    <div class="rp-breadcrumb">
+                        <a href="{% url 'pages_az:assessment_detail' %}">Qiymətləndirmələr</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <a href="{% url 'pages_az:role_assessment_list' %}">Vəzifələr</a>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span>{{ role.title }}</span>
+                    </div>
+                    <div class="rp-detail-badges">
+                        <span class="rp-badge rp-badge--dept">{{ role.department }}</span>
+                        <span class="rp-badge rp-badge--level">{{ role.get_seniority_level_display }}</span>
+                    </div>
+                    <h1 class="rp-detail-title">{{ role.title }} üçün tövsiyə edilən qiymətləndirmələr</h1>
+                    <p class="rp-detail-desc">{{ role.description }}</p>
+                    <div class="rp-detail-stats">
+                        <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ total_duration }} dəq</span>
+                            <span class="rp-detail-stat-lbl">Ümumi Müddət</span>
+                        </div>
+                        <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ total_questions }}</span>
+                            <span class="rp-detail-stat-lbl">Suallar</span>
+                        </div>
+                        <div class="rp-detail-stat">
+                            <span class="rp-detail-stat-val">{{ recommended_assessments|length }}</span>
+                            <span class="rp-detail-stat-lbl">Qiymətləndirmələr</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {# Sticky Table of Contents #}
+            <nav class="rp-toc" id="rp-toc">
+                <span class="rp-toc-label">Bu səhifədə</span>
+                {% if role.key_skills %}<a class="rp-toc-link" href="#skills">Bacarıqlar</a>{% endif %}
+                {% if role.responsibilities %}<a class="rp-toc-link" href="#responsibilities">Vəzifələr</a>{% endif %}
+                {% if recommended_assessments %}<a class="rp-toc-link" href="#assessments">Qiymətləndirmələr</a>{% endif %}
+                {% if sample_questions %}<a class="rp-toc-link" href="#samples">Nümunələr</a>{% endif %}
+                {% if faqs %}<a class="rp-toc-link" href="#faqs">Tez-tez verilən suallar</a>{% endif %}
+                {% if has_interview_questions %}<a class="rp-toc-link" href="#interview-questions">Suallar</a>{% endif %}
+            </nav>
+
+            {# Key Skills #}
+            {% if role.key_skills %}
+            <section class="rp-section" id="skills">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Əsas bacarıqlar</h2>
+                    <p class="rp-section-desc">{{ role.title }} namizədləri üçün tələb olunan əsas səriştələr.</p>
+                    <div class="rp-skills-tags">
+                        {% for skill in role.key_skills %}
+                        <span class="rp-skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Responsibilities #}
+            {% if role.responsibilities %}
+            <section class="rp-section rp-section--alt" id="responsibilities">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Vəzifə öhdəlikləri</h2>
+                    <p class="rp-section-desc">{{ role.title }} vəzifəsindən gözlənilənlər.</p>
+                    <ul class="rp-responsibilities">
+                        {% for resp in role.responsibilities %}
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>{{ resp }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Focus Areas #}
+            {% if focus_areas %}
+            <section class="rp-section" id="focus">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Diqqət sahələri</h2>
+                    <p class="rp-section-desc">{{ role.title }} namizədləri üçün qiymətləndirmə batareyasında qiymətləndirilən əsas sahələr.</p>
+                    <div class="rp-tags">
+                        {% for area in focus_areas %}
+                        <span class="rp-tag">{{ area }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Skills Tested #}
+            {% if skills_tested %}
+            <section class="rp-section rp-section--alt" id="skills-tested">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Sınaqdan keçirilən bacarıqlar</h2>
+                    <p class="rp-section-desc">Bütün tövsiyə olunan qiymətləndirmələrdə ölçülən səriştələr.</p>
+                    <div class="rp-skills-grid">
+                        {% for skill in skills_tested %}
+                        <div class="rp-skill-card">
+                            <h3>{{ skill.name }}</h3>
+                            <p>{{ skill.description }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Recommended Assessment Battery #}
+            {% if recommended_assessments %}
+            <section class="rp-section" id="assessments">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Tövsiyə olunan qiymətləndirmə batareyası</h2>
+                    <p class="rp-section-desc">{{ role.title }} namizədlərinin hərtərəfli qiymətləndirilməsi üçün bu qiymətləndirmələrdən birlikdə istifadə edin.</p>
+                    <div class="rp-battery">
+                        {% for assessment in recommended_assessments %}
+                        <a class="rp-battery-card" href="{{ assessment.get_absolute_url }}"
+                           data-gtag-click="role_assessment_battery_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ assessment.slug }}">
+                            <div class="rp-battery-icon">
+                                {% if assessment.icon_svg %}{{ assessment.icon_svg|safe }}{% endif %}
+                            </div>
+                            <div class="rp-battery-body">
+                                <span class="rp-battery-label">{{ assessment.label }}</span>
+                                <h3>{{ assessment.title }}</h3>
+                                <p>{{ assessment.summary|truncatewords:20 }}</p>
+                                <div class="rp-battery-meta">
+                                    <span>{{ assessment.duration_minutes }} dəqiqə</span>
+                                    <span>{{ assessment.question_count }} sual</span>
+                                    <span>{{ assessment.get_difficulty_level_display }}</span>
+                                </div>
+                            </div>
+                            <svg class="rp-battery-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Mid-page CTA #}
+            <section class="seo-mid-cta">
+                <div class="seo-mid-cta-inner">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <div>
+                        <h3>{{ role.title }} namizədlərini qiymətləndirməyə hazırsınız?</h3>
+                        <p>Bu qiymətləndirmə batareyasını dəqiqələr ərzində göndərin — quraşdırma tələb olunmur.</p>
+                    </div>
+                    <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
+                       data-gtag-click="role_mid_cta_click"
+                       data-gtag-category="conversion"
+                       data-gtag-label="{{ role.slug }}">Pulsuz Başlayın</a>
+                </div>
+            </section>
+
+            {# Sample Questions #}
+            {% if sample_questions %}
+            <section class="rp-section rp-section--alt" id="samples">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Nümunə suallar</h2>
+                    <p class="rp-section-desc">{{ role.title }} namizədlərinin qarşılaşdığı sual növlərini əvvəlcədən nəzərdən keçirin.</p>
+                    <div class="rp-samples">
+                        {% for sample in sample_questions %}
+                        <div class="rp-sample">
+                            <span class="rp-sample-num">{{ forloop.counter }}</span>
+                            <div class="rp-sample-body">
+                                <span class="rp-sample-type">{{ sample.type|default:"Ssenari" }}</span>
+                                <p>{{ sample.question }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Use Cases #}
+            {% if use_cases %}
+            <section class="rp-section" id="use-cases">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Bu qiymətləndirmələri nə vaxt istifadə etməli</h2>
+                    <p class="rp-section-desc">Bu qiymətləndirmə batareyasını tətbiq etmək üçün ideal ssenarilər.</p>
+                    <div class="rp-usecases">
+                        {% for case in use_cases %}
+                        <div class="rp-usecase">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div>
+                                <h3>{{ case.title }}</h3>
+                                <p>{{ case.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# FAQs #}
+            {% if faqs %}
+            <section class="rp-section rp-section--alt" id="faqs">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Tez-tez verilən suallar</h2>
+                    <div class="rp-faqs">
+                        {% for faq in faqs %}
+                        <details class="rp-faq">
+                            <summary>{{ faq.question }}</summary>
+                            <div class="rp-faq-answer">{{ faq.answer }}</div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# CTA #}
+            <section class="rp-cta">
+                <div class="rp-cta-inner">
+                    <h2>Bu gün {{ role.title }} namizədlərini qiymətləndirməyə başlayın</h2>
+                    <p>Avtomatik qiymətləndirmə və ətraflı hesabatlarla dəqiqələr ərzində qiymətləndirmələr göndərin.</p>
+                    <div class="rp-cta-actions">
+                        <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="role_detail_cta_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ role.slug }}">Pulsuz Başlayın</a>
+                        <a class="rp-btn-secondary" href="{% url 'pages:contact' %}"
+                           data-gtag-click="contact_sales_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="role_contact_sales">Satış ilə danışın</a>
+                    </div>
+                </div>
+            </section>
+
+            {# Interview Questions Cross-link #}
+            {% if has_interview_questions %}
+            <section class="rp-section" id="interview-questions">
+                <div class="rp-section-inner">
+                    <a class="rp-crosslink" href="{{ role.get_interview_questions_url }}"
+                       data-gtag-click="role_to_questions_click"
+                       data-gtag-category="engagement"
+                       data-gtag-label="{{ role.slug }}">
+                        <div class="rp-crosslink-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
+                        <div class="rp-crosslink-body">
+                            <h3>{{ role.title }} müsahibə sualları</h3>
+                            <p>Çətinlik dərəcəsi, qiymətləndirmə meyarları və nümunə cavab təlimatları ilə hazırlanmış müsahibə suallarına baxın.</p>
+                        </div>
+                        <svg class="rp-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Blog Cross-links #}
+            {% if blog_posts %}
+            <section class="rp-section" id="resources">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Əlaqəli resurslar</h2>
+                    <p class="rp-section-desc">{{ role.title }} namizədlərinin işə götürülməsi və qiymətləndirilməsi haqqında daha çox öyrənin.</p>
+                    <div class="seo-blog-cards">
+                        {% for post in blog_posts %}
+                        <a class="seo-blog-card" href="{{ post.get_absolute_url }}"
+                           data-gtag-click="blog_crosslink_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ post.slug }}">
+                            <span class="seo-blog-card-pill">{{ post.pill_label }}</span>
+                            <h3>{{ post.title }}</h3>
+                            <p>{{ post.excerpt|truncatewords:18 }}</p>
+                            <span class="seo-blog-card-meta">{{ post.estimated_read_minutes }} dəq oxunma</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {# Related Roles #}
+            {% if related_roles %}
+            <section class="rp-section" id="related">
+                <div class="rp-section-inner">
+                    <h2 class="rp-section-title">Əlaqəli vəzifələr</h2>
+                    <div class="rp-related">
+                        {% for rel in related_roles %}
+                        <a class="rp-related-card" href="{{ rel.get_absolute_url }}"
+                           data-gtag-click="related_role_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="{{ rel.slug }}">
+                            <span class="rp-related-dept">{{ rel.department }}</span>
+                            <h3>{{ rel.title }}</h3>
+                            <p>{{ rel.description|truncatewords:15 }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}
+{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}

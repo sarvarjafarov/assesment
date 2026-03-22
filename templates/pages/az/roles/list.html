@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{% if query %}Axtarış: {{ query }} · {% endif %}Vəzifəyə görə qiymətləndirmə tövsiyələri · Evalon{% endblock %}
+{% block meta_description %}Hər vəzifə üçün düzgün qiymətləndirmə batareyasını tapın. Marketinq, məhsul, dizayn, HR, maliyyə və liderlik vəzifələri üçün tövsiyə olunan Evalon qiymətləndirmələrinə baxın.{% endblock %}
+{% block extra_meta %}
+{% if page_obj.has_previous %}<link rel="prev" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">{% endif %}
+{% if page_obj.has_next %}<link rel="next" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">{% endif %}
+{% endblock %}
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header_az.html' with active='assessments' %}
+    <main>
+        <div class="rp-shell">
+            <section class="rp-hero">
+                <p class="rp-eyebrow">Vəzifəyə görə qiymətləndirmələr</p>
+                <h1 class="rp-title">{% if query %}"{{ query }}" üçün nəticələr{% elif department %}{{ department }} Vəzifələri{% else %}Hər vəzifə üçün düzgün qiymətləndirməni tapın{% endif %}</h1>
+                <p class="rp-desc">
+                    {% if query %}
+                    Axtarışınıza uyğun {{ roles.paginator.count }} vəzifə tapıldı.
+                    {% else %}
+                    Hər vəzifəyə uyğunlaşdırılmış tövsiyə olunan qiymətləndirmə batareyaları — ən vacib bacarıqları, səriştələri və davranışları əhatə edir.
+                    {% endif %}
+                </p>
+
+                {% if not query %}
+                <div class="rp-trust-stats">
+                    <span class="rp-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <strong>{{ total_roles }}+</strong> Vəzifələr
+                    </span>
+                    <span class="rp-trust-dot"></span>
+                    <span class="rp-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <strong>{{ total_assessments }}</strong> Qiymətləndirmələr
+                    </span>
+                    <span class="rp-trust-dot"></span>
+                    <span class="rp-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        <strong>{{ total_departments }}</strong> Şöbələr
+                    </span>
+                    <span class="rp-trust-dot"></span>
+                    <span class="rp-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <strong>AI</strong> Qiymətləndirmə
+                    </span>
+                </div>
+                {% endif %}
+
+                <form action="{% url 'pages_az:role_assessment_list' %}" method="get" class="rp-search">
+                    <div class="rp-search-field">
+                        <svg class="rp-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="search" name="q" value="{{ query }}" placeholder="Axtar..." aria-label="Vəzifələri axtar">
+                    </div>
+                </form>
+
+                {% if departments %}
+                <div class="rp-filters">
+                    <a href="{% url 'pages_az:role_assessment_list' %}" class="rp-filter {% if not department %}rp-filter--active{% endif %}">Hamısı</a>
+                    {% for dept in departments %}
+                    <a href="{% url 'pages_az:role_assessment_list' %}?department={{ dept|urlencode }}" class="rp-filter {% if department == dept %}rp-filter--active{% endif %}">{{ dept }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+
+            <section class="rp-grid" id="grid">
+                {% for role in roles %}
+                <a class="rp-card" href="{{ role.get_absolute_url }}">
+                    <div class="rp-card-top">
+                        <span class="rp-card-dept-wrap">
+                            {% if role.department == "Marketing" %}
+                            <svg class="rp-card-dept-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            {% elif role.department == "Product" %}
+                            <svg class="rp-card-dept-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                            {% elif role.department == "Design" %}
+                            <svg class="rp-card-dept-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+                            {% elif role.department == "HR" %}
+                            <svg class="rp-card-dept-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                            {% elif role.department == "Finance" %}
+                            <svg class="rp-card-dept-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                            {% elif role.department == "Leadership" %}
+                            <svg class="rp-card-dept-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                            {% endif %}
+                            <span class="rp-card-dept">{{ role.department }}</span>
+                        </span>
+                        <span class="rp-card-level">{{ role.get_seniority_level_display }}</span>
+                    </div>
+                    <h3 class="rp-card-title">{{ role.title }}</h3>
+                    <p class="rp-card-desc">{{ role.description|truncatewords:20 }}</p>
+                    {% if role.key_skills %}
+                    <div class="rp-card-skills">
+                        {% for skill in role.key_skills|slice:":3" %}
+                        <span class="rp-card-skill">{{ skill }}</span>
+                        {% endfor %}
+                        {% if role.key_skills|length > 3 %}
+                        <span class="rp-card-skill rp-card-skill--more">+{{ role.key_skills|length|add:"-3" }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% if role.assessment_types.all %}
+                    <div class="rp-card-assessments-row">
+                        {% for at in role.assessment_types.all|slice:":3" %}
+                        <span class="rp-card-assessment-badge">{{ at.label }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="rp-card-footer">
+                        <span class="rp-card-assessments">{{ role.assessment_types.count }} qiymətləndirmə</span>
+                        <span class="rp-card-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="rp-empty">
+                    <h3>Vəzifə tapılmadı</h3>
+                    <p>{% if query %}Axtarışınızı dəyişdirməyi sınayın və ya <a href="{% url 'pages_az:role_assessment_list' %}">bütün vəzifələrə baxın</a>.{% else %}Tezliklə yeni vəzifə bələdçiləri əlavə olunacaq.{% endif %}</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            {% if is_paginated and page_obj.has_next %}
+            <div class="rp-load-more">
+                <a class="rp-load-btn" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Daha çox yüklə</a>
+            </div>
+            {% endif %}
+
+            {# Body CTA #}
+            <section class="seo-list-cta">
+                <div class="seo-list-cta-inner">
+                    <h2>Namizədləri qiymətləndirməyə hazırsınız?</h2>
+                    <p>Avtomatik qiymətləndirmə və komandanızın etibar edə biləcəyi ətraflı hesabatlarla dəqiqələr ərzində qiymətləndirmələr göndərin.</p>
+                    <div class="seo-list-cta-actions">
+                        <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
+                           data-gtag-click="rp_list_cta_click"
+                           data-gtag-category="conversion"
+                           data-gtag-label="rp_list_start_trial">Pulsuz Başlayın</a>
+                        <a class="rp-btn-secondary" href="{% url 'pages:contact' %}"
+                           data-gtag-click="rp_list_contact_click"
+                           data-gtag-category="engagement"
+                           data-gtag-label="rp_list_contact_sales">Satış ilə danışın</a>
+                    </div>
+                </div>
+            </section>
+
+            {# Cross-link to Interview Questions #}
+            <section class="seo-list-crosslink">
+                <a class="rp-crosslink" href="{% url 'pages:interview_questions_list' %}"
+                   data-gtag-click="rp_to_iq_crosslink"
+                   data-gtag-category="engagement"
+                   data-gtag-label="rp_list_crosslink">
+                    <div class="rp-crosslink-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <div class="rp-crosslink-body">
+                        <h3>Vəzifəyə görə müsahibə sualları</h3>
+                        <p>Çətinlik dərəcəsi, qiymətləndirmə meyarları və nümunə cavab təlimatları ilə hazırlanmış müsahibə suallarına baxın.</p>
+                    </div>
+                    <svg class="rp-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}
+{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}
