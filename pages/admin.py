@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import DemoRequest, APIAccessRequest, NewsletterSubscriber, PublicAssessment, ResumeCheckerLead, Role, InterviewQuestion
+from .models import (
+    DemoRequest, APIAccessRequest, NewsletterSubscriber, PublicAssessment,
+    ResumeCheckerLead, ResumeTemplate, ResumeBuilderLead, Role, InterviewQuestion,
+)
 
 
 @admin.register(DemoRequest)
@@ -82,6 +85,25 @@ class APIAccessRequestAdmin(admin.ModelAdmin):
         updated = queryset.update(status='credentials_sent', api_key_issued_at=timezone.now())
         self.message_user(request, f'{updated} request(s) marked as Credentials Sent.')
     mark_as_credentials_sent.short_description = "Mark selected as Credentials Sent"
+
+
+@admin.register(ResumeTemplate)
+class ResumeTemplateAdmin(admin.ModelAdmin):
+    list_display = ['role', 'style', 'is_active', 'downloads_count', 'updated_at']
+    list_filter = ['style', 'is_active', 'role__department']
+    list_editable = ['is_active', 'style']
+    search_fields = ['role__title', 'role__department']
+    raw_id_fields = ['role']
+    readonly_fields = ['downloads_count', 'created_at', 'updated_at']
+
+
+@admin.register(ResumeBuilderLead)
+class ResumeBuilderLeadAdmin(admin.ModelAdmin):
+    list_display = ['email', 'full_name', 'role', 'template_style', 'downloaded', 'created_at']
+    list_filter = ['template_style', 'downloaded', 'created_at']
+    search_fields = ['email', 'full_name']
+    readonly_fields = ['created_at', 'resume_data']
+    raw_id_fields = ['role']
 
 
 @admin.register(ResumeCheckerLead)

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{ data.full_name }} - {{ data.job_title }} Resume</title>
+<style>
+    @page {
+        size: A4;
+        margin: 1.5cm 2cm 1.5cm 2cm;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 10pt;
+        line-height: 1.4;
+        color: #222222;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1, h2, h3, h4, p {
+        margin: 0;
+        padding: 0;
+    }
+
+    a {
+        color: #222222;
+        text-decoration: none;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    td {
+        vertical-align: top;
+        padding: 0;
+    }
+
+    /* ── Professional Style ─────────────────────────────────────── */
+
+    {% if style == "professional" %}
+
+    .header-name {
+        font-size: 22pt;
+        font-weight: bold;
+        color: #1b2a4a;
+        margin-bottom: 4pt;
+    }
+
+    .header-title {
+        font-size: 11pt;
+        color: #4a5568;
+        margin-bottom: 8pt;
+    }
+
+    .header-contact {
+        font-size: 9pt;
+        color: #4a5568;
+        line-height: 1.6;
+    }
+
+    .header-rule {
+        border: none;
+        border-top: 2px solid #1b2a4a;
+        margin: 12pt 0 10pt 0;
+    }
+
+    .section-heading {
+        font-size: 12pt;
+        font-weight: bold;
+        color: #1b2a4a;
+        text-transform: uppercase;
+        letter-spacing: 0.5pt;
+        padding-bottom: 4pt;
+        border-bottom: 1px solid #1b2a4a;
+        margin-bottom: 8pt;
+        margin-top: 14pt;
+    }
+
+    .section-rule {
+        border: none;
+        border-top: 1px solid #d0d5dd;
+        margin: 10pt 0 0 0;
+    }
+
+    .exp-title {
+        font-size: 10.5pt;
+        font-weight: bold;
+        color: #1b2a4a;
+    }
+
+    .exp-company {
+        font-size: 10pt;
+        color: #4a5568;
+    }
+
+    .exp-duration {
+        font-size: 9pt;
+        color: #718096;
+        text-align: right;
+    }
+
+    .exp-bullet {
+        font-size: 10pt;
+        color: #333333;
+        padding-left: 14pt;
+        text-indent: -10pt;
+        margin-bottom: 3pt;
+    }
+
+    .skill-item {
+        font-size: 9.5pt;
+        color: #333333;
+        display: inline;
+    }
+
+    .edu-degree {
+        font-size: 10pt;
+        font-weight: bold;
+        color: #1b2a4a;
+    }
+
+    .edu-school {
+        font-size: 9.5pt;
+        color: #4a5568;
+    }
+
+    .edu-year {
+        font-size: 9pt;
+        color: #718096;
+        text-align: right;
+    }
+
+    .summary-text {
+        font-size: 10pt;
+        color: #333333;
+        line-height: 1.5;
+    }
+
+    {% elif style == "modern" %}
+
+    /* ── Modern Style ───────────────────────────────────────────── */
+
+    .sidebar-accent {
+        border-left: 4px solid #7c3aed;
+        padding-left: 14pt;
+    }
+
+    .header-name {
+        font-size: 22pt;
+        font-weight: bold;
+        color: #1a1a2e;
+        margin-bottom: 2pt;
+    }
+
+    .header-title {
+        font-size: 11pt;
+        color: #7c3aed;
+        font-weight: 600;
+        margin-bottom: 8pt;
+    }
+
+    .header-contact {
+        font-size: 9pt;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .section-heading {
+        font-size: 11pt;
+        font-weight: bold;
+        color: #7c3aed;
+        text-transform: uppercase;
+        letter-spacing: 1pt;
+        margin-bottom: 8pt;
+        margin-top: 16pt;
+    }
+
+    .exp-title {
+        font-size: 10.5pt;
+        font-weight: bold;
+        color: #1a1a2e;
+    }
+
+    .exp-company {
+        font-size: 10pt;
+        color: #6b7280;
+    }
+
+    .exp-duration {
+        font-size: 9pt;
+        color: #9ca3af;
+        text-align: right;
+    }
+
+    .exp-bullet {
+        font-size: 10pt;
+        color: #374151;
+        padding-left: 14pt;
+        text-indent: -10pt;
+        margin-bottom: 3pt;
+    }
+
+    .skill-item {
+        font-size: 9.5pt;
+        color: #374151;
+        display: inline;
+    }
+
+    .edu-degree {
+        font-size: 10pt;
+        font-weight: bold;
+        color: #1a1a2e;
+    }
+
+    .edu-school {
+        font-size: 9.5pt;
+        color: #6b7280;
+    }
+
+    .edu-year {
+        font-size: 9pt;
+        color: #9ca3af;
+        text-align: right;
+    }
+
+    .summary-text {
+        font-size: 10pt;
+        color: #374151;
+        line-height: 1.5;
+    }
+
+    {% elif style == "minimal" %}
+
+    /* ── Minimal Style ──────────────────────────────────────────── */
+
+    .header-name {
+        font-size: 20pt;
+        font-weight: 300;
+        color: #111111;
+        letter-spacing: 1pt;
+        margin-bottom: 4pt;
+    }
+
+    .header-title {
+        font-size: 10pt;
+        color: #888888;
+        font-weight: 400;
+        letter-spacing: 0.5pt;
+        margin-bottom: 10pt;
+    }
+
+    .header-contact {
+        font-size: 8.5pt;
+        color: #999999;
+        line-height: 1.6;
+    }
+
+    .section-heading {
+        font-size: 9pt;
+        font-weight: 600;
+        color: #555555;
+        text-transform: uppercase;
+        letter-spacing: 2pt;
+        padding-bottom: 4pt;
+        border-bottom: 0.5pt solid #dddddd;
+        margin-bottom: 10pt;
+        margin-top: 20pt;
+    }
+
+    .exp-title {
+        font-size: 10pt;
+        font-weight: 600;
+        color: #111111;
+    }
+
+    .exp-company {
+        font-size: 9.5pt;
+        color: #777777;
+    }
+
+    .exp-duration {
+        font-size: 8.5pt;
+        color: #aaaaaa;
+        text-align: right;
+    }
+
+    .exp-bullet {
+        font-size: 9.5pt;
+        color: #444444;
+        padding-left: 14pt;
+        text-indent: -10pt;
+        margin-bottom: 3pt;
+    }
+
+    .skill-item {
+        font-size: 9pt;
+        color: #444444;
+        display: inline;
+    }
+
+    .edu-degree {
+        font-size: 9.5pt;
+        font-weight: 600;
+        color: #111111;
+    }
+
+    .edu-school {
+        font-size: 9pt;
+        color: #777777;
+    }
+
+    .edu-year {
+        font-size: 8.5pt;
+        color: #aaaaaa;
+        text-align: right;
+    }
+
+    .summary-text {
+        font-size: 9.5pt;
+        color: #444444;
+        line-height: 1.6;
+    }
+
+    {% endif %}
+</style>
+</head>
+<body>
+
+{% if style == "modern" %}
+<div class="sidebar-accent">
+{% endif %}
+
+<!-- ── Header ─────────────────────────────────────────────────── -->
+
+<div class="header-name">{{ data.full_name }}</div>
+<div class="header-title">{{ data.job_title }}{% if role %} &mdash; {{ role.title }}{% endif %}</div>
+
+<div class="header-contact">
+    {% if data.email %}{{ data.email }}{% endif %}
+    {% if data.email and data.phone %} &nbsp;|&nbsp; {% endif %}
+    {% if data.phone %}{{ data.phone }}{% endif %}
+    {% if data.location %} &nbsp;|&nbsp; {{ data.location }}{% endif %}
+    {% if data.linkedin %}<br>{{ data.linkedin }}{% endif %}
+</div>
+
+{% if style == "professional" %}
+<hr class="header-rule">
+{% endif %}
+
+<!-- ── Summary ────────────────────────────────────────────────── -->
+
+{% if data.summary %}
+<div class="section-heading">Professional Summary</div>
+<p class="summary-text">{{ data.summary }}</p>
+{% if style == "professional" %}<hr class="section-rule">{% endif %}
+{% endif %}
+
+<!-- ── Experience ─────────────────────────────────────────────── -->
+
+{% if data.experience %}
+<div class="section-heading">Experience</div>
+
+{% for job in data.experience %}
+<table>
+    <tr>
+        <td style="width: 75%;">
+            <div class="exp-title">{{ job.title }}</div>
+            <div class="exp-company">{{ job.company }}</div>
+        </td>
+        <td style="width: 25%;">
+            <div class="exp-duration">{{ job.duration }}</div>
+        </td>
+    </tr>
+</table>
+
+{% if job.bullets %}
+{% for bullet in job.bullets %}
+<p class="exp-bullet">&bull; {{ bullet }}</p>
+{% endfor %}
+{% endif %}
+
+{% if not forloop.last %}
+<div style="margin-bottom: 10pt;"></div>
+{% endif %}
+
+{% endfor %}
+
+{% if style == "professional" %}<hr class="section-rule">{% endif %}
+{% endif %}
+
+<!-- ── Skills ─────────────────────────────────────────────────── -->
+
+{% if data.skills %}
+<div class="section-heading">Skills</div>
+
+<p>
+{% for skill in data.skills %}
+<span class="skill-item">{{ skill }}{% if not forloop.last %}{% if style == "minimal" %} &nbsp;&middot;&nbsp; {% else %}, {% endif %}{% endif %}</span>
+{% endfor %}
+</p>
+
+{% if style == "professional" %}<hr class="section-rule">{% endif %}
+{% endif %}
+
+<!-- ── Education ──────────────────────────────────────────────── -->
+
+{% if data.education %}
+<div class="section-heading">Education</div>
+
+{% for edu in data.education %}
+<table>
+    <tr>
+        <td style="width: 75%;">
+            <div class="edu-degree">{{ edu.degree }}</div>
+            <div class="edu-school">{{ edu.school }}</div>
+        </td>
+        <td style="width: 25%;">
+            <div class="edu-year">{{ edu.year }}</div>
+        </td>
+    </tr>
+</table>
+{% if not forloop.last %}
+<div style="margin-bottom: 6pt;"></div>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if style == "modern" %}
+</div><!-- .sidebar-accent -->
+{% endif %}
+
+</body>
+</html>

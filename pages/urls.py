@@ -34,6 +34,12 @@ urlpatterns = [
     path('assessments/roles/', views.role_assessment_list, name='role_assessment_list'),
     path('assessments/roles/department/<slug:dept_slug>/', views.role_assessment_department, name='role_assessment_department'),
     path('assessments/for/<slug:slug>/', views.role_assessment_detail, name='role_assessment_detail'),
+    # Resume Builder (programmatic SEO + free tool)
+    path('resume/', views.resume_builder_list, name='resume_builder_list'),
+    path('resume/department/<slug:dept_slug>/', views.resume_builder_department, name='resume_builder_department'),
+    path('resume/<slug:slug>/', views.resume_builder_detail, name='resume_builder_detail'),
+    path('resume/<slug:slug>/download/', views.resume_download_pdf, name='resume_download_pdf'),
+
     # Public assessments
     path('assessments/', views.assessment_list, name='assessment_list'),
     path('assessments/<slug:slug>/', views.assessment_detail, name='assessment_detail'),

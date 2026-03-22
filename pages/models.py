@@ -127,6 +127,93 @@ class ResumeCheckerLead(models.Model):
         return f"{self.email} — score {self.ats_score or '?'} ({self.created_at:%b %d})"
 
 
+class ResumeTemplate(models.Model):
+    """Role-specific resume template for the builder + programmatic SEO."""
+
+    STYLE_CHOICES = [
+        ('professional', 'Professional'),
+        ('modern', 'Modern'),
+        ('minimal', 'Minimal'),
+    ]
+
+    role = models.OneToOneField(
+        'Role', on_delete=models.CASCADE, related_name='resume_template',
+    )
+    style = models.CharField(max_length=20, choices=STYLE_CHOICES, default='professional')
+
+    # Pre-built example content (shown on SEO page + pre-fills builder)
+    example_summary = models.TextField(help_text="Example professional summary for this role")
+    example_experience = models.JSONField(
+        default=list,
+        help_text='[{"title":"...", "company":"...", "duration":"...", "bullets":["..."]}]',
+    )
+    example_skills = models.JSONField(default=list, help_text='["Skill 1", ...]')
+    example_education = models.JSONField(
+        default=list,
+        help_text='[{"degree":"...", "school":"...", "year":"..."}]',
+    )
+
+    # SEO landing page content
+    resume_tips = models.JSONField(
+        default=list,
+        help_text='[{"title":"...", "description":"..."}]',
+    )
+    keywords_to_include = models.JSONField(default=list, blank=True)
+    common_mistakes = models.JSONField(default=list, blank=True)
+    faqs = models.JSONField(default=list, blank=True, help_text='[{"q":"...", "a":"..."}]')
+
+    # Meta
+    meta_title = models.CharField(max_length=160, blank=True)
+    meta_description = models.CharField(max_length=300, blank=True)
+
+    is_active = models.BooleanField(default=True)
+    downloads_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['role__order', 'role__title']
+
+    def __str__(self):
+        return f"Resume: {self.role.title}"
+
+    def get_absolute_url(self):
+        return reverse('pages:resume_builder_detail', kwargs={'slug': self.role.slug})
+
+    @property
+    def seo_title(self):
+        return self.meta_title or f"Free {self.role.title} Resume Builder & Template | Evalon"
+
+    @property
+    def seo_description(self):
+        return self.meta_description or (
+            f"Build a professional {self.role.title} resume with our free builder. "
+            f"Pre-written bullet points, ATS-optimized formatting, instant PDF download."
+        )
+
+
+class ResumeBuilderLead(models.Model):
+    """Leads captured from the free resume builder."""
+
+    email = models.EmailField(db_index=True)
+    full_name = models.CharField(max_length=200)
+    role = models.ForeignKey(
+        'Role', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='resume_builder_leads',
+    )
+    template_style = models.CharField(max_length=20, blank=True)
+    resume_data = models.JSONField(null=True, blank=True)
+    downloaded = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        role_title = self.role.title if self.role else 'No role'
+        return f"{self.email} — {role_title} ({self.created_at:%b %d})"
+
+
 class PublicAssessment(models.Model):
     """Public-facing assessment pages for marketing."""
 

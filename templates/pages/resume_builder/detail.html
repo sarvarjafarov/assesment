@@ -1,0 +1,1845 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ template.seo_title|default:"Build Your "|add:role.title|add:" Resume" }} · Evalon{% endblock %}
+{% block meta_description %}{{ template.seo_description|default:"Build a professional "|add:role.title|add:" resume with our free builder. Includes example content, key skills, and expert tips." }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Resume Builder Detail (rb-*) ────────────────────────────────── */
+
+/* Hero */
+.rb-detail-hero {
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.rb-detail-hero .rb-eyebrow {
+    color: #8b5cf6;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.75rem;
+}
+
+.rb-detail-hero h1 {
+    font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 1rem;
+    line-height: 1.15;
+}
+
+.rb-hero-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.rb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+}
+
+.rb-badge--dept {
+    color: #8b5cf6;
+    background: #f5f3ff;
+}
+
+.rb-badge--seniority {
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+.rb-badge--downloads {
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.rb-badge--downloads svg {
+    color: #059669;
+}
+
+.rb-detail-hero p {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Shell */
+.rb-detail-shell {
+    max-width: 1280px;
+    margin: 0 auto 3rem;
+    padding: 0 2rem;
+}
+
+/* Builder Section */
+.rb-builder {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 2rem;
+    align-items: start;
+    margin-top: 2rem;
+}
+
+/* Form Panel */
+.rb-form-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.rb-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.rb-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.rb-card-header h2 {
+    font-size: 1.05rem;
+    font-weight: 650;
+    color: var(--color-navy);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rb-card-header h2 svg {
+    color: #8b5cf6;
+}
+
+.rb-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8b5cf6;
+    background: #f5f3ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.rb-add-btn:hover {
+    background: #ede9fe;
+    border-color: #c4b5fd;
+}
+
+/* Form Fields */
+.rb-field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.rb-field-grid--3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.rb-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.rb-field--full {
+    grid-column: 1 / -1;
+}
+
+.rb-field label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.rb-field input,
+.rb-field textarea {
+    border: 1px solid #e2e5ea;
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--color-navy);
+    background: #fafafa;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    outline: none;
+    resize: vertical;
+}
+
+.rb-field input:focus,
+.rb-field textarea:focus {
+    border-color: #8b5cf6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.08);
+}
+
+.rb-field textarea {
+    min-height: 100px;
+}
+
+/* Experience / Education Entries */
+.rb-entry {
+    border: 1px solid #f3f4f6;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    background: #fafbfc;
+    position: relative;
+}
+
+.rb-entry:last-child {
+    margin-bottom: 0;
+}
+
+.rb-remove-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: #fef2f2;
+    color: #ef4444;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s ease;
+    font-family: inherit;
+}
+
+.rb-remove-btn:hover {
+    background: #fee2e2;
+}
+
+.rb-bullets-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #374151;
+    margin-top: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+
+/* Skills Tags */
+.rb-skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.rb-skill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #7c3aed;
+    background: #f5f3ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 999px;
+    cursor: default;
+}
+
+.rb-skill-tag button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    color: #a78bfa;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0;
+    line-height: 1;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+}
+
+.rb-skill-tag button:hover {
+    background: #ddd6fe;
+    color: #6d28d9;
+}
+
+.rb-skill-add {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.rb-skill-add input {
+    flex: 1;
+    border: 1px solid #e2e5ea;
+    border-radius: 8px;
+    padding: 0.45rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--color-navy);
+    background: #fafafa;
+    outline: none;
+}
+
+.rb-skill-add input:focus {
+    border-color: #8b5cf6;
+    background: #fff;
+}
+
+.rb-skill-add button {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    background: #8b5cf6;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s ease;
+}
+
+.rb-skill-add button:hover {
+    background: #7c3aed;
+}
+
+/* Style Selector */
+.rb-styles {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.rb-style-option {
+    flex: 1;
+    position: relative;
+}
+
+.rb-style-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.rb-style-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1rem 0.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+    text-align: center;
+}
+
+.rb-style-option label:hover {
+    border-color: #c4b5fd;
+}
+
+.rb-style-option input:checked + label {
+    border-color: #8b5cf6;
+    background: #faf5ff;
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+}
+
+.rb-style-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border-radius: 8px;
+    color: #6b7280;
+}
+
+.rb-style-option input:checked + label .rb-style-icon {
+    background: #ede9fe;
+    color: #8b5cf6;
+}
+
+.rb-style-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-navy);
+}
+
+.rb-style-desc {
+    font-size: 0.7rem;
+    color: #9ca3af;
+}
+
+/* Download Button */
+.rb-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.25);
+}
+
+.rb-download-btn:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    box-shadow: 0 6px 20px rgba(124,58,237,0.35);
+    transform: translateY(-1px);
+}
+
+/* Preview Panel */
+.rb-preview-panel {
+    position: sticky;
+    top: 2rem;
+}
+
+.rb-preview-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.rb-preview-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8b5cf6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.rb-preview-label svg {
+    color: #8b5cf6;
+}
+
+/* Live Resume Preview */
+.rb-resume {
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 1.25rem 1rem;
+    background: #fff;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    color: #1f2937;
+    min-height: 500px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* Professional style (default) */
+.rb-resume--professional .rb-resume-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.15rem;
+    text-align: center;
+}
+
+.rb-resume--professional .rb-resume-jobtitle {
+    font-size: 0.78rem;
+    color: #8b5cf6;
+    text-align: center;
+    margin: 0 0 0.35rem;
+    font-weight: 600;
+}
+
+.rb-resume--professional .rb-resume-contact {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    font-size: 0.62rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #8b5cf6;
+}
+
+.rb-resume--professional .rb-resume-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0.6rem 0 0.35rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.rb-resume--professional .rb-resume-summary {
+    font-size: 0.65rem;
+    color: #374151;
+    line-height: 1.5;
+    margin: 0.25rem 0 0;
+}
+
+.rb-resume--professional .rb-resume-exp-item {
+    margin-bottom: 0.5rem;
+}
+
+.rb-resume--professional .rb-resume-exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.rb-resume--professional .rb-resume-exp-title {
+    font-weight: 600;
+    font-size: 0.68rem;
+    color: #1e293b;
+}
+
+.rb-resume--professional .rb-resume-exp-duration {
+    font-size: 0.6rem;
+    color: #9ca3af;
+}
+
+.rb-resume--professional .rb-resume-exp-company {
+    font-size: 0.62rem;
+    color: #6b7280;
+    font-style: italic;
+    margin-bottom: 0.2rem;
+}
+
+.rb-resume--professional .rb-resume-exp-bullets {
+    margin: 0;
+    padding-left: 1rem;
+    font-size: 0.6rem;
+    color: #374151;
+}
+
+.rb-resume--professional .rb-resume-exp-bullets li {
+    margin-bottom: 0.1rem;
+}
+
+.rb-resume--professional .rb-resume-skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.rb-resume--professional .rb-resume-skill-item {
+    font-size: 0.6rem;
+    padding: 0.1rem 0.4rem;
+    background: #f5f3ff;
+    border-radius: 3px;
+    color: #7c3aed;
+}
+
+.rb-resume--professional .rb-resume-edu-item {
+    margin-bottom: 0.35rem;
+}
+
+.rb-resume--professional .rb-resume-edu-degree {
+    font-weight: 600;
+    font-size: 0.65rem;
+    color: #1e293b;
+}
+
+.rb-resume--professional .rb-resume-edu-school {
+    font-size: 0.6rem;
+    color: #6b7280;
+}
+
+/* Modern style */
+.rb-resume--modern .rb-resume-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    margin: -1.25rem -1rem 0;
+    padding: 1rem 1rem 0.5rem;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border-radius: 4px 4px 0 0;
+    text-align: left;
+}
+
+.rb-resume--modern .rb-resume-jobtitle {
+    font-size: 0.75rem;
+    color: #e9d5ff;
+    margin: 0 -1rem;
+    padding: 0 1rem 0.6rem;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    font-weight: 500;
+}
+
+.rb-resume--modern .rb-resume-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.6rem;
+    font-size: 0.6rem;
+    color: #e9d5ff;
+    margin: 0 -1rem;
+    padding: 0 1rem 0.75rem;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border-radius: 0 0 0 0;
+}
+
+.rb-resume--modern .rb-resume-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #7c3aed;
+    margin: 0.75rem 0 0.3rem;
+    padding-left: 0.5rem;
+    border-left: 3px solid #8b5cf6;
+}
+
+.rb-resume--modern .rb-resume-summary {
+    font-size: 0.65rem;
+    color: #374151;
+    line-height: 1.5;
+    margin: 0.25rem 0 0;
+}
+
+.rb-resume--modern .rb-resume-exp-item { margin-bottom: 0.5rem; }
+.rb-resume--modern .rb-resume-exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+.rb-resume--modern .rb-resume-exp-title { font-weight: 700; font-size: 0.68rem; color: #1e293b; }
+.rb-resume--modern .rb-resume-exp-duration { font-size: 0.6rem; color: #8b5cf6; font-weight: 600; }
+.rb-resume--modern .rb-resume-exp-company { font-size: 0.62rem; color: #6b7280; margin-bottom: 0.2rem; }
+.rb-resume--modern .rb-resume-exp-bullets { margin: 0; padding-left: 1rem; font-size: 0.6rem; color: #374151; }
+.rb-resume--modern .rb-resume-exp-bullets li { margin-bottom: 0.1rem; }
+.rb-resume--modern .rb-resume-skills-list { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.25rem; }
+.rb-resume--modern .rb-resume-skill-item { font-size: 0.6rem; padding: 0.12rem 0.45rem; background: #8b5cf6; border-radius: 3px; color: #fff; }
+.rb-resume--modern .rb-resume-edu-item { margin-bottom: 0.35rem; }
+.rb-resume--modern .rb-resume-edu-degree { font-weight: 600; font-size: 0.65rem; color: #1e293b; }
+.rb-resume--modern .rb-resume-edu-school { font-size: 0.6rem; color: #6b7280; }
+
+/* Minimal style */
+.rb-resume--minimal .rb-resume-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.1rem;
+    letter-spacing: 0.02em;
+}
+
+.rb-resume--minimal .rb-resume-jobtitle {
+    font-size: 0.72rem;
+    color: #6b7280;
+    margin: 0 0 0.35rem;
+    font-weight: 400;
+}
+
+.rb-resume--minimal .rb-resume-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.6rem;
+    font-size: 0.6rem;
+    color: #9ca3af;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.rb-resume--minimal .rb-resume-section-title {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0.6rem 0 0.3rem;
+}
+
+.rb-resume--minimal .rb-resume-summary {
+    font-size: 0.65rem;
+    color: #4b5563;
+    line-height: 1.5;
+    margin: 0.25rem 0 0;
+}
+
+.rb-resume--minimal .rb-resume-exp-item { margin-bottom: 0.5rem; }
+.rb-resume--minimal .rb-resume-exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+.rb-resume--minimal .rb-resume-exp-title { font-weight: 600; font-size: 0.68rem; color: #1e293b; }
+.rb-resume--minimal .rb-resume-exp-duration { font-size: 0.6rem; color: #9ca3af; }
+.rb-resume--minimal .rb-resume-exp-company { font-size: 0.62rem; color: #6b7280; margin-bottom: 0.2rem; }
+.rb-resume--minimal .rb-resume-exp-bullets { margin: 0; padding-left: 1rem; font-size: 0.6rem; color: #4b5563; }
+.rb-resume--minimal .rb-resume-exp-bullets li { margin-bottom: 0.1rem; }
+.rb-resume--minimal .rb-resume-skills-list { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.25rem; }
+.rb-resume--minimal .rb-resume-skill-item { font-size: 0.6rem; padding: 0.1rem 0.4rem; background: #f3f4f6; border-radius: 3px; color: #4b5563; }
+.rb-resume--minimal .rb-resume-edu-item { margin-bottom: 0.35rem; }
+.rb-resume--minimal .rb-resume-edu-degree { font-weight: 600; font-size: 0.65rem; color: #1e293b; }
+.rb-resume--minimal .rb-resume-edu-school { font-size: 0.6rem; color: #6b7280; }
+
+/* ── SEO Content Sections ─────────────────────────────────────────── */
+.rb-seo-section {
+    max-width: 860px;
+    margin: 3rem auto 0;
+    padding: 0 1rem;
+}
+
+.rb-section-heading {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rb-section-heading svg {
+    color: #8b5cf6;
+}
+
+/* Tips Cards */
+.rb-tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.rb-tip-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.25rem;
+    border-left: 3px solid #8b5cf6;
+}
+
+.rb-tip-card h3 {
+    font-size: 0.95rem;
+    font-weight: 650;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+}
+
+.rb-tip-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* Keywords Cloud */
+.rb-keywords-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.rb-keyword {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #7c3aed;
+    background: #f5f3ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+}
+
+.rb-keyword:hover {
+    background: #ede9fe;
+    border-color: #c4b5fd;
+}
+
+/* Mistakes List */
+.rb-mistakes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.rb-mistakes-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: #374151;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    line-height: 1.5;
+}
+
+.rb-mistakes-list li svg {
+    flex-shrink: 0;
+    color: #ef4444;
+    margin-top: 0.15rem;
+}
+
+/* FAQ Accordion */
+.rb-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rb-faq-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.rb-faq-q {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    text-align: left;
+    transition: background 0.15s ease;
+}
+
+.rb-faq-q:hover {
+    background: #faf5ff;
+}
+
+.rb-faq-q svg {
+    flex-shrink: 0;
+    color: #8b5cf6;
+    transition: transform 0.25s ease;
+}
+
+.rb-faq-item.active .rb-faq-q svg {
+    transform: rotate(180deg);
+}
+
+.rb-faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.rb-faq-item.active .rb-faq-a {
+    max-height: 600px;
+}
+
+.rb-faq-a-inner {
+    padding: 0 1.25rem 1rem;
+    font-size: 0.88rem;
+    color: #6b7280;
+    line-height: 1.65;
+}
+
+/* Related Templates */
+.rb-related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.rb-related-card {
+    display: block;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    border-top: 3px solid transparent;
+}
+
+.rb-related-card:hover {
+    border-top-color: #8b5cf6;
+    box-shadow: 0 6px 18px rgba(139,92,246,0.1);
+    transform: translateY(-2px);
+}
+
+.rb-related-card h3 {
+    font-size: 0.95rem;
+    font-weight: 650;
+    color: var(--color-navy);
+    margin: 0 0 0.4rem;
+}
+
+.rb-related-card .rb-related-dept {
+    font-size: 0.72rem;
+    color: #8b5cf6;
+    font-weight: 600;
+}
+
+/* Cross-links */
+.rb-cross-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.rb-cross-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+.rb-cross-link:hover {
+    border-color: #c4b5fd;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.08);
+}
+
+.rb-cross-link-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f3ff;
+    border-radius: 10px;
+    color: #8b5cf6;
+}
+
+.rb-cross-link h3 {
+    font-size: 0.92rem;
+    font-weight: 650;
+    color: var(--color-navy);
+    margin: 0 0 0.2rem;
+}
+
+.rb-cross-link p {
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Download Modal */
+.rb-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.rb-modal-overlay.active {
+    display: flex;
+}
+
+.rb-modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    position: relative;
+}
+
+.rb-modal h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.4rem;
+}
+
+.rb-modal p {
+    font-size: 0.88rem;
+    color: #6b7280;
+    margin: 0 0 1.25rem;
+    line-height: 1.5;
+}
+
+.rb-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s ease;
+}
+
+.rb-modal-close:hover {
+    background: #e5e7eb;
+}
+
+.rb-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rb-modal-form input {
+    border: 1px solid #e2e5ea;
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--color-navy);
+    outline: none;
+}
+
+.rb-modal-form input:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.08);
+}
+
+.rb-modal-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s ease;
+    margin-top: 0.25rem;
+}
+
+.rb-modal-submit:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
+
+.rb-modal-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.rb-modal-note {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    text-align: center;
+    margin-top: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .rb-builder {
+        grid-template-columns: 1fr;
+    }
+    .rb-preview-panel {
+        position: static;
+        order: -1;
+    }
+    .rb-cross-links {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .rb-detail-hero {
+        padding: 2rem 1rem 1.5rem;
+    }
+    .rb-detail-shell {
+        padding: 0 1rem;
+    }
+    .rb-field-grid {
+        grid-template-columns: 1fr;
+    }
+    .rb-field-grid--3 {
+        grid-template-columns: 1fr;
+    }
+    .rb-styles {
+        flex-direction: column;
+    }
+    .rb-tips-grid {
+        grid-template-columns: 1fr;
+    }
+    .rb-related-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' with active='assessments' %}
+    <main>
+        <!-- ═══ HERO ═══ -->
+        <section class="rb-detail-hero">
+            <p class="rb-eyebrow">Resume Builder</p>
+            <h1>Build Your {{ role.title }} Resume</h1>
+            <div class="rb-hero-badges">
+                <span class="rb-badge rb-badge--dept">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    {{ role.department }}
+                </span>
+                {% if role.seniority_level %}
+                <span class="rb-badge rb-badge--seniority">{{ role.seniority_level }}</span>
+                {% endif %}
+                {% if template.downloads_count %}
+                <span class="rb-badge rb-badge--downloads">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    {{ template.downloads_count|intcomma }} downloads
+                </span>
+                {% endif %}
+            </div>
+            <p>{{ role.description|default:"Create a professional, ATS-friendly resume tailored for the "|add:role.title|add:" role. Pre-filled with industry-specific content you can customize." }}</p>
+        </section>
+
+        <div class="rb-detail-shell">
+            <!-- ═══ BUILDER ═══ -->
+            <section class="rb-builder" id="rb-builder">
+                <!-- ── Form Panel ── -->
+                <div class="rb-form-panel" id="rb-form">
+
+                    <!-- Contact Info -->
+                    <div class="rb-card">
+                        <div class="rb-card-header">
+                            <h2>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                Contact Information
+                            </h2>
+                        </div>
+                        <div class="rb-field-grid">
+                            <div class="rb-field">
+                                <label for="rb-fullname">Full Name</label>
+                                <input type="text" id="rb-fullname" data-preview="name" placeholder="Jane Smith">
+                            </div>
+                            <div class="rb-field">
+                                <label for="rb-jobtitle">Job Title</label>
+                                <input type="text" id="rb-jobtitle" data-preview="jobtitle" placeholder="{{ role.title }}" value="{{ role.title }}">
+                            </div>
+                            <div class="rb-field">
+                                <label for="rb-email">Email</label>
+                                <input type="email" id="rb-email" data-preview="email" placeholder="jane@example.com">
+                            </div>
+                            <div class="rb-field">
+                                <label for="rb-phone">Phone</label>
+                                <input type="tel" id="rb-phone" data-preview="phone" placeholder="+1 (555) 123-4567">
+                            </div>
+                            <div class="rb-field">
+                                <label for="rb-location">Location</label>
+                                <input type="text" id="rb-location" data-preview="location" placeholder="New York, NY">
+                            </div>
+                            <div class="rb-field">
+                                <label for="rb-linkedin">LinkedIn</label>
+                                <input type="url" id="rb-linkedin" data-preview="linkedin" placeholder="linkedin.com/in/janesmith">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Professional Summary -->
+                    <div class="rb-card">
+                        <div class="rb-card-header">
+                            <h2>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+                                Professional Summary
+                            </h2>
+                        </div>
+                        <div class="rb-field">
+                            <textarea id="rb-summary" data-preview="summary" placeholder="Write a brief professional summary...">{{ template.example_summary }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Experience -->
+                    <div class="rb-card">
+                        <div class="rb-card-header">
+                            <h2>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                Experience
+                            </h2>
+                            <button type="button" class="rb-add-btn" id="rb-add-exp">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add
+                            </button>
+                        </div>
+                        <div id="rb-exp-list">
+                            {% for exp in template.example_experience %}
+                            <div class="rb-entry" data-entry="exp">
+                                <button type="button" class="rb-remove-btn" title="Remove">&times;</button>
+                                <div class="rb-field-grid rb-field-grid--3">
+                                    <div class="rb-field">
+                                        <label>Title</label>
+                                        <input type="text" data-key="title" value="{{ exp.title }}">
+                                    </div>
+                                    <div class="rb-field">
+                                        <label>Company</label>
+                                        <input type="text" data-key="company" value="{{ exp.company }}">
+                                    </div>
+                                    <div class="rb-field">
+                                        <label>Duration</label>
+                                        <input type="text" data-key="duration" value="{{ exp.duration }}">
+                                    </div>
+                                </div>
+                                <label class="rb-bullets-label">Key Achievements</label>
+                                <textarea data-key="bullets" rows="3">{% for b in exp.bullets %}{{ b }}{% if not forloop.last %}
+{% endif %}{% endfor %}</textarea>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="rb-card">
+                        <div class="rb-card-header">
+                            <h2>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                Skills
+                            </h2>
+                        </div>
+                        <div class="rb-skills-list" id="rb-skills-list">
+                            {% for skill in template.example_skills %}
+                            <span class="rb-skill-tag" data-skill="{{ skill }}">{{ skill }}<button type="button" title="Remove">&times;</button></span>
+                            {% endfor %}
+                        </div>
+                        <div class="rb-skill-add">
+                            <input type="text" id="rb-skill-input" placeholder="Add a skill...">
+                            <button type="button" id="rb-skill-add-btn">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="rb-card">
+                        <div class="rb-card-header">
+                            <h2>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"></path></svg>
+                                Education
+                            </h2>
+                            <button type="button" class="rb-add-btn" id="rb-add-edu">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add
+                            </button>
+                        </div>
+                        <div id="rb-edu-list">
+                            {% for edu in template.example_education %}
+                            <div class="rb-entry" data-entry="edu">
+                                <button type="button" class="rb-remove-btn" title="Remove">&times;</button>
+                                <div class="rb-field-grid rb-field-grid--3">
+                                    <div class="rb-field">
+                                        <label>Degree</label>
+                                        <input type="text" data-key="degree" value="{{ edu.degree }}">
+                                    </div>
+                                    <div class="rb-field">
+                                        <label>School</label>
+                                        <input type="text" data-key="school" value="{{ edu.school }}">
+                                    </div>
+                                    <div class="rb-field">
+                                        <label>Year</label>
+                                        <input type="text" data-key="year" value="{{ edu.year }}">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Template Style & Download -->
+                    <div class="rb-card">
+                        <div class="rb-card-header">
+                            <h2>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                                Template Style
+                            </h2>
+                        </div>
+                        <div class="rb-styles">
+                            <div class="rb-style-option">
+                                <input type="radio" name="rb-style" id="rb-style-professional" value="professional" checked>
+                                <label for="rb-style-professional">
+                                    <span class="rb-style-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line><line x1="8" y1="17" x2="12" y2="17"></line></svg>
+                                    </span>
+                                    <span class="rb-style-name">Professional</span>
+                                    <span class="rb-style-desc">Classic & clean</span>
+                                </label>
+                            </div>
+                            <div class="rb-style-option">
+                                <input type="radio" name="rb-style" id="rb-style-modern" value="modern">
+                                <label for="rb-style-modern">
+                                    <span class="rb-style-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon><line x1="12" y1="22" x2="12" y2="15.5"></line><polyline points="22 8.5 12 15.5 2 8.5"></polyline></svg>
+                                    </span>
+                                    <span class="rb-style-name">Modern</span>
+                                    <span class="rb-style-desc">Bold & colorful</span>
+                                </label>
+                            </div>
+                            <div class="rb-style-option">
+                                <input type="radio" name="rb-style" id="rb-style-minimal" value="minimal">
+                                <label for="rb-style-minimal">
+                                    <span class="rb-style-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="14" y2="12"></line><line x1="4" y1="18" x2="18" y2="18"></line></svg>
+                                    </span>
+                                    <span class="rb-style-name">Minimal</span>
+                                    <span class="rb-style-desc">Simple & elegant</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem;">
+                            <button type="button" class="rb-download-btn" id="rb-download-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Download PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Live Preview Panel ── -->
+                <div class="rb-preview-panel">
+                    <div class="rb-preview-card">
+                        <div class="rb-preview-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            Live Preview
+                        </div>
+                        <div class="rb-resume rb-resume--professional" id="rb-resume-preview">
+                            <div class="rb-resume-name" id="rp-name">Your Name</div>
+                            <div class="rb-resume-jobtitle" id="rp-jobtitle">{{ role.title }}</div>
+                            <div class="rb-resume-contact" id="rp-contact">
+                                <span id="rp-email">email@example.com</span>
+                                <span id="rp-phone">(555) 123-4567</span>
+                                <span id="rp-location">City, State</span>
+                            </div>
+
+                            <div class="rb-resume-section-title">Professional Summary</div>
+                            <div class="rb-resume-summary" id="rp-summary">{{ template.example_summary|truncatewords:40 }}</div>
+
+                            <div class="rb-resume-section-title">Experience</div>
+                            <div id="rp-experience">
+                                {% for exp in template.example_experience %}
+                                <div class="rb-resume-exp-item">
+                                    <div class="rb-resume-exp-header">
+                                        <span class="rb-resume-exp-title">{{ exp.title }}</span>
+                                        <span class="rb-resume-exp-duration">{{ exp.duration }}</span>
+                                    </div>
+                                    <div class="rb-resume-exp-company">{{ exp.company }}</div>
+                                    <ul class="rb-resume-exp-bullets">
+                                        {% for b in exp.bullets %}<li>{{ b|truncatewords:12 }}</li>{% endfor %}
+                                    </ul>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="rb-resume-section-title">Skills</div>
+                            <div class="rb-resume-skills-list" id="rp-skills">
+                                {% for skill in template.example_skills %}
+                                <span class="rb-resume-skill-item">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="rb-resume-section-title">Education</div>
+                            <div id="rp-education">
+                                {% for edu in template.example_education %}
+                                <div class="rb-resume-edu-item">
+                                    <div class="rb-resume-edu-degree">{{ edu.degree }}</div>
+                                    <div class="rb-resume-edu-school">{{ edu.school }} &middot; {{ edu.year }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══ SEO CONTENT ═══ -->
+
+            {% if template.resume_tips %}
+            <section class="rb-seo-section">
+                <h2 class="rb-section-heading">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Resume Tips for {{ role.title }}
+                </h2>
+                <div class="rb-tips-grid">
+                    {% for tip in template.resume_tips %}
+                    <div class="rb-tip-card">
+                        <h3>{{ tip.title }}</h3>
+                        <p>{{ tip.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if template.keywords_to_include %}
+            <section class="rb-seo-section">
+                <h2 class="rb-section-heading">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
+                    Keywords to Include
+                </h2>
+                <div class="rb-keywords-cloud">
+                    {% for kw in template.keywords_to_include %}
+                    <span class="rb-keyword">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if template.common_mistakes %}
+            <section class="rb-seo-section">
+                <h2 class="rb-section-heading">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    Common Mistakes to Avoid
+                </h2>
+                <ul class="rb-mistakes-list">
+                    {% for mistake in template.common_mistakes %}
+                    <li>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        {{ mistake }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+
+            {% if template.faqs %}
+            <section class="rb-seo-section">
+                <h2 class="rb-section-heading">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Frequently Asked Questions
+                </h2>
+                <div class="rb-faq-list">
+                    {% for faq in template.faqs %}
+                    <div class="rb-faq-item">
+                        <button type="button" class="rb-faq-q">
+                            {{ faq.q }}
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div class="rb-faq-a">
+                            <div class="rb-faq-a-inner">{{ faq.a }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if related %}
+            <section class="rb-seo-section">
+                <h2 class="rb-section-heading">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line><line x1="8" y1="17" x2="12" y2="17"></line></svg>
+                    Related Resume Templates
+                </h2>
+                <div class="rb-related-grid">
+                    {% for rel in related %}
+                    <a class="rb-related-card" href="{% url 'pages:resume_builder_detail' slug=rel.role.slug %}">
+                        <h3>{{ rel.role.title }} Resume</h3>
+                        <span class="rb-related-dept">{{ rel.role.department }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Cross-links -->
+            <section class="rb-seo-section">
+                <div class="rb-cross-links">
+                    <a class="rb-cross-link" href="{% url 'pages:interview_questions_detail' slug=role.slug %}">
+                        <div class="rb-cross-link-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
+                        <div>
+                            <h3>{{ role.title }} Interview Questions</h3>
+                            <p>Prepare with curated questions and sample answers for this role.</p>
+                        </div>
+                    </a>
+                    <a class="rb-cross-link" href="{% url 'pages:role_assessment_detail' slug=role.slug %}">
+                        <div class="rb-cross-link-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        </div>
+                        <div>
+                            <h3>{{ role.title }} Assessment</h3>
+                            <p>Validate your skills with a tailored assessment for this role.</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<!-- ═══ DOWNLOAD MODAL ═══ -->
+<div class="rb-modal-overlay" id="rb-modal">
+    <div class="rb-modal">
+        <button type="button" class="rb-modal-close" id="rb-modal-close">&times;</button>
+        <h2>Download Your Resume</h2>
+        <p>Enter your details to download a polished PDF version of your resume.</p>
+        <form class="rb-modal-form" id="rb-modal-form">
+            {% csrf_token %}
+            <input type="text" name="full_name" placeholder="Your full name" required>
+            <input type="email" name="email" placeholder="Your email address" required>
+            <button type="submit" class="rb-modal-submit" id="rb-modal-submit-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download PDF
+            </button>
+        </form>
+        <p class="rb-modal-note">We'll send you a copy by email too. No spam, ever.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+
+    /* ── Utility ──────────────────────────────────────────────────── */
+    function debounce(fn, ms) {
+        let t;
+        return function() {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(this, arguments), ms);
+        };
+    }
+
+    function esc(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    /* ── DOM refs ─────────────────────────────────────────────────── */
+    const preview   = document.getElementById('rb-resume-preview');
+    const rpName    = document.getElementById('rp-name');
+    const rpTitle   = document.getElementById('rp-jobtitle');
+    const rpEmail   = document.getElementById('rp-email');
+    const rpPhone   = document.getElementById('rp-phone');
+    const rpLoc     = document.getElementById('rp-location');
+    const rpSummary = document.getElementById('rp-summary');
+    const rpExp     = document.getElementById('rp-experience');
+    const rpSkills  = document.getElementById('rp-skills');
+    const rpEdu     = document.getElementById('rp-education');
+
+    /* ── Live Preview Update ──────────────────────────────────────── */
+    function updatePreview() {
+        // Contact
+        rpName.textContent    = document.getElementById('rb-fullname').value || 'Your Name';
+        rpTitle.textContent   = document.getElementById('rb-jobtitle').value || '{{ role.title }}';
+        rpEmail.textContent   = document.getElementById('rb-email').value || 'email@example.com';
+        rpPhone.textContent   = document.getElementById('rb-phone').value || '(555) 123-4567';
+        rpLoc.textContent     = document.getElementById('rb-location').value || 'City, State';
+
+        // Summary
+        rpSummary.textContent = document.getElementById('rb-summary').value || 'Your professional summary will appear here.';
+
+        // Experience
+        const expEntries = document.querySelectorAll('#rb-exp-list .rb-entry');
+        let expHTML = '';
+        expEntries.forEach(function(entry) {
+            const title    = entry.querySelector('[data-key="title"]').value;
+            const company  = entry.querySelector('[data-key="company"]').value;
+            const duration = entry.querySelector('[data-key="duration"]').value;
+            const bullets  = entry.querySelector('[data-key="bullets"]').value.split('\n').filter(function(b) { return b.trim(); });
+
+            expHTML += '<div class="rb-resume-exp-item">' +
+                '<div class="rb-resume-exp-header">' +
+                    '<span class="rb-resume-exp-title">' + esc(title || 'Position Title') + '</span>' +
+                    '<span class="rb-resume-exp-duration">' + esc(duration || '') + '</span>' +
+                '</div>' +
+                '<div class="rb-resume-exp-company">' + esc(company || 'Company Name') + '</div>';
+            if (bullets.length) {
+                expHTML += '<ul class="rb-resume-exp-bullets">';
+                bullets.forEach(function(b) { expHTML += '<li>' + esc(b) + '</li>'; });
+                expHTML += '</ul>';
+            }
+            expHTML += '</div>';
+        });
+        rpExp.innerHTML = expHTML;
+
+        // Skills
+        const skillTags = document.querySelectorAll('#rb-skills-list .rb-skill-tag');
+        let skillsHTML = '';
+        skillTags.forEach(function(tag) {
+            skillsHTML += '<span class="rb-resume-skill-item">' + esc(tag.dataset.skill) + '</span>';
+        });
+        rpSkills.innerHTML = skillsHTML;
+
+        // Education
+        const eduEntries = document.querySelectorAll('#rb-edu-list .rb-entry');
+        let eduHTML = '';
+        eduEntries.forEach(function(entry) {
+            const degree = entry.querySelector('[data-key="degree"]').value;
+            const school = entry.querySelector('[data-key="school"]').value;
+            const year   = entry.querySelector('[data-key="year"]').value;
+            eduHTML += '<div class="rb-resume-edu-item">' +
+                '<div class="rb-resume-edu-degree">' + esc(degree || 'Degree') + '</div>' +
+                '<div class="rb-resume-edu-school">' + esc(school || 'School') + (year ? ' &middot; ' + esc(year) : '') + '</div>' +
+                '</div>';
+        });
+        rpEdu.innerHTML = eduHTML;
+    }
+
+    const debouncedPreview = debounce(updatePreview, 200);
+
+    // Attach listeners to all existing inputs/textareas + future ones via delegation
+    document.getElementById('rb-form').addEventListener('input', debouncedPreview);
+
+    /* ── Add / Remove Experience ──────────────────────────────────── */
+    document.getElementById('rb-add-exp').addEventListener('click', function() {
+        const entry = document.createElement('div');
+        entry.className = 'rb-entry';
+        entry.dataset.entry = 'exp';
+        entry.innerHTML =
+            '<button type="button" class="rb-remove-btn" title="Remove">&times;</button>' +
+            '<div class="rb-field-grid rb-field-grid--3">' +
+                '<div class="rb-field"><label>Title</label><input type="text" data-key="title" placeholder="Position Title"></div>' +
+                '<div class="rb-field"><label>Company</label><input type="text" data-key="company" placeholder="Company Name"></div>' +
+                '<div class="rb-field"><label>Duration</label><input type="text" data-key="duration" placeholder="2020 - Present"></div>' +
+            '</div>' +
+            '<label class="rb-bullets-label">Key Achievements</label>' +
+            '<textarea data-key="bullets" rows="3" placeholder="One achievement per line"></textarea>';
+        document.getElementById('rb-exp-list').appendChild(entry);
+        updatePreview();
+    });
+
+    /* ── Add / Remove Education ───────────────────────────────────── */
+    document.getElementById('rb-add-edu').addEventListener('click', function() {
+        const entry = document.createElement('div');
+        entry.className = 'rb-entry';
+        entry.dataset.entry = 'edu';
+        entry.innerHTML =
+            '<button type="button" class="rb-remove-btn" title="Remove">&times;</button>' +
+            '<div class="rb-field-grid rb-field-grid--3">' +
+                '<div class="rb-field"><label>Degree</label><input type="text" data-key="degree" placeholder="B.S. Computer Science"></div>' +
+                '<div class="rb-field"><label>School</label><input type="text" data-key="school" placeholder="University Name"></div>' +
+                '<div class="rb-field"><label>Year</label><input type="text" data-key="year" placeholder="2020"></div>' +
+            '</div>';
+        document.getElementById('rb-edu-list').appendChild(entry);
+        updatePreview();
+    });
+
+    // Remove entries (delegated)
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('rb-remove-btn')) {
+            e.target.closest('.rb-entry').remove();
+            updatePreview();
+        }
+    });
+
+    /* ── Skills Add / Remove ──────────────────────────────────────── */
+    function addSkill(name) {
+        name = name.trim();
+        if (!name) return;
+        // Check for duplicates
+        const existing = document.querySelectorAll('#rb-skills-list .rb-skill-tag');
+        for (let i = 0; i < existing.length; i++) {
+            if (existing[i].dataset.skill.toLowerCase() === name.toLowerCase()) return;
+        }
+        const tag = document.createElement('span');
+        tag.className = 'rb-skill-tag';
+        tag.dataset.skill = name;
+        tag.innerHTML = esc(name) + '<button type="button" title="Remove">&times;</button>';
+        document.getElementById('rb-skills-list').appendChild(tag);
+        updatePreview();
+    }
+
+    document.getElementById('rb-skill-add-btn').addEventListener('click', function() {
+        const input = document.getElementById('rb-skill-input');
+        addSkill(input.value);
+        input.value = '';
+        input.focus();
+    });
+
+    document.getElementById('rb-skill-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addSkill(this.value);
+            this.value = '';
+        }
+    });
+
+    document.getElementById('rb-skills-list').addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON') {
+            e.target.closest('.rb-skill-tag').remove();
+            updatePreview();
+        }
+    });
+
+    /* ── Template Style Switcher ──────────────────────────────────── */
+    document.querySelectorAll('input[name="rb-style"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            preview.className = 'rb-resume rb-resume--' + this.value;
+        });
+    });
+
+    /* ── Collect Resume Data ──────────────────────────────────────── */
+    function collectResumeData() {
+        const data = {
+            contact: {
+                full_name: document.getElementById('rb-fullname').value,
+                job_title: document.getElementById('rb-jobtitle').value,
+                email:     document.getElementById('rb-email').value,
+                phone:     document.getElementById('rb-phone').value,
+                location:  document.getElementById('rb-location').value,
+                linkedin:  document.getElementById('rb-linkedin').value
+            },
+            summary: document.getElementById('rb-summary').value,
+            experience: [],
+            skills: [],
+            education: []
+        };
+
+        document.querySelectorAll('#rb-exp-list .rb-entry').forEach(function(entry) {
+            data.experience.push({
+                title:    entry.querySelector('[data-key="title"]').value,
+                company:  entry.querySelector('[data-key="company"]').value,
+                duration: entry.querySelector('[data-key="duration"]').value,
+                bullets:  entry.querySelector('[data-key="bullets"]').value.split('\n').filter(function(b) { return b.trim(); })
+            });
+        });
+
+        document.querySelectorAll('#rb-skills-list .rb-skill-tag').forEach(function(tag) {
+            data.skills.push(tag.dataset.skill);
+        });
+
+        document.querySelectorAll('#rb-edu-list .rb-entry').forEach(function(entry) {
+            data.education.push({
+                degree: entry.querySelector('[data-key="degree"]').value,
+                school: entry.querySelector('[data-key="school"]').value,
+                year:   entry.querySelector('[data-key="year"]').value
+            });
+        });
+
+        return data;
+    }
+
+    /* ── Download Modal ───────────────────────────────────────────── */
+    const modal = document.getElementById('rb-modal');
+
+    document.getElementById('rb-download-btn').addEventListener('click', function() {
+        modal.classList.add('active');
+    });
+
+    document.getElementById('rb-modal-close').addEventListener('click', function() {
+        modal.classList.remove('active');
+    });
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            modal.classList.remove('active');
+        }
+    });
+
+    /* ── Download Form Submit ─────────────────────────────────────── */
+    document.getElementById('rb-modal-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('rb-modal-submit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+
+        const style = document.querySelector('input[name="rb-style"]:checked').value;
+        const resumeData = collectResumeData();
+
+        const formData = new FormData();
+        formData.append('full_name', this.querySelector('[name="full_name"]').value);
+        formData.append('email', this.querySelector('[name="email"]').value);
+        formData.append('style', style);
+        formData.append('resume_data', JSON.stringify(resumeData));
+
+        const csrfToken = this.querySelector('[name="csrfmiddlewaretoken"]').value;
+
+        fetch("{% url 'pages:resume_download_pdf' slug=role.slug %}", {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: formData
+        })
+        .then(function(response) {
+            if (!response.ok) throw new Error('Download failed');
+            return response.blob();
+        })
+        .then(function(blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = resumeData.contact.full_name.replace(/\s+/g, '_') + '_Resume.pdf';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            modal.classList.remove('active');
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download PDF';
+        })
+        .catch(function(err) {
+            alert('Something went wrong. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download PDF';
+            console.error(err);
+        });
+    });
+
+    /* ── FAQ Accordion ────────────────────────────────────────────── */
+    document.querySelectorAll('.rb-faq-q').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const item = this.closest('.rb-faq-item');
+            const wasActive = item.classList.contains('active');
+            // Close all
+            document.querySelectorAll('.rb-faq-item.active').forEach(function(i) {
+                i.classList.remove('active');
+            });
+            if (!wasActive) item.classList.add('active');
+        });
+    });
+
+})();
+</script>
+{% endblock %}

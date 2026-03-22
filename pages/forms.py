@@ -97,6 +97,15 @@ class ResumeCheckerForm(forms.Form):
         return self.cleaned_data["email"].lower().strip()
 
 
+class ResumeDownloadForm(forms.Form):
+    """Email gate for resume PDF download."""
+    full_name = forms.CharField(max_length=200)
+    email = forms.EmailField()
+
+    def clean_email(self):
+        return self.cleaned_data["email"].lower().strip()
+
+
 class DemoRequestForm(forms.ModelForm):
     """Form for capturing demo requests from the homepage."""
 

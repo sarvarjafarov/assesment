@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 
 from blog.models import BlogPost
 from console.models import SiteContentBlock, ResourceAsset
-from .forms import DemoRequestForm, PositionApplyForm, ResumeCheckerForm, VacancyApplyForm
+from .forms import DemoRequestForm, PositionApplyForm, ResumeCheckerForm, ResumeDownloadForm, VacancyApplyForm
 from django.db.models import Count, Prefetch
 from .models import NewsletterSubscriber, PublicAssessment, Role, InterviewQuestion
 
@@ -1945,3 +1945,160 @@ def _send_resume_checker_email(lead, result: dict):
         msg.send(fail_silently=False)
     except Exception as exc:
         logger.warning("Failed to send resume checker email to %s: %s", lead.email, exc)
+
+
+# ── Free Resume Builder (lead magnet + programmatic SEO) ───────────
+
+from .models import ResumeTemplate, ResumeBuilderLead
+
+
+def resume_builder_list(request):
+    """List all roles with resume templates."""
+    roles = Role.objects.filter(
+        is_active=True, resume_template__is_active=True,
+    ).select_related('resume_template').distinct()
+
+    department = request.GET.get('department', '').strip()
+    if department:
+        roles = roles.filter(department__iexact=department)
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        roles = roles.filter(
+            Q(title__icontains=query)
+            | Q(department__icontains=query)
+            | Q(description__icontains=query)
+        )
+
+    departments = (
+        Role.objects.filter(is_active=True, resume_template__is_active=True)
+        .values_list('department', flat=True).distinct().order_by('department')
+    )
+
+    total_templates = Role.objects.filter(
+        is_active=True, resume_template__is_active=True,
+    ).distinct().count()
+    total_downloads = ResumeTemplate.objects.filter(is_active=True).aggregate(
+        total=models.Sum('downloads_count')
+    )['total'] or 0
+
+    paginator = Paginator(roles, 24)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'pages/resume_builder/list.html', {
+        'roles': page_obj,
+        'page_obj': page_obj,
+        'query': query,
+        'department': department,
+        'departments': departments,
+        'total_templates': total_templates,
+        'total_downloads': total_downloads,
+        'total_departments': departments.count(),
+    })
+
+
+@cache_page(60 * 60)
+def resume_builder_department(request, dept_slug):
+    """Department landing page for resume templates."""
+    dept_info = DEPARTMENT_META.get(dept_slug)
+    if not dept_info:
+        raise Http404
+
+    roles = Role.objects.filter(
+        is_active=True, department__iexact=dept_info['name'],
+        resume_template__is_active=True,
+    ).select_related('resume_template').distinct()
+
+    return render(request, 'pages/resume_builder/department.html', {
+        'dept_slug': dept_slug,
+        'dept_info': dept_info,
+        'roles': roles,
+    })
+
+
+def resume_builder_detail(request, slug):
+    """Resume builder page for a specific role — SEO landing + interactive builder."""
+    template = get_object_or_404(
+        ResumeTemplate.objects.select_related('role'),
+        role__slug=slug, is_active=True,
+    )
+    role = template.role
+
+    # Related templates (same department)
+    related = ResumeTemplate.objects.filter(
+        is_active=True, role__department=role.department, role__is_active=True,
+    ).select_related('role').exclude(pk=template.pk)[:4]
+
+    return render(request, 'pages/resume_builder/detail.html', {
+        'template': template,
+        'role': role,
+        'related': related,
+    })
+
+
+@require_POST
+def resume_download_pdf(request, slug):
+    """Generate and download resume PDF — email gated."""
+    template = get_object_or_404(
+        ResumeTemplate.objects.select_related('role'),
+        role__slug=slug, is_active=True,
+    )
+
+    form = ResumeDownloadForm(request.POST)
+    if not form.is_valid():
+        return JsonResponse({'error': 'Please provide name and email.'}, status=400)
+
+    resume_data = json.loads(request.POST.get('resume_data', '{}'))
+
+    # Save lead
+    lead = ResumeBuilderLead.objects.create(
+        email=form.cleaned_data['email'],
+        full_name=form.cleaned_data['full_name'],
+        role=template.role,
+        template_style=request.POST.get('style', 'professional'),
+        resume_data=resume_data,
+        downloaded=True,
+    )
+
+    # Add to newsletter
+    from .models import NewsletterSubscriber
+    NewsletterSubscriber.objects.get_or_create(
+        email=form.cleaned_data['email'],
+        defaults={'source': 'resume_builder'},
+    )
+
+    # Increment download counter
+    ResumeTemplate.objects.filter(pk=template.pk).update(
+        downloads_count=models.F('downloads_count') + 1,
+    )
+
+    # Generate PDF
+    from django.template.loader import render_to_string
+    style = request.POST.get('style', 'professional')
+
+    pdf_context = {
+        'data': resume_data,
+        'role': template.role,
+        'style': style,
+    }
+
+    html_string = render_to_string('pages/resume_builder/pdf_resume.html', pdf_context)
+
+    try:
+        from xhtml2pdf import pisa
+        import io
+
+        buffer = io.BytesIO()
+        pisa_status = pisa.CreatePDF(html_string, dest=buffer)
+        if pisa_status.err:
+            return JsonResponse({'error': 'PDF generation failed.'}, status=500)
+
+        buffer.seek(0)
+        response = HttpResponse(buffer.read(), content_type='application/pdf')
+        safe_name = slug.replace('-', '_')
+        response['Content-Disposition'] = f'attachment; filename="{safe_name}_resume.pdf"'
+        return response
+    except ImportError:
+        # Fallback: return HTML if xhtml2pdf not installed
+        response = HttpResponse(html_string, content_type='text/html')
+        return response

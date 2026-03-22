@@ -1,0 +1,553 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}{{ dept_info.name }} Resume Templates · Evalon{% endblock %}
+{% block meta_description %}Free {{ dept_info.name|lower }} resume templates. Build a professional, ATS-friendly resume tailored to {{ dept_info.name|lower }} roles with role-specific skills and formatting.{% endblock %}
+{% block extra_meta %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Resume Builder", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages:resume_builder_list' %}"},
+        {"@type": "ListItem", "position": 2, "name": "{{ dept_info.name }}"}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Resume Builder Department (rb-*) ────────────────────────── */
+
+.rb-shell {
+    max-width: 1080px;
+    margin: 1.5rem auto 2rem;
+    padding: 0 3rem 4rem;
+    background: #f9fafb;
+    border: 1px solid rgba(14, 20, 40, 0.06);
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 20px 40px rgba(13, 18, 34, 0.05);
+}
+
+/* Hero */
+.rb-hero {
+    text-align: center;
+    padding: 3.5rem 2rem 2.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.rb-breadcrumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    margin-bottom: 1.25rem;
+    color: #9ca3af;
+}
+
+.rb-breadcrumb a {
+    color: #8b5cf6;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.rb-breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.rb-eyebrow {
+    color: #8b5cf6;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.75rem;
+}
+
+.rb-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.75rem;
+    line-height: 1.15;
+}
+
+.rb-desc {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0 0 2rem;
+    line-height: 1.6;
+}
+
+/* Trust Stats */
+.rb-trust-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.rb-trust-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.rb-trust-stat strong {
+    color: var(--color-navy);
+}
+
+.rb-trust-stat svg {
+    color: #8b5cf6;
+}
+
+/* Card Grid */
+.rb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    padding: 0;
+}
+
+.rb-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-white);
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+    border-top: 3px solid transparent;
+}
+
+.rb-card:hover {
+    border-top-color: transparent;
+    border-image: linear-gradient(135deg, #8b5cf6, #7c3aed) 1;
+    border-image-slice: 1 1 0 1;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Card Top (badges row) */
+.rb-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.rb-card-dept {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #8b5cf6;
+    background: #f5f3ff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.rb-card-seniority {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+}
+
+/* Card Title */
+.rb-card-title {
+    font-size: 1.05rem;
+    font-weight: 650;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+}
+
+/* Skills Tags */
+.rb-card-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+}
+
+.rb-card-skill {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+}
+
+/* Card Footer */
+.rb-card-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.rb-card-downloads {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: #9ca3af;
+}
+
+.rb-card-downloads svg {
+    color: #c4b5fd;
+}
+
+.rb-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #8b5cf6;
+    transition: color 0.2s ease;
+}
+
+.rb-card:hover .rb-card-cta {
+    color: #7c3aed;
+}
+
+/* Empty */
+.rb-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.rb-empty h3 {
+    color: var(--color-navy);
+    margin-bottom: 0.5rem;
+}
+
+.rb-empty a {
+    color: #8b5cf6;
+}
+
+/* Section */
+.rb-section {
+    margin-top: 2.5rem;
+}
+
+.rb-section-title {
+    font-size: 1.1rem;
+    font-weight: 650;
+    color: var(--color-navy);
+    margin: 0 0 1rem;
+}
+
+/* Back link pills */
+.rb-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.rb-filter {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: var(--color-white);
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.rb-filter:hover {
+    border-color: #c4b5fd;
+    color: #7c3aed;
+}
+
+/* CTA Section */
+.rb-list-cta {
+    margin-top: 3rem;
+    text-align: center;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    border: 1px solid #e9d5ff;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+}
+
+.rb-list-cta h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 0.5rem;
+}
+
+.rb-list-cta p {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+}
+
+.rb-list-cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.rb-btn-primary {
+    display: inline-block;
+    padding: 0.65rem 1.5rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    background: #8b5cf6;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.rb-btn-primary:hover {
+    background: #7c3aed;
+}
+
+.rb-btn-secondary {
+    display: inline-block;
+    padding: 0.65rem 1.5rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #8b5cf6;
+    background: var(--color-white);
+    border: 1px solid #e9d5ff;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.rb-btn-secondary:hover {
+    border-color: #c4b5fd;
+    background: #faf5ff;
+}
+
+/* Cross-link */
+.rb-crosslink {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--color-white);
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+.rb-crosslink:hover {
+    border-color: #c4b5fd;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+}
+
+.rb-crosslink-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f3ff;
+    border-radius: 10px;
+    color: #8b5cf6;
+}
+
+.rb-crosslink-body {
+    flex: 1;
+}
+
+.rb-crosslink-body h3 {
+    font-size: 0.95rem;
+    font-weight: 650;
+    color: var(--color-navy);
+    margin: 0 0 0.2rem;
+}
+
+.rb-crosslink-body p {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.rb-crosslink-arrow {
+    flex-shrink: 0;
+    color: #c4b5fd;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.rb-crosslink:hover .rb-crosslink-arrow {
+    color: #8b5cf6;
+    transform: translateX(3px);
+}
+
+@media (max-width: 640px) {
+    .rb-shell {
+        padding: 0 1.25rem 3rem;
+    }
+    .rb-hero {
+        padding: 2.5rem 0.5rem 2rem;
+    }
+    .rb-grid {
+        grid-template-columns: 1fr;
+    }
+    .rb-crosslink {
+        flex-direction: column;
+        text-align: center;
+    }
+    .rb-crosslink-arrow {
+        display: none;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    {% include 'includes/site_header.html' with active='assessments' %}
+    <main>
+        <div class="rb-shell">
+            <section class="rb-hero">
+                <div class="rb-breadcrumb">
+                    <a href="{% url 'pages:resume_builder_list' %}">All Templates</a>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    <span>{{ dept_info.name }}</span>
+                </div>
+                <p class="rb-eyebrow">{{ dept_info.name }} Department</p>
+                <h1 class="rb-title">{{ dept_info.name }} Resume Templates</h1>
+                <p class="rb-desc">{{ dept_info.desc }} Build a professional, ATS-friendly resume tailored to {{ dept_info.name|lower }} roles.</p>
+
+                <div class="rb-trust-stats">
+                    <span class="rb-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <strong>{{ roles|length }}</strong> Role{{ roles|length|pluralize }}
+                    </span>
+                    <span class="rb-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line><line x1="8" y1="17" x2="12" y2="17"></line></svg>
+                        <strong>Free</strong> Templates
+                    </span>
+                    <span class="rb-trust-stat">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <strong>ATS</strong> Friendly
+                    </span>
+                </div>
+            </section>
+
+            <section class="rb-grid" id="grid">
+                {% for role in roles %}
+                <a class="rb-card" href="{% url 'pages:resume_builder_detail' slug=role.slug %}">
+                    <div class="rb-card-top">
+                        <span class="rb-card-dept">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line></svg>
+                            {{ dept_info.name }}
+                        </span>
+                        <span class="rb-card-seniority">{{ role.seniority_level }}</span>
+                    </div>
+                    <h3 class="rb-card-title">{{ role.title }} Resume</h3>
+                    {% if role.key_skills %}
+                    <div class="rb-card-skills">
+                        {% for skill in role.key_skills|slice:":4" %}
+                        <span class="rb-card-skill">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="rb-card-footer">
+                        <span class="rb-card-downloads">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            {{ role.resume_template.download_count|default:"0"|intcomma }} downloads
+                        </span>
+                        <span class="rb-card-cta">Build Resume &rarr;</span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="rb-empty">
+                    <h3>No {{ dept_info.name }} templates yet</h3>
+                    <p>Check back soon or <a href="{% url 'pages:resume_builder_list' %}">browse all templates</a>.</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            {# CTA #}
+            <section class="rb-list-cta">
+                <h2>Go beyond resumes</h2>
+                <p>Pair your {{ dept_info.name|lower }} resume with skill assessments to stand out and validate your expertise.</p>
+                <div class="rb-list-cta-actions">
+                    <a class="rb-btn-primary" href="{% url 'clients:signup' %}"
+                       data-gtag-click="rb_dept_cta_click"
+                       data-gtag-category="conversion"
+                       data-gtag-label="rb_dept_{{ dept_slug }}_trial">Start Free Trial</a>
+                    <a class="rb-btn-secondary" href="{% url 'pages:assessment_list' %}"
+                       data-gtag-click="rb_dept_assessments_click"
+                       data-gtag-category="engagement"
+                       data-gtag-label="rb_dept_{{ dept_slug }}_assessments">Browse Assessments</a>
+                </div>
+            </section>
+
+            {# Cross-link back to main list #}
+            <section style="margin-top: 1.5rem;">
+                <a class="rb-crosslink" href="{% url 'pages:resume_builder_list' %}"
+                   data-gtag-click="rb_dept_back_crosslink"
+                   data-gtag-category="engagement"
+                   data-gtag-label="rb_dept_{{ dept_slug }}_back">
+                    <div class="rb-crosslink-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line><line x1="8" y1="17" x2="12" y2="17"></line></svg>
+                    </div>
+                    <div class="rb-crosslink-body">
+                        <h3>Browse All Resume Templates</h3>
+                        <p>Explore resume templates across all departments and roles, with search and filtering.</p>
+                    </div>
+                    <svg class="rb-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </section>
+
+            {# Cross-link to Interview Questions #}
+            <section style="margin-top: 0.75rem;">
+                <a class="rb-crosslink" href="{% url 'pages:interview_questions_list' %}"
+                   data-gtag-click="rb_dept_to_iq_crosslink"
+                   data-gtag-category="engagement"
+                   data-gtag-label="rb_dept_{{ dept_slug }}_iq">
+                    <div class="rb-crosslink-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <div class="rb-crosslink-body">
+                        <h3>Interview Questions by Role</h3>
+                        <p>Prepare for interviews with curated questions, difficulty ratings, and sample answer guidance.</p>
+                    </div>
+                    <svg class="rb-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}
