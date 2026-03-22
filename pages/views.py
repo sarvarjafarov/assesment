@@ -1978,8 +1978,9 @@ def resume_builder_list(request):
     total_templates = Role.objects.filter(
         is_active=True, resume_template__is_active=True,
     ).distinct().count()
+    from django.db.models import Sum
     total_downloads = ResumeTemplate.objects.filter(is_active=True).aggregate(
-        total=models.Sum('downloads_count')
+        total=Sum('downloads_count')
     )['total'] or 0
 
     paginator = Paginator(roles, 24)
@@ -2068,8 +2069,9 @@ def resume_download_pdf(request, slug):
     )
 
     # Increment download counter
+    from django.db.models import F
     ResumeTemplate.objects.filter(pk=template.pk).update(
-        downloads_count=models.F('downloads_count') + 1,
+        downloads_count=F('downloads_count') + 1,
     )
 
     # Generate PDF
