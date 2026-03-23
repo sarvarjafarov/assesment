@@ -35,9 +35,9 @@ def _hreflang(en_path, az_path):
 def home(request):
     hero_content = {
         "badge": "İşə qəbul platforması",
-        "title": "Ən yaxşı namizədləri",
-        "title_accent": "testlərlə seçin",
-        "subtitle": "Hər vəzifə üçün hazır bacarıq testləri — avtomatik nəticələr, prosesin izlənməsi və etibarlı hesabatlar.",
+        "title": "Doğru insanı seçin —",
+        "title_accent": "bacarıq testləri ilə",
+        "subtitle": "Hər vəzifəyə uyğun hazır testlər, avtomatik nəticələr və komandanızın güvənə biləcəyi hesabatlar — hamısı bir platformada.",
         "primary_label": "Pulsuz başlayın",
         "primary_url": reverse("clients:signup"),
         "secondary_link_label": "Necə işləyir →",
@@ -45,25 +45,25 @@ def home(request):
     }
 
     assessment_suite = [
-        {"slug": "marketing", "label": "Marketinq", "title": "Rəqəmsal marketinq", "summary": "Reklam, SEO, analitika və kontent bilikləri yoxlanılır.", "duration": "32 dəq"},
-        {"slug": "product", "label": "Məhsul", "title": "Məhsul idarəetməsi", "summary": "Analitik düşüncə, prioritetlərin müəyyənləşdirilməsi və UX.", "duration": "30 dəq"},
-        {"slug": "behavioral", "label": "Davranış", "title": "Liderlik və mədəniyyət", "summary": "Komanda işi, riskə münasibət və mentorluq bacarıqları.", "duration": "15 dəq"},
-        {"slug": "ux_design", "label": "Dizayn", "title": "UX/UI dizayn", "summary": "İstifadəçi araşdırması, interfeys dizaynı və əlçatanlıq.", "duration": "35 dəq"},
-        {"slug": "hr", "label": "HR", "title": "İnsan resursları", "summary": "İşə qəbul, əmək qanunvericiliyi və HR strategiyası.", "duration": "35 dəq"},
-        {"slug": "finance", "label": "Maliyyə", "title": "Maliyyə idarəetməsi", "summary": "Büdcə planlaması, risk analizi və strateji maliyyə.", "duration": "35 dəq"},
+        {"slug": "marketing", "label": "Marketinq", "title": "Rəqəmsal marketinq", "summary": "Reklam kampaniyaları, SEO, analitika və kontent strategiyası üzrə biliklərin yoxlanması.", "duration": "32 dəq"},
+        {"slug": "product", "label": "Məhsul", "title": "Məhsul idarəetməsi", "summary": "Strateji düşüncə, prioritetləşdirmə, yol xəritəsi planlaması və istifadəçi təcrübəsi.", "duration": "30 dəq"},
+        {"slug": "behavioral", "label": "Davranış", "title": "Liderlik və mədəniyyət", "summary": "Komanda işi tərzi, riskə yanaşma, mentorluq və liderlik bacarıqları.", "duration": "15 dəq"},
+        {"slug": "ux_design", "label": "Dizayn", "title": "UX/UI dizayn", "summary": "İstifadəçi araşdırması, qarşılıqlı əlaqə dizaynı və əlçatanlıq standartları.", "duration": "35 dəq"},
+        {"slug": "hr", "label": "HR", "title": "İnsan resursları", "summary": "İşə qəbul prosesləri, əmək qanunvericiliyi və kadr strategiyası.", "duration": "35 dəq"},
+        {"slug": "finance", "label": "Maliyyə", "title": "Maliyyə idarəetməsi", "summary": "Büdcə planlaması, maliyyə modelləşdirməsi və strateji analiz.", "duration": "35 dəq"},
     ]
 
     features = [
-        {"slug": "create", "title": "Vakansiya yaradın", "description": "Vəzifəni təyin edin, test əlavə edin və vakansiya səhifənizdə dərc edin."},
-        {"slug": "invite", "title": "Namizədləri dəvət edin", "description": "Namizədlər öz vaxtlarında testi keçmək üçün link olan e-poçt alırlar."},
-        {"slug": "review", "title": "Avtomatik nəticələr", "description": "Hər cavab avtomatik qiymətləndirilir — namizədləri asanlıqla müqayisə edin."},
-        {"slug": "decide", "title": "Qərar qəbul edin", "description": "Hesabatları yükləyin və bütün işə qəbul prosesini bir yerdən idarə edin."},
+        {"slug": "create", "title": "Vakansiya açın", "description": "Vəzifəni müəyyən edin, uyğun testi seçin və bir neçə kliklə dərc edin."},
+        {"slug": "invite", "title": "Namizədləri dəvət edin", "description": "Hər namizəd testi öz vaxtında keçmək üçün şəxsi link alır."},
+        {"slug": "review", "title": "Nəticələri görün", "description": "Cavablar avtomatik qiymətləndirilir — namizədləri bir baxışda müqayisə edin."},
+        {"slug": "decide", "title": "Qərarınızı verin", "description": "Ətraflı hesabatları yükləyin, bütün prosesi bir yerdən idarə edin."},
     ]
 
     case_studies = [
-        {"slug": "atlas", "company": "Atlas CRM", "headline": "Məhsul mütəxəssislərinin işə qəbulu 37% sürətləndi.", "result": "Testlərin avtomatik qiymətləndirilməsi müsahibəçilərin vaxtına qənaət etdi.", "metric_label": "İşə qəbul sürəti", "metric_value": "-37%"},
-        {"slug": "northwind", "company": "Northwind Commerce", "headline": "Marketinq testlərindən 2 dəfə çox faydalı nəticə.", "result": "Real ssenari tapşırıqları distant namizədlərə bərabər imkan yaratdı.", "metric_label": "Nəticə keyfiyyəti", "metric_value": "2x"},
-        {"slug": "aster", "company": "Aster Care", "headline": "Namizəd məmnuniyyəti 4.9/5-ə çatdı.", "result": "Rahat interfeys və aydın təlimatlar namizədlərin iştirakını artırdı.", "metric_label": "Namizəd reytinqi", "metric_value": "4.9"},
+        {"slug": "atlas", "company": "Atlas CRM", "headline": "Məhsul üzrə işə qəbul müddəti 37% qısaldı.", "result": "Avtomatik qiymətləndirmə müsahibəçilərin yalnız ən güclü namizədlərə vaxt ayırmasını təmin etdi.", "metric_label": "İşə qəbul sürəti", "metric_value": "-37%"},
+        {"slug": "northwind", "company": "Northwind Commerce", "headline": "Marketinq testlərindən 2 dəfə daha dəqiq nəticə.", "result": "Real iş ssenariləri əsasında tapşırıqlar distant namizədlərə eyni şansı verdi.", "metric_label": "Nəticə dəqiqliyi", "metric_value": "2x"},
+        {"slug": "aster", "company": "Aster Care", "headline": "Namizəd məmnuniyyəti 4.9 bala çatdı.", "result": "Anlaşılan interfeys və addım-addım təlimatlar sayəsində namizədlər prosesi yarımçıq buraxmadı.", "metric_label": "Namizəd reytinqi", "metric_value": "4.9"},
     ]
 
     pricing_tiers = [
@@ -97,9 +97,9 @@ def home(request):
     ]
 
     suite_heading = {
-        "title": "Hər vəzifə üçün testlər",
-        "subtitle": "Qiymətləndirmə rubrikləri və real iş ssenariləri ilə altı hazır sual bankı.",
-        "instructions": "İstənilən testə klikləyərək nümunə sualları görün.",
+        "title": "Altı sahə, bir platforma",
+        "subtitle": "Hər test bankı real iş ssenariləri, qiymətləndirmə rubrikləri və avtomatik ballandırma ilə gəlir.",
+        "instructions": "Hər hansı testə klikləyib nümunə sualları görə bilərsiniz.",
     }
 
     testimonials = [
@@ -107,16 +107,16 @@ def home(request):
             "name": "Murad Əliyev",
             "role": "HR direktoru, Atlas CRM",
             "company": "Atlas CRM",
-            "quote": "Evalon marketinq üzrə işə qəbul müddətimizi 3 həftədən 12 günə endirdi. Avtomatik qiymətləndirmə sayəsində yalnız ən yaxşı namizədlərə fokuslandıq.",
-            "metric": "60% daha sürətli",
+            "quote": "Evalon-dan əvvəl marketinq mütəxəssisi tapmaq 3 həftə çəkirdi. İndi 12 günə qərar veririk. Avtomatik qiymətləndirmə sayəsində hər CV-ni əl ilə oxumağa ehtiyac qalmadı.",
+            "metric": "60% sürətli işə qəbul",
             "avatar": "img/avatar-lauren.svg",
         },
         {
             "name": "Aynur Həsənova",
             "role": "İşə qəbul rəhbəri, Aster Care",
             "company": "Aster Care",
-            "quote": "İndi namizədlər prosesdən razı qalırlar. Aydın təlimatlar və irəliləyiş izləmə yarımçıq qalan testləri yarıya endirdi.",
-            "metric": "50% daha yaxşı tamamlanma",
+            "quote": "Əvvəl namizədlərin yarısı testi yarımçıq buraxırdı. Evalon-un aydın interfeysi və addım-addım göstəriciləri sayəsində tamamlanma faizi 2 dəfə artdı.",
+            "metric": "50% yüksək tamamlanma",
             "avatar": "img/avatar-savannah.svg",
         },
     ]
@@ -128,10 +128,10 @@ def home(request):
     }
 
     ai_pipeline_steps = [
-        {"title": "CV-ləri yükləyin", "desc": "PDF və ya DOCX fayllarını yükləyin — AI hər birini oxuyub anlayır.", "icon": "upload"},
-        {"title": "AI yoxlayır və qiymətləndirir", "desc": "Claude bacarıqları, təcrübəni və vəzifəyə uyğunluğu 0-100 şkalasında qiymətləndirir.", "icon": "brain"},
-        {"title": "Avtomatik test göndərilir", "desc": "Seçilmiş namizədlər avtomatik olaraq uyğun bacarıq testini alırlar.", "icon": "send"},
-        {"title": "AI qərar verir", "desc": "CV analizi + test nəticələri = ağıllı işə qəbul tövsiyələri.", "icon": "check"},
+        {"title": "CV-ləri yükləyin", "desc": "PDF və ya DOCX fayllarını atın — AI hər birini saniyələr ərzində oxuyub anlayır.", "icon": "upload"},
+        {"title": "AI analiz edir", "desc": "Bacarıqlar, təcrübə və vəzifəyə uyğunluq 0-100 şkalasında qiymətləndirilir.", "icon": "brain"},
+        {"title": "Test avtomatik göndərilir", "desc": "Uyğun namizədlərə avtomatik olaraq doğru bacarıq testi göndərilir.", "icon": "send"},
+        {"title": "Tövsiyə hazırdır", "desc": "CV təhlili və test nəticələri birləşdirilir — sizə hazır qərar verilir.", "icon": "check"},
     ]
 
     from .forms import DemoRequestForm
