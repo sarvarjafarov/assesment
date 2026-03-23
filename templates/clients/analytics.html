@@ -6,22 +6,24 @@
 {% block portal_content %}
 <div class="portal-shell">
 
-    {# ── Header ── #}
-    <header class="an-header">
-        <div class="an-header-left">
-            <h1>Analytics</h1>
-            <p class="muted">Performance insights across your assessment pipeline</p>
+    {# ── Dark Hero Header ── #}
+    <header class="an-header" style="background: linear-gradient(135deg, #0e1428 0%, #1a1e3a 100%); position: relative; overflow: hidden; border-radius: 16px; padding: 2.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="position: absolute; top: -40%; right: -10%; width: 420px; height: 420px; background: radial-gradient(circle, rgba(255, 138, 0, 0.12) 0%, transparent 70%); pointer-events: none;"></div>
+        <div style="position: absolute; bottom: -50%; left: 15%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%); pointer-events: none;"></div>
+        <div class="an-header-left" style="position: relative; z-index: 1;">
+            <h1 style="color: #ffffff; font-size: 1.75rem; font-weight: 700; margin: 0 0 0.35rem 0; animation: pp-fadeUp 0.5s ease both;">Analytics</h1>
+            <p style="color: rgba(255,255,255,0.55); font-size: 0.95rem; margin: 0; animation: pp-fadeUp 0.5s ease 0.1s both;">Performance insights across your assessment pipeline</p>
         </div>
-        <div class="an-header-actions">
+        <div class="an-header-actions" style="display: flex; align-items: center; gap: 0.75rem; position: relative; z-index: 1; animation: pp-fadeUp 0.5s ease 0.15s both;">
             <form method="get" class="an-period-form">
-                <select name="period" onchange="this.form.submit()" class="an-period-select">
-                    <option value="7" {% if selected_period == '7' %}selected{% endif %}>Last 7 days</option>
-                    <option value="30" {% if selected_period == '30' %}selected{% endif %}>Last 30 days</option>
-                    <option value="90" {% if selected_period == '90' %}selected{% endif %}>Last 90 days</option>
-                    <option value="all" {% if selected_period == 'all' %}selected{% endif %}>All time</option>
+                <select name="period" onchange="this.form.submit()" class="an-period-select" style="background: rgba(255,255,255,0.08); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem 2rem 0.5rem 0.75rem; font-size: 0.85rem; backdrop-filter: blur(8px); -webkit-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center;">
+                    <option value="7" {% if selected_period == '7' %}selected{% endif %} style="color: #0e1428;">Last 7 days</option>
+                    <option value="30" {% if selected_period == '30' %}selected{% endif %} style="color: #0e1428;">Last 30 days</option>
+                    <option value="90" {% if selected_period == '90' %}selected{% endif %} style="color: #0e1428;">Last 90 days</option>
+                    <option value="all" {% if selected_period == 'all' %}selected{% endif %} style="color: #0e1428;">All time</option>
                 </select>
             </form>
-            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline small">
+            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline small" style="color: #ffffff; border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); backdrop-filter: blur(8px);">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -35,10 +37,10 @@
     {% if analytics.total_invites > 0 %}
 
     {# ── Key Metrics Strip ── #}
-    <div class="an-metrics">
-        <article class="an-metric">
-            <div class="an-metric-icon an-metric-icon--invites">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="an-metrics" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; animation: pp-fadeUp 0.5s ease 0.2s both;">
+        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #6366f1; display: flex; align-items: flex-start; gap: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(99,102,241,0.1); flex-shrink: 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="8.5" cy="7" r="4"></circle>
                     <line x1="20" y1="8" x2="20" y2="14"></line>
@@ -46,136 +48,136 @@
                 </svg>
             </div>
             <div class="an-metric-body">
-                <span class="an-metric-lbl">Total Invites</span>
-                <span class="an-metric-val">{{ analytics.total_invites }}</span>
-                <span class="an-metric-sub">{{ analytics.in_progress_count }} in progress</span>
+                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Total Invites</span>
+                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{{ analytics.total_invites }}</span>
+                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">{{ analytics.in_progress_count }} in progress</span>
             </div>
         </article>
-        <article class="an-metric">
-            <div class="an-metric-icon an-metric-icon--rate">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #10b981; display: flex; align-items: flex-start; gap: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(16,185,129,0.1); flex-shrink: 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
             </div>
             <div class="an-metric-body">
-                <span class="an-metric-lbl">Completion Rate</span>
-                <span class="an-metric-val">{{ analytics.completion_rate|floatformat:0 }}%</span>
-                <span class="an-metric-sub">{{ analytics.completed_count }} completed</span>
+                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Completion Rate</span>
+                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{{ analytics.completion_rate|floatformat:0 }}%</span>
+                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">{{ analytics.completed_count }} completed</span>
             </div>
         </article>
-        <article class="an-metric">
-            <div class="an-metric-icon an-metric-icon--score">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #ff8a00; display: flex; align-items: flex-start; gap: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(255,138,0,0.1); flex-shrink: 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff8a00" stroke-width="2">
                     <line x1="12" y1="20" x2="12" y2="10"></line>
                     <line x1="18" y1="20" x2="18" y2="4"></line>
                     <line x1="6" y1="20" x2="6" y2="16"></line>
                 </svg>
             </div>
             <div class="an-metric-body">
-                <span class="an-metric-lbl">Avg. Score</span>
-                <span class="an-metric-val">{% if analytics.average_score %}{{ analytics.average_score|floatformat:1 }}{% else %}—{% endif %}</span>
-                <span class="an-metric-sub">Across finished sessions</span>
+                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Avg. Score</span>
+                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{% if analytics.average_score %}{{ analytics.average_score|floatformat:1 }}{% else %}—{% endif %}</span>
+                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">Across finished sessions</span>
             </div>
         </article>
-        <article class="an-metric">
-            <div class="an-metric-icon an-metric-icon--time">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #8b5cf6; display: flex; align-items: flex-start; gap: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(139,92,246,0.1); flex-shrink: 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
             </div>
             <div class="an-metric-body">
-                <span class="an-metric-lbl">Avg. Duration</span>
-                <span class="an-metric-val">{% if analytics.average_duration %}{{ analytics.average_duration|floatformat:0 }}m{% else %}—{% endif %}</span>
-                <span class="an-metric-sub">Time to complete</span>
+                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Avg. Duration</span>
+                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{% if analytics.average_duration %}{{ analytics.average_duration|floatformat:0 }}m{% else %}—{% endif %}</span>
+                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">Time to complete</span>
             </div>
         </article>
     </div>
 
     {# ── Charts Row ── #}
-    <div class="an-charts">
-        <article class="an-chart-card">
-            <div class="an-card-head">
-                <h3>Activity Trend</h3>
-                <span class="an-card-sub">Invites and completions over time</span>
+    <div class="an-charts" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; animation: pp-fadeUp 0.5s ease 0.3s both;">
+        <article class="an-chart-card" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #6366f1;">
+            <div class="an-card-head" style="margin-bottom: 1rem;">
+                <h3 style="font-size: 1rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Activity Trend</h3>
+                <span class="an-card-sub" style="font-size: 0.8rem; color: #9ca3af;">Invites and completions over time</span>
             </div>
-            <div class="an-chart-wrap" id="trendChartContainer">
+            <div class="an-chart-wrap" id="trendChartContainer" style="height: 260px; position: relative;">
                 <canvas id="trendChart"></canvas>
             </div>
         </article>
-        <article class="an-chart-card">
-            <div class="an-card-head">
-                <h3>Assessment Breakdown</h3>
-                <span class="an-card-sub">Completion rates by type</span>
+        <article class="an-chart-card" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #ff8a00;">
+            <div class="an-card-head" style="margin-bottom: 1rem;">
+                <h3 style="font-size: 1rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Assessment Breakdown</h3>
+                <span class="an-card-sub" style="font-size: 0.8rem; color: #9ca3af;">Completion rates by type</span>
             </div>
-            <div class="an-chart-wrap" id="breakdownChartContainer">
+            <div class="an-chart-wrap" id="breakdownChartContainer" style="height: 260px; position: relative;">
                 <canvas id="breakdownChart"></canvas>
             </div>
         </article>
     </div>
 
     {# ── Conversion Funnel ── #}
-    <section class="an-section">
-        <div class="an-section-head">
-            <h2>Conversion Funnel</h2>
-            <span class="an-section-sub">Journey from invite to completion</span>
+    <section class="an-section" style="animation: pp-slideRight 0.5s ease 0.35s both;">
+        <div class="an-section-head" style="margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.15rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Conversion Funnel</h2>
+            <span class="an-section-sub" style="font-size: 0.82rem; color: #9ca3af;">Journey from invite to completion</span>
         </div>
-        <div class="an-funnel">
+        <div class="an-funnel" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06);">
             <div class="an-funnel-step">
-                <div class="an-funnel-bar" style="width: 100%;">
-                    <div class="an-funnel-info">
+                <div class="an-funnel-bar" style="width: 100%; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; color: #fff; min-height: 48px;">
+                    <div class="an-funnel-info" style="display: flex; align-items: center; gap: 0.5rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
-                        <span class="an-funnel-label">Invited</span>
+                        <span class="an-funnel-label" style="font-weight: 600; font-size: 0.9rem;">Invited</span>
                     </div>
-                    <span class="an-funnel-count">{{ analytics.chart_data.funnel.invited }}</span>
+                    <span class="an-funnel-count" style="font-weight: 700; font-size: 1.1rem;">{{ analytics.chart_data.funnel.invited }}</span>
                 </div>
-                <span class="an-funnel-pct">100%</span>
+                <span class="an-funnel-pct" style="font-size: 0.78rem; color: #6b7280; font-weight: 600; margin-top: 0.35rem; display: block; text-align: right;">100%</span>
             </div>
-            <div class="an-funnel-arrow">
+            <div class="an-funnel-arrow" style="text-align: center; padding: 0.35rem 0; color: #d1d5db;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="an-funnel-step">
-                <div class="an-funnel-bar an-funnel-bar--mid" style="width: {% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%;">
-                    <div class="an-funnel-info">
+                <div class="an-funnel-bar an-funnel-bar--mid" style="width: {% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%; background: linear-gradient(90deg, #ff8a00, #ffb347); border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; color: #fff; min-height: 48px;">
+                    <div class="an-funnel-info" style="display: flex; align-items: center; gap: 0.5rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        <span class="an-funnel-label">Started</span>
+                        <span class="an-funnel-label" style="font-weight: 600; font-size: 0.9rem;">Started</span>
                     </div>
-                    <span class="an-funnel-count">{{ analytics.chart_data.funnel.started }}</span>
+                    <span class="an-funnel-count" style="font-weight: 700; font-size: 1.1rem;">{{ analytics.chart_data.funnel.started }}</span>
                 </div>
-                <span class="an-funnel-pct">{% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%</span>
+                <span class="an-funnel-pct" style="font-size: 0.78rem; color: #6b7280; font-weight: 600; margin-top: 0.35rem; display: block; text-align: right;">{% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%</span>
             </div>
-            <div class="an-funnel-arrow">
+            <div class="an-funnel-arrow" style="text-align: center; padding: 0.35rem 0; color: #d1d5db;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="an-funnel-step">
-                <div class="an-funnel-bar an-funnel-bar--end" style="width: {% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%;">
-                    <div class="an-funnel-info">
+                <div class="an-funnel-bar an-funnel-bar--end" style="width: {% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; color: #fff; min-height: 48px;">
+                    <div class="an-funnel-info" style="display: flex; align-items: center; gap: 0.5rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                        <span class="an-funnel-label">Completed</span>
+                        <span class="an-funnel-label" style="font-weight: 600; font-size: 0.9rem;">Completed</span>
                     </div>
-                    <span class="an-funnel-count">{{ analytics.chart_data.funnel.completed }}</span>
+                    <span class="an-funnel-count" style="font-weight: 700; font-size: 1.1rem;">{{ analytics.chart_data.funnel.completed }}</span>
                 </div>
-                <span class="an-funnel-pct">{% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%</span>
+                <span class="an-funnel-pct" style="font-size: 0.78rem; color: #6b7280; font-weight: 600; margin-top: 0.35rem; display: block; text-align: right;">{% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%</span>
             </div>
         </div>
     </section>
 
     {# ── Assessment Performance ── #}
-    <section class="an-section">
-        <div class="an-section-head">
-            <h2>Assessment Performance</h2>
-            <span class="an-section-sub">Breakdown by assessment type</span>
+    <section class="an-section" style="animation: pp-fadeUp 0.5s ease 0.4s both;">
+        <div class="an-section-head" style="margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.15rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Assessment Performance</h2>
+            <span class="an-section-sub" style="font-size: 0.82rem; color: #9ca3af;">Breakdown by assessment type</span>
         </div>
-        <div class="an-table-card">
+        <div class="an-table-card" style="background: #fff; border-radius: 14px; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #10b981; overflow: hidden;">
             <table class="an-table">
                 <thead>
                     <tr>
@@ -208,12 +210,12 @@
 
     {# ── Score Distribution ── #}
     {% if analytics.score_distribution %}
-    <section class="an-section">
-        <div class="an-section-head">
-            <h2>Score Distribution</h2>
-            <span class="an-section-sub">How candidates scored across all assessments</span>
+    <section class="an-section" style="animation: pp-fadeUp 0.5s ease 0.45s both;">
+        <div class="an-section-head" style="margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.15rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Score Distribution</h2>
+            <span class="an-section-sub" style="font-size: 0.82rem; color: #9ca3af;">How candidates scored across all assessments</span>
         </div>
-        <div class="an-dist-card">
+        <div class="an-dist-card" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #8b5cf6;">
             {% for range in analytics.score_distribution %}
             <div class="an-dist-row">
                 <span class="an-dist-label">{{ range.label }}</span>
@@ -233,7 +235,7 @@
     {% else %}
 
     {# ── Empty State ── #}
-    <div class="an-empty">
+    <div class="an-empty" style="animation: pp-scaleIn 0.4s ease both;">
         <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
             <line x1="12" y1="20" x2="12" y2="10"></line>
             <line x1="18" y1="20" x2="18" y2="4"></line>
