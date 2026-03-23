@@ -96,12 +96,70 @@ def home(request):
         },
     ]
 
+    suite_heading = {
+        "title": "Hər vəzifə üçün testlər",
+        "subtitle": "Qiymətləndirmə rubrikləri və real iş ssenariləri ilə altı hazır sual bankı.",
+        "instructions": "İstənilən testə klikləyərək nümunə sualları görün.",
+    }
+
+    testimonials = [
+        {
+            "name": "Murad Əliyev",
+            "role": "HR direktoru, Atlas CRM",
+            "company": "Atlas CRM",
+            "quote": "Evalon marketinq üzrə işə qəbul müddətimizi 3 həftədən 12 günə endirdi. Avtomatik qiymətləndirmə sayəsində yalnız ən yaxşı namizədlərə fokuslandıq.",
+            "metric": "60% daha sürətli",
+            "avatar": "img/avatar-lauren.svg",
+        },
+        {
+            "name": "Aynur Həsənova",
+            "role": "İşə qəbul rəhbəri, Aster Care",
+            "company": "Aster Care",
+            "quote": "İndi namizədlər prosesdən razı qalırlar. Aydın təlimatlar və irəliləyiş izləmə yarımçıq qalan testləri yarıya endirdi.",
+            "metric": "50% daha yaxşı tamamlanma",
+            "avatar": "img/avatar-savannah.svg",
+        },
+    ]
+
+    pricing_helper = {
+        "headline": "Sadə və aydın qiymətlər",
+        "subline": "Pulsuz başlayın, daha çox vakansiya lazım olduqda yüksəldin. Bütün planlara 6 test növü daxildir.",
+        "footnote": "Bütün planlara limitsiz komanda üzvləri daxildir. İllik ödənişdə Pro planda 20% qənaət.",
+    }
+
+    ai_pipeline_steps = [
+        {"title": "CV-ləri yükləyin", "desc": "PDF və ya DOCX fayllarını yükləyin — AI hər birini oxuyub anlayır.", "icon": "upload"},
+        {"title": "AI yoxlayır və qiymətləndirir", "desc": "Claude bacarıqları, təcrübəni və vəzifəyə uyğunluğu 0-100 şkalasında qiymətləndirir.", "icon": "brain"},
+        {"title": "Avtomatik test göndərilir", "desc": "Seçilmiş namizədlər avtomatik olaraq uyğun bacarıq testini alırlar.", "icon": "send"},
+        {"title": "AI qərar verir", "desc": "CV analizi + test nəticələri = ağıllı işə qəbul tövsiyələri.", "icon": "check"},
+    ]
+
+    from .forms import DemoRequestForm
+    if request.method == "POST":
+        form = DemoRequestForm(request.POST)
+        if form.is_valid():
+            demo_request = form.save()
+            from django.contrib import messages as django_messages
+            django_messages.success(
+                request,
+                f"Təşəkkürlər {demo_request.full_name.split()[0]}! Demo sorğunuzu aldıq, 1 iş günü ərzində əlaqə saxlayacağıq.",
+            )
+            return redirect(f"{reverse('pages_az:home')}#cta")
+    else:
+        form = DemoRequestForm()
+
     return render(request, "pages/az/home.html", {
         "hero_content": hero_content,
+        "suite": assessment_suite,
+        "suite_heading": suite_heading,
         "assessment_suite": assessment_suite,
         "features": features,
         "case_studies": case_studies,
+        "testimonials": testimonials,
         "pricing_tiers": pricing_tiers,
+        "pricing_helper": pricing_helper,
+        "invite_form": form,
+        "ai_pipeline_steps": ai_pipeline_steps,
         "lang": "az",
         "hreflang": _hreflang("/", "/az/"),
     })
