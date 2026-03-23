@@ -6,20 +6,21 @@
 <div class="portal-shell">
 
     {# ── Header ── #}
-    <header class="gd-header">
-        <div class="gd-header-left">
-            <div class="gd-header-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <header class="gd-header" style="display:flex; align-items:center; justify-content:space-between; padding:1.75rem 2rem; background:linear-gradient(135deg, #0e1428 0%, #1a1e3a 100%); border-radius:20px; margin-bottom:1.5rem; position:relative; overflow:hidden; opacity:0; animation: pp-fadeUp 0.45s ease forwards; animation-delay:0.04s;">
+        <div style="position:absolute; top:-40px; right:-30px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%); pointer-events:none;"></div>
+        <div style="display:flex; align-items:center; gap:1rem; position:relative; z-index:1;">
+            <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:rgba(255,255,255,0.08); color:#a78bfa;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                 </svg>
             </div>
             <div>
-                <h1>Platform Guide</h1>
-                <p class="muted">Everything you need to know about using Evalon</p>
+                <h1 style="margin:0 0 0.2rem; font-size:1.4rem; font-weight:800; color:#fff;">Platform Guide</h1>
+                <p style="margin:0; font-size:0.85rem; color:rgba(255,255,255,0.5);">Everything you need to know about using Evalon</p>
             </div>
         </div>
-        <span class="gd-plan-chip gd-plan-chip--{{ plan_slug }}">{{ plan_label }} Plan</span>
+        <span class="gd-plan-chip gd-plan-chip--{{ plan_slug }}" style="position:relative; z-index:1;">{{ plan_label }} Plan</span>
     </header>
 
     {# ── Table of Contents ── #}

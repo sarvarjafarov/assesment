@@ -3,12 +3,111 @@
 {% block title %}Settings · Evalon{% endblock %}
 {% block meta_description %}Manage your account settings and preferences.{% endblock %}
 {% block portal_content %}
+<style>
+/* ── Settings page inline enhancements ── */
+.st-hero-header {
+    background: linear-gradient(135deg, #0e1428 0%, #1a1e3a 100%);
+    padding: 2.5rem 2rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+.st-hero-header::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(100, 116, 139, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+.st-hero-header h1 {
+    color: #fff;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+}
+.st-hero-subtitle {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ── Section card enhancements ── */
+.st-section.st-section--acct { border-left: 3px solid #6366f1; }
+.st-section.st-section--brand { border-left: 3px solid #f59e0b; }
+.st-section.st-section--api { border-left: 3px solid #10b981; }
+.st-section.st-section--tour { border-left: 3px solid #8b5cf6; }
+.st-section.st-section--security { border-left: 3px solid #ef4444; }
+.st-section.st-section--notif { border-left: 3px solid #06b6d4; }
+.st-section.st-section--help { border-left: 3px solid #64748b; }
+.st-section[style*="border-left"] { padding-left: 1.25rem; }
+
+.st-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    transition: box-shadow 0.25s ease;
+}
+
+/* ── Form focus ring animation ── */
+.st-form input[type="text"]:focus,
+.st-form input[type="url"]:focus,
+.st-form input[type="password"]:focus,
+.st-form textarea:focus,
+.st-field input:focus,
+.st-field textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ── Branding preview enhancement ── */
+.st-preview-box-enhanced {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+/* ── Section separator ── */
+.st-visual-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #cbd5e1, transparent);
+    margin: 2rem 0;
+    border: none;
+}
+
+/* ── Modern toggle switch ── */
+.st-toggle-modern .st-toggle-slider {
+    background: #cbd5e1;
+    border-radius: 999px;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.st-toggle-modern .st-toggle-slider::before {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.st-toggle-modern input:checked + .st-toggle-slider {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+}
+.st-toggle-modern input:focus + .st-toggle-slider {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ── Entrance animation ── */
+.st-animated {
+    animation: pp-fadeUp 0.5s ease both;
+}
+</style>
+
 <div class="portal-shell">
 
-    {# ── Header ── #}
-    <header class="st-header">
+    {# ── Hero Header ── #}
+    <header class="st-hero-header st-animated" style="animation-delay: 0.05s;">
         <h1>Settings</h1>
-        <p class="muted">Manage your account and preferences</p>
+        <p class="st-hero-subtitle">Manage your account, branding, and preferences</p>
     </header>
 
     {# ── Settings/Billing Tabs ── #}
@@ -18,7 +117,7 @@
     </nav>
 
     {# ── Account Information ── #}
-    <section class="st-section">
+    <section class="st-section st-section--acct st-animated" style="animation-delay: 0.15s; border-left: 3px solid #6366f1; padding-left: 1.25rem;">
         <div class="st-section-head">
             <div class="st-section-icon st-section-icon--account">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -53,9 +152,12 @@
         </div>
     </section>
 
+    {# ── Visual Separator ── #}
+    <hr class="st-visual-separator">
+
     {# ── Branding & White-Labeling ── #}
     {% if can_manage_branding %}
-    <section class="st-section" id="branding">
+    <section class="st-section st-section--brand st-animated" id="branding" style="animation-delay: 0.25s; border-left: 3px solid #f59e0b; padding-left: 1.25rem;">
         <div class="st-section-head">
             <div class="st-section-icon st-section-icon--brand">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -187,7 +289,7 @@
                 </div>
 
                 {# Branding Preview #}
-                <div class="st-preview-box" id="branding-preview">
+                <div class="st-preview-box st-preview-box-enhanced" id="branding-preview" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 1.25rem;">
                     <p class="st-preview-label">Preview</p>
                     <div class="st-preview-card">
                         {% if account.logo_data_url %}
@@ -287,7 +389,7 @@
                             </p>
                         </div>
                     </div>
-                    <label class="st-toggle">
+                    <label class="st-toggle st-toggle-modern">
                         <input type="checkbox" name="hide_evalon_branding"
                                {% if account.hide_evalon_branding %}checked{% endif %}
                                {% if not account.can_use_white_labeling %}disabled{% endif %}>
@@ -319,7 +421,7 @@
 
     {# ── Webhook & API Integration ── #}
     {% if can_manage_branding %}
-    <section class="st-section">
+    <section class="st-section st-section--api st-animated" style="animation-delay: 0.35s; border-left: 3px solid #10b981; padding-left: 1.25rem;">
         <div class="st-section-head">
             <div class="st-section-icon st-section-icon--api">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -356,7 +458,7 @@
                         <h4>Enable Webhooks</h4>
                         <p class="muted">Toggle to start receiving event notifications</p>
                     </div>
-                    <label class="st-toggle">
+                    <label class="st-toggle st-toggle-modern">
                         <input type="checkbox" name="webhook_enabled" id="webhook_enabled"
                                {% if account.webhook_enabled %}checked{% endif %}>
                         <span class="st-toggle-slider"></span>
@@ -502,7 +604,7 @@
     {% endif %}
 
     {# ── Onboarding Tour ── #}
-    <section class="st-section">
+    <section class="st-section st-section--tour st-animated" style="animation-delay: 0.45s; border-left: 3px solid #8b5cf6; padding-left: 1.25rem;">
         <div class="st-section-head">
             <div class="st-section-icon st-section-icon--tour">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -530,7 +632,7 @@
     </section>
 
     {# ── Security & Access ── #}
-    <section class="st-section">
+    <section class="st-section st-section--security st-animated" style="animation-delay: 0.55s; border-left: 3px solid #ef4444; padding-left: 1.25rem;">
         <div class="st-section-head">
             <div class="st-section-icon st-section-icon--security">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -579,7 +681,7 @@
     </section>
 
     {# ── Notifications ── #}
-    <section class="st-section" id="notifications">
+    <section class="st-section st-section--notif st-animated" id="notifications" style="animation-delay: 0.65s; border-left: 3px solid #06b6d4; padding-left: 1.25rem;">
         <div class="st-section-head">
             <div class="st-section-icon st-section-icon--notif">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -601,7 +703,7 @@
                         <h4>Weekly Summary Email</h4>
                         <p class="muted">Receive a weekly digest of your assessment activity and candidate results</p>
                     </div>
-                    <label class="st-toggle">
+                    <label class="st-toggle st-toggle-modern">
                         <input type="checkbox" name="receive_weekly_summary" {% if account.receive_weekly_summary %}checked{% endif %}>
                         <span class="st-toggle-slider"></span>
                     </label>
@@ -611,7 +713,7 @@
                         <h4>Assessment Completion Alerts</h4>
                         <p class="muted">Get notified when a candidate completes an assessment</p>
                     </div>
-                    <label class="st-toggle">
+                    <label class="st-toggle st-toggle-modern">
                         <input type="checkbox" name="receive_completion_alerts" {% if account.receive_completion_alerts %}checked{% endif %}>
                         <span class="st-toggle-slider"></span>
                     </label>
@@ -621,7 +723,7 @@
                         <h4>New Candidate Alerts</h4>
                         <p class="muted">Get notified when a new candidate starts an assessment</p>
                     </div>
-                    <label class="st-toggle">
+                    <label class="st-toggle st-toggle-modern">
                         <input type="checkbox" name="receive_new_candidate_alerts" {% if account.receive_new_candidate_alerts %}checked{% endif %}>
                         <span class="st-toggle-slider"></span>
                     </label>
@@ -634,7 +736,7 @@
     </section>
 
     {# ── Help & Support ── #}
-    <section class="st-section">
+    <section class="st-section st-section--help st-animated" style="animation-delay: 0.75s; border-left: 3px solid #64748b; padding-left: 1.25rem;">
         <div class="st-section-head">
             <div class="st-section-icon st-section-icon--help">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
