@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize static %}
 {% block title %}{% if query %}Axtarış: {{ query }} · {% endif %}Pulsuz CV Yaradıcı · Evalon{% endblock %}
-{% block meta_description %}{{ total_departments }} şöbə üzrə {{ total_templates }}+ pulsuz CV şablonuna baxın. Peşəkar formatlaşdırma, əsas bacarıqlar və rola uyğun təlimatlarla süni intellektlə dəstəklənən CV yaradıcı.{% endblock %}
+{% block meta_description %}{{ total_departments }} şöbə üzrə {{ total_templates }}+ pulsuz CV şablonuna baxın. AI dəstəkli CV yaradıcı.{% endblock %}
 {% block extra_meta %}
 {% if page_obj.has_previous %}<link rel="prev" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">{% endif %}
 {% if page_obj.has_next %}<link rel="next" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">{% endif %}
@@ -490,7 +490,7 @@
                     {% if query %}
                     Axtarışınıza uyğun {{ roles.paginator.count }} şablon tapıldı.
                     {% else %}
-                    Bir neçə dəqiqə ərzində peşəkar, rola uyğun CV-lər yaradın. Hədəf rolunuza uyğunlaşdırılmış şablon seçin, doğru bacarıqları vurğulayın və daha çox müsahibəyə dəvət alın.
+                    Bir neçə dəqiqəyə peşəkar CV yaradın. Vəzifənizə uyğun şablon seçin, bacarıqlarınızı göstərin və daha çox müsahibə qazanın.
                     {% endif %}
                 </p>
 
@@ -577,8 +577,8 @@
 
             {# Body CTA #}
             <section class="rb-list-cta">
-                <h2>CV-dən kənara çıxın</h2>
-                <p>CV-nizi bacarıq qiymətləndirmələri ilə birləşdirərək fərqlənin və təcrübənizi təsdiqləyin.</p>
+                <h2>CV-dən o yana</h2>
+                <p>Bacarıq testləri ilə CV-nizi daha güclü edin.</p>
                 <div class="rb-list-cta-actions">
                     <a class="rb-btn-primary" href="{% url 'clients:signup' %}"
                        data-gtag-click="rb_list_cta_click"
@@ -587,7 +587,7 @@
                     <a class="rb-btn-secondary" href="{% url 'pages:assessment_list' %}"
                        data-gtag-click="rb_list_assessments_click"
                        data-gtag-category="engagement"
-                       data-gtag-label="rb_list_browse_assessments">Qiymətləndirmələrə baxın</a>
+                       data-gtag-label="rb_list_browse_assessments">Testlərə baxın</a>
                 </div>
             </section>
 
@@ -601,7 +601,7 @@
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     </div>
                     <div class="rb-crosslink-body">
-                        <h3>Vəzifəyə görə müsahibə sualları</h3>
+                        <h3>Müsahibə sualları</h3>
                         <p>Hər bir rol üçün seçilmiş suallar, çətinlik dərəcələri və nümunə cavab təlimatları ilə müsahibələrə hazırlaşın.</p>
                     </div>
                     <svg class="rb-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>

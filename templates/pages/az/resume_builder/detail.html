@@ -1181,13 +1181,13 @@
                         <div class="rb-card-header">
                             <h2>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                Əlaqə Məlumatları
+                                Əlaqə məlumatları
                             </h2>
                         </div>
                         <div class="rb-field-grid">
                             <div class="rb-field">
                                 <label for="rb-fullname">Ad Soyad</label>
-                                <input type="text" id="rb-fullname" data-preview="name" placeholder="Ad Soyadınız">
+                                <input type="text" id="rb-fullname" data-preview="name" placeholder="Adınız">
                             </div>
                             <div class="rb-field">
                                 <label for="rb-jobtitle">Vəzifə</label>
@@ -1195,7 +1195,7 @@
                             </div>
                             <div class="rb-field">
                                 <label for="rb-email">Email</label>
-                                <input type="email" id="rb-email" data-preview="email" placeholder="ad@misal.com">
+                                <input type="email" id="rb-email" data-preview="email" placeholder="E-poçtunuz">
                             </div>
                             <div class="rb-field">
                                 <label for="rb-phone">Telefon</label>
@@ -1217,7 +1217,7 @@
                         <div class="rb-card-header">
                             <h2>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
-                                Peşəkar Xülasə
+                                Haqqınızda
                             </h2>
                         </div>
                         <div class="rb-field">
@@ -1234,7 +1234,7 @@
                             </h2>
                             <button type="button" class="rb-add-btn" id="rb-add-exp">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Təcrübə əlavə et
+                                Təcrübə əlavə edin
                             </button>
                         </div>
                         <div id="rb-exp-list">
@@ -1255,7 +1255,7 @@
                                         <input type="text" data-key="duration" value="{{ exp.duration }}">
                                     </div>
                                 </div>
-                                <label class="rb-bullets-label">Əsas Nailiyyətlər</label>
+                                <label class="rb-bullets-label">Əsas nailiyyətlər</label>
                                 <textarea data-key="bullets" rows="5">{% for b in exp.bullets %}{{ b }}{% if not forloop.last %}
 {% endif %}{% endfor %}</textarea>
                             </div>
@@ -1666,7 +1666,7 @@
                 '<div class="rb-field"><label>Şirkət</label><input type="text" data-key="company" placeholder="Şirkət adı"></div>' +
                 '<div class="rb-field"><label>Müddət</label><input type="text" data-key="duration" placeholder="2020 - İndiyədək"></div>' +
             '</div>' +
-            '<label class="rb-bullets-label">Əsas Nailiyyətlər</label>' +
+            '<label class="rb-bullets-label">Əsas nailiyyətlər</label>' +
             '<textarea data-key="bullets" rows="5" placeholder="Hər sətirdə bir nailiyyət"></textarea>';
         document.getElementById('rb-exp-list').appendChild(entry);
         updatePreview();

@@ -50,7 +50,7 @@
                 <a class="rp-card" href="{{ role.get_absolute_url }}">
                     <div class="rp-card-top">
                         <span class="rp-card-dept">{{ role.get_seniority_level_display }}</span>
-                        <span class="rp-card-level">{{ role.assessment_types.count }} qiymətləndirmə</span>
+                        <span class="rp-card-level">{{ role.assessment_types.count }} test</span>
                     </div>
                     <h3 class="rp-card-title">{{ role.title }}</h3>
                     <p class="rp-card-desc">{{ role.description|truncatewords:20 }}</p>
@@ -65,7 +65,7 @@
                     </div>
                     {% endif %}
                     <div class="rp-card-footer">
-                        <span class="rp-card-assessments">{{ role.assessment_types.count }} qiymətləndirmə</span>
+                        <span class="rp-card-assessments">{{ role.assessment_types.count }} test</span>
                         <span class="rp-card-arrow">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </span>
@@ -94,8 +94,8 @@
             {# CTA #}
             <section class="seo-list-cta">
                 <div class="seo-list-cta-inner">
-                    <h2>{{ dept_name|lower }} namizədlərini qiymətləndirməyə hazırsınız?</h2>
-                    <p>Avtomatik qiymətləndirmə və komandanızın etibar edə biləcəyi ətraflı hesabatlarla dəqiqələr ərzində qiymətləndirmələr göndərin.</p>
+                    <h2>{{ dept_name|lower }} namizədlərini test etməyə hazırsınız?</h2>
+                    <p>Bir neçə dəqiqəyə test göndərin — avtomatik nəticələr və ətraflı hesabatlar ilə.</p>
                     <div class="seo-list-cta-actions">
                         <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
                            data-gtag-click="rp_dept_cta_click"
