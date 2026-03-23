@@ -168,48 +168,106 @@ def home(request):
 # ── Pricing ───────────────────────────────────────────────────────────
 
 def pricing(request):
-    from .views import pricing as en_pricing_view
-    # Reuse the English pricing data structure but with AZ labels
-    pricing_tiers = [
+    tiers = [
         {
-            "slug": "starter", "badge": "Pulsuz", "name": "Başlanğıc",
-            "price": "$0", "frequency": "Həmişəlik",
-            "description": "2 aktiv vakansiya ilə Evalon-u sınayın.",
+            "slug": "starter", "name": "Başlanğıc",
+            "price": "$0", "frequency": "həmişəlik",
+            "desc": "2 aktiv vakansiya ilə Evalon-u sınayın.",
+            "limits": "2 vakansiya · ayda 20 dəvət",
             "cta_label": "Pulsuz qeydiyyat", "cta_url": reverse("clients:signup"),
             "highlighted": False,
-            "features": ["6 test bankının hamısı", "Sadə hesabatlar", "E-poçt dəstəyi", "Ayda 20 dəvət", "2 aktiv vakansiya"],
+            "features": [
+                "6 test bankının hamısı",
+                "2 aktiv vakansiya",
+                "Ayda 20 namizəd dəvəti",
+                "Sadə bal hesabatları",
+                "CSV ixracı",
+                "E-poçt dəstəyi",
+            ],
         },
         {
-            "slug": "pro", "badge": "Ən çox seçilən", "name": "Pro",
+            "slug": "pro", "name": "Pro",
             "price": "$59", "frequency": "aylıq",
-            "description": "Ətraflı hesabatlar və brendinq ilə bir neçə vakansiya idarə edin.",
-            "cta_label": "Pro-nu sınayın", "cta_url": reverse("clients:signup"),
+            "desc": "Ətraflı hesabatlar, brendinq və AI alətləri ilə bir neçə vakansiya idarə edin.",
+            "limits": "10 vakansiya · ayda 250 dəvət",
+            "cta_label": "14 günlük pulsuz sınaq", "cta_url": reverse("clients:signup"),
             "highlighted": True,
-            "features": ["AI ilə avtomatik işə qəbul", "Öz testlərinizi yaradın", "Namizəd paneli", "Şirkət brendinqi + hesabatlar", "Webhook və API", "Prioritet dəstək", "Ayda 250 dəvət", "10 aktiv vakansiya"],
+            "features": [
+                "Başlanğıc planın hər şeyi, üstəgəl:",
+                "10 aktiv vakansiya",
+                "Ayda 250 namizəd dəvəti",
+                "AI ilə avtomatik işə qəbul",
+                "Öz testlərinizi yaradın",
+                "Namizəd paneli və ən yaxşı namizəd seçimi",
+                "Şirkət brendinqi və paylaşılan hesabatlar",
+                "Webhook və API inteqrasiya",
+                "Əlavə dəvət $0.40",
+                "Prioritet dəstək",
+            ],
         },
         {
-            "slug": "enterprise", "badge": "Fərdi", "name": "Korporativ",
-            "price": "Fərdi", "frequency": "bizimlə əlaqə saxlayın",
-            "description": "Limitsiz vakansiya, dəvət və fərdi dəstək.",
+            "slug": "enterprise", "name": "Korporativ",
+            "price": "Fərdi", "frequency": "bizimlə əlaqə",
+            "desc": "Limitsiz vakansiya və dəvət, fərdi dəstək və yerində təlim.",
+            "limits": "Limitsiz vakansiya və dəvət",
             "cta_label": "Qiymət öyrənin", "cta_url": reverse("pages_az:contact"),
             "highlighted": False,
-            "features": ["Fərdi müştəri meneceri", "SLA zəmanəti", "Təkmil analitika və audit", "Yerində təlim", "Limitsiz vakansiya və dəvət"],
+            "features": [
+                "Pro planın hər şeyi, üstəgəl:",
+                "Limitsiz vakansiya və dəvət",
+                "Fərdi müştəri meneceri",
+                "SLA zəmanəti",
+                "Tam API girişi",
+                "Yerində təlim və dəstək",
+            ],
         },
     ]
 
     comparison = [
-        {"feature": "Test bankları", "starter": "6-sı da", "pro": "6 + öz testləriniz", "enterprise": "6 + öz testləriniz"},
         {"feature": "Aktiv vakansiyalar", "starter": "2", "pro": "10", "enterprise": "Limitsiz"},
-        {"feature": "Aylıq dəvət", "starter": "20", "pro": "250", "enterprise": "Limitsiz"},
-        {"feature": "AI işə qəbul", "starter": "—", "pro": "✓", "enterprise": "✓"},
-        {"feature": "Şirkət brendinqi", "starter": "—", "pro": "✓", "enterprise": "✓"},
-        {"feature": "API", "starter": "—", "pro": "✓", "enterprise": "✓"},
-        {"feature": "Dəstək", "starter": "E-poçt", "pro": "Prioritet", "enterprise": "Fərdi menecer"},
+        {"feature": "Aylıq dəvətlər", "starter": "20", "pro": "250", "enterprise": "Limitsiz"},
+        {"feature": "6 test bankı", "starter": True, "pro": True, "enterprise": True},
+        {"feature": "Bal hesabatları", "starter": True, "pro": True, "enterprise": True},
+        {"feature": "CSV ixracı", "starter": True, "pro": True, "enterprise": True},
+        {"feature": "Namizəd paneli", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Ən yaxşı namizəd seçimi", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Şirkət brendinqi", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Paylaşılan hesabatlar", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Prioritet dəstək", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "AI ilə avtomatik işə qəbul", "starter": False, "pro": True, "enterprise": True, "highlight": True},
+        {"feature": "Öz testlərinizi yaradın", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Webhook və API", "starter": False, "pro": True, "enterprise": True},
+        {"feature": "Fərdi menecer", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "SLA zəmanəti", "starter": False, "pro": False, "enterprise": True},
+        {"feature": "Yerində təlim", "starter": False, "pro": False, "enterprise": True},
+    ]
+
+    assessments = [
+        {"name": "Marketinq", "desc": "Reklam, SEO, analitika və kampaniya strategiyası."},
+        {"name": "Məhsul idarəetməsi", "desc": "Strategiya, icra, yol xəritəsi və məhsul düşüncəsi."},
+        {"name": "Davranış", "desc": "Mədəniyyət və vəzifəyə uyğunluq üçün psixometrik siqnallar."},
+        {"name": "UX/UI Dizayn", "desc": "İstifadəçi araşdırması, interfeys dizaynı və prototipləmə."},
+        {"name": "HR", "desc": "İşə qəbul, əmək münasibətləri və uyğunluq."},
+        {"name": "Maliyyə", "desc": "Maliyyə planlaması, büdcə və analiz."},
+    ]
+
+    faqs = [
+        {"q": "Planımı istənilən vaxt dəyişə bilərəm?", "a": "Bəli. İstədiyiniz vaxt yüksəldə və ya endirə bilərsiniz — dəyişikliklər növbəti ödəniş dövründə qüvvəyə minir."},
+        {"q": "Dəvət limitini keçsəm nə olur?", "a": "Pro planda hər əlavə dəvət $0.40-dır. Başlanğıc planda növbəti ayı gözləyin və ya Pro-ya yüksəldin."},
+        {"q": "Bütün planlara 6 test növü daxildirmi?", "a": "Bəli. Pulsuz Başlanğıc planı da daxil olmaqla bütün planlara altı test bankının hamısı daxildir."},
+        {"q": "İllik ödənişdə endirim varmı?", "a": "Bəli. Pro planın illik ödənişi 20% qənaət edir — aylıq $47-ə düşür."},
+        {"q": "Hansı ödəniş üsullarını qəbul edirsiniz?", "a": "Visa, Mastercard, Amex qəbul edirik. Korporativ müştərilər üçün faktura ilə ödəniş mümkündür."},
+        {"q": "İstədiyim vaxt ləğv edə bilərəm?", "a": "Mütləq. Uzunmüddətli müqavilə yoxdur. İdarə panelindən ləğv edin — cari dövrün sonuna qədər giriş davam edir."},
+        {"q": "Pulsuz sınaq necə işləyir?", "a": "Pro sınağı 14 gün tam Pro funksiyalarını verir. Kredit kartı lazım deyil. Sınaq bitdikdə abunə olun və ya Başlanğıc plana qayıdın."},
+        {"q": "Məlumatlarım təhlükəsizdirmi?", "a": "Bəli. AES-256 şifrələmə, TLS 1.3 və müntəzəm üçüncü tərəf audit istifadə edirik. Korporativ müştərilər SOC 2 hesabatı tələb edə bilər."},
     ]
 
     return render(request, "pages/az/pricing.html", {
-        "pricing_tiers": pricing_tiers,
+        "active": "pricing",
+        "tiers": tiers,
         "comparison": comparison,
+        "assessments": assessments,
+        "faqs": faqs,
         "lang": "az",
         "hreflang": _hreflang("/pricing/", "/az/qiymet/"),
     })
@@ -218,14 +276,35 @@ def pricing(request):
 # ── Contact ───────────────────────────────────────────────────────────
 
 def contact(request):
-    channels = [
-        {"label": "Ümumi suallar", "email": "hello@evalon.app", "sla": "24 saat ərzində cavab", "details": ["Məhsul haqqında suallar", "Qiymət təklifləri", "Əməkdaşlıq"]},
-        {"label": "Texniki dəstək", "email": "support@evalon.app", "sla": "12 saat ərzində cavab", "details": ["Hesab problemləri", "İnteqrasiya köməyi", "Xəta bildirişi"]},
-        {"label": "Əməkdaşlıq", "email": "partners@evalon.app", "sla": "48 saat ərzində cavab", "details": ["Distribütor proqramı", "API əməkdaşlıq", "Birgə marketinq"]},
+    hero = {
+        "eyebrow": "Əlaqə",
+        "title": "Biz çox sürətli cavab veririk.",
+        "lede": "Evalon-u yoxlayırsınız, komandanızı qoşursunuz və ya təhlükəsizlik yoxlaması istəyirsiniz — sizi doğru mütəxəssisə yönləndirəcəyik.",
+    }
+    sections = [
+        {
+            "badge": "Satış və demo",
+            "title": "hello@evalon.app",
+            "body": "1 iş günü ərzində cavab.",
+            "list": ["Canlı məhsul nümayişi", "Qiymət və tətbiq köməyi", "Təhlükəsizlik sorğuları"],
+        },
+        {
+            "badge": "Dəstək",
+            "title": "support@evalon.app",
+            "body": "4 iş saatı ərzində cavab.",
+            "list": ["Test problemlərinin həlli", "Namizəd portalı köməyi", "Hesab və ödəniş dəyişiklikləri"],
+        },
+        {
+            "badge": "Əməkdaşlıq",
+            "title": "partners@evalon.app",
+            "body": "2 iş günü ərzində cavab.",
+            "list": ["ATS və HRIS inteqrasiyalar", "Araşdırma əməkdaşlığı", "Kontent və tədbir sorğuları"],
+        },
     ]
 
     return render(request, "pages/az/contact.html", {
-        "channels": channels,
+        "hero": hero,
+        "sections": sections,
         "lang": "az",
         "hreflang": _hreflang("/contact/", "/az/elaqe/"),
     })

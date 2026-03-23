@@ -1,53 +1,59 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Qiymətlər · Evalon{% endblock %}
-{% block meta_description %}Sadə və aydın qiymətlər. Pulsuz başlayın, ehtiyac olduqda planı yüksəldin. Bütün planlara bütün test növləri daxildir.{% endblock %}
+{% block meta_description %}Sadə və aydın qiymətlər. Pulsuz başlayın, ehtiyac olduqda yüksəldin. Bütün planlara 6 test növü daxildir.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header_az.html' %}
 
     <main class="pr-main">
 
-        {# ── Qəhrəman ── #}
+        {# ── Hero ── #}
         <div class="pr-hero">
             <p class="pr-eyebrow">Qiymətlər</p>
             <h1 class="pr-title">Sadə və aydın qiymətlər</h1>
-            <p class="pr-subtitle">Pulsuz başlayın, ehtiyac olduqda planı yüksəldin. Bütün planlara bütün test növləri daxildir.</p>
+            <p class="pr-subtitle">Pulsuz başlayın, ehtiyac olduqda yüksəldin. Bütün planlara 6 test növü daxildir.</p>
         </div>
 
-        {# ── Tarif Kartları ── #}
+        {# ── Tier Cards ── #}
         <div class="pr-grid">
-            {% for tier in pricing_tiers %}
-            <article class="pr-card {% if tier.is_popular %}pr-card--popular{% endif %}">
-                {% if tier.badge %}<div class="pr-ribbon">{{ tier.badge }}</div>{% endif %}
+            {% for tier in tiers %}
+            <article class="pr-card {% if tier.highlighted %}pr-card--popular{% endif %}">
+                {% if tier.highlighted %}<div class="pr-ribbon">Ən çox seçilən</div>{% endif %}
                 <div class="pr-card-top">
                     <h3 class="pr-card-name">{{ tier.name }}</h3>
                     <div class="pr-price">
                         <span class="pr-amount">{{ tier.price }}</span>
-                        <span class="pr-freq">{{ tier.period }}</span>
+                        <span class="pr-freq">{{ tier.frequency }}</span>
                     </div>
-                    <p class="pr-desc">{{ tier.description }}</p>
+                    <p class="pr-desc">{{ tier.desc }}</p>
+                    <p class="pr-limits">{{ tier.limits }}</p>
                 </div>
                 <ul class="pr-features">
                     {% for f in tier.features %}
-                    <li>
+                    <li {% if 'Agentic AI' in f %}class="pr-feature--ai"{% endif %}>
+                        {% if 'Agentic AI' in f %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        {{ f }} <span class="pr-new-tag">New</span>
+                        {% else %}
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         {{ f }}
+                        {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
-                <a class="pr-cta {% if tier.is_popular %}pr-cta--filled{% endif %}"
+                <a class="pr-cta {% if tier.highlighted %}pr-cta--filled{% endif %}"
                    href="{{ tier.cta_url }}"
                    data-gtag-click="pricing_plan_click"
                    data-gtag-category="pricing"
-                   data-gtag-label="{{ tier.name|lower }}">{{ tier.cta_label }}</a>
+                   data-gtag-label="{{ tier.slug }}">{{ tier.cta_label }}</a>
             </article>
             {% endfor %}
         </div>
 
-        <p class="pr-footnote">Bütün planlarda komanda üzvlərinin sayı limitsizdir. İllik ödənişdə Pro plana 20% endirim tətbiq olunur.</p>
+        <p class="pr-footnote">Bütün planlara limitsiz komanda üzvləri daxildir. İllik ödənişdə Pro planda 20% qənaət.</p>
 
-        {# ── Xüsusiyyət Müqayisəsi ── #}
+        {# ── Feature Comparison ── #}
         <div class="pr-section">
             <h2 class="pr-section-title">Planları müqayisə edin</h2>
             <div class="pr-table-wrap">
@@ -55,15 +61,16 @@
                     <thead>
                         <tr>
                             <th>Funksiya</th>
-                            <th>Starter</th>
+                            <th>Başlanğıc</th>
                             <th>Pro</th>
-                            <th>Enterprise</th>
+                            <th>Korporativ</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in comparison %}
-                        <tr>
-                            <td>{{ row.feature }}</td>
+                        <tr {% if row.highlight %}class="pr-row--highlight"{% endif %}>
+                            <td>{{ row.feature }}{% if row.highlight %} <span class="pr-new-tag">New</span>{% endif %}</td>
+                            {% for plan in "starter,pro,enterprise"|make_list %}{% endfor %}
                             <td>
                                 {% if row.starter is True %}
                                 <svg class="pr-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -92,34 +99,34 @@
             </div>
         </div>
 
-        {# ── Tez-tez verilən suallar ── #}
+        {# ── Included Assessments ── #}
         <div class="pr-section">
-            <h2 class="pr-section-title">Tez-tez verilən suallar</h2>
-            <div class="pr-faq">
-                <details class="pr-faq-item">
-                    <summary>Pulsuz plan nə qədər müddətə aktivdir?</summary>
-                    <p>Pulsuz plan müddət limitsizdir — istədiyiniz qədər istifadə edin, ödəniş tələb olunmur.</p>
-                </details>
-                <details class="pr-faq-item">
-                    <summary>Planımı istənilən vaxt dəyişə bilərəm?</summary>
-                    <p>Bəli, planınızı istənilən vaxt yüksəldə və ya endirə bilərsiniz. Dəyişiklik dərhal qüvvəyə minir.</p>
-                </details>
-                <details class="pr-faq-item">
-                    <summary>Hansı ödəniş üsullarını qəbul edirsiniz?</summary>
-                    <p>Kredit kartı, debet kartı və bank köçürməsi ilə ödəniş edə bilərsiniz. Enterprise plan üçün faktura ilə ödəniş də mümkündür.</p>
-                </details>
-                <details class="pr-faq-item">
-                    <summary>Geri qaytarma siyasətiniz necədir?</summary>
-                    <p>İlk 14 gün ərzində tam geri qaytarma təmin edirik — heç bir sual soruşulmur.</p>
-                </details>
-                <details class="pr-faq-item">
-                    <summary>Komanda üzvləri üçün əlavə ödəniş var?</summary>
-                    <p>Xeyr, bütün planlarda komanda üzvlərinin sayı limitsizdir. Əlavə ödəniş yoxdur.</p>
-                </details>
+            <h2 class="pr-section-title">6 test bankının hamısı daxildir</h2>
+            <p class="pr-section-sub">Hər plan sizə hazır bacarıq testlərinin tam kitabxanasına giriş verir.</p>
+            <div class="pr-assess-grid">
+                {% for a in assessments %}
+                <div class="pr-assess-card">
+                    <h4 class="pr-assess-name">{{ a.name }}</h4>
+                    <p class="pr-assess-desc">{{ a.desc }}</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
-        {# ── Son CTA ── #}
+        {# ── FAQ ── #}
+        <div class="pr-section">
+            <h2 class="pr-section-title">Tez-tez verilən suallar</h2>
+            <div class="pr-faq">
+                {% for item in faqs %}
+                <details class="pr-faq-item">
+                    <summary>{{ item.q }}</summary>
+                    <p>{{ item.a }}</p>
+                </details>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# ── Final CTA ── #}
         <div class="pr-final">
             <h2 class="pr-final-title">Doğru namizədi seçməyə hazırsınız?</h2>
             <p class="pr-final-sub">Pulsuz qeydiyyatdan keçin və ilk testi bir neçə dəqiqəyə göndərin.</p>
@@ -129,8 +136,6 @@
     </main>
 </div>
 {% endblock %}
-
 {% block site_footer %}
     {% include 'includes/site_footer_az.html' %}
 {% endblock %}
-

@@ -1,48 +1,37 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block title %}Əlaqə · Evalon{% endblock %}
-{% block meta_description %}Demo, dəstək və ya təhlükəsizlik yoxlaması üçün bizimlə əlaqə saxlayın. Tez cavab veririk və sizi doğru komanda üzvünə yönləndiririk.{% endblock %}
+{% block meta_description %}Demo, dəstək və ya təhlükəsizlik yoxlaması üçün bizimlə əlaqə saxlayın.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header_az.html' %}
-    <main>
-        <div class="page-container slim">
-            <section class="hero-card stacked">
-                <div>
-                    <p class="eyebrow">Əlaqə</p>
-                    <h1>Bizimlə əlaqə saxlayın</h1>
-                    <p class="lede">Sualınız var? Doğru komanda üzvünə yönləndirəcəyik.</p>
-                </div>
-            </section>
+    <main class="pb-main">
+        <div class="pb-hero">
+            <p class="pb-eyebrow">{{ hero.eyebrow }}</p>
+            <h1 class="pb-title">{{ hero.title }}</h1>
+            <p class="pb-lede">{{ hero.lede }}</p>
+        </div>
 
-            <section class="panel">
-                <div class="info-grid">
-                    {% for channel in channels %}
-                    <article class="info-card">
-                        <p class="label">{{ channel.label }}</p>
-                        <h3>{{ channel.email }}</h3>
-                        <p class="sla">{{ channel.sla }}</p>
-                        <ul>
-                            {% for detail in channel.details %}
-                            <li>{{ detail }}</li>
-                            {% endfor %}
-                        </ul>
-                        <a class="btn btn-pill"
-                           href="mailto:{{ channel.email }}"
-                           data-gtag-click="contact_email_click"
-                           data-gtag-category="engagement"
-                           data-gtag-label="{{ channel.label|lower }}"
-                           data-gtag-params='{"channel":"{{ channel.label|escapejs }}"}'>Yazın</a>
-                    </article>
+        <div class="pb-grid">
+            {% for section in sections %}
+            <article class="pb-card">
+                {% if section.badge %}<span class="pb-badge">{{ section.badge }}</span>{% endif %}
+                <h3 class="pb-card-title">{{ section.title }}</h3>
+                {% if section.body %}<p class="pb-card-body">{{ section.body }}</p>{% endif %}
+                {% if section.list %}
+                <ul class="pb-list">
+                    {% for item in section.list %}
+                    <li>{{ item }}</li>
                     {% endfor %}
-                </div>
-            </section>
+                </ul>
+                {% endif %}
+                {% if section.cta_label %}
+                <a class="pb-cta" href="{{ section.cta_url }}">{{ section.cta_label }}</a>
+                {% endif %}
+            </article>
+            {% endfor %}
         </div>
     </main>
 </div>
 {% endblock %}
 
-{% block site_footer %}
-    {% include 'includes/site_footer_az.html' %}
-{% endblock %}
-
+{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}
