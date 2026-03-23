@@ -9,7 +9,7 @@
     "name": "Evalon",
     "url": "https://www.evalon.tech",
     "logo": "https://www.evalon.tech{% static 'img/evalon-logo.png' %}",
-    "description": "Müasir komandalar üçün strukturlaşdırılmış işə qəbul qiymətləndirmələri. Əsl bacarıqları qiymətləndirin, qərəzliliyi azaldın və inamla işə götürün.",
+    "description": "Müasir komandalar üçün işə qəbul test platforması. Namizədlərin bacarıqlarını ölçün, qərəzsiz qərar verin və doğru insanı seçin.",
     "foundingDate": "2024",
     "sameAs": [],
     "contactPoint": {
@@ -51,8 +51,8 @@
                         {{ hero_content.title }}<br>
                         <span class="hero-rotating-wrapper">
                             <span class="hero-rotating-words">
-                                <span class="hero-word active">strukturlaşdırılmış qiymətləndirmələr</span>
-                                <span class="hero-word">AI ilə qiymətləndirmə</span>
+                                <span class="hero-word active">bacarıq testləri</span>
+                                <span class="hero-word">AI qiymətləndirmə</span>
                                 <span class="hero-word">bacarıq əsaslı işə qəbul</span>
                                 <span class="hero-word">verilənlərə əsaslanan qərarlar</span>
                             </span>
@@ -97,7 +97,7 @@
                         </div>
                         <div class="mockup-toast" data-toast="1">
                             <span class="mockup-toast-icon info"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
-                            <span class="mockup-toast-msg"><strong>Michael Park</strong> qiymətləndirməyə başladı</span>
+                            <span class="mockup-toast-msg"><strong>Michael Park</strong> testi başladı</span>
                         </div>
                         <div class="mockup-toast" data-toast="2">
                             <span class="mockup-toast-icon warn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
@@ -144,7 +144,7 @@
                                     <div class="mockup-notif-dropdown" id="mockupNotifDrop">
                                         <div class="notif-drop-item new">
                                             <span class="notif-drop-dot" style="background:#22c55e"></span>
-                                            <span>Anna Chen qiymətləndirməni tamamladı</span>
+                                            <span>Anna Chen testi tamamladı</span>
                                         </div>
                                         <div class="notif-drop-item">
                                             <span class="notif-drop-dot" style="background:#3b82f6"></span>
@@ -250,7 +250,7 @@
                 <div class="section-heading section-heading-tight">
                     <p class="eyebrow">Necə işləyir</p>
                     <h2>Dəvətdən işə qəbula dörd sadə addım</h2>
-                    <p class="how-subhead">Qurun, dəvət edin və işə götürün — Evalon qiymətləndirməni idarə edir, siz insanlara diqqət yetirin.</p>
+                    <p class="how-subhead">Vakansiya yaradın, dəvət göndərin, işə götürün — Evalon testi idarə edir, siz insanlara fokuslanın.</p>
                 </div>
                 <div class="how-steps" id="howSteps">
                     {% for feature in features %}
@@ -378,7 +378,7 @@
                        class="btn btn-outline"
                        data-gtag-click="see_all_assessments"
                        data-gtag-category="engagement"
-                       data-gtag-label="see_all_assessments">Bütün qiymətləndirmələrə bax</a>
+                       data-gtag-label="see_all_assessments">Bütün testlərə baxın</a>
                 </div>
             </div>
         </section>
@@ -390,10 +390,10 @@
                     <div class="ai-showcase-text">
                         <span class="ai-showcase-badge">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            Müəssisə
+                            Korporativ
                         </span>
                         <h2 class="ai-showcase-title">Agentik AI<br>İşə Qəbul Xətləri</h2>
-                        <p class="ai-showcase-desc">AI-ın ağır işləri görməsinə icazə verin. CV-ləri yükləyin, agentik xəttimiz namizədləri yoxlasın, qiymətləndirmələr göndərsin və işə qəbul tövsiyələri versin — hər addımda insan nəzarəti ilə.</p>
+                        <p class="ai-showcase-desc">İşə qəbulun çətin hissəsini AI-yə tapşırın. CV-ləri yükləyin — AI namizədləri yoxlayır, test göndərir və tövsiyə verir. Hər addımda siz nəzarət edirsiniz.</p>
                         <div class="ai-showcase-modes">
                             <div class="ai-showcase-mode">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
@@ -532,7 +532,7 @@
                 <div class="pricing-grid-v2">
                     {% for tier in pricing_tiers %}
                     <article class="price-card {% if tier.is_popular %}price-card--popular{% endif %}">
-                        {% if tier.is_popular %}<div class="price-card-ribbon">Ən populyar</div>{% endif %}
+                        {% if tier.is_popular %}<div class="price-card-ribbon">Ən çox seçilən</div>{% endif %}
                         <div class="price-card-top">
                             <h3 class="price-card-name">{{ tier.name }}</h3>
                             <div class="price-card-price">
@@ -579,10 +579,10 @@
                 <div class="final-cta-grid">
                     <div class="final-cta-text">
                         <h2>İnamla işə götürməyə hazırsınız?</h2>
-                        <p class="final-cta-desc">Pulsuz başlayın — kredit kartı tələb olunmur. İlk qiymətləndirmənizi 10 dəqiqəyə qurun.</p>
+                        <p class="final-cta-desc">Pulsuz başlayın — kredit kartı lazım deyil. İlk testi 10 dəqiqəyə göndərin.</p>
                         <ul class="final-cta-list">
-                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Altı qiymətləndirmə növünün hamısı daxildir</li>
-                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Avtomatik qiymətləndirmə və hesabatlar</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 6 test bankının hamısı daxildir</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Avtomatik nəticələr və hesabatlar</li>
                             <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Limitsiz komanda üzvləri</li>
                         </ul>
                         <a class="final-cta-btn" href="{% url 'clients:signup' %}" data-gtag-click="final_cta_signup">Pulsuz Başlayın</a>

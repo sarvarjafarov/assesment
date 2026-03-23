@@ -8,7 +8,7 @@
     {
         "@context": "https://schema.org",
         "@type": "WebPage",
-        "name": "{{ role.title }} Qiymətləndirmə Batareyası",
+        "name": "{{ role.title }} Test paketi",
         "description": "{{ role.role_seo_description|escapejs }}",
         "breadcrumb": {
             "@type": "BreadcrumbList",
@@ -16,7 +16,7 @@
                 {
                     "@type": "ListItem",
                     "position": 1,
-                    "name": "Qiymətləndirmələr",
+                    "name": "Testlər",
                     "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages_az:assessment_list' %}"
                 },
                 {
@@ -49,7 +49,7 @@
             <header class="rp-detail-hero">
                 <div class="rp-detail-hero-inner">
                     <div class="rp-breadcrumb">
-                        <a href="{% url 'pages_az:assessment_list' %}">Qiymətləndirmələr</a>
+                        <a href="{% url 'pages_az:assessment_list' %}">Testlər</a>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         <a href="{% url 'pages_az:role_assessment_list' %}">Vəzifələr</a>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -59,7 +59,7 @@
                         <span class="rp-badge rp-badge--dept">{{ role.department }}</span>
                         <span class="rp-badge rp-badge--level">{{ role.get_seniority_level_display }}</span>
                     </div>
-                    <h1 class="rp-detail-title">{{ role.title }} üçün tövsiyə edilən qiymətləndirmələr</h1>
+                    <h1 class="rp-detail-title">{{ role.title }} üçün uyğun testlər</h1>
                     <p class="rp-detail-desc">{{ role.description }}</p>
                     <div class="rp-detail-stats">
                         <div class="rp-detail-stat">
@@ -72,7 +72,7 @@
                         </div>
                         <div class="rp-detail-stat">
                             <span class="rp-detail-stat-val">{{ recommended_assessments|length }}</span>
-                            <span class="rp-detail-stat-lbl">Qiymətləndirmələr</span>
+                            <span class="rp-detail-stat-lbl">Testlər</span>
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                 <span class="rp-toc-label">Bu səhifədə</span>
                 {% if role.key_skills %}<a class="rp-toc-link" href="#skills">Bacarıqlar</a>{% endif %}
                 {% if role.responsibilities %}<a class="rp-toc-link" href="#responsibilities">Vəzifələr</a>{% endif %}
-                {% if recommended_assessments %}<a class="rp-toc-link" href="#assessments">Qiymətləndirmələr</a>{% endif %}
+                {% if recommended_assessments %}<a class="rp-toc-link" href="#assessments">Testlər</a>{% endif %}
                 {% if sample_questions %}<a class="rp-toc-link" href="#samples">Nümunələr</a>{% endif %}
                 {% if faqs %}<a class="rp-toc-link" href="#faqs">Tez-tez verilən suallar</a>{% endif %}
                 {% if has_interview_questions %}<a class="rp-toc-link" href="#interview-questions">Suallar</a>{% endif %}
@@ -108,7 +108,7 @@
             {% if role.responsibilities %}
             <section class="rp-section rp-section--alt" id="responsibilities">
                 <div class="rp-section-inner">
-                    <h2 class="rp-section-title">Vəzifə öhdəlikləri</h2>
+                    <h2 class="rp-section-title">Əsas vəzifələr</h2>
                     <p class="rp-section-desc">{{ role.title }} vəzifəsindən gözlənilənlər.</p>
                     <ul class="rp-responsibilities">
                         {% for resp in role.responsibilities %}
@@ -127,7 +127,7 @@
             <section class="rp-section" id="focus">
                 <div class="rp-section-inner">
                     <h2 class="rp-section-title">Diqqət sahələri</h2>
-                    <p class="rp-section-desc">{{ role.title }} namizədləri üçün qiymətləndirmə batareyasında qiymətləndirilən əsas sahələr.</p>
+                    <p class="rp-section-desc">{{ role.title }} namizədləri üçün test paketində yoxlanılan sahələr.</p>
                     <div class="rp-tags">
                         {% for area in focus_areas %}
                         <span class="rp-tag">{{ area }}</span>
@@ -141,8 +141,8 @@
             {% if skills_tested %}
             <section class="rp-section rp-section--alt" id="skills-tested">
                 <div class="rp-section-inner">
-                    <h2 class="rp-section-title">Sınaqdan keçirilən bacarıqlar</h2>
-                    <p class="rp-section-desc">Bütün tövsiyə olunan qiymətləndirmələrdə ölçülən səriştələr.</p>
+                    <h2 class="rp-section-title">Yoxlanılan bacarıqlar</h2>
+                    <p class="rp-section-desc">Bütün testlərdə yoxlanılan bacarıqlar.</p>
                     <div class="rp-skills-grid">
                         {% for skill in skills_tested %}
                         <div class="rp-skill-card">
@@ -159,8 +159,8 @@
             {% if recommended_assessments %}
             <section class="rp-section" id="assessments">
                 <div class="rp-section-inner">
-                    <h2 class="rp-section-title">Tövsiyə olunan qiymətləndirmə batareyası</h2>
-                    <p class="rp-section-desc">{{ role.title }} namizədlərinin hərtərəfli qiymətləndirilməsi üçün bu qiymətləndirmələrdən birlikdə istifadə edin.</p>
+                    <h2 class="rp-section-title">Tövsiyə olunan test paketi</h2>
+                    <p class="rp-section-desc">{{ role.title }} namizədlərinin ətraflı qiymətləndirilməsi üçün bu testləri birlikdə istifadə edin.</p>
                     <div class="rp-battery">
                         {% for assessment in recommended_assessments %}
                         <a class="rp-battery-card" href="{{ assessment.get_absolute_url }}"
@@ -193,8 +193,8 @@
                 <div class="seo-mid-cta-inner">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     <div>
-                        <h3>{{ role.title }} namizədlərini qiymətləndirməyə hazırsınız?</h3>
-                        <p>Bu qiymətləndirmə batareyasını dəqiqələr ərzində göndərin — quraşdırma tələb olunmur.</p>
+                        <h3>{{ role.title }} namizədlərini test etməyə hazırsınız?</h3>
+                        <p>Bu test paketini bir neçə dəqiqəyə göndərin — quraşdırma tələb olunmur.</p>
                     </div>
                     <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
                        data-gtag-click="role_mid_cta_click"
@@ -228,8 +228,8 @@
             {% if use_cases %}
             <section class="rp-section" id="use-cases">
                 <div class="rp-section-inner">
-                    <h2 class="rp-section-title">Bu qiymətləndirmələri nə vaxt istifadə etməli</h2>
-                    <p class="rp-section-desc">Bu qiymətləndirmə batareyasını tətbiq etmək üçün ideal ssenarilər.</p>
+                    <h2 class="rp-section-title">Bu testləri nə vaxt istifadə etməli</h2>
+                    <p class="rp-section-desc">Bu test paketini istifadə etmək üçün ideal hallar.</p>
                     <div class="rp-usecases">
                         {% for case in use_cases %}
                         <div class="rp-usecase">
@@ -265,8 +265,8 @@
             {# CTA #}
             <section class="rp-cta">
                 <div class="rp-cta-inner">
-                    <h2>Bu gün {{ role.title }} namizədlərini qiymətləndirməyə başlayın</h2>
-                    <p>Avtomatik qiymətləndirmə və ətraflı hesabatlarla dəqiqələr ərzində qiymətləndirmələr göndərin.</p>
+                    <h2>Elə indi {{ role.title }} namizədlərini test edin</h2>
+                    <p>Bir neçə dəqiqəyə test göndərin — avtomatik nəticələr və ətraflı hesabatlar.</p>
                     <div class="rp-cta-actions">
                         <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
                            data-gtag-click="role_detail_cta_click"
@@ -293,7 +293,7 @@
                         </div>
                         <div class="rp-crosslink-body">
                             <h3>{{ role.title }} müsahibə sualları</h3>
-                            <p>Çətinlik dərəcəsi, qiymətləndirmə meyarları və nümunə cavab təlimatları ilə hazırlanmış müsahibə suallarına baxın.</p>
+                            <p>Hər vəzifəyə uyğun müsahibə sualları, çətinlik dərəcələri və cavab nümunələri.</p>
                         </div>
                         <svg class="rp-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                     </a>
@@ -305,8 +305,8 @@
             {% if blog_posts %}
             <section class="rp-section" id="resources">
                 <div class="rp-section-inner">
-                    <h2 class="rp-section-title">Əlaqəli resurslar</h2>
-                    <p class="rp-section-desc">{{ role.title }} namizədlərinin işə götürülməsi və qiymətləndirilməsi haqqında daha çox öyrənin.</p>
+                    <h2 class="rp-section-title">Faydalı resurslar</h2>
+                    <p class="rp-section-desc">{{ role.title }} namizədlərinin işə götürülməsi və test edilməsi haqqında daha çox öyrənin.</p>
                     <div class="seo-blog-cards">
                         {% for post in blog_posts %}
                         <a class="seo-blog-card" href="{{ post.get_absolute_url }}"
@@ -316,7 +316,7 @@
                             <span class="seo-blog-card-pill">{{ post.pill_label }}</span>
                             <h3>{{ post.title }}</h3>
                             <p>{{ post.excerpt|truncatewords:18 }}</p>
-                            <span class="seo-blog-card-meta">{{ post.estimated_read_minutes }} dəq oxunma</span>
+                            <span class="seo-blog-card-meta">{{ post.estimated_read_minutes }} dəq oxu</span>
                         </a>
                         {% endfor %}
                     </div>

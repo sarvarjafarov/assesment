@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Əlaqə · Evalon{% endblock %}
-{% block meta_description %}Demolar, dəstək və ya təhlükəsizlik yoxlamaları üçün Evalon ilə əlaqə saxlayın. Biz tez cavab veririk və sizi doğru komanda üzvünə yönləndiririk.{% endblock %}
+{% block meta_description %}Demo, dəstək və ya təhlükəsizlik yoxlaması üçün bizimlə əlaqə saxlayın. Tez cavab veririk və sizi doğru komanda üzvünə yönləndiririk.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header_az.html' %}
@@ -11,7 +11,7 @@
                 <div>
                     <p class="eyebrow">Əlaqə</p>
                     <h1>Bizimlə əlaqə saxlayın</h1>
-                    <p class="lede">Evalon-u qiymətləndirməyiniz, komandanızı qoşmağınız və ya təhlükəsizlik yoxlaması tələb etməyiniz fərq etməz — sizi doğru mütəxəssisə yönləndirəcəyik.</p>
+                    <p class="lede">Sualınız var? Doğru komanda üzvünə yönləndirəcəyik.</p>
                 </div>
             </section>
 
@@ -32,7 +32,7 @@
                            data-gtag-click="contact_email_click"
                            data-gtag-category="engagement"
                            data-gtag-label="{{ channel.label|lower }}"
-                           data-gtag-params='{"channel":"{{ channel.label|escapejs }}"}'>E-poçt göndər</a>
+                           data-gtag-params='{"channel":"{{ channel.label|escapejs }}"}'>Yazın</a>
                     </article>
                     {% endfor %}
                 </div>

@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load humanize static %}
-{% block title %}{{ dept_name }} qiymətləndirmə tövsiyələri · Evalon{% endblock %}
-{% block meta_description %}{{ dept_name|lower }} vəzifələri üçün düzgün qiymətləndirmə batareyasını tapın. Avtomatik qiymətləndirmə ilə {{ dept_name|lower }} vəzifələrinə uyğunlaşdırılmış tövsiyə olunan Evalon qiymətləndirmələrinə baxın.{% endblock %}
+{% block title %}{{ dept_name }} üçün uyğun testlər · Evalon{% endblock %}
+{% block meta_description %}{{ dept_name|lower }} vəzifələri üçün doğru test paketini tapın. {{ dept_name|lower }} vəzifələrinə uyğun Evalon testlərinə baxın — avtomatik nəticələr və ətraflı hesabatlar ilə.{% endblock %}
 {% block extra_meta %}
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Vəzifəyə görə qiymətləndirmələr", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages_az:role_assessment_list' %}"},
+        {"@type": "ListItem", "position": 1, "name": "Vəzifəyə uyğun testlər", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'pages_az:role_assessment_list' %}"},
         {"@type": "ListItem", "position": 2, "name": "{{ dept_name }}"}
     ]
 }
@@ -25,9 +25,9 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     <span>{{ dept_name }}</span>
                 </div>
-                <p class="rp-eyebrow">{{ dept_name }} Qiymətləndirmələri</p>
-                <h1 class="rp-title">{{ dept_name }} vəzifə qiymətləndirmələri</h1>
-                <p class="rp-desc">{{ dept_name|lower }} vəzifələrinə uyğunlaşdırılmış tövsiyə olunan qiymətləndirmə batareyaları — ən vacib bacarıqları, səriştələri və davranışları əhatə edir.</p>
+                <p class="rp-eyebrow">{{ dept_name }} Testləri</p>
+                <h1 class="rp-title">{{ dept_name }} vəzifələri üçün testlər</h1>
+                <p class="rp-desc">{{ dept_name|lower }} vəzifələri üçün hazırlanmış test paketləri — ən vacib bacarıqları, səriştələri və davranışları əhatə edir.</p>
 
                 <div class="rp-trust-stats">
                     <span class="rp-trust-stat">
@@ -36,11 +36,11 @@
                     </span>
                     <span class="rp-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        <strong>{{ total_assessments }}</strong> Qiymətləndirmələr
+                        <strong>{{ total_assessments }}</strong> Testlər
                     </span>
                     <span class="rp-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        <strong>AI</strong> Qiymətləndirmə
+                        <strong>AI</strong> Test
                     </span>
                 </div>
             </section>

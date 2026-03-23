@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Agentlik AI İşəgötürmə Boru Xətləri · Evalon{% endblock %}
-{% block meta_description %}İşəgötürmə prosesinizi AI ilə avtomatlaşdırın. CV-ləri yükləyin, namizədləri yoxlayın, qiymətləndirmələr göndərin və işəgötürmə tövsiyələri alın — hər addımda insan nəzarəti ilə.{% endblock %}
+{% block title %}AI ilə avtomatik işə qəbul · Evalon{% endblock %}
+{% block meta_description %}İşə qəbul prosesinizi AI ilə avtomatlaşdırın. CV-ləri yükləyin — AI namizədləri yoxlayır, test göndərir və tövsiyə verir. Hər addımda siz nəzarət edirsiniz.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header_az.html' %}
@@ -16,15 +16,15 @@
                     <div class="aih-hero-text">
                         <span class="aih-badge">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            Pro Xüsusiyyət
+                            Pro funksiya
                         </span>
-                        <h1 class="aih-hero-title">Agentlik AI<br><span class="aih-accent">İşəgötürmə Boru Xətləri</span></h1>
-                        <p class="aih-hero-sub">Ağır işi AI-yə həvalə edin. CV-ləri yükləyin, agentlik boru xəttimiz namizədləri yoxlayır, qiymətləndirmələr göndərir və işəgötürmə tövsiyələri verir — hər addımda insan nəzarəti ilə.</p>
+                        <h1 class="aih-hero-title">AI ilə avtomatik<br><span class="aih-accent">işə qəbul</span></h1>
+                        <p class="aih-hero-sub">İşə qəbulun çətin hissəsini AI-yə tapşırın. CV-ləri yükləyin — AI namizədləri yoxlayır, test göndərir və tövsiyə verir. Hər addımda siz nəzarət edirsiniz.</p>
                         <div class="aih-hero-actions">
                             <a class="btn btn-pill aih-cta-primary" href="{% url 'pages:contact' %}"
                                data-gtag-click="ai_hiring_hero_cta"
                                data-gtag-category="engagement"
-                               data-gtag-label="ai_hiring_request_demo">Demo tələb edin</a>
+                               data-gtag-label="ai_hiring_request_demo">Demo istəyin</a>
                             <a class="aih-cta-secondary" href="#how-it-works">
                                 Necə işləyir
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
@@ -33,15 +33,15 @@
                         <div class="aih-hero-stats">
                             <div class="aih-hero-stat">
                                 <span class="aih-hero-stat-val">80%</span>
-                                <span class="aih-hero-stat-lbl">Daha az manual yoxlama</span>
+                                <span class="aih-hero-stat-lbl">Daha az əl işi</span>
                             </div>
                             <div class="aih-hero-stat">
                                 <span class="aih-hero-stat-val">3x</span>
-                                <span class="aih-hero-stat-lbl">Daha sürətli işəgötürmə</span>
+                                <span class="aih-hero-stat-lbl">3 dəfə sürətli</span>
                             </div>
                             <div class="aih-hero-stat">
                                 <span class="aih-hero-stat-val">100%</span>
-                                <span class="aih-hero-stat-lbl">Audit izi</span>
+                                <span class="aih-hero-stat-lbl">Tam şəffaflıq</span>
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                                 <span class="aih-mock-dot" style="background:#ff5f57"></span>
                                 <span class="aih-mock-dot" style="background:#febc2e"></span>
                                 <span class="aih-mock-dot" style="background:#28c840"></span>
-                                <span class="aih-mock-title">AI Boru Xətti — Baş Frontend Mühəndis</span>
+                                <span class="aih-mock-title">AI prosesi — Baş Frontend Mühəndis</span>
                             </div>
                             <div class="aih-mock-body">
                                 <div class="aih-mock-candidate aih-mock-c1">
@@ -60,7 +60,7 @@
                                         <span class="aih-mock-name">Jane Doe</span>
                                         <span class="aih-mock-score">AI Bal: <strong>92</strong></span>
                                     </div>
-                                    <span class="aih-mock-tag aih-tag-advance">İrəli</span>
+                                    <span class="aih-mock-tag aih-tag-advance">Növbəti mərhələ</span>
                                 </div>
                                 <div class="aih-mock-candidate aih-mock-c2">
                                     <div class="aih-mock-avatar">MC</div>
@@ -68,7 +68,7 @@
                                         <span class="aih-mock-name">Marcus Chen</span>
                                         <span class="aih-mock-score">AI Bal: <strong>85</strong></span>
                                     </div>
-                                    <span class="aih-mock-tag aih-tag-assess">Qiymətləndirilir</span>
+                                    <span class="aih-mock-tag aih-tag-assess">Test edilir</span>
                                 </div>
                                 <div class="aih-mock-candidate aih-mock-c3">
                                     <div class="aih-mock-avatar">PS</div>
@@ -76,7 +76,7 @@
                                         <span class="aih-mock-name">Priya Sharma</span>
                                         <span class="aih-mock-score">AI Bal: <strong>78</strong></span>
                                     </div>
-                                    <span class="aih-mock-tag aih-tag-review">Nəzərdən keçir</span>
+                                    <span class="aih-mock-tag aih-tag-review">Nəzərdən keçirilir</span>
                                 </div>
                                 <div class="aih-mock-candidate aih-mock-c4">
                                     <div class="aih-mock-avatar">AL</div>
@@ -84,7 +84,7 @@
                                         <span class="aih-mock-name">Alex Liu</span>
                                         <span class="aih-mock-score">AI Bal: <strong>44</strong></span>
                                     </div>
-                                    <span class="aih-mock-tag aih-tag-reject">Rədd edildi</span>
+                                    <span class="aih-mock-tag aih-tag-reject">Uyğun deyil</span>
                                 </div>
                             </div>
                         </div>
@@ -96,23 +96,23 @@
         {# ── Trusted by ── #}
         <section class="aih-trust-bar">
             <div class="section-shell">
-                <p class="aih-trust-label">Dünya üzrə işəgötürmə komandalarının etibar etdiyi texnologiya üzərində qurulub</p>
+                <p class="aih-trust-label">Dünya üzrə HR komandalarının etibar etdiyi texnologiya ilə işləyir</p>
                 <div class="aih-trust-logos">
                     <span class="aih-trust-logo">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        SOC 2 Hazır
+                        SOC 2
                     </span>
                     <span class="aih-trust-logo">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        AES-256 Şifrələnmiş
+                        AES-256 Şifrəli
                     </span>
                     <span class="aih-trust-logo">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><circle cx="12" cy="12" r="10"></circle></svg>
-                        Claude AI ilə işləyir
+                        Claude AI
                     </span>
                     <span class="aih-trust-logo">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                        99.9% İşləmə müddəti
+                        99.9% uptime
                     </span>
                 </div>
             </div>
@@ -124,7 +124,7 @@
                 <div class="section-heading section-heading-tight">
                     <p class="eyebrow">Necə işləyir</p>
                     <h2>CV-lərdən tövsiyələrə dörd addımda</h2>
-                    <p class="lede">AI işəgötürmə köməkçiniz bütün yoxlama prosesini idarə edir — hər qərar sizin nəzarətinizdədir.</p>
+                    <p class="lede">AI köməkçiniz bütün yoxlama prosesini idarə edir — hər qərar sizin nəzarətinizdədir.</p>
                 </div>
                 <div class="aih-steps">
                     <div class="aih-step" data-aih-step="0">
@@ -150,11 +150,11 @@
                         </div>
                         <div class="aih-step-body">
                             <span class="aih-step-num">Addım 2</span>
-                            <h3>AI yoxlayır və qiymətləndirir</h3>
-                            <p>Claude AI hər CV-ni iş təsvirinizə uyğun qiymətləndirir, bacarıqları, təcrübəni və rola uyğunluğu 0-100 şkalasında ölçür.</p>
+                            <h3>AI yoxlayır və ballandırır</h3>
+                            <p>Claude AI hər CV-ni iş təsvirinizə uyğun analiz edir — bacarıqları, təcrübəni və rola uyğunluğu 0-100 şkalasında qiymətləndirir.</p>
                             <div class="aih-step-detail">
                                 <span>Bacarıq uyğunluğu</span>
-                                <span>0-100 qiymətləndirmə</span>
+                                <span>0-100 bal</span>
                                 <span>Əsaslandırma</span>
                             </div>
                         </div>
@@ -166,12 +166,12 @@
                         </div>
                         <div class="aih-step-body">
                             <span class="aih-step-num">Addım 3</span>
-                            <h3>Avtomatik qiymətləndirmə göndər</h3>
-                            <p>Seçilmiş namizədlər avtomatik olaraq düzgün bacarıq testlərini alır — marketinq, davranış, məhsul və ya altı qiymətləndirmə növündən hər hansı biri.</p>
+                            <h3>Avtomatik test göndər</h3>
+                            <p>Seçilmiş namizədlər avtomatik olaraq uyğun bacarıq testini alır — marketinq, davranış, məhsul və ya altı test növündən hər hansı biri.</p>
                             <div class="aih-step-detail">
-                                <span>6 qiymətləndirmə növü</span>
+                                <span>6 test növü</span>
                                 <span>Avtomatik dəvət</span>
-                                <span>Gedişatı izlə</span>
+                                <span>Prosesi izlə</span>
                             </div>
                         </div>
                     </div>
@@ -182,12 +182,12 @@
                         </div>
                         <div class="aih-step-body">
                             <span class="aih-step-num">Addım 4</span>
-                            <h3>AI işəgötürmə tövsiyələri</h3>
-                            <p>CV təhlili + qiymətləndirmə balları güclü tərəflər, narahatlıqlar və yekun bal ilə ağıllı işəgötürmə tövsiyəsinə çevrilir.</p>
+                            <h3>AI tövsiyə verir</h3>
+                            <p>CV təhlili + test balları güclü tərəflər, narahatlıqlar və yekun bal ilə ağıllı işə qəbul tövsiyəsinə çevrilir.</p>
                             <div class="aih-step-detail">
                                 <span>Birləşdirilmiş qiymətləndirmə</span>
                                 <span>Güclü tərəflər və boşluqlar</span>
-                                <span>Audit izi</span>
+                                <span>Tam şəffaflıq</span>
                             </div>
                         </div>
                     </div>
@@ -201,16 +201,16 @@
                 <div class="section-heading section-heading-tight">
                     <p class="eyebrow">Nəzarət səviyyələri</p>
                     <h2>Avtomatlaşdırma səviyyənizi seçin</h2>
-                    <p class="lede">Tam insan nəzarətindən tam avtonom rejimə qədər — komandanızın rahatlıq səviyyəsinə uyğun rejimi seçin.</p>
+                    <p class="lede">Tam insan nəzarətindən tam avtonom rejimə qədər — komandanızın ehtiyacına uyğun rejimi seçin.</p>
                 </div>
                 <div class="aih-modes-grid">
                     <div class="aih-mode-card">
                         <div class="aih-mode-icon">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
                         </div>
-                        <h3>Tövsiyə</h3>
+                        <h3>Tövsiyə rejimi</h3>
                         <p class="aih-mode-sub">AI təklif edir, siz qərar verirsiniz</p>
-                        <p class="aih-mode-desc">AI CV-ləri yoxlayır və tövsiyələr verir, lakin hər bir hərəkət — seçim, qiymətləndirmə göndərmə və yekun qərarlar — sizin təsdiqinizi tələb edir.</p>
+                        <p class="aih-mode-desc">AI CV-ləri yoxlayır və tövsiyələr verir, lakin hər bir hərəkət — seçim, test göndərmə və yekun qərarlar — sizin təsdiqinizi tələb edir.</p>
                         <ul class="aih-mode-checks">
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -218,7 +218,7 @@
                             </li>
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                İnsan qiymətləndirmələri təsdiqləyir
+                                İnsan testləri təsdiqləyir
                             </li>
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -231,9 +231,9 @@
                         <div class="aih-mode-icon">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                         </div>
-                        <h3>Yarı-Avtomatik</h3>
+                        <h3>Yarı-avto rejim</h3>
                         <p class="aih-mode-sub">AI yoxlayır, siz əsas addımları təsdiqləyirsiniz</p>
-                        <p class="aih-mode-desc">AI avtomatik olaraq CV-ləri yoxlayır və seçilmiş namizədlərə qiymətləndirmələr göndərir. Siz tam kontekstlə yekun işəgötürmə qərarlarını təsdiqləyirsiniz.</p>
+                        <p class="aih-mode-desc">AI avtomatik olaraq CV-ləri yoxlayır və seçilmiş namizədlərə test göndərir. Siz tam kontekstlə yekun işə qəbul qərarlarını təsdiqləyirsiniz.</p>
                         <ul class="aih-mode-checks">
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -241,7 +241,7 @@
                             </li>
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                AI avtomatik qiymətləndirmə göndərir
+                                AI avtomatik test göndərir
                             </li>
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -254,9 +254,9 @@
                         <div class="aih-mode-icon">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         </div>
-                        <h3>Tam Avtomatik</h3>
+                        <h3>Tam avto rejim</h3>
                         <p class="aih-mode-sub">AI hər şeyi idarə edir</p>
-                        <p class="aih-mode-desc">Boru xətti CV yükləməsindən işəgötürmə tövsiyəsinə qədər avtonom işləyir. İstənilən mərhələdə müdaxilə edə bilərsiniz, lakin AI standart olaraq hər şeyi idarə edir.</p>
+                        <p class="aih-mode-desc">Proses CV yükləməsindən işə qəbul tövsiyəsinə qədər avtonom işləyir. İstənilən mərhələdə müdaxilə edə bilərsiniz, lakin AI standart olaraq hər şeyi idarə edir.</p>
                         <ul class="aih-mode-checks">
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -264,14 +264,14 @@
                             </li>
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                AI avtomatik qiymətləndirmə göndərir
+                                AI avtomatik test göndərir
                             </li>
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                 AI avtomatik qərar verir (istənilən vaxt dəyişdirin)
                             </li>
                         </ul>
-                        <span class="aih-mode-tag">Peşəkar istifadəçilər</span>
+                        <span class="aih-mode-tag">Təcrübəli istifadəçilər</span>
                     </div>
                 </div>
             </div>
@@ -282,7 +282,7 @@
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
                     <p class="eyebrow">İmkanlar</p>
-                    <h2>AI ilə işəgötürmə üçün lazım olan hər şey</h2>
+                    <h2>AI ilə işə qəbul üçün lazım olan hər şey</h2>
                 </div>
                 <div class="aih-feat-grid">
                     <div class="aih-feat-card">
@@ -303,29 +303,29 @@
                         <div class="aih-feat-icon">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                         </div>
-                        <h4>İnsan nəzarət nöqtələri</h4>
-                        <p>AI heç vaxt sizin xəbəriniz olmadan qərar vermir. Boru xəttinin istənilən mərhələsində nəzərdən keçirin, təsdiqləyin və ya dəyişdirin.</p>
+                        <h4>İnsan nəzarəti</h4>
+                        <p>AI heç vaxt sizin xəbəriniz olmadan qərar vermir. Prosesin istənilən mərhələsində nəzərdən keçirin, təsdiqləyin və ya dəyişdirin.</p>
                     </div>
                     <div class="aih-feat-card">
                         <div class="aih-feat-icon">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22 6 12 13 2 6"></polyline></svg>
                         </div>
-                        <h4>Avtomatik qiymətləndirmə dəvətləri</h4>
-                        <p>Seçilmiş namizədlər avtomatik olaraq qiymətləndirmə dəvətləri alır — marketinq, davranış, məhsul və ya altı növdən hər hansı biri.</p>
+                        <h4>Avtomatik test dəvətləri</h4>
+                        <p>Seçilmiş namizədlər avtomatik olaraq test dəvəti alır — marketinq, davranış, məhsul və ya altı növdən hər hansı biri.</p>
                     </div>
                     <div class="aih-feat-card">
                         <div class="aih-feat-icon">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                         </div>
-                        <h4>Tam audit izi</h4>
-                        <p>Hər AI hərəkəti qeydə alınır — nə aldı, nə qaytardı, istifadə olunan model və emal müddəti. Tam şəffaflıq.</p>
+                        <h4>Tam şəffaflıq</h4>
+                        <p>Hər AI hərəkəti qeydə alınır — nə aldı, nə qaytardı, istifadə olunan model və emal müddəti. Bütün proseslər izlənilə bilir.</p>
                     </div>
                     <div class="aih-feat-card">
                         <div class="aih-feat-icon">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                         </div>
-                        <h4>Boru xətti paneli</h4>
-                        <p>Hər namizədin mərhələsini bir baxışda görün — yüklənmişdən işə götürülmüşə qədər. Bal, mərhələ və ya qiymətləndirmə statusuna görə filtrləyin.</p>
+                        <h4>Proses paneli</h4>
+                        <p>Hər namizədin mərhələsini bir baxışda görün — yüklənmişdən işə götürülmüşə qədər. Bal, mərhələ və ya test statusuna görə filtrləyin.</p>
                     </div>
                 </div>
             </div>
@@ -336,8 +336,8 @@
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
                     <p class="eyebrow">Namizəd yolu</p>
-                    <h2>CV-dən işə götürməyə doqquz mərhələ</h2>
-                    <p class="lede">Hər namizəd aydın keçidlər və qərar nöqtələri olan şəffaf, izlənə bilən vəziyyət maşınından keçir.</p>
+                    <h2>CV-dən işə qəbula doqquz mərhələ</h2>
+                    <p class="lede">Hər namizəd aydın keçidlər və qərar nöqtələri olan şəffaf, izlənə bilən prosesdən keçir.</p>
                 </div>
                 <div class="aih-pipeline-flow" id="aihPipeFlow">
                     {# Traveling pulse particle #}
@@ -365,7 +365,7 @@
                     <div class="aih-pipe-stage aih-pipe-stage--ai" data-pipe-node>
                         <span class="aih-pipe-dot"></span>
                         <span class="aih-pipe-ring"></span>
-                        <span class="aih-pipe-label">Qiymətləndirmə göndərildi</span>
+                        <span class="aih-pipe-label">Test göndərildi</span>
                     </div>
                     <div class="aih-pipe-arrow" data-pipe-arrow></div>
                     <div class="aih-pipe-stage aih-pipe-stage--wait" data-pipe-node>
@@ -407,8 +407,8 @@
                 <div class="aih-screening-grid">
                     <div class="aih-screening-text">
                         <p class="eyebrow">CV intellekti</p>
-                        <h2>CV-ləri baş rekruter kimi oxuyan AI</h2>
-                        <p>Hər CV Claude AI tərəfindən tam iş təsvirinizə, tələb olunan bacarıqlara, üstünlük verilən kvalifikasiyalara və kənd səviyyəsinə uyğun təhlil edilir. Nəticə strukturlaşdırılmış qiymətləndirmədir — açar söz uyğunluğu deyil.</p>
+                        <h2>CV-ləri peşəkar rekruter kimi oxuyan AI</h2>
+                        <p>Hər CV Claude AI tərəfindən tam iş təsvirinizə, tələb olunan bacarıqlara, üstünlük verilən kvalifikasiyalara və səviyyəyə uyğun təhlil edilir. Nəticə strukturlaşdırılmış qiymətləndirmədir — sadəcə açar söz uyğunluğu deyil.</p>
                         <ul class="aih-screening-list">
                             <li>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -424,7 +424,7 @@
                             </li>
                             <li>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                İrəli / Gözlət / Rədd et tövsiyəsi
+                                Növbəti / Gözlət / Uyğun deyil tövsiyəsi
                             </li>
                         </ul>
                     </div>
@@ -463,7 +463,7 @@
                             <div class="aih-screen-action" data-aih-verdict>
                                 <span class="aih-screen-rec aih-rec-advance">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                                    İrəli
+                                    Növbəti mərhələ
                                 </span>
                             </div>
                         </div>
@@ -476,9 +476,9 @@
         <section class="aih-integration">
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
-                    <p class="eyebrow">Qiymətləndirmə inteqrasiyası</p>
-                    <h2>Bütün altı Evalon qiymətləndirmə növünə qoşulur</h2>
-                    <p class="lede">AI boru xətti rol tələblərinə əsasən avtomatik olaraq düzgün qiymətləndirmələri seçir və göndərir.</p>
+                    <p class="eyebrow">Test inteqrasiyası</p>
+                    <h2>Bütün altı Evalon test növünə qoşulur</h2>
+                    <p class="lede">AI proses vəzifə tələblərinə əsasən avtomatik olaraq uyğun testi seçir və göndərir.</p>
                 </div>
                 <div class="aih-assess-grid">
                     <div class="aih-assess-item">
@@ -513,17 +513,17 @@
         <section class="aih-faq">
             <div class="section-shell">
                 <div class="section-heading section-heading-tight">
-                    <p class="eyebrow">TVS</p>
+                    <p class="eyebrow">Tez verilən suallar</p>
                     <h2>Tez-tez verilən suallar</h2>
                 </div>
                 <div class="aih-faq-list">
                     <details class="aih-faq-item">
                         <summary>AI CV-ləri necə yoxlayır?</summary>
-                        <p>AI Anthropic tərəfindən hazırlanmış Claude-dan istifadə edərək tam CV mətnini oxuyur və iş təsvirinizə, tələb olunan bacarıqlara, üstünlük verilən kvalifikasiyalara və kənd səviyyəsinə uyğun qiymətləndirir. Yazılı əsaslandırma, bacarıq uyğunluqları və tövsiyə (irəli, gözlət və ya rədd et) ilə 0-100 bal verir.</p>
+                        <p>AI Anthropic tərəfindən hazırlanmış Claude-dan istifadə edərək tam CV mətnini oxuyur və iş təsvirinizə, tələb olunan bacarıqlara, üstünlük verilən kvalifikasiyalara və səviyyəyə uyğun qiymətləndirir. Yazılı əsaslandırma, bacarıq uyğunluqları və tövsiyə (növbəti, gözlət və ya uyğun deyil) ilə 0-100 bal verir.</p>
                     </details>
                     <details class="aih-faq-item">
                         <summary>AI qərarlarını dəyişdirə bilərəmmi?</summary>
-                        <p>Bəli, həmişə. Hər üç rejimdə (Tövsiyə, Yarı-Avtomatik, Tam Avtomatik) istənilən namizədi nəzərdən keçirə, istənilən AI tövsiyəsini dəyişdirə, qeydlər əlavə edə və boru xəttinin istənilən mərhələsində öz qərarınızı verə bilərsiniz.</p>
+                        <p>Bəli, həmişə. Hər üç rejimdə (Tövsiyə, Yarı-avto, Tam avto) istənilən namizədi nəzərdən keçirə, istənilən AI tövsiyəsini dəyişdirə, qeydlər əlavə edə və prosesin istənilən mərhələsində öz qərarınızı verə bilərsiniz.</p>
                     </details>
                     <details class="aih-faq-item">
                         <summary>CV-lər üçün hansı fayl formatları dəstəklənir?</summary>
@@ -531,15 +531,15 @@
                     </details>
                     <details class="aih-faq-item">
                         <summary>AI məlumatları təhlükəsizdirmi?</summary>
-                        <p>Tamamilə. Bütün CV məlumatları və AI qarşılıqlı əlaqələri şifrələnir (saxlamada AES-256, ötürmədə TLS 1.3). AI emalı AI provayderi tərəfindən heç bir məlumat saxlanmadan təcrid olunmuş sessiyalarda baş verir. SOC 2 hazırlığını təmin edir və tam audit izləri təqdim edirik.</p>
+                        <p>Tamamilə. Bütün CV məlumatları və AI qarşılıqlı əlaqələri şifrələnir (saxlamada AES-256, ötürmədə TLS 1.3). AI emalı AI provayderi tərəfindən heç bir məlumat saxlanmadan təcrid olunmuş sessiyalarda baş verir. SOC 2 standartlarına uyğundur və tam şəffaflıq təmin edirik.</p>
                     </details>
                     <details class="aih-faq-item">
-                        <summary>Hansı plan AI İşəgötürmə Boru Xətlərini əhatə edir?</summary>
-                        <p>AI İşəgötürmə Boru Xətləri Enterprise planında mövcuddur. Qiymətləndirmə və xüsusiyyətin fərdi demosu üçün satış komandamızla əlaqə saxlayın.</p>
+                        <summary>Hansı plan AI işə qəbul funksiyasını əhatə edir?</summary>
+                        <p>AI işə qəbul funksiyası Enterprise planında mövcuddur. Qiymət və fərdi demo üçün satış komandamızla əlaqə saxlayın.</p>
                     </details>
                     <details class="aih-faq-item">
-                        <summary>Mövcud qiymətləndirmələrə necə qoşulur?</summary>
-                        <p>Boru xətti bütün altı Evalon qiymətləndirmə növü ilə birbaşa inteqrasiya olunur. Namizəd seçildikdə, AI avtomatik olaraq qiymətləndirmə sessiyaları yaradır və komandanızın artıq istifadə etdiyi eyni infrastrukturdan istifadə edərək dəvət e-poçtları göndərir.</p>
+                        <summary>Mövcud testlərə necə qoşulur?</summary>
+                        <p>Proses bütün altı Evalon test növü ilə birbaşa inteqrasiya olunur. Namizəd seçildikdə, AI avtomatik olaraq test sessiyaları yaradır və komandanızın artıq istifadə etdiyi eyni infrastrukturdan istifadə edərək dəvət e-poçtları göndərir.</p>
                     </details>
                 </div>
             </div>
@@ -549,17 +549,17 @@
         <section class="aih-final-cta">
             <div class="section-shell">
                 <div class="aih-final-content">
-                    <h2>İşəgötürmə prosesinizi avtomatlaşdırmağa hazırsınız?</h2>
-                    <p>AI İşəgötürmə Boru Xətlərinin işə qəbul prosesinizi necə dəyişdirə biləcəyi haqqında komandamızla danışın.</p>
+                    <h2>İşə qəbul prosesinizi avtomatlaşdırmağa hazırsınız?</h2>
+                    <p>AI ilə işə qəbulun sizin üçün necə işləyəcəyini öyrənmək üçün komandamızla əlaqə saxlayın.</p>
                     <div class="aih-final-actions">
                         <a class="btn btn-pill aih-cta-primary" href="{% url 'pages:contact' %}"
                            data-gtag-click="ai_hiring_final_cta"
                            data-gtag-category="engagement"
-                           data-gtag-label="ai_hiring_final_demo">Demo tələb edin</a>
+                           data-gtag-label="ai_hiring_final_demo">Demo istəyin</a>
                         <a class="btn btn-outline" href="{% url 'pages:pricing' %}"
                            data-gtag-click="ai_hiring_pricing_cta"
                            data-gtag-category="engagement"
-                           data-gtag-label="ai_hiring_view_pricing">Qiymətlərə baxın</a>
+                           data-gtag-label="ai_hiring_view_pricing">Qiymətlər</a>
                     </div>
                 </div>
             </div>

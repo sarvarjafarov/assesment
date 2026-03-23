@@ -1,40 +1,40 @@
 {% extends 'base.html' %}
 {% load humanize static %}
-{% block title %}{% if query %}Axtarış: {{ query }} · {% endif %}Qiymətləndirmə Kitabxanası · Evalon{% endblock %}
-{% block meta_description %}Evalon-un marketinq, məhsul, davranış, UX/UI dizayn, HR və maliyyə rolları üçün hazır qiymətləndirmələrinə baxın. Avtomatik qiymətləndirmə ilə hazır sual bankları.{% endblock %}
+{% block title %}{% if query %}Axtarış: {{ query }} · {% endif %}Test kitabxanası · Evalon{% endblock %}
+{% block meta_description %}Evalon-un marketinq, məhsul, davranış, UX/UI dizayn, HR və maliyyə vəzifələri üçün hazır testlərinə baxın. Avtomatik qiymətləndirmə ilə hazır sual bankları.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header_az.html' with active='assessments' %}
     <main>
         <div class="al-shell" data-assessment-list-shell>
             <section class="al-hero">
-                <p class="al-eyebrow">Qiymətləndirmə Kitabxanası</p>
-                <h1 class="al-title">{% if query %}"{{ query }}" üçün nəticələr{% else %}Hər rol üçün düzgün qiymətləndirməni tapın{% endif %}</h1>
+                <p class="al-eyebrow">Test kitabxanası</p>
+                <h1 class="al-title">{% if query %}"{{ query }}" üçün nəticələr{% else %}Hər vəzifə üçün uyğun testi tapın{% endif %}</h1>
                 {% if assessments %}
                 <p class="al-desc">
                     {% if query %}
-                    Axtarışınıza uyğun {{ assessments.paginator.count }} qiymətləndirmə tapıldı.
+                    Axtarışınıza uyğun {{ assessments.paginator.count }} test tapıldı.
                     {% else %}
-                    Qiymətləndirmə rubrikaları və real ssenarilər ilə hazır sual bankları — marketinq, məhsul, davranış, UX, HR və maliyyəni əhatə edir.
+                    Real iş ssenariləri əsasında hazır sual bankları — marketinq, məhsul, davranış, UX, HR və maliyyə sahələrini əhatə edir.
                     {% endif %}
                 </p>
                 {% elif query %}
-                <p class="al-desc">Qiymətləndirmə tapılmadı. Fərqli axtarış termini sınayın.</p>
+                <p class="al-desc">Test tapılmadı. Fərqli axtarış sözü sınayın.</p>
                 {% endif %}
 
                 {# Trust stats #}
                 <div class="al-trust-stats">
                     <span class="al-trust-stat">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        <strong>500+</strong> şirkətlər
+                        <strong>500+</strong> şirkət
                     </span>
                     <span class="al-trust-stat">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        <strong>6</strong> qiymətləndirmə növü
+                        <strong>6</strong> test növü
                     </span>
                     <span class="al-trust-stat">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        AI ilə qiymətləndirmə
+                        AI qiymətləndirmə
                     </span>
                     <span class="al-trust-stat">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -48,7 +48,7 @@
                       data-gtag-label="assessment_library">
                     <div class="al-search-field">
                         <svg class="al-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="search" name="q" value="{{ query }}" placeholder="Qiymətləndirmələri axtar..." aria-label="Qiymətləndirmələri axtar">
+                        <input type="search" name="q" value="{{ query }}" placeholder="Test axtar..." aria-label="Test axtar">
                     </div>
                 </form>
             </section>
@@ -88,8 +88,8 @@
                 </a>
                 {% empty %}
                     <div class="al-empty">
-                        <h3>Qiymətləndirmə tapılmadı</h3>
-                        <p>{% if query %}Axtarışınızı dəyişdirin və ya <a href="{% url 'pages_az:assessment_list' %}">bütün qiymətləndirmələrə baxın</a>.{% else %}Yeni qiymətləndirmələr üçün tezliklə yoxlayın.{% endif %}</p>
+                        <h3>Test tapılmadı</h3>
+                        <p>{% if query %}Axtarışınızı dəyişdirin və ya <a href="{% url 'pages_az:assessment_list' %}">bütün testlərə baxın</a>.{% else %}Yeni testlər üçün tezliklə yoxlayın.{% endif %}</p>
                     </div>
                 {% endfor %}
             </section>
@@ -107,17 +107,17 @@
             {# Bottom CTA #}
             <section class="al-cta">
                 <div class="al-cta-inner">
-                    <h2>Hansı qiymətləndirmənin uyğun olduğunu bilmirsiniz?</h2>
-                    <p>Fərdi tövsiyə üçün komandamızla danışın — və ya pulsuz başlayın və özünüz araşdırın.</p>
+                    <h2>Hansı testin sizə uyğun olduğunu bilmirsiniz?</h2>
+                    <p>Komandamızla əlaqə saxlayın — və ya pulsuz başlayıb özünüz kəşf edin.</p>
                     <div class="al-cta-actions">
                         <a class="ad-btn-primary" href="{% url 'clients:signup' %}"
                            data-gtag-click="assessment_list_cta_click"
                            data-gtag-category="engagement"
-                           data-gtag-label="list_cta_trial">Pulsuz Başlayın</a>
+                           data-gtag-label="list_cta_trial">Pulsuz başlayın</a>
                         <a class="ad-btn-secondary" href="{% url 'pages:contact' %}"
                            data-gtag-click="contact_sales_click"
                            data-gtag-category="engagement"
-                           data-gtag-label="list_cta_sales">Satış ilə əlaqə</a>
+                           data-gtag-label="list_cta_sales">Bizimlə əlaqə</a>
                     </div>
                 </div>
             </section>

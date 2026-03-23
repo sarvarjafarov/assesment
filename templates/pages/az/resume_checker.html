@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Pulsuz ATS CV Yoxlayıcı · Evalon{% endblock %}
-{% block meta_description %}CV-nizin ATS yoxlamasından keçib-keçmədiyini yoxlayın. CV-nizi yükləyin, vəzifə təsvirini yapışdırın və süni intellektlə dəstəklənən ani rəy alın — tamamilə pulsuz.{% endblock %}
+{% block meta_description %}CV-nizin ATS süzgəcindən keçib-keçmədiyini öyrənin. CV-ni yükləyin, vakansiya təsvirini yapışdırın və AI dəstəkli nəticəni saniyələr içində alın — tamamilə pulsuzdur.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header_az.html' %}
@@ -12,7 +12,7 @@
             <section class="rc-hero">
                 <div class="rc-hero-badge">Pulsuz Alət</div>
                 <h1>ATS CV Yoxlayıcı</h1>
-                <p class="rc-hero-sub">CV-nizi yükləyin və vəzifə təsvirini yapışdırın — süni intellekt vasitəsilə CV-nizin uyğunluğunu dərhal görün.</p>
+                <p class="rc-hero-sub">CV-nizi yükləyin, vakansiya təsvirini yapışdırın — uyğunluq nəticəsini dərhal görün.</p>
             </section>
 
             {% if error %}
@@ -42,13 +42,13 @@
                         <div class="rc-field">
                             <label for="id_email" class="rc-label">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                Email ünvanı
+                                E-poçt ünvanı
                             </label>
-                            <input type="email" name="email" id="id_email" class="rc-input" placeholder="siz@misal.com" required value="{{ form.email.value|default:"" }}">
+                            <input type="email" name="email" id="id_email" class="rc-input" placeholder="siz@numune.com" required value="{{ form.email.value|default:"" }}">
                             {% if form.email.errors %}
                             <div class="rc-field-error">{{ form.email.errors.0 }}</div>
                             {% endif %}
-                            <span class="rc-field-hint">Ətraflı hesabatınızı bu emailə göndərəcəyik</span>
+                            <span class="rc-field-hint">Nəticələri bu e-poçta göndərəcəyik</span>
                         </div>
                     </div>
 
@@ -61,7 +61,7 @@
                             <input type="file" name="resume" id="id_resume" accept=".pdf,.docx" required>
                             <div class="rc-dropzone-content">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                <span class="rc-dropzone-text">Sürükləyib buraxın və ya <strong>seçin</strong></span>
+                                <span class="rc-dropzone-text">Faylı buraya atın və ya <strong>seçin</strong></span>
                                 <span class="rc-dropzone-hint">PDF və ya DOCX, maks 5 MB</span>
                             </div>
                             <div class="rc-dropzone-file" id="rc-file-name" style="display:none;"></div>
@@ -76,7 +76,7 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
                             Vəzifə təsviri
                         </label>
-                        <textarea name="job_description" id="id_job_description" rows="8" class="rc-textarea" placeholder="Tam vəzifə təsvirini bura yapışdırın — ən yaxşı analiz üçün tələbləri, vəzifələri və kvalifikasiyaları daxil edin..." required maxlength="10000">{{ form.job_description.value|default:"" }}</textarea>
+                        <textarea name="job_description" id="id_job_description" rows="8" class="rc-textarea" placeholder="Vakansiya təsvirini bura yapışdırın — tələblər, vəzifələr və kvalifikasiyalar daxil olsa, nəticə daha dəqiq olar..." required maxlength="10000">{{ form.job_description.value|default:"" }}</textarea>
                         {% if form.job_description.errors %}
                         <div class="rc-field-error">{{ form.job_description.errors.0 }}</div>
                         {% endif %}
@@ -84,7 +84,7 @@
 
                     <button type="submit" class="rc-submit" id="rc-submit">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>
-                        CV-mi Analiz Et
+                        CV-ni yoxla
                     </button>
                 </form>
             </section>
@@ -100,13 +100,13 @@
                     </div>
                     <div class="rc-step">
                         <div class="rc-step-num">2</div>
-                        <h3>Təsvir əlavə edin</h3>
-                        <p>Hədəflədiyiniz vəzifə təsvirini əlavə edin</p>
+                        <h3>Təsviri yapışdırın</h3>
+                        <p>Müraciət etdiyiniz vakansiya təsvirini yapışdırın</p>
                     </div>
                     <div class="rc-step">
                         <div class="rc-step-num">3</div>
-                        <h3>Nəticə alın</h3>
-                        <p>Ani ATS uyğunluq rəyi alın</p>
+                        <h3>Nəticəni görün</h3>
+                        <p>ATS uyğunluq nəticəsini dərhal əldə edin</p>
                     </div>
                 </div>
             </section>
@@ -145,7 +145,7 @@
             <section class="rc-section">
                 <h2>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    Açar söz analizi
+                    Açar sözlərin analizi
                 </h2>
                 <div class="rc-keywords">
                     {% for kw in result.keyword_matches %}
@@ -172,7 +172,7 @@
             <section class="rc-section">
                 <h2>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    Bacarıqlar analizi
+                    Bacarıq analizi
                 </h2>
                 {% if result.hard_skills_analysis.matched %}
                 <p class="rc-skill-heading rc-skill-heading--green">Uyğun gələn bacarıqlar</p>
@@ -183,7 +183,7 @@
                 </div>
                 {% endif %}
                 {% if result.hard_skills_analysis.missing_critical %}
-                <p class="rc-skill-heading rc-skill-heading--red">Çatışmayan kritik bacarıqlar</p>
+                <p class="rc-skill-heading rc-skill-heading--red">Əksik olan vacib bacarıqlar</p>
                 <div class="rc-skill-tags">
                     {% for s in result.hard_skills_analysis.missing_critical %}
                     <span class="rc-skill-tag rc-skill-tag--red">{{ s }}</span>
@@ -191,7 +191,7 @@
                 </div>
                 {% endif %}
                 {% if result.hard_skills_analysis.missing_nice_to_have %}
-                <p class="rc-skill-heading rc-skill-heading--amber">Arzu olunan (çatışmayan)</p>
+                <p class="rc-skill-heading rc-skill-heading--amber">Üstünlük verilən (əksik)</p>
                 <div class="rc-skill-tags">
                     {% for s in result.hard_skills_analysis.missing_nice_to_have %}
                     <span class="rc-skill-tag rc-skill-tag--amber">{{ s }}</span>
@@ -206,14 +206,14 @@
             <section class="rc-section">
                 <h2>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
-                    Təcrübə uyğunluğu
+                    Təcrübənin uyğunluğu
                     <span class="rc-inline-score">{{ result.experience_alignment.score }} / 100</span>
                 </h2>
                 <p class="rc-muted">{{ result.experience_alignment.assessment }}</p>
                 {% if result.experience_alignment.years_detected != "unclear" %}
                 <div class="rc-meta-row">
-                    <span>Aşkarlanıb: <strong>{{ result.experience_alignment.years_detected }}</strong></span>
-                    <span>Tələb olunur: <strong>{{ result.experience_alignment.years_required }}</strong></span>
+                    <span>Müəyyən edilib: <strong>{{ result.experience_alignment.years_detected }}</strong></span>
+                    <span>Tələb olunan: <strong>{{ result.experience_alignment.years_required }}</strong></span>
                 </div>
                 {% endif %}
             </section>
@@ -225,7 +225,7 @@
                 <section class="rc-section rc-section--green">
                     <h2>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        Güclü tərəflər
+                        Güclü cəhətlər
                     </h2>
                     <ul class="rc-list rc-list--green">
                         {% for s in result.strengths %}
@@ -239,7 +239,7 @@
                 <section class="rc-section rc-section--amber">
                     <h2>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                        Təkmilləşdirmələr
+                        Yaxşılaşdırmalar
                     </h2>
                     <ul class="rc-list rc-list--amber">
                         {% for imp in result.improvements %}
@@ -259,7 +259,7 @@
                         Göstəricilər və rəqəmlər
                     </h2>
                     {% if result.quantification_check.examples_found %}
-                    <p class="rc-small-label">CV-nizdə tapıldı:</p>
+                    <p class="rc-small-label">CV-də tapılanlar:</p>
                     <ul class="rc-list rc-list--green">
                         {% for ex in result.quantification_check.examples_found %}
                         <li>{{ ex }}</li>
@@ -267,7 +267,7 @@
                     </ul>
                     {% endif %}
                     {% if result.quantification_check.suggestions %}
-                    <p class="rc-small-label" style="margin-top: 0.75rem;">Buraya göstərici əlavə edin:</p>
+                    <p class="rc-small-label" style="margin-top: 0.75rem;">Rəqəm əlavə etməyə dəyər:</p>
                     <ul class="rc-list rc-list--amber">
                         {% for sug in result.quantification_check.suggestions %}
                         <li>{{ sug }}</li>
@@ -305,7 +305,7 @@
                 <section class="rc-section rc-section--red">
                     <h2>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
-                        Çatışmayan bölmələr
+                        Əksik bölmələr
                     </h2>
                     <ul class="rc-list rc-list--red">
                         {% for ms in result.missing_sections %}
@@ -318,7 +318,7 @@
                 <section class="rc-section">
                     <h2>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                        Format qeydləri
+                        Formatla bağlı qeydlər
                     </h2>
                     <ul class="rc-list">
                         {% for fi in result.formatting_issues %}
@@ -335,7 +335,7 @@
             <section class="rc-section rc-section--purple">
                 <h2>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>
-                    Əsas fəaliyyət addımları
+                    İlk növbədə bunları edin
                 </h2>
                 <div class="rc-priorities">
                     {% for rec in result.overall_recommendations|slice:":3" %}
@@ -363,10 +363,10 @@
             <div class="rc-actions">
                 <a href="{% url 'pages_az:resume_checker' %}" class="rc-btn-again">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                    Başqa CV Yoxla
+                    Yeni CV yoxla
                 </a>
                 <a href="{% url 'pages_az:home' %}#pricing" class="rc-btn-cta">
-                    Namizədləri miqyaslı şəkildə yoxlamaq istəyirsiniz? Evalon-u pulsuz sınayın
+                    Namizədləri toplu şəkildə qiymətləndirmək istəyirsiniz? Evalon-u pulsuz sınayın
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
             </div>

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize static %}
-{% block title %}{% if query %}Axtarış: {{ query }} · {% endif %}Vəzifəyə görə qiymətləndirmə tövsiyələri · Evalon{% endblock %}
-{% block meta_description %}Hər vəzifə üçün düzgün qiymətləndirmə batareyasını tapın. Marketinq, məhsul, dizayn, HR, maliyyə və liderlik vəzifələri üçün tövsiyə olunan Evalon qiymətləndirmələrinə baxın.{% endblock %}
+{% block title %}{% if query %}Axtarış: {{ query }} · {% endif %}Vəzifəyə uyğun testlər · Evalon{% endblock %}
+{% block meta_description %}Hər vəzifə üçün doğru test paketini tapın. Marketinq, məhsul, dizayn, HR, maliyyə və liderlik vəzifələri üçün tövsiyə olunan Evalon testlərinə baxın.{% endblock %}
 {% block extra_meta %}
 {% if page_obj.has_previous %}<link rel="prev" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">{% endif %}
 {% if page_obj.has_next %}<link rel="next" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">{% endif %}
@@ -12,13 +12,13 @@
     <main>
         <div class="rp-shell">
             <section class="rp-hero">
-                <p class="rp-eyebrow">Vəzifəyə görə qiymətləndirmələr</p>
-                <h1 class="rp-title">{% if query %}"{{ query }}" üçün nəticələr{% elif department %}{{ department }} Vəzifələri{% else %}Hər vəzifə üçün düzgün qiymətləndirməni tapın{% endif %}</h1>
+                <p class="rp-eyebrow">Vəzifəyə uyğun testlər</p>
+                <h1 class="rp-title">{% if query %}"{{ query }}" üçün nəticələr{% elif department %}{{ department }} Vəzifələri{% else %}Hər vəzifə üçün doğru testi tapın{% endif %}</h1>
                 <p class="rp-desc">
                     {% if query %}
                     Axtarışınıza uyğun {{ roles.paginator.count }} vəzifə tapıldı.
                     {% else %}
-                    Hər vəzifəyə uyğunlaşdırılmış tövsiyə olunan qiymətləndirmə batareyaları — ən vacib bacarıqları, səriştələri və davranışları əhatə edir.
+                    Hər vəzifə üçün hazırlanmış test paketləri — ən vacib bacarıqları, səriştələri və davranışları əhatə edir.
                     {% endif %}
                 </p>
 
@@ -31,7 +31,7 @@
                     <span class="rp-trust-dot"></span>
                     <span class="rp-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        <strong>{{ total_assessments }}</strong> Qiymətləndirmələr
+                        <strong>{{ total_assessments }}</strong> Testlər
                     </span>
                     <span class="rp-trust-dot"></span>
                     <span class="rp-trust-stat">
@@ -41,7 +41,7 @@
                     <span class="rp-trust-dot"></span>
                     <span class="rp-trust-stat">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        <strong>AI</strong> Qiymətləndirmə
+                        <strong>AI</strong> Test
                     </span>
                 </div>
                 {% endif %}
@@ -49,7 +49,7 @@
                 <form action="{% url 'pages_az:role_assessment_list' %}" method="get" class="rp-search">
                     <div class="rp-search-field">
                         <svg class="rp-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="search" name="q" value="{{ query }}" placeholder="Axtar..." aria-label="Vəzifələri axtar">
+                        <input type="search" name="q" value="{{ query }}" placeholder="Axtar..." aria-label="Axtar...">
                     </div>
                 </form>
 
@@ -105,7 +105,7 @@
                     </div>
                     {% endif %}
                     <div class="rp-card-footer">
-                        <span class="rp-card-assessments">{{ role.assessment_types.count }} qiymətləndirmə</span>
+                        <span class="rp-card-assessments">{{ role.assessment_types.count }} test</span>
                         <span class="rp-card-arrow">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </span>
@@ -128,8 +128,8 @@
             {# Body CTA #}
             <section class="seo-list-cta">
                 <div class="seo-list-cta-inner">
-                    <h2>Namizədləri qiymətləndirməyə hazırsınız?</h2>
-                    <p>Avtomatik qiymətləndirmə və komandanızın etibar edə biləcəyi ətraflı hesabatlarla dəqiqələr ərzində qiymətləndirmələr göndərin.</p>
+                    <h2>Namizədləri test etməyə hazırsınız?</h2>
+                    <p>Bir neçə dəqiqəyə test göndərin — avtomatik nəticələr və ətraflı hesabatlar ilə.</p>
                     <div class="seo-list-cta-actions">
                         <a class="rp-btn-primary" href="{% url 'clients:signup' %}"
                            data-gtag-click="rp_list_cta_click"
@@ -153,8 +153,8 @@
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     </div>
                     <div class="rp-crosslink-body">
-                        <h3>Vəzifəyə görə müsahibə sualları</h3>
-                        <p>Çətinlik dərəcəsi, qiymətləndirmə meyarları və nümunə cavab təlimatları ilə hazırlanmış müsahibə suallarına baxın.</p>
+                        <h3>Müsahibə sualları</h3>
+                        <p>Hər vəzifəyə uyğun müsahibə sualları, çətinlik dərəcələri və cavab nümunələri.</p>
                     </div>
                     <svg class="rp-crosslink-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>

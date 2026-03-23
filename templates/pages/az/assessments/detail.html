@@ -36,12 +36,12 @@
             <header class="ad-hero">
                 <div class="ad-hero-inner">
                     <div class="ad-breadcrumb">
-                        <a href="{% url 'pages_az:assessment_list' %}">Qiymətləndirmələr</a>
+                        <a href="{% url 'pages_az:assessment_list' %}">Testlər</a>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         <span>{{ assessment.label }}</span>
                     </div>
                     {% if preview_mode %}
-                    <div class="ad-preview-banner">Önizləmə rejimi — yalnız etibarlı önizləmə linki ilə görünür.</div>
+                    <div class="ad-preview-banner">Önbaxış rejimi — yalnız keçərli link ilə görünür.</div>
                     {% endif %}
                     <span class="ad-label">{{ assessment.label }}</span>
                     <h1 class="ad-title">{{ assessment.title }}</h1>
@@ -73,7 +73,7 @@
                            href="{% url 'pages:contact' %}"
                            data-gtag-click="contact_sales_click"
                            data-gtag-category="engagement"
-                           data-gtag-label="assessment_contact_sales">Satış ilə əlaqə</a>
+                           data-gtag-label="assessment_contact_sales">Bizimlə əlaqə</a>
                     </div>
                 </div>
             </header>
@@ -82,11 +82,11 @@
             <div class="ad-trust-stats">
                 <span class="ad-trust-stat">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    <strong>500+</strong> şirkətlər
+                    <strong>500+</strong> şirkət
                 </span>
                 <span class="ad-trust-stat">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    AI ilə qiymətləndirmə
+                    AI qiymətləndirmə
                 </span>
                 <span class="ad-trust-stat">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -97,21 +97,21 @@
             {# Sticky TOC #}
             <nav class="ad-toc" id="ad-toc" aria-label="Səhifə bölmələri">
                 <span class="ad-toc-label">Bu səhifədə</span>
-                {% if assessment.description or assessment.overview_content %}<a class="ad-toc-link" href="#overview">İcmal</a>{% endif %}
-                {% if assessment.focus_areas %}<a class="ad-toc-link" href="#focus">Diqqət sahələri</a>{% endif %}
+                {% if assessment.description or assessment.overview_content %}<a class="ad-toc-link" href="#overview">Ümumi baxış</a>{% endif %}
+                {% if assessment.focus_areas %}<a class="ad-toc-link" href="#focus">Əsas sahələr</a>{% endif %}
                 {% if assessment.skills_tested %}<a class="ad-toc-link" href="#skills">Bacarıqlar</a>{% endif %}
-                {% if assessment.sample_questions %}<a class="ad-toc-link" href="#samples">Nümunələr</a>{% endif %}
-                {% if assessment.scoring_rubric %}<a class="ad-toc-link" href="#scoring">Qiymətləndirmə</a>{% endif %}
+                {% if assessment.sample_questions %}<a class="ad-toc-link" href="#samples">Nümunə suallar</a>{% endif %}
+                {% if assessment.scoring_rubric %}<a class="ad-toc-link" href="#scoring">Qiymətləndirmə metodikası</a>{% endif %}
                 {% if assessment.stats %}<a class="ad-toc-link" href="#stats">Statistika</a>{% endif %}
                 {% if assessment.use_cases %}<a class="ad-toc-link" href="#use-cases">İstifadə halları</a>{% endif %}
-                {% if assessment.faqs %}<a class="ad-toc-link" href="#faqs">TVS</a>{% endif %}
+                {% if assessment.faqs %}<a class="ad-toc-link" href="#faqs">Tez-tez verilən suallar</a>{% endif %}
             </nav>
 
             {# Overview #}
             {% if assessment.description or assessment.overview_content %}
             <section class="ad-section" id="overview">
                 <div class="ad-section-inner">
-                    <h2 class="ad-section-title">İcmal</h2>
+                    <h2 class="ad-section-title">Ümumi baxış</h2>
                     {% if assessment.overview_content %}
                     <div class="ad-prose">{{ assessment.overview_content|safe }}</div>
                     {% else %}
@@ -125,8 +125,8 @@
             {% if assessment.focus_areas %}
             <section class="ad-section ad-section--alt" id="focus">
                 <div class="ad-section-inner">
-                    <h2 class="ad-section-title">Diqqət sahələri</h2>
-                    <p class="ad-section-desc">Bu qiymətləndirmədə qiymətləndirilən əsas sahələr.</p>
+                    <h2 class="ad-section-title">Əsas sahələr</h2>
+                    <p class="ad-section-desc">Bu testdə yoxlanılan əsas sahələr.</p>
                     <div class="ad-tags">
                         {% for area in assessment.focus_areas %}
                         <span class="ad-tag">{{ area }}</span>
@@ -141,7 +141,7 @@
             <section class="ad-section" id="skills">
                 <div class="ad-section-inner">
                     <h2 class="ad-section-title">Yoxlanılan bacarıqlar</h2>
-                    <p class="ad-section-desc">Hər namizəd üçün qiymətləndirilən əsas bacarıqlar.</p>
+                    <p class="ad-section-desc">Hər namizəddə yoxlanılan bacarıqlar.</p>
                     <div class="ad-skills">
                         {% for skill in assessment.skills_tested %}
                         <div class="ad-skill">
@@ -159,7 +159,7 @@
             <section class="ad-section ad-section--alt" id="samples">
                 <div class="ad-section-inner">
                     <h2 class="ad-section-title">Nümunə suallar</h2>
-                    <p class="ad-section-desc">Namizədlərin qarşılaşacağı sual növlərinə baxın.</p>
+                    <p class="ad-section-desc">Testdəki sual nümunələrinə baxın.</p>
                     <div class="ad-samples">
                         {% for sample in assessment.sample_questions %}
                         <div class="ad-sample">
@@ -177,7 +177,7 @@
 
             {# Mid-page CTA #}
             <div class="ad-mid-cta">
-                <p>Bəyəndiniz? Bu gün namizədləri qiymətləndirməyə başlayın.</p>
+                <p>Bəyəndiniz? Elə indi namizədləri test edin.</p>
                 <a class="ad-btn-primary"
                    href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
                    data-gtag-click="assessment_mid_cta_click"
@@ -189,7 +189,7 @@
             {% if assessment.scoring_rubric %}
             <section class="ad-section" id="scoring">
                 <div class="ad-section-inner">
-                    <h2 class="ad-section-title">Qiymətləndirmə metodologiyası</h2>
+                    <h2 class="ad-section-title">Qiymətləndirmə metodikası</h2>
                     <div class="ad-scoring-bars" id="scoring-bars">
                         {# JS will parse rubric text and render bars; fallback to prose #}
                     </div>
@@ -202,7 +202,7 @@
             {% if assessment.stats %}
             <section class="ad-section ad-section--alt" id="stats">
                 <div class="ad-section-inner">
-                    <h2 class="ad-section-title">Bir baxışda</h2>
+                    <h2 class="ad-section-title">Ümumi statistika</h2>
                     <div class="ad-stats-row">
                         {% for stat in assessment.stats %}
                         <div class="ad-stat">
@@ -219,7 +219,7 @@
             {% if assessment.use_cases %}
             <section class="ad-section" id="use-cases">
                 <div class="ad-section-inner">
-                    <h2 class="ad-section-title">Bu qiymətləndirməni nə vaxt istifadə etməli</h2>
+                    <h2 class="ad-section-title">Bu testi nə vaxt istifadə etməli</h2>
                     <div class="ad-usecases">
                         {% for case in assessment.use_cases %}
                         <div class="ad-usecase">
@@ -255,8 +255,8 @@
             {# CTA #}
             <section class="ad-cta">
                 <div class="ad-cta-inner">
-                    <h2>{{ assessment.label }} namizədlərini qiymətləndirməyə hazırsınız?</h2>
-                    <p>Pulsuz başlayın və dəqiqələr ərzində qiymətləndirmə göndərin.</p>
+                    <h2>{{ assessment.label }} namizədlərini test etməyə hazırsınız?</h2>
+                    <p>Pulsuz başlayın və bir neçə dəqiqəyə ilk testi göndərin.</p>
                     <div class="ad-cta-actions">
                         <a class="ad-btn-primary"
                            href="{% if assessment.cta_url %}{{ assessment.cta_url }}{% else %}{% url 'clients:signup' %}{% endif %}"
@@ -267,7 +267,7 @@
                            href="{% url 'pages:contact' %}"
                            data-gtag-click="contact_sales_click"
                            data-gtag-category="engagement"
-                           data-gtag-label="assessment_contact_sales_footer">Satış ilə danışın</a>
+                           data-gtag-label="assessment_contact_sales_footer">Bizimlə əlaqə</a>
                     </div>
                 </div>
             </section>
@@ -276,8 +276,8 @@
             {% if assessment.roles.exists %}
             <section class="ad-section" id="roles">
                 <div class="ad-section-inner">
-                    <h2 class="ad-section-title">Bu qiymətləndirmədən istifadə edən rollar</h2>
-                    <p class="ad-section-desc">Bu qiymətləndirmənin xüsusi vəzifələr üçün işə götürməyə necə uyğun olduğunu görün.</p>
+                    <h2 class="ad-section-title">Bu testi istifadə edən vəzifələr</h2>
+                    <p class="ad-section-desc">Bu testin müxtəlif vəzifələr üçün işə qəbulda necə istifadə olunduğunu görün.</p>
                     <div class="ad-related">
                         {% for role in assessment.roles.all|slice:":6" %}
                         <a class="ad-related-card" href="{{ role.get_absolute_url }}">
@@ -302,7 +302,7 @@
             {% if related_assessments %}
             <section class="ad-section" id="related">
                 <div class="ad-section-inner">
-                    <h2 class="ad-section-title">Əlaqəli qiymətləndirmələr</h2>
+                    <h2 class="ad-section-title">Digər testlər</h2>
                     <div class="ad-related">
                         {% for related in related_assessments %}
                         <a class="ad-related-card" href="{{ related.get_absolute_url }}"

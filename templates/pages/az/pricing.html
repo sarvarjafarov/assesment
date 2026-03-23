@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Qiymətlər · Evalon{% endblock %}
-{% block meta_description %}Sadə və şəffaf qiymətləndirmə. Pulsuz başlayın, ehtiyac olduqda yüksəldin. Bütün planlara bütün qiymətləndirmə növləri daxildir.{% endblock %}
+{% block meta_description %}Sadə və aydın qiymətlər. Pulsuz başlayın, ehtiyac olduqda planı yüksəldin. Bütün planlara bütün test növləri daxildir.{% endblock %}
 {% block content %}
 <div class="page-shell">
     {% include 'includes/site_header_az.html' %}
@@ -11,8 +11,8 @@
         {# ── Qəhrəman ── #}
         <div class="pr-hero">
             <p class="pr-eyebrow">Qiymətlər</p>
-            <h1 class="pr-title">Sadə və Şəffaf Qiymətləndirmə</h1>
-            <p class="pr-subtitle">Pulsuz başlayın, daha çox layihə və dəvət lazım olduqda yüksəldin. Bütün planlara bütün qiymətləndirmə növləri daxildir.</p>
+            <h1 class="pr-title">Sadə və aydın qiymətlər</h1>
+            <p class="pr-subtitle">Pulsuz başlayın, ehtiyac olduqda planı yüksəldin. Bütün planlara bütün test növləri daxildir.</p>
         </div>
 
         {# ── Tarif Kartları ── #}
@@ -45,7 +45,7 @@
             {% endfor %}
         </div>
 
-        <p class="pr-footnote">Bütün planlara limitsiz komanda üzvləri daxildir. İllik ödəniş Pro planında 20% qənaət edir.</p>
+        <p class="pr-footnote">Bütün planlarda komanda üzvlərinin sayı limitsizdir. İllik ödənişdə Pro plana 20% endirim tətbiq olunur.</p>
 
         {# ── Xüsusiyyət Müqayisəsi ── #}
         <div class="pr-section">
@@ -54,7 +54,7 @@
                 <table class="pr-table">
                     <thead>
                         <tr>
-                            <th>Xüsusiyyət</th>
+                            <th>Funksiya</th>
                             <th>Starter</th>
                             <th>Pro</th>
                             <th>Enterprise</th>
@@ -98,31 +98,31 @@
             <div class="pr-faq">
                 <details class="pr-faq-item">
                     <summary>Pulsuz plan nə qədər müddətə aktivdir?</summary>
-                    <p>Pulsuz plan müddətsizdir. Siz istədiyiniz qədər istifadə edə bilərsiniz və heç vaxt ödəniş tələb olunmur.</p>
+                    <p>Pulsuz plan müddət limitsizdir — istədiyiniz qədər istifadə edin, ödəniş tələb olunmur.</p>
                 </details>
                 <details class="pr-faq-item">
                     <summary>Planımı istənilən vaxt dəyişə bilərəm?</summary>
-                    <p>Bəli, istənilən vaxt planınızı yüksəldə və ya aşağı sala bilərsiniz. Dəyişikliklər dərhal tətbiq olunur.</p>
+                    <p>Bəli, planınızı istənilən vaxt yüksəldə və ya endirə bilərsiniz. Dəyişiklik dərhal qüvvəyə minir.</p>
                 </details>
                 <details class="pr-faq-item">
-                    <summary>Ödəniş üsulları hansılardır?</summary>
-                    <p>Biz kredit kartı, debet kartı və bank köçürməsi qəbul edirik. Enterprise planlar üçün faktura ilə ödəniş də mövcuddur.</p>
+                    <summary>Hansı ödəniş üsullarını qəbul edirsiniz?</summary>
+                    <p>Kredit kartı, debet kartı və bank köçürməsi ilə ödəniş edə bilərsiniz. Enterprise plan üçün faktura ilə ödəniş də mümkündür.</p>
                 </details>
                 <details class="pr-faq-item">
                     <summary>Geri qaytarma siyasətiniz necədir?</summary>
-                    <p>İlk 14 gün ərzində tam geri qaytarma təmin edirik. Heç bir sual verilmir.</p>
+                    <p>İlk 14 gün ərzində tam geri qaytarma təmin edirik — heç bir sual soruşulmur.</p>
                 </details>
                 <details class="pr-faq-item">
                     <summary>Komanda üzvləri üçün əlavə ödəniş var?</summary>
-                    <p>Xeyr, bütün planlara limitsiz komanda üzvləri daxildir. Əlavə ödəniş yoxdur.</p>
+                    <p>Xeyr, bütün planlarda komanda üzvlərinin sayı limitsizdir. Əlavə ödəniş yoxdur.</p>
                 </details>
             </div>
         </div>
 
         {# ── Son CTA ── #}
         <div class="pr-final">
-            <h2 class="pr-final-title">Güvənlə işə götürməyə hazırsınız?</h2>
-            <p class="pr-final-sub">Pulsuz hesab yaradın və ilk qiymətləndirməni dəqiqələr ərzində göndərin.</p>
+            <h2 class="pr-final-title">Doğru namizədi seçməyə hazırsınız?</h2>
+            <p class="pr-final-sub">Pulsuz qeydiyyatdan keçin və ilk testi bir neçə dəqiqəyə göndərin.</p>
             <a class="pr-final-btn" href="{% url 'clients:signup' %}">Pulsuz başlayın</a>
         </div>
 
