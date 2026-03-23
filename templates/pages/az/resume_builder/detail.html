@@ -1278,7 +1278,7 @@
                         </div>
                         <div class="rb-skill-add">
                             <input type="text" id="rb-skill-input" placeholder="Bacarıq əlavə et...">
-                            <button type="button" id="rb-skill-add-btn">Əlavə et</button>
+                            <button type="button" id="rb-skill-add-btn">Əlavə edin</button>
                         </div>
                     </div>
 
@@ -1291,7 +1291,7 @@
                             </h2>
                             <button type="button" class="rb-add-btn" id="rb-add-edu">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Təhsil əlavə et
+                                Təhsil əlavə edin
                             </button>
                         </div>
                         <div id="rb-edu-list">
@@ -1322,7 +1322,7 @@
                         <div class="rb-card-header">
                             <h2>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                                Şablon stili
+                                Dizayn seçin
                             </h2>
                         </div>
                         <div class="rb-styles">
@@ -1372,10 +1372,10 @@
                     <div class="rb-preview-card">
                         <div class="rb-preview-label">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            Canlı Önizləmə
+                            Canlı önbaxış
                         </div>
                         <div class="rb-resume rb-resume--professional" id="rb-resume-preview">
-                            <div class="rb-resume-name" id="rp-name">Ad Soyadınız</div>
+                            <div class="rb-resume-name" id="rp-name">Adınız</div>
                             <div class="rb-resume-jobtitle" id="rp-jobtitle">{{ role.title }}</div>
                             <div class="rb-resume-contact" id="rp-contact">
                                 <span id="rp-email">email@misal.com</span>
@@ -1383,7 +1383,7 @@
                                 <span id="rp-location">Şəhər, Ölkə</span>
                             </div>
 
-                            <div class="rb-resume-section-title">Peşəkar Xülasə</div>
+                            <div class="rb-resume-section-title">Haqqınızda</div>
                             <div class="rb-resume-summary" id="rp-summary">{{ template.example_summary|truncatewords:40 }}</div>
 
                             <div class="rb-resume-section-title">Təcrübə</div>
@@ -1429,7 +1429,7 @@
             <section class="rb-seo-section">
                 <h2 class="rb-section-heading">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    {{ role.title }} üçün CV Məsləhətləri
+                    {{ role.title }} üçün CV üçün məsləhətlər
                 </h2>
                 <div class="rb-tips-grid">
                     {% for tip in template.resume_tips %}
@@ -1446,7 +1446,7 @@
             <section class="rb-seo-section">
                 <h2 class="rb-section-heading">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
-                    Daxil ediləcək açar sözlər
+                    CV-yə əlavə edilməli açar sözlər
                 </h2>
                 <div class="rb-keywords-cloud">
                     {% for kw in template.keywords_to_include %}
@@ -1460,7 +1460,7 @@
             <section class="rb-seo-section">
                 <h2 class="rb-section-heading">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                    Qarşısını almaq lazım olan ümumi səhvlər
+                    Ən çox edilən səhvlər
                 </h2>
                 <ul class="rb-mistakes-list">
                     {% for mistake in template.common_mistakes %}
@@ -1499,7 +1499,7 @@
             <section class="rb-seo-section">
                 <h2 class="rb-section-heading">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line><line x1="8" y1="17" x2="12" y2="17"></line></svg>
-                    Əlaqəli şablonlar
+                    Oxşar şablonlar
                 </h2>
                 <div class="rb-related-grid">
                     {% for rel in related %}
@@ -1520,7 +1520,7 @@
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                         </div>
                         <div>
-                            <h3>{{ role.title }} Müsahibə Sualları</h3>
+                            <h3>{{ role.title }} müsahibə sualları</h3>
                             <p>Bu rol üçün seçilmiş suallar və nümunə cavablarla hazırlaşın.</p>
                         </div>
                     </a>
@@ -1529,8 +1529,8 @@
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         </div>
                         <div>
-                            <h3>{{ role.title }} Qiymətləndirmə</h3>
-                            <p>Bu rol üçün hazırlanmış qiymətləndirmə ilə bacarıqlarınızı təsdiqləyin.</p>
+                            <h3>{{ role.title }} Testləri</h3>
+                            <p>Bu rol üçün hazırlanmış testlər ilə bacarıqlarınızı təsdiqləyin.</p>
                         </div>
                     </a>
                 </div>
@@ -1544,12 +1544,12 @@
 <div class="rb-modal-overlay" id="rb-modal">
     <div class="rb-modal">
         <button type="button" class="rb-modal-close" id="rb-modal-close">&times;</button>
-        <h2>CV-nizi Yükləyin</h2>
-        <p>CV-nizin cilalanmış PDF versiyasını yükləmək üçün məlumatlarınızı daxil edin.</p>
+        <h2>CV-ni yükləyin</h2>
+        <p>PDF yükləmək üçün məlumatlarınızı daxil edin.</p>
         <form class="rb-modal-form" id="rb-modal-form">
             {% csrf_token %}
-            <input type="text" name="full_name" placeholder="Ad Soyadınız" required>
-            <input type="email" name="email" placeholder="Email ünvanınız" required>
+            <input type="text" name="full_name" placeholder="Adınız" required>
+            <input type="email" name="email" placeholder="E-poçtunuz" required>
             <button type="submit" class="rb-modal-submit" id="rb-modal-submit-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 PDF Yüklə
@@ -1593,14 +1593,14 @@
     /* ── Live Preview Update ──────────────────────────────────────── */
     function updatePreview() {
         // Contact
-        rpName.textContent    = document.getElementById('rb-fullname').value || 'Ad Soyadınız';
+        rpName.textContent    = document.getElementById('rb-fullname').value || 'Adınız';
         rpTitle.textContent   = document.getElementById('rb-jobtitle').value || '{{ role.title }}';
         rpEmail.textContent   = document.getElementById('rb-email').value || 'email@misal.com';
         rpPhone.textContent   = document.getElementById('rb-phone').value || '(050) 123-4567';
         rpLoc.textContent     = document.getElementById('rb-location').value || 'Şəhər, Ölkə';
 
         // Summary
-        rpSummary.textContent = document.getElementById('rb-summary').value || 'Peşəkar xülasəniz burada görünəcək.';
+        rpSummary.textContent = document.getElementById('rb-summary').value || 'Haqqınızda bölməsi burada görünəcək.';
 
         // Experience
         const expEntries = document.querySelectorAll('#rb-exp-list .rb-entry');
