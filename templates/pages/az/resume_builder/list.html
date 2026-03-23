@@ -7,7 +7,7 @@
 {% if page_obj.has_next %}<link rel="next" href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if department %}department={{ department|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">{% endif %}
 {% endblock %}
 
-{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}
+
 
 {% block content %}
 <style>
@@ -611,3 +611,6 @@
     </main>
 </div>
 {% endblock %}
+
+{% block site_footer %}{% include 'includes/site_footer_az.html' %}{% endblock %}
+
