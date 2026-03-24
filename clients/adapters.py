@@ -125,7 +125,13 @@ class ClientSocialAccountAdapter(DefaultSocialAccountAdapter):
                 client.save()
             except Exception as e:
                 logger.exception("Social signup: ClientAccount save failed: %s", e)
-                raise
+                # Retry with unique slug if duplicate
+                if "slug" in str(e).lower() and "duplicate" in str(e).lower():
+                    import uuid as _uuid
+                    client.slug = f"user-{_uuid.uuid4().hex[:8]}"
+                    client.save()
+                else:
+                    raise
             user.is_active = True
             user.save(update_fields=['is_active'])
             client.mark_email_verified()

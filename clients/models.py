@@ -286,9 +286,15 @@ class ClientAccount(TimeStampedModel):
         self._original_plan_slug = self.plan_slug
 
     def save(self, *args, **kwargs):
-        if not self.slug and self.company_name:
+        if not self.slug:
             from django.utils.text import slugify
-            base = slugify(self.company_name)[:200] or "company"
+            import uuid as _uuid
+            if self.company_name:
+                base = slugify(self.company_name)[:200] or "company"
+            elif self.email:
+                base = slugify(self.email.split("@")[0])[:200] or "user"
+            else:
+                base = "user"
             slug = base
             n = 1
             while ClientAccount.objects.filter(slug=slug).exclude(pk=self.pk).exists():
