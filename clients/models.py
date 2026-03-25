@@ -650,9 +650,19 @@ class ClientProject(TimeStampedModel):
         blank=True,
         help_text="Assessment candidates take when applying via public careers page",
     )
+    magic_token = models.CharField(
+        max_length=32, unique=True, blank=True, db_index=True,
+        help_text="Shareable invite link token",
+    )
 
     class Meta:
         ordering = ("-created_at",)
+
+    def save(self, *args, **kwargs):
+        if not self.magic_token:
+            import secrets
+            self.magic_token = secrets.token_urlsafe(16)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} ({self.client.company_name})"

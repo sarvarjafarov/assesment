@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Welcome · Evalon{% endblock %}
+{% block content %}
+<div class="page-shell">
+<style>
+.ob-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;background:linear-gradient(135deg,#f8fafc,#eef2ff)}
+.ob-card{width:100%;max-width:560px;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.08);overflow:hidden}
+.ob-header{background:linear-gradient(135deg,#0e1428,#1a1e3a);padding:2rem 2.5rem 1.5rem;color:#fff}
+.ob-header h1{font-size:1.4rem;font-weight:800;margin:0 0 .25rem}
+.ob-header p{color:#94a3b8;font-size:.85rem;margin:0}
+.ob-progress{display:flex;gap:6px;margin-top:1rem}
+.ob-dot{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.15);transition:background .4s}
+.ob-dot.active{background:#ff8a00}
+.ob-dot.done{background:#10b981}
+.ob-body{padding:2rem 2.5rem}
+.ob-step{display:none;animation:obSlide .4s ease}
+.ob-step.active{display:block}
+@keyframes obSlide{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.ob-step h2{font-size:1.15rem;font-weight:700;color:#0e1428;margin:0 0 .25rem}
+.ob-step .ob-desc{color:#64748b;font-size:.85rem;margin:0 0 1.5rem}
+.ob-field{margin-bottom:1.25rem}
+.ob-field label{display:block;font-size:.8rem;font-weight:600;color:#334155;margin-bottom:6px}
+.ob-field input,.ob-field select,.ob-field textarea{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.9rem;box-sizing:border-box;transition:border .2s}
+.ob-field input:focus,.ob-field select:focus,.ob-field textarea:focus{outline:none;border-color:#ff8a00;box-shadow:0 0 0 3px rgba(255,138,0,.1)}
+.ob-field textarea{resize:vertical;min-height:60px}
+.ob-assess-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.ob-assess-card{border:1.5px solid #e2e8f0;border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;position:relative}
+.ob-assess-card:hover{border-color:#cbd5e1;background:#f8fafc}
+.ob-assess-card.selected{border-color:#ff8a00;background:#fff7ed;box-shadow:0 0 0 3px rgba(255,138,0,.1)}
+.ob-assess-card input[type=radio]{position:absolute;opacity:0}
+.ob-assess-card strong{display:block;font-size:.85rem;color:#0e1428}
+.ob-assess-card span{font-size:.75rem;color:#64748b}
+.ob-level-row{display:flex;gap:.75rem}
+.ob-level-btn{flex:1;padding:10px;border:1.5px solid #e2e8f0;border-radius:10px;text-align:center;cursor:pointer;font-size:.85rem;font-weight:600;color:#475569;transition:all .2s;background:#fff}
+.ob-level-btn:hover{border-color:#cbd5e1}
+.ob-level-btn.selected{border-color:#ff8a00;background:#fff7ed;color:#ea580c}
+.ob-level-btn input{display:none}
+.ob-actions{display:flex;gap:.75rem;margin-top:1.5rem}
+.ob-btn{flex:1;padding:12px;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
+.ob-btn-primary{background:linear-gradient(135deg,#ff8a00,#ff6b00);color:#fff}
+.ob-btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,138,0,.3)}
+.ob-btn-secondary{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.ob-btn-secondary:hover{background:#e2e8f0}
+.ob-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.ob-invite-row{display:flex;gap:.75rem;align-items:flex-end}
+.ob-invite-row .ob-field{flex:1;margin:0}
+.ob-link-box{display:flex;gap:8px;margin-top:1rem}
+.ob-link-input{flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.8rem;color:#64748b;background:#f8fafc}
+.ob-copy-btn{padding:10px 16px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fff;cursor:pointer;font-size:.8rem;font-weight:600;color:#475569;transition:all .2s;white-space:nowrap}
+.ob-copy-btn:hover{background:#f1f5f9}
+.ob-or{text-align:center;color:#94a3b8;font-size:.8rem;margin:1rem 0}
+.ob-success{text-align:center;padding:2rem 0}
+.ob-success svg{color:#10b981;margin-bottom:1rem}
+.ob-success h2{font-size:1.3rem;font-weight:800;color:#0e1428;margin:0 0 .5rem}
+.ob-success p{color:#64748b;font-size:.9rem;margin:0 0 1.5rem}
+.ob-skip{text-align:center;margin-top:.75rem}
+.ob-skip a{color:#94a3b8;font-size:.8rem;text-decoration:none}
+.ob-skip a:hover{color:#475569}
+.ob-error{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;color:#dc2626;font-size:.82rem;margin-bottom:1rem;display:none}
+</style>
+
+<div class="ob-wrap">
+    <div class="ob-card">
+        <div class="ob-header">
+            <h1>Welcome to Evalon, {{ account.full_name|default:"there" }}!</h1>
+            <p>Let's set up your first assessment in 2 minutes</p>
+            <div class="ob-progress">
+                <div class="ob-dot active" id="dot1"></div>
+                <div class="ob-dot" id="dot2"></div>
+                <div class="ob-dot" id="dot3"></div>
+            </div>
+        </div>
+
+        <div class="ob-body">
+            <div class="ob-error" id="obError"></div>
+
+            <!-- STEP 1: Company Info -->
+            <div class="ob-step active" id="step1">
+                <h2>Tell us about your company</h2>
+                <p class="ob-desc">This helps us personalize your experience</p>
+                <div class="ob-field">
+                    <label>Company name</label>
+                    <input type="text" id="companyName" placeholder="Acme Inc." value="{{ account.company_name }}">
+                </div>
+                <div class="ob-field">
+                    <label>Team size</label>
+                    <select id="employeeSize">
+                        {% for val, label in employee_sizes %}
+                        <option value="{{ val }}" {% if account.employee_size == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="ob-field">
+                    <label>What roles are you hiring for? <span style="color:#94a3b8;font-weight:400">(optional)</span></label>
+                    <textarea id="hiringGoals" rows="2" placeholder="e.g., Marketing Manager, Product Designer..."></textarea>
+                </div>
+                <div class="ob-actions">
+                    <button class="ob-btn ob-btn-primary" onclick="submitStep(1)">Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Create Position -->
+            <div class="ob-step" id="step2">
+                <h2>Create your first position</h2>
+                <p class="ob-desc">What role are you hiring for?</p>
+                <div class="ob-field">
+                    <label>Position title</label>
+                    <input type="text" id="positionTitle" placeholder="e.g., Marketing Manager">
+                </div>
+                <div class="ob-field">
+                    <label>Assessment type</label>
+                    <div class="ob-assess-grid">
+                        <label class="ob-assess-card" onclick="selectAssess(this)">
+                            <input type="radio" name="assessment_type" value="marketing">
+                            <strong>Marketing</strong><span>Digital, content, brand</span>
+                        </label>
+                        <label class="ob-assess-card" onclick="selectAssess(this)">
+                            <input type="radio" name="assessment_type" value="product">
+                            <strong>Product</strong><span>Strategy, roadmap, metrics</span>
+                        </label>
+                        <label class="ob-assess-card selected" onclick="selectAssess(this)">
+                            <input type="radio" name="assessment_type" value="behavioral" checked>
+                            <strong>Behavioral</strong><span>Leadership, teamwork</span>
+                        </label>
+                        <label class="ob-assess-card" onclick="selectAssess(this)">
+                            <input type="radio" name="assessment_type" value="ux_design">
+                            <strong>UX Design</strong><span>Research, prototyping</span>
+                        </label>
+                        <label class="ob-assess-card" onclick="selectAssess(this)">
+                            <input type="radio" name="assessment_type" value="hr">
+                            <strong>HR</strong><span>People ops, compliance</span>
+                        </label>
+                        <label class="ob-assess-card" onclick="selectAssess(this)">
+                            <input type="radio" name="assessment_type" value="finance">
+                            <strong>Finance</strong><span>Accounting, analysis</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="ob-field">
+                    <label>Experience level</label>
+                    <div class="ob-level-row">
+                        <label class="ob-level-btn" onclick="selectLevel(this)"><input type="radio" name="level" value="junior">Junior</label>
+                        <label class="ob-level-btn selected" onclick="selectLevel(this)"><input type="radio" name="level" value="mid" checked>Mid-Level</label>
+                        <label class="ob-level-btn" onclick="selectLevel(this)"><input type="radio" name="level" value="senior">Senior</label>
+                    </div>
+                </div>
+                <div class="ob-actions">
+                    <button class="ob-btn ob-btn-secondary" onclick="goBack(1)">Back</button>
+                    <button class="ob-btn ob-btn-primary" onclick="submitStep(2)">Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Invite Candidate -->
+            <div class="ob-step" id="step3">
+                <h2>Invite your first candidate</h2>
+                <p class="ob-desc">Send them an assessment link via email</p>
+                <div class="ob-field">
+                    <label>Candidate email</label>
+                    <input type="email" id="candidateEmail" placeholder="candidate@example.com">
+                </div>
+                <div class="ob-or">— or share a link —</div>
+                <div class="ob-link-box">
+                    <input class="ob-link-input" id="magicLink" readonly value="Link will appear after setup">
+                    <button class="ob-copy-btn" onclick="copyLink()">Copy</button>
+                </div>
+                <div class="ob-actions">
+                    <button class="ob-btn ob-btn-secondary" onclick="goBack(2)">Back</button>
+                    <button class="ob-btn ob-btn-primary" onclick="submitStep(3)">Finish Setup</button>
+                </div>
+                <div class="ob-skip"><a href="{% url 'clients:dashboard' %}?skip_onboarding=1" onclick="skipOnboarding()">Skip for now</a></div>
+            </div>
+
+            <!-- SUCCESS -->
+            <div class="ob-step" id="stepDone">
+                <div class="ob-success">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <h2>You're all set!</h2>
+                    <p>Your position is live and ready for candidates.</p>
+                    <a class="ob-btn ob-btn-primary" href="{% url 'clients:dashboard' %}" style="display:inline-block;padding:12px 32px;text-decoration:none;border-radius:10px">Go to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+var projectId = null;
+var csrf = '{{ csrf_token }}';
+
+function showError(msg) {
+    var el = document.getElementById('obError');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(function() { el.style.display = 'none'; }, 5000);
+}
+
+function selectAssess(card) {
+    document.querySelectorAll('.ob-assess-card').forEach(function(c) { c.classList.remove('selected'); });
+    card.classList.add('selected');
+    card.querySelector('input').checked = true;
+}
+
+function selectLevel(btn) {
+    document.querySelectorAll('.ob-level-btn').forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+    btn.querySelector('input').checked = true;
+}
+
+function goStep(n) {
+    document.querySelectorAll('.ob-step').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById(n === 4 ? 'stepDone' : 'step' + n).classList.add('active');
+    for (var i = 1; i <= 3; i++) {
+        var dot = document.getElementById('dot' + i);
+        dot.className = 'ob-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+    }
+}
+
+function goBack(step) { goStep(step); }
+
+function submitStep(step) {
+    var btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    var fd = new FormData();
+    fd.append('step', step);
+
+    if (step === 1) {
+        fd.append('company_name', document.getElementById('companyName').value);
+        fd.append('employee_size', document.getElementById('employeeSize').value);
+        fd.append('hiring_goals', document.getElementById('hiringGoals').value);
+    } else if (step === 2) {
+        fd.append('position_title', document.getElementById('positionTitle').value);
+        var at = document.querySelector('[name=assessment_type]:checked');
+        fd.append('assessment_type', at ? at.value : 'behavioral');
+        var lv = document.querySelector('[name=level]:checked');
+        fd.append('level', lv ? lv.value : 'mid');
+    } else if (step === 3) {
+        fd.append('candidate_email', document.getElementById('candidateEmail').value);
+        if (projectId) fd.append('project_id', projectId);
+    }
+
+    fetch('{% url "clients:onboarding" %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrf},
+        body: fd
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        btn.disabled = false;
+        if (data.error) {
+            showError(data.error);
+            btn.textContent = step === 3 ? 'Finish Setup' : 'Continue';
+            return;
+        }
+        if (data.project_id) projectId = data.project_id;
+        if (data.done) {
+            goStep(4);
+        } else {
+            btn.textContent = 'Continue';
+            goStep(data.step);
+        }
+    })
+    .catch(function() {
+        btn.disabled = false;
+        btn.textContent = step === 3 ? 'Finish Setup' : 'Continue';
+        showError('Something went wrong. Please try again.');
+    });
+}
+
+function copyLink() {
+    var input = document.getElementById('magicLink');
+    navigator.clipboard.writeText(input.value).then(function() {
+        var btn = document.querySelector('.ob-copy-btn');
+        btn.textContent = 'Copied!';
+        btn.style.color = '#10b981';
+        setTimeout(function() { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+    });
+}
+
+function skipOnboarding() {
+    fetch('{% url "clients:onboarding" %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrf, 'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'step=3'
+    });
+}
+</script>
+{% endblock %}

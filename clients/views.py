@@ -9,6 +9,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -443,6 +444,160 @@ class ClientSignupCompleteView(TemplateView):
     template_name = "clients/signup_complete.html"
 
 
+class OnboardingWizardView(LoginRequiredMixin, TemplateView):
+    template_name = "clients/onboarding.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("clients:login")
+        account = getattr(request.user, "clientaccount", None) or getattr(
+            request.user, "client_account", None
+        )
+        if not account:
+            return redirect("clients:login")
+        if account.has_completed_onboarding:
+            return redirect("clients:dashboard")
+        self.account = account
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["account"] = self.account
+        ctx["employee_sizes"] = ClientAccount.EMPLOYEE_SIZE_CHOICES
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        account = self.account
+        step = request.POST.get("step")
+
+        if step == "1":
+            account.company_name = request.POST.get("company_name", "").strip()
+            account.employee_size = request.POST.get("employee_size", "1-10")
+            notes = request.POST.get("hiring_goals", "").strip()
+            if notes:
+                account.notes = f"Hiring goals: {notes}"
+            account.onboarding_step_data["step_1"] = True
+            account.save()
+            return JsonResponse({"ok": True, "step": 2})
+
+        elif step == "2":
+            title = request.POST.get("position_title", "").strip() or "My First Position"
+            assessment_type = request.POST.get("assessment_type", "behavioral")
+            level = request.POST.get("level", "mid")
+            project = ClientProject.objects.create(
+                client=account,
+                title=title,
+                assessment_type=assessment_type,
+                role_level=level,
+                status="active",
+            )
+            account.onboarding_step_data["step_2"] = True
+            account.onboarding_step_data["first_project_id"] = project.id
+            account.save(update_fields=["onboarding_step_data"])
+            return JsonResponse({"ok": True, "step": 3, "project_id": project.id})
+
+        elif step == "3":
+            account.has_completed_onboarding = True
+            account.onboarding_completed_at = timezone.now()
+            account.onboarding_step_data["step_3"] = True
+            account.save(update_fields=[
+                "has_completed_onboarding", "onboarding_completed_at", "onboarding_step_data",
+            ])
+            candidate_email = request.POST.get("candidate_email", "").strip()
+            project_id = request.POST.get("project_id")
+            if candidate_email and project_id:
+                try:
+                    project = ClientProject.objects.get(id=project_id, client=account)
+                    from assessments.models import AssessmentSession, Assessment
+                    assessment = Assessment.objects.filter(code=project.assessment_type).first()
+                    if assessment:
+                        AssessmentSession.objects.create(
+                            candidate_email=candidate_email,
+                            assessment=assessment,
+                            company=account,
+                            position_task=project,
+                            status="invited",
+                            level=project.role_level or "mid",
+                            duration_minutes=30,
+                        )
+                except Exception:
+                    pass
+            return JsonResponse({"ok": True, "done": True})
+
+        return JsonResponse({"error": "Invalid step"}, status=400)
+
+
+class MagicInviteView(TemplateView):
+    """Public page where candidates apply via a shareable link."""
+    template_name = "clients/magic_invite.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        token = self.kwargs["token"]
+        try:
+            project = ClientProject.objects.select_related("client").get(
+                magic_token=token, status="active",
+            )
+            ctx["project"] = project
+            ctx["account"] = project.client
+            ctx["valid"] = True
+        except ClientProject.DoesNotExist:
+            ctx["valid"] = False
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        token = self.kwargs["token"]
+        try:
+            project = ClientProject.objects.select_related("client").get(
+                magic_token=token, status="active",
+            )
+        except ClientProject.DoesNotExist:
+            return JsonResponse({"error": "This link is no longer active."}, status=404)
+
+        candidate_name = request.POST.get("name", "").strip()
+        candidate_email = request.POST.get("email", "").strip()
+        if not candidate_email:
+            return JsonResponse({"error": "Email is required."}, status=400)
+
+        remaining = project.client.invites_remaining()
+        if remaining is not None and remaining <= 0:
+            return JsonResponse(
+                {"error": "This position is no longer accepting applications."},
+                status=400,
+            )
+
+        from assessments.models import AssessmentSession, Assessment
+
+        existing = AssessmentSession.objects.filter(
+            candidate_email__iexact=candidate_email,
+            position_task=project,
+        ).first()
+        if existing:
+            return JsonResponse(
+                {"error": "You have already applied for this position."},
+                status=400,
+            )
+
+        assessment = Assessment.objects.filter(code=project.assessment_type).first()
+        if not assessment:
+            return JsonResponse({"error": "Assessment not available."}, status=500)
+
+        AssessmentSession.objects.create(
+            candidate_email=candidate_email,
+            candidate_name=candidate_name,
+            assessment=assessment,
+            company=project.client,
+            position_task=project,
+            status="invited",
+            level=project.role_level or "mid",
+            duration_minutes=30,
+        )
+        return JsonResponse({
+            "ok": True,
+            "message": f"Check {candidate_email} for the assessment link.",
+        })
+
+
 class ClientVerifyEmailView(TemplateView):
     template_name = "clients/verify_email.html"
 
@@ -547,6 +702,9 @@ class ClientDashboardView(LoginRequiredMixin, TemplateView):
         if not hasattr(request.user, "client_account"):
             return redirect("clients:login")
         client = request.user.client_account
+        # Redirect new users to onboarding wizard
+        if not client.has_completed_onboarding and "skip_onboarding" not in request.GET:
+            return redirect("clients:onboarding")
         # Check profile completion first
         if not client.company_name:
             return redirect("clients:complete_profile")

@@ -22,6 +22,8 @@ path("verify/<int:account_id>/<slug:token>/", views.ClientVerifyEmailView.as_vie
     path("logout/", views.ClientLogoutView.as_view(), name="logout"),
     path("complete-profile/", views.CompleteProfileView.as_view(), name="complete_profile"),
     path("pending-approval/", views.PendingApprovalView.as_view(), name="pending_approval"),
+    path("onboarding/", views.OnboardingWizardView.as_view(), name="onboarding"),
+    path("apply/<slug:token>/", views.MagicInviteView.as_view(), name="magic-invite"),
     path("dashboard/", views.ClientDashboardView.as_view(), name="dashboard"),
     path("dashboard/activity/export/", views.ClientActivityExportView.as_view(), name="activity-export"),
     path("assessments/", views.ClientAssessmentsView.as_view(), name="assessments"),
