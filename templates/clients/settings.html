@@ -4,30 +4,8 @@
 {% block meta_description %}Manage your account settings and preferences.{% endblock %}
 {% block portal_content %}
 <style>
-/* ── Settings page inline enhancements ── */
-.st-hero-header {
-    background: linear-gradient(135deg, #0e1428 0%, #1a1e3a 100%);
-    padding: 2.5rem 2rem 2rem;
-    border-radius: 16px;
-    margin-bottom: 2rem;
-    position: relative;
-    overflow: hidden;
-}
-.st-hero-header::before {
-    content: '';
-    position: absolute;
-    top: -40%;
-    right: -10%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(100, 116, 139, 0.15) 0%, transparent 70%);
-    pointer-events: none;
-}
-.st-hero-header h1 {
-    color: #fff;
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0 0 0.35rem;
+.st-section{border-left:none!important;padding-left:0!important}
+.st-animated{animation:none!important;opacity:1!important}
 }
 .st-hero-subtitle {
     color: #94a3b8;
@@ -104,10 +82,9 @@
 
 <div class="portal-shell">
 
-    {# ── Hero Header ── #}
-    <header class="st-hero-header st-animated" style="animation-delay: 0.05s;">
-        <h1>Settings</h1>
-        <p class="st-hero-subtitle">Manage your account, branding, and preferences</p>
+    <header style="padding:1.5rem 2rem;border-bottom:1px solid #e5e7eb">
+        <h1 style="font-size:1.35rem;font-weight:700;color:#0e1428;margin:0">Settings</h1>
+        <p style="color:#64748b;font-size:.85rem;margin:.25rem 0 0">Manage your account and preferences</p>
     </header>
 
     {# ── Settings/Billing Tabs ── #}
