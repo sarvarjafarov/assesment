@@ -1,846 +1,268 @@
 {% extends 'portal_base.html' %}
-{% load static %}
-{% load humanize %}
+{% load static humanize %}
 {% block title %}Dashboard · Evalon{% endblock %}
 {% block meta_description %}Your Evalon dashboard - track assessments, projects, and candidate progress.{% endblock %}
 {% block portal_content %}
 <style>
-/* ── Dashboard Redesign ────────────────────────────────────────────── */
-
-/* Animations */
-@keyframes db-fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes db-scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-@keyframes db-countUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes db-slideRight {
-    from { opacity: 0; transform: translateX(-12px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-@keyframes db-pulse-ring {
-    0% { transform: scale(1); opacity: 0.4; }
-    100% { transform: scale(1.8); opacity: 0; }
-}
-@keyframes db-shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-.db-anim { opacity: 0; animation: db-fadeUp 0.5s ease forwards; }
-.db-anim-1 { animation-delay: 0.05s; }
-.db-anim-2 { animation-delay: 0.1s; }
-.db-anim-3 { animation-delay: 0.15s; }
-.db-anim-4 { animation-delay: 0.2s; }
-.db-anim-5 { animation-delay: 0.25s; }
-.db-anim-6 { animation-delay: 0.3s; }
-.db-anim-7 { animation-delay: 0.35s; }
-
-/* ── Hero Summary Card ── */
-.db-hero {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    padding: 1.75rem 2rem;
-    background: linear-gradient(135deg, #0e1428 0%, #1a1e3a 100%);
-    border-radius: var(--radius-2xl, 20px);
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-}
-.db-hero::before {
-    content: '';
-    position: absolute;
-    top: -40px;
-    right: -30px;
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 138, 0, 0.15), transparent 70%);
-    pointer-events: none;
-}
-.db-hero-text h1 {
-    margin: 0 0 0.35rem;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #fff;
-}
-.db-hero-text p {
-    margin: 0;
-    font-size: 0.88rem;
-    color: rgba(255,255,255,0.55);
-}
-.db-hero-text .db-hero-highlight {
-    color: var(--color-orange, #ff8a00);
-    font-weight: 700;
-}
-.db-hero-actions {
-    display: flex;
-    gap: 0.75rem;
-    flex-shrink: 0;
-}
-.db-hero-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.65rem 1.25rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border-radius: var(--radius-lg, 12px);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-.db-hero-btn--primary {
-    background: var(--color-orange, #ff8a00);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(255, 138, 0, 0.3);
-}
-.db-hero-btn--primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(255, 138, 0, 0.4);
-}
-.db-hero-btn--ghost {
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.8);
-    border: 1px solid rgba(255,255,255,0.12);
-}
-.db-hero-btn--ghost:hover {
-    background: rgba(255,255,255,0.14);
-    color: #fff;
-}
-
-/* ── Quick Actions ── */
-.db-quick-actions {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.875rem;
-    margin-bottom: 1.5rem;
-}
-.db-quick-action {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 1.25rem;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(14, 20, 40, 0.06);
-    border-radius: var(--radius-xl, 16px);
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-}
-.db-quick-action::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--qa-color, var(--color-orange));
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-.db-quick-action:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(14, 20, 40, 0.08);
-    border-color: rgba(14, 20, 40, 0.1);
-}
-.db-quick-action:hover::before { opacity: 1; }
-.db-qa-icon {
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md, 10px);
-    background: color-mix(in srgb, var(--qa-color, #ff8a00) 10%, transparent);
-    color: var(--qa-color, #ff8a00);
-    flex-shrink: 0;
-}
-.db-qa-text h4 {
-    margin: 0;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--color-navy, #0e1428);
-}
-.db-qa-text p {
-    margin: 0.1rem 0 0;
-    font-size: 0.72rem;
-    color: var(--color-text-muted, #6b7280);
-}
-
-/* ── Metrics Grid ── */
-.db-metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.875rem;
-    margin-bottom: 1.5rem;
-}
-.db-metric-card {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(14, 20, 40, 0.06);
-    border-radius: var(--radius-xl, 16px);
-    padding: 1.25rem;
-    transition: all 0.25s ease;
-    position: relative;
-}
-.db-metric-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(14, 20, 40, 0.06);
-}
-.db-mc-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-}
-.db-mc-label {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--color-text-muted, #6b7280);
-}
-.db-mc-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md, 10px);
-    background: color-mix(in srgb, var(--mc-color, #ff8a00) 8%, transparent);
-    color: var(--mc-color, #ff8a00);
-}
-.db-mc-value {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--color-navy, #0e1428);
-    line-height: 1;
-    margin-bottom: 0.35rem;
-}
-.db-mc-sub {
-    font-size: 0.75rem;
-    color: var(--color-text-muted, #6b7280);
-}
-.db-mc-trend {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 0.15rem 0.5rem;
-    border-radius: 999px;
-}
-.db-mc-trend--up {
-    background: rgba(16, 185, 129, 0.1);
-    color: #059669;
-}
-.db-mc-trend--down {
-    background: rgba(239, 68, 68, 0.1);
-    color: #dc2626;
-}
-.db-mc-sparkline {
-    margin-top: 0.5rem;
-    height: 28px;
-}
-.db-mc-sparkline svg {
-    width: 100%;
-    height: 28px;
-}
-
-/* ── Funnel Visual ── */
-.db-funnel {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    margin-bottom: 1.5rem;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid rgba(14, 20, 40, 0.06);
-    border-radius: var(--radius-xl, 16px);
-    overflow: hidden;
-}
-.db-funnel-stage {
-    flex: 1;
-    text-align: center;
-    padding: 1rem 0.75rem;
-    position: relative;
-    transition: background 0.2s ease;
-}
-.db-funnel-stage:hover {
-    background: rgba(14, 20, 40, 0.02);
-}
-.db-funnel-stage:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 20%;
-    height: 60%;
-    width: 1px;
-    background: rgba(14, 20, 40, 0.08);
-}
-.db-funnel-num {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--color-navy);
-    line-height: 1.2;
-}
-.db-funnel-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--color-text-muted);
-    margin-top: 0.2rem;
-}
-.db-funnel-arrow {
-    flex-shrink: 0;
-    color: rgba(14, 20, 40, 0.15);
-    margin: 0 -4px;
-    z-index: 1;
-}
-
-/* ── Plan Usage (compact) ── */
-.db-plan-bar {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid rgba(14, 20, 40, 0.06);
-    border-radius: var(--radius-lg, 12px);
-    margin-bottom: 1.5rem;
-    font-size: 0.82rem;
-}
-
-/* ── Vacancy bar ── */
-.db-vacancy-compact {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.65rem 1rem;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid rgba(14, 20, 40, 0.06);
-    border-radius: var(--radius-lg, 12px);
-    margin-bottom: 1.5rem;
-    font-size: 0.82rem;
-}
-.db-vacancy-compact svg { color: var(--color-orange); flex-shrink: 0; }
-.db-vacancy-compact .db-vc-url { color: var(--color-navy); font-weight: 600; flex: 1; }
-.db-vacancy-compact .db-vc-count { color: var(--color-text-muted); font-size: 0.78rem; }
-
-/* ── Attention items (redesigned) ── */
-.db-alerts {
-    margin-bottom: 1.5rem;
-}
-.db-alert {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: rgba(245, 158, 11, 0.04);
-    border: 1px solid rgba(245, 158, 11, 0.12);
-    border-radius: var(--radius-lg, 12px);
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
-}
-.db-alert:hover {
-    background: rgba(245, 158, 11, 0.08);
-}
-.db-alert-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #f59e0b;
-    flex-shrink: 0;
-    position: relative;
-}
-.db-alert-dot::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    background: #f59e0b;
-    animation: db-pulse-ring 2s ease-out infinite;
-}
-.db-alert-text { flex: 1; color: var(--color-navy); }
-.db-alert-text strong { font-weight: 700; }
-.db-alert-link {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--color-orange);
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-/* ── Two-column layout (activity + sidebar) ── */
-.db-content-grid {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 1.5rem;
-}
-.db-sidebar-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-.db-sidebar-card {
-    background: rgba(255,255,255,0.9);
-    border: 1px solid rgba(14, 20, 40, 0.06);
-    border-radius: var(--radius-xl, 16px);
-    padding: 1.25rem;
-}
-.db-sidebar-card h4 {
-    margin: 0 0 0.75rem;
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--color-text-muted);
-}
-
-/* Project preview cards */
-.db-project-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid rgba(14, 20, 40, 0.04);
-    text-decoration: none;
-    color: inherit;
-    transition: opacity 0.15s ease;
-}
-.db-project-item:last-child { border-bottom: none; }
-.db-project-item:hover { opacity: 0.7; }
-.db-project-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-.db-project-info { flex: 1; min-width: 0; }
-.db-project-name {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-navy);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.db-project-meta {
-    font-size: 0.72rem;
-    color: var(--color-text-muted);
-}
-.db-project-sessions {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--color-navy);
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-    .db-hero { flex-direction: column; text-align: center; padding: 1.5rem; }
-    .db-hero-actions { justify-content: center; }
-    .db-quick-actions { grid-template-columns: repeat(2, 1fr); }
-    .db-metrics-grid { grid-template-columns: repeat(2, 1fr); }
-    .db-content-grid { grid-template-columns: 1fr; }
-    .db-funnel { flex-direction: column; }
-    .db-funnel-stage:not(:last-child)::after { display: none; }
-}
-@media (max-width: 480px) {
-    .db-quick-actions { grid-template-columns: 1fr; }
-    .db-metrics-grid { grid-template-columns: 1fr; }
-}
+.db-header{padding:1.5rem 2rem;border-bottom:1px solid #e5e7eb}
+.db-header h1{font-size:1.35rem;font-weight:700;color:#0e1428;margin:0}
+.db-header p{color:#64748b;font-size:.85rem;margin:.25rem 0 0}
+.db-header-row{display:flex;align-items:center;justify-content:space-between}
+.db-header-actions{display:flex;gap:.5rem}
+.db-header-actions a{font-size:.8rem;font-weight:600;color:#475569;text-decoration:none;padding:6px 14px;border:1px solid #e5e7eb;border-radius:8px;transition:background .15s}
+.db-header-actions a:hover{background:#f8fafc}
+.db-header-actions .primary{background:#ff8a00;color:#fff;border-color:#ff8a00}
+.db-header-actions .primary:hover{background:#e67e00}
+.db-stats{display:flex;gap:2rem;padding:1.25rem 2rem;border-bottom:1px solid #f1f5f9}
+.db-stat{min-width:0}
+.db-stat-val{font-size:1.4rem;font-weight:700;color:#0e1428}
+.db-stat-label{font-size:.75rem;color:#94a3b8;margin-top:2px}
+.db-onboarding{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:#fffbeb;border-bottom:1px solid #fef3c7;font-size:.85rem}
+.db-onboarding strong{color:#92400e}
+.db-onboarding a{color:#92400e;font-weight:600;text-decoration:none;margin-left:.5rem}
+.db-alerts{padding:0 2rem}
+.db-alert{display:flex;align-items:center;gap:.75rem;padding:.75rem 0;border-bottom:1px solid #f1f5f9;font-size:.85rem}
+.db-alert-dot{width:6px;height:6px;border-radius:50%;background:#f59e0b;flex-shrink:0}
+.db-alert a{color:#ff8a00;font-weight:600;text-decoration:none;margin-left:auto;white-space:nowrap}
+.db-usage{display:flex;gap:2rem;padding:1rem 2rem;border-bottom:1px solid #f1f5f9;font-size:.8rem;color:#64748b}
+.db-usage-bar{width:80px;height:4px;background:#f1f5f9;border-radius:2px;margin-top:4px}
+.db-usage-fill{height:100%;background:#ff8a00;border-radius:2px}
+.db-usage-fill.warn{background:#ef4444}
+.db-plan-badge{font-size:.7rem;font-weight:700;color:#ff8a00;background:#fff7ed;padding:2px 8px;border-radius:4px}
+.db-upgrade{color:#ff8a00;font-weight:600;font-size:.8rem;text-decoration:none;margin-left:.5rem}
+.db-content{display:grid;grid-template-columns:1fr 280px;gap:0}
+.db-main{border-right:1px solid #f1f5f9}
+.db-section-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid #f1f5f9}
+.db-section-head h3{font-size:.9rem;font-weight:700;color:#0e1428;margin:0}
+.db-section-head a{font-size:.78rem;color:#64748b;text-decoration:none}
+.db-filters{display:flex;gap:.75rem;padding:.75rem 2rem;border-bottom:1px solid #f1f5f9;background:#fafbfc}
+.db-filters select{font-size:.78rem;padding:4px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#334155}
+.db-filters a{font-size:.78rem;color:#94a3b8;text-decoration:none}
+table.db-table{width:100%;border-collapse:collapse;font-size:.82rem}
+table.db-table th{text-align:left;padding:8px 16px;color:#94a3b8;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #f1f5f9}
+table.db-table td{padding:10px 16px;border-bottom:1px solid #f8fafc;color:#334155}
+table.db-table tr:hover{background:#fafbfc}
+.db-avatar{width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#64748b;margin-right:8px;vertical-align:middle}
+.db-status{font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:4px}
+.db-status.success{color:#059669;background:#ecfdf5}
+.db-status.active{color:#d97706;background:#fffbeb}
+.db-status.pending{color:#6b7280;background:#f3f4f6}
+.db-empty{text-align:center;padding:3rem 2rem;color:#94a3b8}
+.db-empty p{margin:.25rem 0}
+.db-empty a{color:#ff8a00;font-weight:600;text-decoration:none;display:inline-block;margin-top:.75rem}
+.db-sidebar{padding:1rem}
+.db-side-card{margin-bottom:1rem}
+.db-side-card h4{font-size:.78rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin:0 0 .75rem;padding:0 .5rem}
+.db-side-item{display:flex;align-items:center;gap:.5rem;padding:.5rem;border-radius:6px;font-size:.82rem;color:#334155;text-decoration:none;transition:background .15s}
+.db-side-item:hover{background:#f8fafc}
+.db-side-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.db-side-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.db-side-count{color:#94a3b8;font-size:.75rem}
+.db-side-meta{color:#94a3b8;font-size:.72rem}
+.db-vacancy-link{font-size:.78rem;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.25rem .5rem}
+.db-vacancy-actions{display:flex;gap:.5rem;padding:.25rem .5rem}
+.db-vacancy-actions button,.db-vacancy-actions a{font-size:.75rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#475569;cursor:pointer;text-decoration:none;transition:background .15s}
+.db-vacancy-actions button:hover,.db-vacancy-actions a:hover{background:#f8fafc}
+@media(max-width:768px){.db-content{grid-template-columns:1fr}.db-main{border-right:none}.db-stats{flex-wrap:wrap;gap:1rem}}
 </style>
 
 <div class="portal-shell">
 
-    {# ── Hero Summary Card ── #}
-    <div class="db-hero db-anim db-anim-1">
-        <div class="db-hero-text">
-            <h1>{% now "H" as current_hour %}{% if current_hour|add:"0" < 12 %}Good morning{% elif current_hour|add:"0" < 17 %}Good afternoon{% else %}Good evening{% endif %}, {{ account.company_name }}</h1>
-            <p>{{ "now"|date:"l, F j, Y" }} · {{ role_label }}
-                {% if activity_summary.in_progress %}
-                · <span class="db-hero-highlight">{{ activity_summary.in_progress }} candidate{{ activity_summary.in_progress|pluralize }} in progress</span>
+    {# ── Header ── #}
+    <div class="db-header">
+        <div class="db-header-row">
+            <div>
+                <h1>{% now "H" as current_hour %}{% if current_hour|add:"0" < 12 %}Good morning{% elif current_hour|add:"0" < 17 %}Good afternoon{% else %}Good evening{% endif %}, {{ account.full_name|default:account.company_name }}</h1>
+                <p>{{ "now"|date:"l, F j, Y" }}</p>
+            </div>
+            <div class="db-header-actions">
+                {% if allowed_assessments %}
+                <a href="{{ allowed_assessments.0.manage_url }}">Invite</a>
                 {% endif %}
-            </p>
-        </div>
-        <div class="db-hero-actions">
-            <a href="{% url 'clients:project-create' %}" class="db-hero-btn db-hero-btn--primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                New Position
-            </a>
-            {% if allowed_assessments %}
-            <a href="{{ allowed_assessments.0.manage_url }}" class="db-hero-btn db-hero-btn--ghost">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                Invite
-            </a>
-            {% endif %}
+                <a href="{% url 'clients:project-create' %}" class="primary">+ New Position</a>
+            </div>
         </div>
     </div>
 
-    {# ── Onboarding Banner ── #}
+    {# ── Onboarding ── #}
     {% if not account.has_completed_onboarding %}
-    <div class="db-onboarding-banner db-anim db-anim-2">
-        <div class="db-onboarding-info">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            <span><strong>{{ onboarding_completed_steps }}/{{ onboarding_total_steps }} setup steps done.</strong> Complete your setup to get the most out of Evalon.</span>
-        </div>
-        <div class="db-onboarding-actions">
-            <a href="{% url 'clients:getting-started' %}" class="btn btn-outline small">Continue Setup</a>
-            <form method="post" style="display:inline">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="dismiss_onboarding">
-                <button type="submit" class="btn-close" title="Dismiss">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </form>
-        </div>
+    <div class="db-onboarding">
+        <span><strong>{{ onboarding_completed_steps }}/{{ onboarding_total_steps }} setup steps done.</strong> Complete setup to get started.</span>
+        <span>
+            <a href="{% url 'clients:getting-started' %}">Continue →</a>
+            <form method="post" style="display:inline">{% csrf_token %}<input type="hidden" name="action" value="dismiss_onboarding"><button type="submit" style="background:none;border:none;color:#92400e;cursor:pointer;font-size:.8rem">Dismiss</button></form>
+        </span>
     </div>
     {% endif %}
 
-    {# ── Quick Actions ── #}
-    <div class="db-quick-actions">
-        <a href="{% url 'clients:project-create' %}" class="db-quick-action db-anim db-anim-2" style="--qa-color: #10b981;">
-            <div class="db-qa-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
-            </div>
-            <div class="db-qa-text">
-                <h4>Create Position</h4>
-                <p>Open a new role</p>
-            </div>
-        </a>
-        {% if allowed_assessments %}
-        <a href="{{ allowed_assessments.0.manage_url }}" class="db-quick-action db-anim db-anim-3" style="--qa-color: #6366f1;">
-            <div class="db-qa-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-            </div>
-            <div class="db-qa-text">
-                <h4>Invite Candidate</h4>
-                <p>Send assessment link</p>
-            </div>
-        </a>
-        {% endif %}
-        <a href="{% url 'clients:activity-export' %}" class="db-quick-action db-anim db-anim-4" style="--qa-color: #f59e0b;">
-            <div class="db-qa-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            </div>
-            <div class="db-qa-text">
-                <h4>Export Data</h4>
-                <p>Download CSV report</p>
-            </div>
-        </a>
-        <a href="{% url 'clients:project-list' %}" class="db-quick-action db-anim db-anim-5" style="--qa-color: #8b5cf6;">
-            <div class="db-qa-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-            </div>
-            <div class="db-qa-text">
-                <h4>All Positions</h4>
-                <p>{{ project_count }} position{{ project_count|pluralize }}</p>
-            </div>
-        </a>
-    </div>
-
-    {# ── Metrics Cards ── #}
-    <div class="db-metrics-grid">
-        <div class="db-metric-card db-anim db-anim-3" style="--mc-color: #10b981;">
-            <div class="db-mc-header">
-                <span class="db-mc-label">Completion Rate</span>
-                <div class="db-mc-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-            </div>
-            <div class="db-mc-value" data-count="{{ portal_stats.completion_rate|floatformat:0 }}" data-suffix="%">{{ portal_stats.completion_rate|floatformat:0 }}%</div>
-            <span class="db-mc-sub">{{ portal_stats.completed_count }} of {{ activity_summary.total }} completed</span>
+    {# ── Stats ── #}
+    <div class="db-stats">
+        <div class="db-stat">
+            <div class="db-stat-val">{{ activity_summary.total|default:"0" }}</div>
+            <div class="db-stat-label">Total Sessions</div>
         </div>
-        <div class="db-metric-card db-anim db-anim-4" style="--mc-color: #6366f1;">
-            <div class="db-mc-header">
-                <span class="db-mc-label">Avg. Duration</span>
-                <div class="db-mc-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </div>
-            </div>
-            <div class="db-mc-value">{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}</div>
-            <span class="db-mc-sub">Start to submission</span>
+        <div class="db-stat">
+            <div class="db-stat-val">{{ portal_stats.completion_rate|floatformat:0 }}%</div>
+            <div class="db-stat-label">Completion Rate</div>
         </div>
-        <div class="db-metric-card db-anim db-anim-5" style="--mc-color: var(--color-orange, #ff8a00);">
-            <div class="db-mc-header">
-                <span class="db-mc-label">Avg. Score</span>
-                <div class="db-mc-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                </div>
-            </div>
-            <div class="db-mc-value">{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:1 }}{% else %}—{% endif %}</div>
-            <span class="db-mc-sub">Across all sessions</span>
+        <div class="db-stat">
+            <div class="db-stat-val">{% if portal_stats.average_score %}{{ portal_stats.average_score|floatformat:0 }}{% else %}—{% endif %}</div>
+            <div class="db-stat-label">Avg Score</div>
         </div>
-        <div class="db-metric-card db-anim db-anim-6" style="--mc-color: #8b5cf6;">
-            <div class="db-mc-header">
-                <span class="db-mc-label">Active Positions</span>
-                <div class="db-mc-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>
-                </div>
-            </div>
-            <div class="db-mc-value">{{ published_position_count|default:"0" }}</div>
-            <span class="db-mc-sub">{{ project_count }} total position{{ project_count|pluralize }}</span>
+        <div class="db-stat">
+            <div class="db-stat-val">{% if portal_stats.average_duration %}{{ portal_stats.average_duration|floatformat:0 }}m{% else %}—{% endif %}</div>
+            <div class="db-stat-label">Avg Duration</div>
+        </div>
+        <div class="db-stat">
+            <div class="db-stat-val">{{ project_count|default:"0" }}</div>
+            <div class="db-stat-label">Positions</div>
         </div>
     </div>
 
-    {# ── Candidate Funnel ── #}
-    {% if activity_summary.total > 0 %}
-    <div class="db-funnel db-anim db-anim-4">
-        <div class="db-funnel-stage">
-            <div class="db-funnel-num" data-count="{{ activity_summary.total }}">{{ activity_summary.total }}</div>
-            <div class="db-funnel-label">Invited</div>
-        </div>
-        <svg class="db-funnel-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        <div class="db-funnel-stage">
-            <div class="db-funnel-num" data-count="{{ activity_summary.in_progress }}">{{ activity_summary.in_progress }}</div>
-            <div class="db-funnel-label">In Progress</div>
-        </div>
-        <svg class="db-funnel-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        <div class="db-funnel-stage">
-            <div class="db-funnel-num" data-count="{{ activity_summary.completed }}">{{ activity_summary.completed }}</div>
-            <div class="db-funnel-label">Completed</div>
-        </div>
-        <svg class="db-funnel-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        <div class="db-funnel-stage">
-            <div class="db-funnel-num">{{ activity_summary.completion_rate|floatformat:0 }}%</div>
-            <div class="db-funnel-label">Conversion</div>
-        </div>
-    </div>
-    {% endif %}
-
-    {# ── Attention Items ── #}
+    {# ── Alerts ── #}
     {% if attention_items %}
-    <div class="db-alerts db-anim db-anim-5">
+    <div class="db-alerts">
         {% for item in attention_items|slice:":3" %}
         <div class="db-alert">
             <span class="db-alert-dot"></span>
-            <span class="db-alert-text"><strong>{{ item.label }}</strong> — {{ item.detail }}</span>
-            {% if item.action_url %}
-            <a href="{{ item.action_url }}" class="db-alert-link">Review →</a>
-            {% endif %}
+            <span><strong>{{ item.label }}</strong> — {{ item.detail }}</span>
+            {% if item.action_url %}<a href="{{ item.action_url }}">Review →</a>{% endif %}
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    {# ── Plan + Vacancy (compact) ── #}
+    {# ── Plan Usage ── #}
     {% if plan_overview %}
-    <div class="db-plan-usage db-anim db-anim-5">
-        <div class="db-usage-item">
-            <div class="db-usage-label">
-                <span>Invites</span>
-                <span class="db-usage-count">{{ plan_overview.invites_used }} / {{ plan_overview.invite_limit|default:"∞" }}</span>
-            </div>
+    <div class="db-usage">
+        <div>
+            Invites: {{ plan_overview.invites_used }} / {{ plan_overview.invite_limit|default:"∞" }}
             {% if plan_overview.invite_limit %}
-            <div class="db-usage-bar">
-                <div class="db-usage-fill {% if plan_overview.invite_percent > 85 %}warn{% endif %}" style="width: {{ plan_overview.invite_percent|floatformat:0 }}%"></div>
-            </div>
-            {% else %}
-            <div class="db-usage-bar"><div class="db-usage-fill" style="width: 0%"></div></div>
+            <div class="db-usage-bar"><div class="db-usage-fill {% if plan_overview.invite_percent > 85 %}warn{% endif %}" style="width:{{ plan_overview.invite_percent|floatformat:0 }}%"></div></div>
             {% endif %}
         </div>
-        <div class="db-usage-item">
-            <div class="db-usage-label">
-                <span>Positions</span>
-                <span class="db-usage-count">{{ plan_overview.project_used }} / {{ plan_overview.project_limit|default:"∞" }}</span>
-            </div>
+        <div>
+            Positions: {{ plan_overview.project_used }} / {{ plan_overview.project_limit|default:"∞" }}
             {% if plan_overview.project_limit %}
-            <div class="db-usage-bar">
-                <div class="db-usage-fill {% if plan_overview.project_percent > 85 %}warn{% endif %}" style="width: {% widthratio plan_overview.project_used plan_overview.project_limit 100 %}%"></div>
-            </div>
-            {% else %}
-            <div class="db-usage-bar"><div class="db-usage-fill" style="width: 0%"></div></div>
+            <div class="db-usage-bar"><div class="db-usage-fill {% if plan_overview.project_percent > 85 %}warn{% endif %}" style="width:{% widthratio plan_overview.project_used plan_overview.project_limit 100 %}%"></div></div>
             {% endif %}
         </div>
-        <div class="db-usage-plan">
+        <div>
             <span class="db-plan-badge">{{ plan_overview.name }}</span>
-            {% if plan_overview.upgrade_url %}
-            <a href="{{ plan_overview.upgrade_url }}" class="db-upgrade-link">Upgrade</a>
-            {% endif %}
+            {% if plan_overview.upgrade_url %}<a href="{{ plan_overview.upgrade_url }}" class="db-upgrade">Upgrade</a>{% endif %}
         </div>
     </div>
     {% endif %}
 
-    {# ── Two-Column: Activity + Sidebar ── #}
-    <div class="db-content-grid">
-        {# Left: Activity Report #}
-        <section class="db-activity-full db-anim db-anim-6">
-            <div class="section-header">
-                <h3>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    Recent Activity
-                </h3>
+    {# ── Main Content ── #}
+    <div class="db-content">
+        <div class="db-main">
+            <div class="db-section-head">
+                <h3>Recent Activity</h3>
                 {% if activity_feed %}
-                <a href="{% url 'clients:activity-export' %}{% if activity_querystring %}?{{ activity_querystring }}{% endif %}" class="btn btn-outline small">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Export
-                </a>
+                <a href="{% url 'clients:activity-export' %}{% if activity_querystring %}?{{ activity_querystring }}{% endif %}">Export CSV</a>
                 {% endif %}
             </div>
 
-            {# Filters #}
-            <form method="get" class="db-report-filters" id="activity-filter-form">
-                <div class="db-filter-group">
-                    <label class="db-filter-label">Assessment</label>
-                    <select name="assessment" class="db-filter-select" onchange="this.form.submit()">
-                        {% for value, label in activity_filter_options.assessments %}
-                        <option value="{{ value }}" {% if activity_filters.assessment == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="db-filter-group">
-                    <label class="db-filter-label">Status</label>
-                    <select name="status" class="db-filter-select" onchange="this.form.submit()">
-                        {% for value, label in activity_filter_options.statuses %}
-                        <option value="{{ value }}" {% if activity_filters.status == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="db-filter-group">
-                    <label class="db-filter-label">Time</label>
-                    <select name="window" class="db-filter-select" onchange="this.form.submit()">
-                        {% for value, label in activity_filter_options.windows %}
-                        <option value="{{ value }}" {% if activity_filters.window == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <form method="get" class="db-filters" id="activity-filter-form">
+                <select name="assessment" onchange="this.form.submit()">
+                    {% for value, label in activity_filter_options.assessments %}
+                    <option value="{{ value }}" {% if activity_filters.assessment == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="status" onchange="this.form.submit()">
+                    {% for value, label in activity_filter_options.statuses %}
+                    <option value="{{ value }}" {% if activity_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="window" onchange="this.form.submit()">
+                    {% for value, label in activity_filter_options.windows %}
+                    <option value="{{ value }}" {% if activity_filters.window == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
                 {% if activity_filters.assessment != "all" or activity_filters.status != "all" or activity_filters.window != "all" %}
-                <a href="{% url 'clients:dashboard' %}" class="db-filter-reset btn btn-ghost small">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    Reset
-                </a>
+                <a href="{% url 'clients:dashboard' %}">Reset</a>
                 {% endif %}
             </form>
 
             {% if activity_feed %}
-            <div class="db-activity-card">
-                <div class="db-report-table-wrap">
-                    <table class="db-report-table">
-                        <thead>
-                            <tr>
-                                <th>Candidate</th>
-                                <th>Assessment</th>
-                                <th>Status</th>
-                                <th>Time</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for entry in activity_feed|slice:":15" %}
-                            <tr class="db-report-row">
-                                <td class="db-report-candidate">
-                                    <div class="activity-avatar">
-                                        <span>{{ entry.candidate|slice:":1"|upper }}</span>
-                                    </div>
-                                    <span class="db-report-candidate-name">{{ entry.candidate }}</span>
-                                </td>
-                                <td class="db-report-assessment">
-                                    <span class="db-report-assessment-badge">{{ entry.assessment }}</span>
-                                </td>
-                                <td class="db-report-status">
-                                    <span class="db-report-status-pill {% if entry.status == 'Completed' or entry.status == 'Submitted' %}pill-success{% elif entry.status == 'In Progress' %}pill-active{% else %}pill-pending{% endif %}">
-                                        <span class="db-status-dot {% if entry.status == 'Completed' or entry.status == 'Submitted' %}dot-success{% elif entry.status == 'In Progress' %}dot-active{% else %}dot-pending{% endif %}"></span>
-                                        {{ entry.status }}
-                                    </span>
-                                </td>
-                                <td class="db-report-time">
-                                    <span title="{{ entry.timestamp|date:'N j, Y g:i A' }}">{{ entry.timestamp|naturaltime }}</span>
-                                </td>
-                                <td class="db-report-action">
-                                    {% if entry.detail_url %}
-                                    <a href="{{ entry.detail_url }}" class="btn btn-ghost small">View</a>
-                                    {% else %}
-                                    <a href="{{ entry.manage_url }}" class="btn btn-ghost small">Manage</a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <table class="db-table">
+                <thead>
+                    <tr><th>Candidate</th><th>Assessment</th><th>Status</th><th>Time</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for entry in activity_feed|slice:":15" %}
+                    <tr>
+                        <td>
+                            <span class="db-avatar">{{ entry.candidate|slice:":1"|upper }}</span>
+                            {{ entry.candidate }}
+                        </td>
+                        <td>{{ entry.assessment }}</td>
+                        <td>
+                            <span class="db-status {% if entry.status == 'Completed' or entry.status == 'Submitted' %}success{% elif entry.status == 'In Progress' %}active{% else %}pending{% endif %}">
+                                {{ entry.status }}
+                            </span>
+                        </td>
+                        <td style="color:#94a3b8" title="{{ entry.timestamp|date:'N j, Y g:i A' }}">{{ entry.timestamp|naturaltime }}</td>
+                        <td>
+                            {% if entry.detail_url %}
+                            <a href="{{ entry.detail_url }}" style="color:#ff8a00;font-size:.78rem;text-decoration:none;font-weight:600">View</a>
+                            {% else %}
+                            <a href="{{ entry.manage_url }}" style="color:#64748b;font-size:.78rem;text-decoration:none">Manage</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
-            <div class="db-empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; margin-bottom: 1rem; color: var(--color-navy);">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="8.5" cy="7" r="4"></circle>
-                    <line x1="20" y1="8" x2="20" y2="14"></line>
-                    <line x1="23" y1="11" x2="17" y2="11"></line>
-                </svg>
+            <div class="db-empty">
                 <p><strong>No activity yet</strong></p>
-                <p class="muted">Create a position and invite candidates to get started.</p>
-                <a href="{% url 'clients:project-create' %}" class="btn btn-primary small">Create Your First Position</a>
+                <p>Create a position and invite candidates to get started.</p>
+                <a href="{% url 'clients:project-create' %}">Create Your First Position →</a>
             </div>
             {% endif %}
-        </section>
+        </div>
 
-        {# Right: Sidebar #}
-        <div class="db-sidebar-cards db-anim db-anim-7">
-            {# Positions Preview #}
+        <div class="db-sidebar">
             {% if project_preview %}
-            <div class="db-sidebar-card">
-                <h4>Recent Positions</h4>
+            <div class="db-side-card">
+                <h4>Positions</h4>
                 {% for project in project_preview %}
-                <a href="{{ project.href }}" class="db-project-item">
-                    <span class="db-project-dot" style="background: {% if project.status == 'Active' %}#10b981{% elif project.status == 'Draft' %}#f59e0b{% else %}#94a3b8{% endif %};"></span>
-                    <div class="db-project-info">
-                        <div class="db-project-name">{{ project.title }}</div>
-                        <div class="db-project-meta">{{ project.status }} · {{ project.priority }}</div>
-                    </div>
-                    <span class="db-project-sessions">{{ project.sessions }}</span>
+                <a href="{{ project.href }}" class="db-side-item">
+                    <span class="db-side-dot" style="background:{% if project.status == 'Active' %}#10b981{% elif project.status == 'Draft' %}#f59e0b{% else %}#cbd5e1{% endif %}"></span>
+                    <span class="db-side-name">{{ project.title }}</span>
+                    <span class="db-side-count">{{ project.sessions }}</span>
                 </a>
                 {% endfor %}
             </div>
             {% endif %}
 
-            {# Vacancy Link #}
             {% if vacancy_page_url %}
-            <div class="db-sidebar-card">
+            <div class="db-side-card">
                 <h4>Vacancy Page</h4>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-orange)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                    <span style="font-size: 0.8rem; color: var(--color-navy); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="db-vacancy-url">{{ request.get_host }}{{ vacancy_page_url }}</span>
-                </div>
-                {% if published_position_count %}
-                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin: 0 0 0.75rem;">{{ published_position_count }} live position{{ published_position_count|pluralize }}</p>
-                {% endif %}
-                <div style="display: flex; gap: 0.5rem;">
-                    <button type="button" class="btn btn-outline small" id="db-copy-vacancy" style="flex:1;">Copy Link</button>
-                    <a href="{{ vacancy_page_url }}" target="_blank" class="btn btn-outline small" style="flex:1;">View</a>
+                <div class="db-vacancy-link" id="db-vacancy-url">{{ request.get_host }}{{ vacancy_page_url }}</div>
+                {% if published_position_count %}<div style="font-size:.72rem;color:#94a3b8;padding:0 .5rem;margin-bottom:.5rem">{{ published_position_count }} live position{{ published_position_count|pluralize }}</div>{% endif %}
+                <div class="db-vacancy-actions">
+                    <button type="button" id="db-copy-vacancy">Copy Link</button>
+                    <a href="{{ vacancy_page_url }}" target="_blank">View</a>
                 </div>
             </div>
             {% endif %}
 
-            {# Assessments Quick Access #}
             {% if allowed_assessments %}
-            <div class="db-sidebar-card">
-                <h4>Your Assessments</h4>
+            <div class="db-side-card">
+                <h4>Assessments</h4>
                 {% for assess in allowed_assessments %}
-                <a href="{{ assess.manage_url }}" class="db-project-item">
-                    <span class="db-project-dot" style="background: var(--color-orange);"></span>
-                    <div class="db-project-info">
-                        <div class="db-project-name">{{ assess.label }}</div>
-                        <div class="db-project-meta">{% if assess.metrics.invites %}{{ assess.metrics.invites }} invite{{ assess.metrics.invites|pluralize }}{% else %}No invites yet{% endif %}</div>
-                    </div>
+                <a href="{{ assess.manage_url }}" class="db-side-item">
+                    <span class="db-side-name">{{ assess.label }}</span>
+                    <span class="db-side-meta">{% if assess.metrics.invites %}{{ assess.metrics.invites }}{% else %}0{% endif %}</span>
                 </a>
                 {% endfor %}
             </div>
             {% endif %}
         </div>
     </div>
-
 </div>
 
 {% if vacancy_page_url %}
