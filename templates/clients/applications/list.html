@@ -1,132 +1,91 @@
 {% extends 'portal_base.html' %}
-{% load static %}
-{% load humanize %}
+{% load static humanize %}
 {% block title %}Candidates · Evalon{% endblock %}
 {% block meta_description %}Review candidate applications across all positions.{% endblock %}
 {% block portal_content %}
 <div class="portal-shell">
 
-    {# ── Page Header ── #}
-    <header class="ap-header" style="display:flex; align-items:center; justify-content:space-between; padding:1.5rem 1.75rem; background:linear-gradient(135deg, #0e1428, #1a1e3a); border-radius:20px; margin-bottom:1.5rem; position:relative; overflow:hidden; opacity:0; animation: pp-fadeUp 0.45s ease forwards; animation-delay: 0s;">
-        <div style="position:absolute; top:-40px; right:-30px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle, rgba(245,158,11,0.15), transparent 70%); pointer-events:none;"></div>
-        <div style="position:relative; z-index:1;">
-            <h1 style="color:#ffffff; margin:0;">Candidates</h1>
-            <p class="muted" style="color:rgba(255,255,255,0.55); margin:0.25rem 0 0 0;">Review candidate applications across all positions</p>
+    <header style="display:flex;align-items:center;justify-content:space-between;padding:1.5rem 2rem;border-bottom:1px solid #e5e7eb">
+        <div>
+            <h1 style="font-size:1.35rem;font-weight:700;color:#0e1428;margin:0">Candidates</h1>
+            <p style="color:#64748b;font-size:.85rem;margin:.25rem 0 0">{{ applications|length }} candidate{{ applications|length|pluralize }}</p>
         </div>
     </header>
 
-    {# ── Stats Strip ── #}
-    {% if applications %}
-    <div style="display:flex; gap:1px; background:rgba(14,20,40,0.05); border-radius:16px; overflow:hidden; margin-bottom:1.25rem; opacity:0; animation: pp-fadeUp 0.45s ease forwards; animation-delay: 0.08s;">
-        <div style="flex:1; padding:1rem 1.25rem; background:#fff; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:700; color:#0e1428;">{{ applications|length }}</div>
-            <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.15rem;">Total Candidates</div>
-        </div>
-        <div style="flex:1; padding:1rem 1.25rem; background:#fff; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:700; color:#10b981;">{% with count=0 %}{% for app in applications %}{% if app.status == "accepted" %}{% with count=count|add:"1" %}{% endwith %}{% endif %}{% endfor %}{{ count }}{% endwith %}</div>
-            <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.15rem;">Accepted</div>
-        </div>
-        <div style="flex:1; padding:1rem 1.25rem; background:#fff; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:700; color:#f59e0b;">{% with count=0 %}{% for app in applications %}{% if app.status == "pending" or app.status == "reviewing" %}{% with count=count|add:"1" %}{% endwith %}{% endif %}{% endfor %}{{ count }}{% endwith %}</div>
-            <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.15rem;">In Review</div>
-        </div>
-        <div style="flex:1; padding:1rem 1.25rem; background:#fff; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:700; color:#ef4444;">{% with count=0 %}{% for app in applications %}{% if app.status == "rejected" %}{% with count=count|add:"1" %}{% endwith %}{% endif %}{% endfor %}{{ count }}{% endwith %}</div>
-            <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.15rem;">Rejected</div>
-        </div>
-    </div>
-    {% endif %}
-
-    {# ── Filter Bar ── #}
-    <div class="ap-filters" style="background:rgba(14,20,40,0.02); border:1px solid rgba(14,20,40,0.06); border-radius:14px; padding:0.85rem 1.15rem; margin-bottom:1.25rem; opacity:0; animation: pp-fadeUp 0.45s ease forwards; animation-delay: 0.16s;">
-        <form method="get" class="ap-filter-form" style="display:flex; align-items:center; gap:0.65rem; flex-wrap:wrap;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="flex-shrink:0;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            <select name="position" class="ap-filter-select">
+    <div style="padding:.75rem 2rem;border-bottom:1px solid #f1f5f9;background:#fafbfc">
+        <form method="get" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+            <select name="position" class="ap-filter-select" style="font-size:.8rem;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff">
                 <option value="">All positions</option>
                 {% for project in projects %}
                 <option value="{{ project.uuid }}" {% if selected_position == project.uuid|stringformat:"s" %}selected{% endif %}>{{ project.title }}</option>
                 {% endfor %}
             </select>
-            <select name="status" class="ap-filter-select">
+            <select name="status" class="ap-filter-select" style="font-size:.8rem;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff">
                 <option value="">All statuses</option>
                 {% for code, label in status_choices %}
                 <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
             {% if can_use_ai_hiring %}
-            <select name="ai" class="ap-filter-select">
+            <select name="ai" class="ap-filter-select" style="font-size:.8rem;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff">
                 <option value="">AI: All</option>
                 <option value="screened" {% if selected_ai == "screened" %}selected{% endif %}>AI Screened</option>
                 <option value="passed" {% if selected_ai == "passed" %}selected{% endif %}>AI Passed</option>
                 <option value="failed" {% if selected_ai == "failed" %}selected{% endif %}>AI Failed</option>
             </select>
             {% endif %}
-            <button type="submit" class="btn btn-outline small">Filter</button>
+            <button type="submit" style="font-size:.78rem;padding:5px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;cursor:pointer;color:#334155">Filter</button>
         </form>
     </div>
 
     {% if applications %}
-    <div class="ap-table-wrap" style="opacity:0; animation: pp-fadeUp 0.45s ease forwards; animation-delay: 0.24s;">
-        <table class="ap-table">
-            <thead>
-                <tr>
-                    <th>Candidate</th>
-                    <th>Position</th>
-                    <th>Status</th>
-                    {% if can_use_ai_hiring %}<th>AI Score</th>{% endif %}
-                    <th>Applied</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for app in applications %}
-                <tr class="ap-row" style="opacity:0; animation: pp-slideRight 0.35s ease forwards; animation-delay: 0.{{ forloop.counter0 }}5s;">
-                    <td>
-                        <div style="display:flex; align-items:center; gap:0.65rem;">
-                            <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, {% cycle '#6366f1' '#10b981' '#f59e0b' '#ef4444' '#8b5cf6' '#ec4899' %}, {% cycle '#818cf8' '#34d399' '#fbbf24' '#f87171' '#a78bfa' '#f472b6' %}); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:0.8rem; flex-shrink:0; text-transform:uppercase;">{{ app.full_name|make_list|first }}</div>
-                            <div>
-                                <span class="ap-name">{{ app.full_name }}</span>
-                                <span class="ap-email">{{ app.email }}</span>
-                            </div>
+    <table class="ap-table" style="width:100%;border-collapse:collapse;font-size:.82rem">
+        <thead>
+            <tr style="border-bottom:1px solid #f1f5f9">
+                <th style="text-align:left;padding:10px 16px;color:#94a3b8;font-weight:600;font-size:.72rem;text-transform:uppercase">Candidate</th>
+                <th style="text-align:left;padding:10px 16px;color:#94a3b8;font-weight:600;font-size:.72rem;text-transform:uppercase">Position</th>
+                <th style="text-align:left;padding:10px 16px;color:#94a3b8;font-weight:600;font-size:.72rem;text-transform:uppercase">Status</th>
+                {% if can_use_ai_hiring %}<th style="text-align:left;padding:10px 16px;color:#94a3b8;font-weight:600;font-size:.72rem;text-transform:uppercase">AI Score</th>{% endif %}
+                <th style="text-align:left;padding:10px 16px;color:#94a3b8;font-weight:600;font-size:.72rem;text-transform:uppercase">Applied</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr style="border-bottom:1px solid #f8fafc">
+                <td style="padding:10px 16px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <span style="width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#64748b">{{ app.full_name|make_list|first|upper }}</span>
+                        <div>
+                            <div style="font-weight:600;color:#0e1428">{{ app.full_name }}</div>
+                            <div style="font-size:.72rem;color:#94a3b8">{{ app.email }}</div>
                         </div>
-                    </td>
-                    <td>{{ app.project.title }}</td>
-                    <td><span class="ap-status ap-status-{{ app.status }}">{{ app.get_status_display }}</span></td>
-                    {% if can_use_ai_hiring %}
-                    <td>
-                        {% if app.pipeline_candidate and app.pipeline_candidate.ai_screen_score is not None %}
-                        <span class="ap-ai-score {% if app.pipeline_candidate.ai_screen_score >= 60 %}ap-ai-score-pass{% else %}ap-ai-score-fail{% endif %}">{{ app.pipeline_candidate.ai_screen_score|floatformat:0 }}</span>
-                        {% else %}
-                        <span class="ap-cell-muted">&mdash;</span>
-                        {% endif %}
-                    </td>
-                    {% endif %}
-                    <td class="ap-cell-muted">{{ app.created_at|naturaltime }}</td>
-                    <td class="ap-cell-action">
-                        <a href="{% url 'clients:application-detail' application_uuid=app.uuid %}" class="ap-view-link">View &rarr;</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    </div>
+                </td>
+                <td style="padding:10px 16px;color:#475569">{{ app.project.title }}</td>
+                <td style="padding:10px 16px"><span class="ap-status ap-status-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                {% if can_use_ai_hiring %}
+                <td style="padding:10px 16px">
+                    {% if app.pipeline_candidate and app.pipeline_candidate.ai_screen_score is not None %}
+                    <span class="ap-ai-score {% if app.pipeline_candidate.ai_screen_score >= 60 %}ap-ai-score-pass{% else %}ap-ai-score-fail{% endif %}">{{ app.pipeline_candidate.ai_screen_score|floatformat:0 }}</span>
+                    {% else %}—{% endif %}
+                </td>
+                {% endif %}
+                <td style="padding:10px 16px;color:#94a3b8">{{ app.created_at|naturaltime }}</td>
+                <td style="padding:10px 16px"><a href="{% url 'clients:application-detail' application_uuid=app.uuid %}" style="color:#ff8a00;font-weight:600;font-size:.78rem;text-decoration:none">View →</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% else %}
-    <div class="ap-empty" style="text-align:center; padding:3.5rem 2rem; opacity:0; animation: pp-fadeUp 0.45s ease forwards; animation-delay: 0.24s;">
-        <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.03)); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem;">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" style="opacity:0.5;">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                <line x1="9" y1="12" x2="15" y2="12"></line>
-                <line x1="9" y1="16" x2="13" y2="16"></line>
-            </svg>
-        </div>
-        <h3 style="margin:0 0 0.5rem; color:#0e1428; font-size:1.15rem;">No candidates yet</h3>
-        <p class="muted" style="max-width:380px; margin:0 auto 1.25rem; line-height:1.6;">Share your vacancy page or send assessment invites directly to start building your talent pipeline.</p>
-        <div class="ap-empty-actions" style="display:flex; gap:0.65rem; justify-content:center;">
+    <div style="text-align:center;padding:4rem 2rem;color:#94a3b8">
+        <h3 style="color:#334155;margin:.5rem 0">No candidates yet</h3>
+        <p>Share your vacancy page or send assessment invites to start.</p>
+        <div style="display:flex;gap:.5rem;justify-content:center;margin-top:1rem">
             {% if vacancy_page_url %}
-            <a href="{{ vacancy_page_url }}" target="_blank" class="btn btn-outline small">View Vacancy Page</a>
+            <a href="{{ vacancy_page_url }}" target="_blank" style="font-size:.8rem;padding:6px 14px;border:1px solid #e5e7eb;border-radius:8px;color:#475569;text-decoration:none">View Vacancy Page</a>
             {% endif %}
-            <a href="{% url 'clients:project-create' %}" class="btn btn-primary small">Create Position</a>
+            <a href="{% url 'clients:project-create' %}" style="font-size:.8rem;padding:6px 14px;border-radius:8px;background:#ff8a00;color:#fff;text-decoration:none">Create Position</a>
         </div>
     </div>
     {% endif %}
