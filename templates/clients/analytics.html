@@ -1,251 +1,139 @@
 {% extends 'portal_base.html' %}
-{% load static %}
-{% load humanize %}
+{% load static humanize %}
 {% block title %}Analytics · Evalon{% endblock %}
 {% block meta_description %}View detailed analytics and reports for your assessments.{% endblock %}
 {% block portal_content %}
+<style>
+.an-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem 2rem;border-bottom:1px solid #e5e7eb;flex-wrap:wrap;gap:.75rem}
+.an-header h1{font-size:1.35rem;font-weight:700;color:#0e1428;margin:0}
+.an-header-actions{display:flex;align-items:center;gap:.75rem}
+.an-header select{font-size:.8rem;padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;color:#334155;background:#fff}
+.an-header a{font-size:.8rem;color:#64748b;text-decoration:none}
+.an-stats{display:flex;gap:2rem;padding:1.25rem 2rem;border-bottom:1px solid #f1f5f9;flex-wrap:wrap}
+.an-stat-val{font-size:1.4rem;font-weight:700;color:#0e1428}
+.an-stat-label{font-size:.75rem;color:#94a3b8;margin-top:2px}
+.an-stat-sub{font-size:.7rem;color:#cbd5e1}
+.an-charts{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #e5e7eb}
+.an-chart{padding:1.5rem 2rem;position:relative}
+.an-chart:first-child{border-right:1px solid #f1f5f9}
+.an-chart h3{font-size:.85rem;font-weight:700;color:#0e1428;margin:0 0 .25rem}
+.an-chart p{font-size:.75rem;color:#94a3b8;margin:0 0 1rem}
+.an-chart canvas{max-height:240px}
+.an-section{padding:1.5rem 2rem;border-bottom:1px solid #f1f5f9}
+.an-section h2{font-size:.9rem;font-weight:700;color:#0e1428;margin:0 0 1rem}
+table.an-table{width:100%;border-collapse:collapse;font-size:.82rem}
+table.an-table th{text-align:left;padding:8px 0;color:#94a3b8;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #f1f5f9}
+table.an-table td{padding:10px 0;border-bottom:1px solid #f8fafc;color:#334155}
+.an-bar{display:inline-flex;align-items:center;gap:8px}
+.an-bar-track{width:80px;height:4px;background:#f1f5f9;border-radius:2px}
+.an-bar-fill{height:100%;background:#ff8a00;border-radius:2px}
+.an-dist-row{display:flex;align-items:center;gap:1rem;padding:6px 0}
+.an-dist-label{width:60px;font-size:.78rem;color:#64748b;font-weight:600}
+.an-dist-track{flex:1;height:6px;background:#f1f5f9;border-radius:3px}
+.an-dist-fill{height:100%;background:#ff8a00;border-radius:3px}
+.an-dist-count{font-size:.78rem;color:#334155;font-weight:600;width:30px;text-align:right}
+.an-empty{text-align:center;padding:4rem 2rem;color:#94a3b8}
+.an-empty h3{color:#334155;margin:.5rem 0}
+.an-empty a{color:#ff8a00;font-weight:600;text-decoration:none;display:inline-block;margin-top:.75rem}
+@media(max-width:768px){.an-charts{grid-template-columns:1fr}.an-chart:first-child{border-right:none;border-bottom:1px solid #f1f5f9}}
+</style>
+
 <div class="portal-shell">
 
-    {# ── Dark Hero Header ── #}
-    <header class="an-header" style="background: linear-gradient(135deg, #0e1428 0%, #1a1e3a 100%); position: relative; overflow: hidden; border-radius: 16px; padding: 2.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-        <div style="position: absolute; top: -40%; right: -10%; width: 420px; height: 420px; background: radial-gradient(circle, rgba(255, 138, 0, 0.12) 0%, transparent 70%); pointer-events: none;"></div>
-        <div style="position: absolute; bottom: -50%; left: 15%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%); pointer-events: none;"></div>
-        <div class="an-header-left" style="position: relative; z-index: 1;">
-            <h1 style="color: #ffffff; font-size: 1.75rem; font-weight: 700; margin: 0 0 0.35rem 0; animation: pp-fadeUp 0.5s ease both;">Analytics</h1>
-            <p style="color: rgba(255,255,255,0.55); font-size: 0.95rem; margin: 0; animation: pp-fadeUp 0.5s ease 0.1s both;">Performance insights across your assessment pipeline</p>
-        </div>
-        <div class="an-header-actions" style="display: flex; align-items: center; gap: 0.75rem; position: relative; z-index: 1; animation: pp-fadeUp 0.5s ease 0.15s both;">
-            <form method="get" class="an-period-form">
-                <select name="period" onchange="this.form.submit()" class="an-period-select" style="background: rgba(255,255,255,0.08); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem 2rem 0.5rem 0.75rem; font-size: 0.85rem; backdrop-filter: blur(8px); -webkit-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center;">
-                    <option value="7" {% if selected_period == '7' %}selected{% endif %} style="color: #0e1428;">Last 7 days</option>
-                    <option value="30" {% if selected_period == '30' %}selected{% endif %} style="color: #0e1428;">Last 30 days</option>
-                    <option value="90" {% if selected_period == '90' %}selected{% endif %} style="color: #0e1428;">Last 90 days</option>
-                    <option value="all" {% if selected_period == 'all' %}selected{% endif %} style="color: #0e1428;">All time</option>
+    <div class="an-header">
+        <h1>Analytics</h1>
+        <div class="an-header-actions">
+            <form method="get">
+                <select name="period" onchange="this.form.submit()">
+                    <option value="7" {% if selected_period == '7' %}selected{% endif %}>Last 7 days</option>
+                    <option value="30" {% if selected_period == '30' %}selected{% endif %}>Last 30 days</option>
+                    <option value="90" {% if selected_period == '90' %}selected{% endif %}>Last 90 days</option>
+                    <option value="all" {% if selected_period == 'all' %}selected{% endif %}>All time</option>
                 </select>
             </form>
-            <a href="{% url 'clients:activity-export' %}" class="btn btn-outline small" style="color: #ffffff; border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); backdrop-filter: blur(8px);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Export
-            </a>
+            <a href="{% url 'clients:activity-export' %}">Export CSV</a>
         </div>
-    </header>
+    </div>
 
     {% if analytics.total_invites > 0 %}
 
-    {# ── Key Metrics Strip ── #}
-    <div class="an-metrics" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; animation: pp-fadeUp 0.5s ease 0.2s both;">
-        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #6366f1; display: flex; align-items: flex-start; gap: 1rem;">
-            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(99,102,241,0.1); flex-shrink: 0;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="8.5" cy="7" r="4"></circle>
-                    <line x1="20" y1="8" x2="20" y2="14"></line>
-                    <line x1="23" y1="11" x2="17" y2="11"></line>
-                </svg>
-            </div>
-            <div class="an-metric-body">
-                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Total Invites</span>
-                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{{ analytics.total_invites }}</span>
-                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">{{ analytics.in_progress_count }} in progress</span>
-            </div>
-        </article>
-        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #10b981; display: flex; align-items: flex-start; gap: 1rem;">
-            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(16,185,129,0.1); flex-shrink: 0;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-            </div>
-            <div class="an-metric-body">
-                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Completion Rate</span>
-                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{{ analytics.completion_rate|floatformat:0 }}%</span>
-                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">{{ analytics.completed_count }} completed</span>
-            </div>
-        </article>
-        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #ff8a00; display: flex; align-items: flex-start; gap: 1rem;">
-            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(255,138,0,0.1); flex-shrink: 0;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff8a00" stroke-width="2">
-                    <line x1="12" y1="20" x2="12" y2="10"></line>
-                    <line x1="18" y1="20" x2="18" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="16"></line>
-                </svg>
-            </div>
-            <div class="an-metric-body">
-                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Avg. Score</span>
-                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{% if analytics.average_score %}{{ analytics.average_score|floatformat:1 }}{% else %}—{% endif %}</span>
-                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">Across finished sessions</span>
-            </div>
-        </article>
-        <article class="an-metric" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-top: 3px solid #8b5cf6; display: flex; align-items: flex-start; gap: 1rem;">
-            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(139,92,246,0.1); flex-shrink: 0;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </div>
-            <div class="an-metric-body">
-                <span class="an-metric-lbl" style="font-size: 0.78rem; color: #6b7280; font-weight: 500; display: block; margin-bottom: 0.25rem;">Avg. Duration</span>
-                <span class="an-metric-val" style="font-size: 1.6rem; font-weight: 700; color: #0e1428; display: block; line-height: 1.1;">{% if analytics.average_duration %}{{ analytics.average_duration|floatformat:0 }}m{% else %}—{% endif %}</span>
-                <span class="an-metric-sub" style="font-size: 0.75rem; color: #9ca3af; display: block; margin-top: 0.35rem;">Time to complete</span>
-            </div>
-        </article>
+    <div class="an-stats">
+        <div>
+            <div class="an-stat-val">{{ analytics.total_invites }}</div>
+            <div class="an-stat-label">Total Invites</div>
+            <div class="an-stat-sub">{{ analytics.in_progress_count }} in progress</div>
+        </div>
+        <div>
+            <div class="an-stat-val">{{ analytics.completion_rate|floatformat:0 }}%</div>
+            <div class="an-stat-label">Completion Rate</div>
+            <div class="an-stat-sub">{{ analytics.completed_count }} completed</div>
+        </div>
+        <div>
+            <div class="an-stat-val">{% if analytics.average_score %}{{ analytics.average_score|floatformat:1 }}{% else %}—{% endif %}</div>
+            <div class="an-stat-label">Avg Score</div>
+        </div>
+        <div>
+            <div class="an-stat-val">{% if analytics.average_duration %}{{ analytics.average_duration|floatformat:0 }}m{% else %}—{% endif %}</div>
+            <div class="an-stat-label">Avg Duration</div>
+        </div>
     </div>
 
-    {# ── Charts Row ── #}
-    <div class="an-charts" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; animation: pp-fadeUp 0.5s ease 0.3s both;">
-        <article class="an-chart-card" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #6366f1;">
-            <div class="an-card-head" style="margin-bottom: 1rem;">
-                <h3 style="font-size: 1rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Activity Trend</h3>
-                <span class="an-card-sub" style="font-size: 0.8rem; color: #9ca3af;">Invites and completions over time</span>
-            </div>
-            <div class="an-chart-wrap" id="trendChartContainer" style="height: 260px; position: relative;">
-                <canvas id="trendChart"></canvas>
-            </div>
-        </article>
-        <article class="an-chart-card" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #ff8a00;">
-            <div class="an-card-head" style="margin-bottom: 1rem;">
-                <h3 style="font-size: 1rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Assessment Breakdown</h3>
-                <span class="an-card-sub" style="font-size: 0.8rem; color: #9ca3af;">Completion rates by type</span>
-            </div>
-            <div class="an-chart-wrap" id="breakdownChartContainer" style="height: 260px; position: relative;">
-                <canvas id="breakdownChart"></canvas>
-            </div>
-        </article>
+    <div class="an-charts">
+        <div class="an-chart">
+            <h3>Activity Trend</h3>
+            <p>Invites and completions over time</p>
+            <canvas id="trendChart"></canvas>
+        </div>
+        <div class="an-chart">
+            <h3>Assessment Breakdown</h3>
+            <p>Completion rates by type</p>
+            <canvas id="breakdownChart"></canvas>
+        </div>
     </div>
 
-    {# ── Conversion Funnel ── #}
-    <section class="an-section" style="animation: pp-slideRight 0.5s ease 0.35s both;">
-        <div class="an-section-head" style="margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.15rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Conversion Funnel</h2>
-            <span class="an-section-sub" style="font-size: 0.82rem; color: #9ca3af;">Journey from invite to completion</span>
-        </div>
-        <div class="an-funnel" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06);">
-            <div class="an-funnel-step">
-                <div class="an-funnel-bar" style="width: 100%; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; color: #fff; min-height: 48px;">
-                    <div class="an-funnel-info" style="display: flex; align-items: center; gap: 0.5rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                            <polyline points="22,6 12,13 2,6"></polyline>
-                        </svg>
-                        <span class="an-funnel-label" style="font-weight: 600; font-size: 0.9rem;">Invited</span>
-                    </div>
-                    <span class="an-funnel-count" style="font-weight: 700; font-size: 1.1rem;">{{ analytics.chart_data.funnel.invited }}</span>
-                </div>
-                <span class="an-funnel-pct" style="font-size: 0.78rem; color: #6b7280; font-weight: 600; margin-top: 0.35rem; display: block; text-align: right;">100%</span>
-            </div>
-            <div class="an-funnel-arrow" style="text-align: center; padding: 0.35rem 0; color: #d1d5db;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-            <div class="an-funnel-step">
-                <div class="an-funnel-bar an-funnel-bar--mid" style="width: {% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%; background: linear-gradient(90deg, #ff8a00, #ffb347); border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; color: #fff; min-height: 48px;">
-                    <div class="an-funnel-info" style="display: flex; align-items: center; gap: 0.5rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <span class="an-funnel-label" style="font-weight: 600; font-size: 0.9rem;">Started</span>
-                    </div>
-                    <span class="an-funnel-count" style="font-weight: 700; font-size: 1.1rem;">{{ analytics.chart_data.funnel.started }}</span>
-                </div>
-                <span class="an-funnel-pct" style="font-size: 0.78rem; color: #6b7280; font-weight: 600; margin-top: 0.35rem; display: block; text-align: right;">{% widthratio analytics.chart_data.funnel.started analytics.chart_data.funnel.invited 100 %}%</span>
-            </div>
-            <div class="an-funnel-arrow" style="text-align: center; padding: 0.35rem 0; color: #d1d5db;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-            <div class="an-funnel-step">
-                <div class="an-funnel-bar an-funnel-bar--end" style="width: {% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; color: #fff; min-height: 48px;">
-                    <div class="an-funnel-info" style="display: flex; align-items: center; gap: 0.5rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span class="an-funnel-label" style="font-weight: 600; font-size: 0.9rem;">Completed</span>
-                    </div>
-                    <span class="an-funnel-count" style="font-weight: 700; font-size: 1.1rem;">{{ analytics.chart_data.funnel.completed }}</span>
-                </div>
-                <span class="an-funnel-pct" style="font-size: 0.78rem; color: #6b7280; font-weight: 600; margin-top: 0.35rem; display: block; text-align: right;">{% widthratio analytics.chart_data.funnel.completed analytics.chart_data.funnel.invited 100 %}%</span>
-            </div>
-        </div>
-    </section>
+    <div class="an-section">
+        <h2>Assessment Performance</h2>
+        <table class="an-table">
+            <thead>
+                <tr><th>Assessment</th><th>Total</th><th>Completed</th><th>Completion Rate</th></tr>
+            </thead>
+            <tbody>
+                {% for item in analytics.assessment_breakdown %}
+                <tr>
+                    <td>{{ item.label }}</td>
+                    <td>{{ item.total }}</td>
+                    <td>{{ item.completed }}</td>
+                    <td>
+                        <div class="an-bar">
+                            <div class="an-bar-track"><div class="an-bar-fill" style="width:{{ item.completion_rate|floatformat:0 }}%"></div></div>
+                            <span>{{ item.completion_rate|floatformat:0 }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    {# ── Assessment Performance ── #}
-    <section class="an-section" style="animation: pp-fadeUp 0.5s ease 0.4s both;">
-        <div class="an-section-head" style="margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.15rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Assessment Performance</h2>
-            <span class="an-section-sub" style="font-size: 0.82rem; color: #9ca3af;">Breakdown by assessment type</span>
-        </div>
-        <div class="an-table-card" style="background: #fff; border-radius: 14px; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #10b981; overflow: hidden;">
-            <table class="an-table">
-                <thead>
-                    <tr>
-                        <th>Assessment</th>
-                        <th>Total</th>
-                        <th>Completed</th>
-                        <th>Completion Rate</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in analytics.assessment_breakdown %}
-                    <tr>
-                        <td class="an-cell-name">{{ item.label }}</td>
-                        <td>{{ item.total }}</td>
-                        <td>{{ item.completed }}</td>
-                        <td>
-                            <div class="an-bar-cell">
-                                <div class="an-bar-track">
-                                    <div class="an-bar-fill" style="width: {{ item.completion_rate|floatformat:0 }}%;"></div>
-                                </div>
-                                <span class="an-bar-text">{{ item.completion_rate|floatformat:0 }}%</span>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    {# ── Score Distribution ── #}
     {% if analytics.score_distribution %}
-    <section class="an-section" style="animation: pp-fadeUp 0.5s ease 0.45s both;">
-        <div class="an-section-head" style="margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.15rem; font-weight: 650; color: #0e1428; margin: 0 0 0.2rem 0;">Score Distribution</h2>
-            <span class="an-section-sub" style="font-size: 0.82rem; color: #9ca3af;">How candidates scored across all assessments</span>
+    <div class="an-section">
+        <h2>Score Distribution</h2>
+        {% for range in analytics.score_distribution %}
+        <div class="an-dist-row">
+            <span class="an-dist-label">{{ range.label }}</span>
+            <div class="an-dist-track"><div class="an-dist-fill" style="width:{{ range.percentage|floatformat:0 }}%"></div></div>
+            <span class="an-dist-count">{{ range.count }}</span>
         </div>
-        <div class="an-dist-card" style="background: #fff; border-radius: 14px; padding: 1.5rem; border: 1px solid rgba(14,20,40,0.06); border-left: 4px solid #8b5cf6;">
-            {% for range in analytics.score_distribution %}
-            <div class="an-dist-row">
-                <span class="an-dist-label">{{ range.label }}</span>
-                <div class="an-dist-bar-wrap">
-                    <div class="an-dist-bar">
-                        <div class="an-dist-fill {% if range.label == '85-100' %}an-dist-fill--top{% elif range.label == 'Below 40' %}an-dist-fill--low{% endif %}" style="width: {{ range.percentage|floatformat:0 }}%;"></div>
-                    </div>
-                </div>
-                <span class="an-dist-count">{{ range.count }}</span>
-                <span class="an-dist-pct">{{ range.percentage|floatformat:0 }}%</span>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
+        {% endfor %}
+    </div>
     {% endif %}
 
     {% else %}
-
-    {# ── Empty State ── #}
-    <div class="an-empty" style="animation: pp-scaleIn 0.4s ease both;">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
-            <line x1="12" y1="20" x2="12" y2="10"></line>
-            <line x1="18" y1="20" x2="18" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="16"></line>
-        </svg>
+    <div class="an-empty">
         <h3>No analytics data yet</h3>
-        <p class="muted">Start inviting candidates to see performance insights and trends.</p>
-        <a href="{% url 'clients:assessments' %}" class="btn btn-pill" style="margin-top: 1.25rem;">Go to Assessments</a>
+        <p>Start inviting candidates to see performance insights.</p>
+        <a href="{% url 'clients:assessments' %}">Go to Assessments →</a>
     </div>
-
     {% endif %}
 
 </div>
@@ -255,77 +143,31 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function() {
-    const chartData = JSON.parse(document.getElementById('chart-data').textContent);
-    const orange = 'rgba(255, 138, 0, 1)';
-    const orangeLight = 'rgba(255, 138, 0, 0.08)';
-    const navy = 'rgba(14, 20, 40, 1)';
-    const navyLight = 'rgba(14, 20, 40, 0.06)';
-    const grid = 'rgba(14, 20, 40, 0.06)';
-    const font = { family: "'Inter', -apple-system, sans-serif", size: 11, weight: '500' };
-
-    const baseOpts = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: true, position: 'bottom', labels: { font, usePointStyle: true, pointStyle: 'circle', padding: 16 } },
-            tooltip: {
-                backgroundColor: '#0e1428',
-                titleFont: { ...font, size: 12 },
-                bodyFont: { ...font, size: 12 },
-                cornerRadius: 8,
-                padding: 10,
-            },
-        },
-        scales: {
-            y: { beginAtZero: true, grid: { color: grid, drawBorder: false }, ticks: { font, padding: 8 } },
-            x: { grid: { display: false }, ticks: { font, padding: 8 } },
-        },
+    const d = JSON.parse(document.getElementById('chart-data').textContent);
+    const orange = '#ff8a00', navy = '#0e1428', grid = '#f1f5f9';
+    const font = { family: "'Manrope', sans-serif", size: 11 };
+    const opts = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { font, usePointStyle: true, padding: 12 } }, tooltip: { backgroundColor: '#0e1428', cornerRadius: 6, padding: 8 } },
+        scales: { y: { beginAtZero: true, grid: { color: grid }, ticks: { font } }, x: { grid: { display: false }, ticks: { font } } },
     };
 
-    /* Activity Trend */
-    const trendCtx = document.getElementById('trendChart');
-    if (trendCtx && chartData.trend.length > 0) {
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: chartData.trend.map(d => d.date),
-                datasets: [
-                    { label: 'Invites', data: chartData.trend.map(d => d.count), borderColor: orange, backgroundColor: orangeLight, tension: 0.35, fill: true, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5 },
-                    { label: 'Completed', data: chartData.trend.map(d => d.completed), borderColor: navy, backgroundColor: navyLight, tension: 0.35, fill: true, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5 },
-                ]
-            },
-            options: baseOpts,
-        });
-    }
+    const t = document.getElementById('trendChart');
+    if (t && d.trend.length) new Chart(t, {
+        type: 'line',
+        data: { labels: d.trend.map(r => r.date), datasets: [
+            { label: 'Invites', data: d.trend.map(r => r.count), borderColor: orange, tension: .3, borderWidth: 2, pointRadius: 2, fill: false },
+            { label: 'Completed', data: d.trend.map(r => r.completed), borderColor: navy, tension: .3, borderWidth: 2, pointRadius: 2, fill: false },
+        ]}, options: opts
+    });
 
-    /* Assessment Breakdown */
-    const brkCtx = document.getElementById('breakdownChart');
-    if (brkCtx && chartData.breakdown.length > 0) {
-        new Chart(brkCtx, {
-            type: 'bar',
-            data: {
-                labels: chartData.breakdown.map(d => d.label),
-                datasets: [{
-                    label: 'Completion %',
-                    data: chartData.breakdown.map(d => d.completion_rate),
-                    backgroundColor: orange,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                    barPercentage: 0.6,
-                }]
-            },
-            options: {
-                ...baseOpts,
-                plugins: { ...baseOpts.plugins, legend: { display: false } },
-                scales: {
-                    ...baseOpts.scales,
-                    y: { ...baseOpts.scales.y, max: 100, ticks: { ...baseOpts.scales.y.ticks, callback: v => v + '%' } },
-                },
-            },
-        });
-    }
+    const b = document.getElementById('breakdownChart');
+    if (b && d.breakdown.length) new Chart(b, {
+        type: 'bar',
+        data: { labels: d.breakdown.map(r => r.label), datasets: [{ data: d.breakdown.map(r => r.completion_rate), backgroundColor: orange, borderRadius: 4, barPercentage: .6 }] },
+        options: { ...opts, plugins: { ...opts.plugins, legend: { display: false } }, scales: { ...opts.scales, y: { ...opts.scales.y, max: 100, ticks: { ...opts.scales.y.ticks, callback: v => v + '%' } } } }
+    });
 })();
 </script>
 {% endif %}
-
 {% endblock %}
