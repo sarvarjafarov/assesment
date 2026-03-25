@@ -1,75 +1,55 @@
 {% extends 'portal_base.html' %}
-{% load static %}
-{% load humanize %}
+{% load static humanize %}
 {% block title %}Assessments · Evalon{% endblock %}
 {% block meta_description %}Browse and manage your assessment catalog - invite candidates and track progress.{% endblock %}
 {% block portal_content %}
+<style>
+.as-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem 2rem;border-bottom:1px solid #e5e7eb}
+.as-header h1{font-size:1.35rem;font-weight:700;color:#0e1428;margin:0}
+.as-header span{color:#64748b;font-size:.85rem}
+.as-header a{font-size:.8rem;color:#64748b;text-decoration:none}
+.as-toolbar{display:flex;align-items:center;gap:1rem;padding:.75rem 2rem;border-bottom:1px solid #f1f5f9;background:#fafbfc}
+.as-toolbar input{flex:1;padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:.82rem;max-width:240px}
+.as-toolbar input:focus{outline:none;border-color:#ff8a00}
+.as-filters{display:flex;gap:4px}
+.as-filter{padding:4px 10px;border:none;background:none;font-size:.78rem;font-weight:600;color:#94a3b8;cursor:pointer;border-radius:4px}
+.as-filter.active{color:#0e1428;background:#e5e7eb}
+.as-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0}
+.as-card{display:block;padding:1.25rem 2rem;border-bottom:1px solid #f1f5f9;text-decoration:none;color:#334155;transition:background .15s}
+.as-card:hover{background:#fafbfc}
+.as-card h3{font-size:.9rem;font-weight:700;color:#0e1428;margin:0 0 .25rem}
+.as-card p{font-size:.78rem;color:#94a3b8;margin:0 0 .75rem}
+.as-card-stats{display:flex;gap:1.5rem;font-size:.78rem}
+.as-card-stats span{color:#64748b}
+.as-card-stats strong{color:#0e1428}
+.as-progress{height:3px;background:#f1f5f9;border-radius:2px;margin-top:.75rem}
+.as-progress-fill{height:100%;background:#ff8a00;border-radius:2px}
+.as-card-foot{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.75rem}
+.as-manage{color:#ff8a00;font-weight:600}
+.as-in-progress{color:#94a3b8}
+.as-empty{text-align:center;padding:4rem 2rem;color:#94a3b8}
+.as-empty h3{color:#334155;margin:.5rem 0}
+.as-help{display:flex;align-items:center;gap:.75rem;padding:1rem 2rem;border-top:1px solid #f1f5f9;font-size:.82rem;color:#64748b}
+.as-help a{color:#ff8a00;font-weight:600;text-decoration:none}
+.as-no-results{padding:2rem;text-align:center;color:#94a3b8}
+</style>
+
 <div class="portal-shell">
 
-    {# ── Dark Hero Header ── #}
-    <header class="as-header" style="background: linear-gradient(135deg, #0e1428 0%, #1a1e3a 100%); position: relative; overflow: hidden; border-radius: 16px; padding: 2.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-        <div style="position: absolute; top: -40%; right: -10%; width: 420px; height: 420px; background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%); pointer-events: none;"></div>
-        <div style="position: absolute; bottom: -60%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255, 138, 0, 0.08) 0%, transparent 70%); pointer-events: none;"></div>
-        <div style="position: relative; z-index: 1;">
-            <h1 style="color: #ffffff; font-size: 1.75rem; font-weight: 700; margin: 0 0 0.35rem 0; animation: pp-fadeUp 0.5s ease both;">Assessments</h1>
-            <p style="color: rgba(255,255,255,0.55); font-size: 0.95rem; margin: 0; animation: pp-fadeUp 0.5s ease 0.1s both;">{{ allowed_assessments|length }} assessment{{ allowed_assessments|length|pluralize }} in your catalog</p>
+    <div class="as-header">
+        <div>
+            <h1>Assessments</h1>
+            <span>{{ allowed_assessments|length }} assessment{{ allowed_assessments|length|pluralize }} in your catalog</span>
         </div>
         {% if can_manage_invites %}
-        <a href="{{ activity_export_url }}" class="btn btn-outline small" style="color: #ffffff; border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); position: relative; z-index: 1; animation: pp-fadeUp 0.5s ease 0.15s both;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Export Data
-        </a>
+        <a href="{{ activity_export_url }}">Export CSV</a>
         {% endif %}
-    </header>
-
-    {# ── Assessment Tabs ── #}
-    {% include 'includes/_assessment_tabs.html' %}
-
-    {# ── Stats Strip ── #}
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; animation: pp-fadeUp 0.5s ease 0.2s both;">
-        <div style="background: #fff; border-radius: 12px; padding: 1.25rem 1rem; border: 1px solid rgba(14,20,40,0.06); text-align: center;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: rgba(99,102,241,0.1); margin-bottom: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-            </div>
-            <div style="font-size: 1.35rem; font-weight: 700; color: #0e1428;">{{ allowed_assessments|length }}</div>
-            <div style="font-size: 0.78rem; color: #6b7280; font-weight: 500;">Assessment Types</div>
-        </div>
-        <div style="background: #fff; border-radius: 12px; padding: 1.25rem 1rem; border: 1px solid rgba(14,20,40,0.06); text-align: center;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: rgba(16,185,129,0.1); margin-bottom: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-            <div style="font-size: 1.35rem; font-weight: 700; color: #0e1428;">{{ total_completed|default:"—" }}</div>
-            <div style="font-size: 0.78rem; color: #6b7280; font-weight: 500;">Completed</div>
-        </div>
-        <div style="background: #fff; border-radius: 12px; padding: 1.25rem 1rem; border: 1px solid rgba(14,20,40,0.06); text-align: center;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: rgba(255,138,0,0.1); margin-bottom: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff8a00" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            </div>
-            <div style="font-size: 1.35rem; font-weight: 700; color: #0e1428;">{{ total_in_progress|default:"—" }}</div>
-            <div style="font-size: 0.78rem; color: #6b7280; font-weight: 500;">In Progress</div>
-        </div>
-        <div style="background: #fff; border-radius: 12px; padding: 1.25rem 1rem; border: 1px solid rgba(14,20,40,0.06); text-align: center;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: rgba(239,68,68,0.1); margin-bottom: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
-            </div>
-            <div style="font-size: 1.35rem; font-weight: 700; color: #0e1428;">{{ total_invites|default:"—" }}</div>
-            <div style="font-size: 0.78rem; color: #6b7280; font-weight: 500;">Total Invites</div>
-        </div>
     </div>
 
-    {# ── Search + Filter ── #}
+    {% include 'includes/_assessment_tabs.html' %}
+
     <div class="as-toolbar">
-        <div class="as-search">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <input type="text" id="assessment-search" placeholder="Search assessments..." autocomplete="off">
-        </div>
+        <input type="text" id="assessment-search" placeholder="Search assessments...">
         <div class="as-filters">
             <button class="as-filter active" data-filter="all">All</button>
             <button class="as-filter" data-filter="active">Active</button>
@@ -77,63 +57,25 @@
         </div>
     </div>
 
-    {# ── Assessment Grid ── #}
     {% if allowed_assessments %}
     <div class="as-grid" id="as-grid">
         {% for assessment in allowed_assessments %}
         <a href="{{ assessment.manage_url }}" class="as-card"
            data-code="{{ assessment.code }}"
            data-label="{{ assessment.label|lower }}"
-           data-has-invites="{% if assessment.metrics.total_invites %}true{% else %}false{% endif %}"
-           style="border-left: 4px solid {% if assessment.code == 'marketing' %}#6366f1{% elif assessment.code == 'product' %}#ff8a00{% elif assessment.code == 'behavioral' %}#10b981{% elif assessment.code == 'ux_design' %}#ec4899{% elif assessment.code == 'hr' %}#06b6d4{% elif assessment.code == 'finance' %}#f59e0b{% else %}#8b5cf6{% endif %}; animation: pp-fadeUp 0.5s ease {{ forloop.counter0 }}00ms both;">
-
-            <div class="as-card-head">
-                <div class="as-icon" style="background: {% if assessment.code == 'marketing' %}rgba(99,102,241,0.1){% elif assessment.code == 'product' %}rgba(255,138,0,0.1){% elif assessment.code == 'behavioral' %}rgba(16,185,129,0.1){% elif assessment.code == 'ux_design' %}rgba(236,72,153,0.1){% elif assessment.code == 'hr' %}rgba(6,182,212,0.1){% elif assessment.code == 'finance' %}rgba(245,158,11,0.1){% else %}rgba(139,92,246,0.1){% endif %}; color: {% if assessment.code == 'marketing' %}#6366f1{% elif assessment.code == 'product' %}#ff8a00{% elif assessment.code == 'behavioral' %}#10b981{% elif assessment.code == 'ux_design' %}#ec4899{% elif assessment.code == 'hr' %}#06b6d4{% elif assessment.code == 'finance' %}#f59e0b{% else %}#8b5cf6{% endif %};">
-                    {% if assessment.code == 'marketing' %}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
-                    {% elif assessment.code == 'product' %}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                    {% elif assessment.code == 'behavioral' %}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    {% elif assessment.code == 'ux_design' %}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-                    {% elif assessment.code == 'hr' %}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="17" y1="11" x2="23" y2="11"></line><line x1="20" y1="8" x2="20" y2="14"></line></svg>
-                    {% elif assessment.code == 'finance' %}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                    {% else %}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                    {% endif %}
-                </div>
-                <div class="as-title-area">
-                    <h3>{{ assessment.label }}</h3>
-                    <p>{{ assessment.description }}</p>
-                </div>
+           data-has-invites="{% if assessment.metrics.total_invites %}true{% else %}false{% endif %}">
+            <h3>{{ assessment.label }}</h3>
+            <p>{{ assessment.description }}</p>
+            <div class="as-card-stats">
+                <span><strong>{{ assessment.metrics.total_invites|default:0 }}</strong> invites</span>
+                <span><strong>{{ assessment.metrics.completed_invites|default:0 }}</strong> completed</span>
+                <span><strong>{% if assessment.metrics.completion_rate is not None %}{{ assessment.metrics.completion_rate|floatformat:0 }}%{% else %}—{% endif %}</strong> rate</span>
             </div>
-
-            <div class="as-stats">
-                <div class="as-stat">
-                    <span class="as-stat-num">{{ assessment.metrics.total_invites|default:0 }}</span>
-                    <span class="as-stat-lbl">Invites</span>
-                </div>
-                <div class="as-stat">
-                    <span class="as-stat-num">{{ assessment.metrics.completed_invites|default:0 }}</span>
-                    <span class="as-stat-lbl">Completed</span>
-                </div>
-                <div class="as-stat">
-                    <span class="as-stat-num {% if assessment.metrics.completion_rate is not None %}as-stat-highlight{% endif %}">
-                        {% if assessment.metrics.completion_rate is not None %}{{ assessment.metrics.completion_rate|floatformat:0 }}%{% else %}—{% endif %}
-                    </span>
-                    <span class="as-stat-lbl">Rate</span>
-                </div>
-            </div>
-
             {% if assessment.metrics.total_invites %}
             <div class="as-progress">
-                <div class="as-progress-fill" style="width: {% if assessment.metrics.completion_rate is not None %}{{ assessment.metrics.completion_rate|floatformat:0 }}{% else %}0{% endif %}%; background: linear-gradient(90deg, {% if assessment.code == 'marketing' %}#6366f1, #818cf8{% elif assessment.code == 'product' %}#ff8a00, #ffb347{% elif assessment.code == 'behavioral' %}#10b981, #34d399{% elif assessment.code == 'ux_design' %}#ec4899, #f472b6{% elif assessment.code == 'hr' %}#06b6d4, #22d3ee{% elif assessment.code == 'finance' %}#f59e0b, #fbbf24{% else %}#8b5cf6, #a78bfa{% endif %});"></div>
+                <div class="as-progress-fill" style="width:{% if assessment.metrics.completion_rate is not None %}{{ assessment.metrics.completion_rate|floatformat:0 }}{% else %}0{% endif %}%"></div>
             </div>
             {% endif %}
-
             <div class="as-card-foot">
                 <span class="as-manage">Manage →</span>
                 {% if assessment.metrics.in_progress_invites %}
@@ -144,30 +86,16 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="as-empty" style="animation: pp-scaleIn 0.4s ease both;">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.2; color: var(--color-orange); margin-bottom: 1rem;">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-        </svg>
+    <div class="as-empty">
         <h3>No assessments available</h3>
-        <p class="muted">Contact support to add assessments to your account.</p>
+        <p>Contact support to add assessments to your account.</p>
     </div>
     {% endif %}
 
-    {# ── Help ── #}
-    <div class="as-help" style="animation: pp-fadeUp 0.5s ease 0.4s both;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        <div>
-            <strong>Need help choosing an assessment?</strong>
-            <span class="muted"> Our team can guide you. </span>
-            <a href="mailto:support@evalon.app" class="as-help-link">Contact Support →</a>
-        </div>
+    <div class="as-help">
+        <strong>Need help choosing?</strong>
+        <a href="mailto:support@evalon.app">Contact Support →</a>
     </div>
-
 </div>
 
 <script>
@@ -176,13 +104,10 @@
     const filters = document.querySelectorAll('.as-filter');
     const cards = document.querySelectorAll('.as-card');
     let filter = 'all', query = '';
-
     function run() {
         let visible = 0;
         cards.forEach(c => {
-            const lbl = (c.dataset.label || '');
-            const code = (c.dataset.code || '');
-            const has = c.dataset.hasInvites === 'true';
+            const lbl = (c.dataset.label || ''), code = (c.dataset.code || ''), has = c.dataset.hasInvites === 'true';
             const sm = !query || lbl.includes(query) || code.includes(query);
             const fm = filter === 'all' || (filter === 'active' && has) || (filter === 'unused' && !has);
             c.style.display = sm && fm ? '' : 'none';
@@ -191,22 +116,11 @@
         const grid = document.getElementById('as-grid');
         if (!grid) return;
         let empty = grid.querySelector('.as-no-results');
-        if (visible === 0 && !empty) {
-            empty = document.createElement('div');
-            empty.className = 'as-no-results';
-            empty.innerHTML = '<p class="muted">No assessments match your search.</p>';
-            grid.appendChild(empty);
-        } else if (visible > 0 && empty) {
-            empty.remove();
-        }
+        if (visible === 0 && !empty) { empty = document.createElement('div'); empty.className = 'as-no-results'; empty.innerHTML = '<p>No assessments match your search.</p>'; grid.appendChild(empty); }
+        else if (visible > 0 && empty) { empty.remove(); }
     }
     if (search) search.addEventListener('input', e => { query = e.target.value.toLowerCase(); run(); });
-    filters.forEach(b => b.addEventListener('click', () => {
-        filters.forEach(f => f.classList.remove('active'));
-        b.classList.add('active');
-        filter = b.dataset.filter;
-        run();
-    }));
+    filters.forEach(b => b.addEventListener('click', () => { filters.forEach(f => f.classList.remove('active')); b.classList.add('active'); filter = b.dataset.filter; run(); }));
 })();
 </script>
 {% endblock %}
