@@ -651,7 +651,7 @@ class ClientProject(TimeStampedModel):
         help_text="Assessment candidates take when applying via public careers page",
     )
     magic_token = models.CharField(
-        max_length=32, unique=True, blank=True, db_index=True,
+        max_length=32, blank=True, db_index=True,
         help_text="Shareable invite link token",
     )
 
