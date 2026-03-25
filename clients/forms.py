@@ -184,6 +184,83 @@ class ClientSignupForm(forms.ModelForm):
         return account
 
 
+class SimpleSignupForm(forms.Form):
+    """Minimal 3-field signup form — name, email, password."""
+
+    full_name = forms.CharField(
+        max_length=120,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Your full name",
+            "autocomplete": "name",
+        }),
+    )
+    email = forms.EmailField(
+        max_length=254,
+        widget=forms.EmailInput(attrs={
+            "placeholder": "you@company.com",
+            "autocomplete": "email",
+        }),
+    )
+    password1 = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={
+            "placeholder": "Minimum 8 characters",
+            "autocomplete": "new-password",
+        }),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].lower().strip()
+        if ClientAccount.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with this email already exists.")
+        return email
+
+    def clean_password1(self):
+        pw = self.cleaned_data.get("password1", "")
+        if len(pw) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters.")
+        return pw
+
+    @transaction.atomic
+    def save(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        email = self.cleaned_data["email"]
+        full_name = self.cleaned_data["full_name"]
+        password = self.cleaned_data["password1"]
+        parts = full_name.split()
+
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            first_name=parts[0] if parts else "",
+            last_name=" ".join(parts[1:]) if len(parts) > 1 else "",
+        )
+        user.is_active = True
+        user.save()
+
+        account = ClientAccount(
+            user=user,
+            email=email,
+            full_name=full_name,
+            company_name="",
+            phone_number="",
+            employee_size="1-10",
+            status="approved",
+            auth_provider="email",
+        )
+        account.email_verified_at = timezone.now()
+        account.save()
+
+        account.allowed_assessments = [
+            "marketing", "product", "behavioral", "ux_design", "hr", "finance",
+        ]
+        account.save(update_fields=["allowed_assessments"])
+        return account
+
+
 class ClientLoginForm(AuthenticationForm):
     username = forms.EmailField(label="Email address")
 

@@ -46,6 +46,7 @@ from .forms import (
     ClientHRInviteForm,
     ClientFinanceInviteForm,
     ClientSignupForm,
+    SimpleSignupForm,
     ClientSessionNoteForm,
     EmailPreferencesForm,
     HiringProjectForm,
@@ -413,38 +414,29 @@ def build_activity_feed(account: ClientAccount, dataset_map: dict, filters: dict
 
 class ClientSignupView(FormView):
     template_name = "clients/signup.html"
-    form_class = ClientSignupForm
-    success_url = reverse_lazy("clients:signup-complete")
+    form_class = SimpleSignupForm
+    success_url = reverse_lazy("clients:dashboard")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("clients:dashboard")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         try:
             account = form.save()
         except Exception as e:
             logger.exception("Client signup failed: %s", e)
-            if isinstance(e, ValidationError):
-                msg_list = getattr(e, "messages", None) or getattr(e, "message_list", None)
-                msg = msg_list[0] if msg_list else str(e)
-                form.add_error(None, msg)
-                return self.form_invalid(form)
-            raise
-        # Send verification email with new service
-        email_sent = send_verification_email(account)
-        if email_sent:
-            messages.success(
-                self.request,
-                "Thanks for signing up! Please check your inbox to verify your email address.",
-            )
-        else:
-            messages.warning(
-                self.request,
-                "Account created, but we couldn't send the verification email. Please contact support.",
-            )
+            form.add_error(None, "Something went wrong. Please try again.")
+            return self.form_invalid(form)
+        # Auto-login
+        from django.contrib.auth import login
+        login(self.request, account.user, backend="django.contrib.auth.backends.ModelBackend")
+        messages.success(
+            self.request,
+            f"Welcome to Evalon, {account.full_name.split()[0]}! Let's set up your first assessment.",
+        )
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["assessment_details"] = ClientAccount.ASSESSMENT_DETAILS
-        return context
 
 
 class ClientSignupCompleteView(TemplateView):
