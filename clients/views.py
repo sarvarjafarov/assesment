@@ -3505,3 +3505,108 @@ class ApplicationSendAssessmentView(ClientProjectAccessMixin, View):
             messages.success(request, f"Assessment session created for {application.email}.")
 
         return redirect("clients:application-detail", application_uuid=application.uuid)
+
+
+@login_required
+def ai_auto_setup(request):
+    """Parse a job description with AI and create a position automatically."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    account = getattr(request.user, "clientaccount", None) or getattr(
+        request.user, "client_account", None
+    )
+    if not account:
+        return JsonResponse({"error": "No client account"}, status=403)
+
+    job_description = request.POST.get("job_description", "").strip()
+    if not job_description or len(job_description) < 30:
+        return JsonResponse(
+            {"error": "Please paste a longer job description (at least 30 characters)."},
+            status=400,
+        )
+
+    remaining = account.remaining_projects()
+    if remaining is not None and remaining <= 0:
+        return JsonResponse(
+            {"error": "Position limit reached. Archive a position or upgrade your plan."},
+            status=400,
+        )
+
+    import anthropic
+
+    prompt = f"""Analyze this job description and extract structured data. Return ONLY valid JSON:
+
+{{
+  "title": "exact job title",
+  "department": "one of: marketing, product, engineering, design, hr, finance, operations, sales, other",
+  "assessment_type": "best match from: marketing, product, behavioral, ux_design, hr, finance",
+  "role_level": "one of: junior, mid, senior",
+  "employment_type": "one of: full_time, part_time, contract, internship, freelance",
+  "work_model": "one of: onsite, remote, hybrid",
+  "location": "city/country or empty string",
+  "required_skills": "comma-separated top 5-8 skills",
+  "description": "2-3 sentence summary",
+  "responsibilities": "top 5 responsibilities, one per line",
+  "requirements": "top 5 requirements, one per line",
+  "nice_to_haves": "top 3 nice-to-haves, one per line"
+}}
+
+Job Description:
+{job_description[:3000]}"""
+
+    try:
+        client = anthropic.Anthropic(timeout=20.0)
+        response = client.messages.create(
+            model="claude-haiku-4-5-20250901",
+            max_tokens=1000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = response.content[0].text.strip()
+        if "```" in raw:
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        data = json.loads(raw)
+    except Exception as e:
+        logger.warning("AI auto-setup parse failed: %s", e)
+        return JsonResponse(
+            {"error": "Could not parse the job description. Please try again."},
+            status=500,
+        )
+
+    valid_types = ["marketing", "product", "behavioral", "ux_design", "hr", "finance"]
+    assessment_type = data.get("assessment_type", "behavioral")
+    if assessment_type not in valid_types:
+        assessment_type = "behavioral"
+
+    project = ClientProject.objects.create(
+        client=account,
+        title=data.get("title", "Untitled Position"),
+        department=data.get("department", ""),
+        assessment_type=assessment_type,
+        role_level=data.get("role_level", "mid"),
+        employment_type=data.get("employment_type", "full_time"),
+        work_model=data.get("work_model", ""),
+        location=data.get("location", ""),
+        required_skills=data.get("required_skills", ""),
+        description=data.get("description", ""),
+        responsibilities=data.get("responsibilities", ""),
+        requirements=data.get("requirements", ""),
+        nice_to_haves=data.get("nice_to_haves", ""),
+        status="active",
+        published=True,
+    )
+
+    return JsonResponse({
+        "ok": True,
+        "project": {
+            "id": project.id,
+            "uuid": str(project.uuid),
+            "title": project.title,
+            "assessment_type": project.assessment_type,
+            "role_level": project.role_level,
+            "department": project.department,
+        },
+        "redirect": reverse("clients:project-detail", kwargs={"project_uuid": project.uuid}),
+    })
